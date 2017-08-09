@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SimpleChat</string>
+
+    <string name="account">账号</string>
+    <string name="password">密码</string>
+    <string name="no_account_goto_sign_up"><![CDATA[没有账号？ >>去注册]]></string>
+</resources>
