@@ -196,14 +196,22 @@ public class BaseActivity extends AppCompatActivity {
      * log日志，等级为V
      * */
     public  <T> void v(T msg) {
-        Log.v(TAG, msg.toString());
+        if (msg == null) {
+            Log.e(TAG, "null");
+        } else {
+            Log.v(TAG, msg.toString());
+        }
     }
 
     /**
      * log日志，等级为D
      * */
     public  <T> void d(T msg) {
-        Log.d(TAG, msg.toString());
+        if (msg == null) {
+            Log.e(TAG, "null");
+        } else {
+            Log.d(TAG, msg.toString());
+        }
     }
 
 
@@ -211,7 +219,12 @@ public class BaseActivity extends AppCompatActivity {
      * log日志，等级为I
      * */
     public  <T> void i(T msg) {
-        Log.i(TAG, msg.toString());
+        if (msg == null) {
+            Log.e(TAG, "null");
+        } else {
+            Log.i(TAG, msg.toString());
+        }
+
     }
 
 
@@ -219,7 +232,11 @@ public class BaseActivity extends AppCompatActivity {
      * log日志，等级为W
      * */
     public  <T> void w(T msg) {
-        Log.w(TAG, msg.toString());
+        if (msg == null) {
+            Log.e(TAG, "null");
+        } else {
+            Log.w(TAG, msg.toString());
+        }
     }
 
 
@@ -227,7 +244,11 @@ public class BaseActivity extends AppCompatActivity {
      * log日志，等级为E
      * */
     public  <T> void e(T msg) {
-        Log.e(TAG, msg.toString());
+        if (msg == null) {
+            Log.e(TAG, "null");
+        } else {
+            Log.e(TAG, msg.toString());
+        }
     }
 
 }

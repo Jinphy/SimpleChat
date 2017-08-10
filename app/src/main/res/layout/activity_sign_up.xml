@@ -34,4 +34,5 @@
     </android.support.design.widget.CoordinatorLayout>
 
     <include layout="@layout/layout_appbar"/>
+
 </FrameLayout>

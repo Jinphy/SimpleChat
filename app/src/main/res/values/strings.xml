@@ -4,4 +4,9 @@
     <string name="account">账号</string>
     <string name="password">密码</string>
     <string name="no_account_goto_sign_up"><![CDATA[没有账号？ >>去注册]]></string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign up</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

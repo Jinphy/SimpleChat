@@ -1,8 +1,13 @@
 package com.example.jinphy.simplechat.modules.login;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -13,6 +18,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +30,10 @@ public class LoginFragment extends Fragment  implements LoginContract.View{
 
     private TextInputEditText accountText;
     private TextInputEditText passwordText;
+    private View gotoSignUp;
+    private FloatingActionButton fab;
+
+    private LoginActivity activity;
 
 
     public LoginFragment() {
@@ -49,19 +59,56 @@ public class LoginFragment extends Fragment  implements LoginContract.View{
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        activity = null;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        activity = (LoginActivity) getActivity();
+
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_login, container, false);
 
-        accountText = root.findViewById(R.id.account_text);
-        passwordText = root.findViewById(R.id.password_text);
+        initView(root);
+
+        initData();
 
         return root;
     }
 
-    @Override
-    public void setPresenter(Object presenter) {
 
+    @Override
+    public void setPresenter(LoginContract.Presenter presenter) {
+
+    }
+
+    @Override
+    public void initView(View view) {
+
+        accountText = view.findViewById(R.id.account_text);
+        passwordText = view.findViewById(R.id.password_text);
+        gotoSignUp = view.findViewById(R.id.goto_sign_up_text);
+        gotoSignUp.setOnClickListener(this::showSignUp);
+        fab = getActivity().findViewById(R.id.fab_login);
+        fab.setOnClickListener(this::fabAction);
+
+    }
+
+    @Override
+    public void initData() {
+
+    }
+
+    @Override
+    public void showSignUp(View view) {
+        Intent intent = new Intent(getActivity(), SignUpActivity.class);
+        startActivity(intent);
+    }
+
+    private void fabAction(View view) {
+        activity.showSnack(view,"you click the fab!");
     }
 }

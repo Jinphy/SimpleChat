@@ -1,7 +1,8 @@
-package com.example.jinphy.simplechat;
+package com.example.jinphy.simplechat.modules.main;
 
 import android.os.Bundle;
 
+import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
 
 public class MainActivity extends BaseActivity {
@@ -11,4 +12,5 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
+
 }
