@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SimpleChat</string>
+    <string name="app_name">Simple Chat</string>
 
     <string name="account">账号</string>
     <string name="password">密码</string>
@@ -9,4 +9,12 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="self">自己</string>
+    <string name="routine">日常</string>
+    <string name="friends">朋友</string>
+    <string name="friend_remark">备注：</string>
+    <string name="friend_account">账号：</string>
+    <string name="friend_address">地址：</string>
+    <string name="friend_date">日期：</string>
+    <string name="social">社交</string>
 </resources>

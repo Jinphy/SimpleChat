@@ -1,28 +1,30 @@
-package com.example.jinphy.simplechat.modules.signup;
+package com.example.jinphy.simplechat.modules.main.self;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link SignUpFragment#newInstance} factory method to
+ * Use the {@link SelfFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SignUpFragment extends Fragment implements SignUpContract.View {
+public class SelfFragment extends Fragment implements SelfContract.View {
+
+    private MainFragment fragment;
+
+    private SelfContract.Presenter presenter;
 
 
-    private SignUpActivity activity;
-
-    private SignUpContract.Presenter presenter;
-
-
-    public SignUpFragment() {
+    public SelfFragment() {
         // Required empty public constructor
     }
 
@@ -30,26 +32,26 @@ public class SignUpFragment extends Fragment implements SignUpContract.View {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment SignUpFragment.
+     * @return A new instance of fragment FriendsFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static SignUpFragment newInstance() {
-        SignUpFragment fragment = new SignUpFragment();
+    public static SelfFragment newInstance(MainFragment mainFragment) {
+        SelfFragment fragment = new SelfFragment();
+        fragment.setMainFragment(mainFragment);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        this.activity = (SignUpActivity) getActivity();
+        if (getArguments() != null) {
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         if (this.presenter == null) {
-            this.presenter = activity.getPresenter(this);
+            this.presenter = fragment.getSelfPresenter(this);
         }
         this.presenter.start();
     }
@@ -58,11 +60,17 @@ public class SignUpFragment extends Fragment implements SignUpContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sign_up, container, false);
+        View root = inflater.inflate(R.layout.fragment_self, container, false);
+
+        initView(root);
+
+        initData();
+
+        return root;
     }
 
     @Override
-    public void setPresenter(SignUpContract.Presenter presenter) {
+    public void setPresenter(SelfContract.Presenter presenter) {
         this.presenter = Preconditions.checkNotNull(presenter);
     }
 
@@ -74,5 +82,10 @@ public class SignUpFragment extends Fragment implements SignUpContract.View {
     @Override
     public void initData() {
 
+    }
+
+    @Override
+    public void setMainFragment(@NonNull MainFragment mainFragment) {
+        this.fragment = Preconditions.checkNotNull(mainFragment);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.modules.signup;
 
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,10 +28,14 @@ public class SignUpActivity extends BaseActivity {
         actionBar.setTitle(R.string.sign_up);
 
         SignUpFragment fragment = SignUpFragment.newInstance();
-
         addFragment(fragment,R.id.fragment);
 
-        new SignUpPresenter(fragment);
+        getPresenter(fragment);
+    }
+
+    @Override
+    public SignUpPresenter getPresenter(Fragment fragment) {
+        return new SignUpPresenter((SignUpContract.View) fragment);
     }
 
     @Override
@@ -38,4 +43,6 @@ public class SignUpActivity extends BaseActivity {
         onBackPressed();
         return true;
     }
+
+
 }

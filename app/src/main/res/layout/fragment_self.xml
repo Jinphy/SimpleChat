@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                tools:context="com.example.jinphy.simplechat.modules.main.self.SelfFragment">
+
+    <!--<android.support.v7.widget.CardView-->
+        <!--android:id="@+id/head_view"-->
+        <!--app:cardBackgroundColor="@color/colorPrimaryDark"-->
+        <!--app:cardElevation="@dimen/dimen_4dp"-->
+        <!--app:cardCornerRadius="0dp"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="300dp">-->
+        <!--<RelativeLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
+
+            <!--<de.hdodenhof.circleimageview.CircleImageView-->
+                <!--android:id="@+id/avatar"-->
+                <!--android:src="@drawable/ic_person_48dp"-->
+                <!--android:layout_centerInParent="true"-->
+                <!--android:elevation="@dimen/dimen_10dp"-->
+                <!--app:civ_fill_color="@color/colorPrimaryDark"-->
+                <!--app:civ_border_width="@dimen/dimen_3dp"-->
+                <!--app:civ_border_color="@color/white"-->
+                <!--android:layout_width="150dp"-->
+                <!--android:layout_height="150dp"/>-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/name"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentBottom="true"-->
+                <!--android:layout_alignParentLeft="true"-->
+                <!--android:layout_marginLeft="@dimen/dimen_12dp"-->
+                <!--android:layout_marginBottom="@dimen/dimen_12dp"-->
+                <!--android:textColor="#9fffffff"-->
+                <!--android:textSize="18sp"-->
+                <!--android:text="Jinphy"/>-->
+
+        <!--</RelativeLayout>-->
+
+    <!--</android.support.v7.widget.CardView>-->
+
+
+</RelativeLayout>

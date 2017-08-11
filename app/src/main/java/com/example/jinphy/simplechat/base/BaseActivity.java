@@ -14,7 +14,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.jinphy.simplechat.utils.Preconditions.checkNotNull;
 
@@ -22,7 +24,7 @@ import static com.example.jinphy.simplechat.utils.Preconditions.checkNotNull;
  * Created by jinphy on 2017/8/9.
  */
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     private static List<AppCompatActivity> activities = new ArrayList<>();
 
@@ -43,6 +45,10 @@ public class BaseActivity extends AppCompatActivity {
         super.onDestroy();
         activities.remove(this);
     }
+
+
+    public abstract <T> T getPresenter(Fragment fragment) ;
+
 
     /**
      *

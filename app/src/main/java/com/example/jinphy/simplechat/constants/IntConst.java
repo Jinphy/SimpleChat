@@ -7,4 +7,5 @@ package com.example.jinphy.simplechat.constants;
 public class IntConst {
 
     public static final int DURATION_1500 = 1500;
+    public static final int DURATION_500 = 500;
 }

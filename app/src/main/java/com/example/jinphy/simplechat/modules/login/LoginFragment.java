@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
+import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,6 +36,9 @@ public class LoginFragment extends Fragment  implements LoginContract.View{
 
     private LoginActivity activity;
 
+    private LoginContract.Presenter presenter;
+
+
 
     public LoginFragment() {
         // Required empty public constructor
@@ -49,6 +53,15 @@ public class LoginFragment extends Fragment  implements LoginContract.View{
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
         return fragment;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (this.presenter == null) {
+            this.presenter = activity.getPresenter(this);
+        }
+        this.presenter.start();
     }
 
     @Override
@@ -82,7 +95,7 @@ public class LoginFragment extends Fragment  implements LoginContract.View{
 
     @Override
     public void setPresenter(LoginContract.Presenter presenter) {
-
+        this.presenter = Preconditions.checkNotNull(presenter);
     }
 
     @Override

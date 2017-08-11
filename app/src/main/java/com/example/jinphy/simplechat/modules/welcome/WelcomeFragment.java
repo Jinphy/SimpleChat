@@ -85,9 +85,10 @@ public class WelcomeFragment extends Fragment implements WelcomeContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        if (presenter != null) {
-            presenter.start();
+        if (presenter == null) {
+            presenter = activity.getPresenter(this);
         }
+        presenter.start();
     }
 
     @Override
@@ -149,6 +150,7 @@ public class WelcomeFragment extends Fragment implements WelcomeContract.View {
     public void showMainActivity() {
         Intent intent = new Intent(activity, MainActivity.class);
         startActivity(intent);
+        activity.finish();
     }
 
     @Override
@@ -159,7 +161,7 @@ public class WelcomeFragment extends Fragment implements WelcomeContract.View {
                 .setTranY(-100* ScreenUtils.getDensity(activity),0)
                 .setDuration(IntConst.DURATION_1500)
                 .setInterpolator(interpolator)
-                .onEnd(a->presenter.doAfterWelcome(activity))
+                .onEnd(a->presenter.doAfterWelcome(getContext()))
                 .animate();
         AnimUtils.just(startView)
                 .setAlpha(0f,1f)

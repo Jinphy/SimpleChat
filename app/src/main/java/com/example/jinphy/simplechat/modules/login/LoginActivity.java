@@ -1,9 +1,11 @@
 package com.example.jinphy.simplechat.modules.login;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
@@ -25,8 +27,10 @@ public class LoginActivity extends BaseActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_back_24dp);
         actionBar.setTitle(R.string.login);
 
-        LoginFragment loginFragment = LoginFragment.newInstance();
-        addFragment(loginFragment,R.id.fragment);
+        LoginFragment fragment = LoginFragment.newInstance();
+        addFragment(fragment, R.id.fragment);
+
+        getPresenter(fragment);
     }
 
     @Override
@@ -34,4 +38,13 @@ public class LoginActivity extends BaseActivity {
         onBackPressed();
         return true;
     }
+
+    @Override
+    public LoginPresenter getPresenter(Fragment fragment) {
+
+        return new LoginPresenter((LoginContract.View) fragment);
+
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.welcome;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
@@ -17,6 +18,13 @@ public class WelcomeActivity extends BaseActivity {
         WelcomeFragment fragment = WelcomeFragment.newInstance();
         addFragment(fragment,R.id.fragment);
 
-        new WelcomePresenter(fragment);
+        getPresenter(fragment);
+
+    }
+
+    @Override
+    public WelcomePresenter getPresenter(Fragment fragment) {
+
+        return new WelcomePresenter((WelcomeContract.View) fragment);
     }
 }
