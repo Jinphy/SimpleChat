@@ -1,9 +1,8 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -12,8 +11,8 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
-import com.example.jinphy.simplechat.modules.main.msg.MsgFragment;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;
@@ -29,6 +28,8 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
     private MainFragment fragment;
 
     private RoutineContract.Presenter presenter;
+
+    FloatingActionButton fab;
 
 
     public RoutineFragment() {
@@ -61,7 +62,21 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
             this.presenter = fragment.getRoutinePresenter(this);
         }
         this.presenter.start();
+
     }
+
+    @Override
+    public void initFab() {
+        fab = fragment.getActivity().findViewById(R.id.fab);
+        fab.setImageResource(R.drawable.ic_smile_24dp);
+        fab.setVisibility(View.VISIBLE);
+        fab.setScaleX(1);
+        fab.setScaleY(1);
+        fab.setTranslationY(-IntConst.TOOLBAR_HEIGHT);
+        fab.setOnClickListener(this::fabAction);
+    }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,12 +92,17 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
 
     @Override
     public void initView(View view) {
+
         GridLayout container = view.findViewById(R.id.grid_layout);
 
         List<CardView> items = getAllCardView(container);
 
         // TODO: 2017/8/11 设置图片，设置文字，设置点击监听,设置宽高
 
+
+    }
+    @Override
+    public void fabAction(View view) {
 
     }
 

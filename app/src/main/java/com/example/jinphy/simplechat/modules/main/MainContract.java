@@ -1,6 +1,8 @@
 package com.example.jinphy.simplechat.modules.main;
 
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
@@ -47,10 +49,21 @@ public interface MainContract {
 
         void showBar();
 
+        void setToolbarAlpha(float faction);
+
+        void setHeadViewTransY(float faction,int baseTransY,int distance);
+
+        void initFab();
+
+        int currentItemPosition();
+
+        boolean dispatchTouchEvent(MotionEvent event);
+
     }
 
 
     interface Presenter extends BasePresenter{
 
+        boolean dispatchTouchEvent(MotionEvent event);
     }
 }

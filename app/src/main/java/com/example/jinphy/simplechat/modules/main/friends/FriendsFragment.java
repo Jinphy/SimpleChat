@@ -66,11 +66,24 @@ public class FriendsFragment extends Fragment implements FriendsContract.View {
             this.presenter = fragment.getFriendsPresenter(this);
         }
         this.presenter.start();
+    }
+
+    @Override
+    public void initFab() {
+        this.fab = fragment.getActivity().findViewById(R.id.fab);
+        this.fab.setTranslationY(0);
+        this.fab.setVisibility(View.GONE);
         this.fab.setImageResource(R.drawable.ic_arrow_up_24dp);
         this.fab.setOnClickListener(this::fabAction);
     }
 
-    private void fabAction(View view) {
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void fabAction(View view) {
         fragment.showBar();
         recyclerView.smoothScrollToPosition(0);
     }
@@ -94,8 +107,6 @@ public class FriendsFragment extends Fragment implements FriendsContract.View {
 
     @Override
     public void initView(View view) {
-
-        fab = fragment.getActivity().findViewById(R.id.fab);
 
         recyclerView = view.findViewById(R.id.recycler_view);
 

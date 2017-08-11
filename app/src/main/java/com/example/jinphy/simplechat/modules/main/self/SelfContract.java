@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.main.self;
 
 import android.support.annotation.NonNull;
+import android.view.MotionEvent;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
@@ -15,6 +16,13 @@ public interface SelfContract {
     interface View extends BaseView<Presenter> {
 
         void setMainFragment(@NonNull MainFragment mainFragment);
+
+        void initFab();
+
+        void fabAction(android.view.View view);
+
+
+        boolean onTouch(MotionEvent event);
     }
 
     interface Presenter extends BasePresenter {

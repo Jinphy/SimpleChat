@@ -2,13 +2,16 @@ package com.example.jinphy.simplechat.modules.main.self;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
@@ -23,6 +26,7 @@ public class SelfFragment extends Fragment implements SelfContract.View {
 
     private SelfContract.Presenter presenter;
 
+    private FloatingActionButton fab;
 
     public SelfFragment() {
         // Required empty public constructor
@@ -57,6 +61,22 @@ public class SelfFragment extends Fragment implements SelfContract.View {
     }
 
     @Override
+    public void initFab() {
+        fab = fragment.getActivity().findViewById(R.id.fab);
+        fab.setImageResource(R.drawable.ic_edit_24dp);
+        fab.setVisibility(View.VISIBLE);
+        fab.setScaleX(1);
+        fab.setScaleY(1);
+        fab.setTranslationY(-IntConst.TOOLBAR_HEIGHT);
+        fab.setOnClickListener(this::fabAction);
+    }
+
+    @Override
+    public void fabAction(View view) {
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -87,5 +107,11 @@ public class SelfFragment extends Fragment implements SelfContract.View {
     @Override
     public void setMainFragment(@NonNull MainFragment mainFragment) {
         this.fragment = Preconditions.checkNotNull(mainFragment);
+    }
+
+    @Override
+    public boolean onTouch(MotionEvent event) {
+
+        return false;
     }
 }
