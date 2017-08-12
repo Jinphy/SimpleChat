@@ -45,9 +45,11 @@ public interface MainContract {
 
         void showSelectedState();
 
-        void hideBar();
+        void animateBar(android.view.View view, float fromValue,float toValue,boolean showBar);
 
-        void showBar();
+        void hideBar(android.view.View view);
+
+        void showBar(android.view.View view);
 
         void setToolbarAlpha(float faction);
 

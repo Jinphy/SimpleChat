@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.main.msg;
 
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
@@ -20,6 +21,8 @@ public interface MsgContract {
         void  initFab();
 
         void fabAction(android.view.View view);
+
+        RecyclerView getRecyclerView();
     }
 
 

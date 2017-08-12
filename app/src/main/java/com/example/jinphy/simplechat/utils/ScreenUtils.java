@@ -56,6 +56,13 @@ public class ScreenUtils {
 	}
 
 	/**
+	 * 获取toolbar的高度
+	 * */
+	public static int getToolbarHeight(Context context) {
+		return (int) (56 * getDensity(context));
+	}
+
+	/**
 	 *
 	 * 获取对应activity对象下的状态栏颜色
 	 * @param activity activity对象

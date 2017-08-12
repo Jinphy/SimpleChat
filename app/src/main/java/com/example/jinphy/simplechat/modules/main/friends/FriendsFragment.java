@@ -84,7 +84,7 @@ public class FriendsFragment extends Fragment implements FriendsContract.View {
 
     @Override
     public void fabAction(View view) {
-        fragment.showBar();
+        fragment.showBar(recyclerView);
         recyclerView.smoothScrollToPosition(0);
     }
 
@@ -121,11 +121,11 @@ public class FriendsFragment extends Fragment implements FriendsContract.View {
                 total+=dy;
                 if (total > 300) {
                     total=0;
-                    fragment.hideBar();
+                    fragment.hideBar(recyclerView);
                 }
                 if (total < -300) {
                     total=0;
-                    fragment.showBar();
+                    fragment.showBar(recyclerView);
                 }
             }
         });
@@ -146,5 +146,10 @@ public class FriendsFragment extends Fragment implements FriendsContract.View {
     @Override
     public void setMainFragment(@NonNull MainFragment fragment) {
         this.fragment = Preconditions.checkNotNull(fragment);
+    }
+
+    @Override
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.modules.main;
 
+import android.animation.AnimatorSet;
 import android.os.Bundle;
 import android.support.annotation.IntRange;
 import android.support.design.widget.FloatingActionButton;
@@ -8,12 +9,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -298,7 +299,13 @@ public class MainFragment extends Fragment implements MainContract.View {
                 activity.e("============selected================");
 
                 if (selectedTab != position) {
-                    showBar();
+                    if (position == 0) {
+                        showBar(((MsgFragment) adapter.getItem(0)).getRecyclerView());
+                    } else if (position == 1) {
+                        showBar(((FriendsFragment) adapter.getItem(1)).getRecyclerView());
+                    } else {
+                        showBar(null);
+                    }
                 }
                 selectTab(position, false);
 
@@ -498,68 +505,84 @@ public class MainFragment extends Fragment implements MainContract.View {
 
     }
 
-    private boolean isBarVisibale = true;
+    private boolean isBarVisible = true;
+
+    private boolean isAnimating = false;
+    private AnimatorSet animatorSet = null;
 
     @Override
-    public void hideBar() {
-        if (isBarVisibale) {
-            isBarVisibale = false;
-            AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
-            AnimUtils.just()
-                    .setFloat(0, -appbarLayout.getHeight())
-                    .setInterpolator(interpolator)
-                    .setDuration(IntConst.DURATION_500)
-                    .onUpdateFloat(animator ->
-                            appbarLayout.setTranslationY((Float) animator.getAnimatedValue()))
-                    .onEnd(animator -> appbarLayout.setVisibility(View.GONE))
-                    .animate();
-            AnimUtils.just(bottomBar)
-                    .setTranY(0, bottomBar.getHeight())
-                    .setInterpolator(interpolator)
-                    .setDuration(IntConst.DURATION_500)
-                    .onEnd(animator -> bottomBar.setVisibility(View.GONE))
-                    .animate();
-            AnimUtils.just(fab)
-                    .setScaleX(0, 1f)
-                    .setScaleY(0, 1f)
-                    .setInterpolator(interpolator)
-                    .setDuration(IntConst.DURATION_500)
-                    .onStart(animator -> fab.setVisibility(View.VISIBLE))
-                    .animate();
+    public void animateBar(View view, float fromValue, float toValue,boolean showBar) {
+
+        if (animatorSet != null && animatorSet.isRunning()) {
+            animatorSet.end();
+        }
+
+        int appbarHeight = appbarLayout.getHeight();
+        int bottomBarHeight = bottomBar.getHeight();
+        animatorSet = AnimUtils.just()
+                .setFloat(fromValue,toValue)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .setDuration(IntConst.DURATION_500)
+                .onStart(animator ->{
+                    if (showBar) {
+                        appbarLayout.setVisibility(View.VISIBLE);
+                        bottomBar.setVisibility(View.VISIBLE);
+                    } else {
+                        fab.setVisibility(View.VISIBLE);
+                    }
+                } )
+                .onUpdateFloat(animator -> {
+                    float value = (float) animator.getAnimatedValue();
+                    float margin = appbarHeight * (1-value);
+                    appbarLayout.setTranslationY(value * (-appbarHeight));
+                    bottomBar.setTranslationY(value * bottomBarHeight);
+                    fab.setScaleX(value);
+                    fab.setScaleY(value);
+                    setMargin(view,margin);
+                })
+                .onEnd(animator -> {
+                    if (showBar) {
+                        fab.setVisibility(View.GONE);
+                    } else {
+                        appbarLayout.setVisibility(View.GONE);
+                        bottomBar.setVisibility(View.GONE);
+                    }
+                })
+                .build();
+        animatorSet.start();
+
+    }
+
+    @Override
+    public void hideBar(View view) {
+        if (isBarVisible) {
+            isBarVisible = false;
+            animateBar(view,0,1,false);
 
         }
 
     }
 
     @Override
-    public void showBar() {
+    public void showBar(View view) {
+        if (!isBarVisible) {
+            isBarVisible = true;
+            animateBar(view,1,0,true);
 
-        if (!isBarVisibale) {
-            isBarVisibale = true;
-            AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
-            AnimUtils.just()
-                    .setFloat(0)
-                    .setInterpolator(interpolator)
-                    .setDuration(IntConst.DURATION_500)
-                    .onUpdateFloat(animator ->
-                            appbarLayout.setTranslationY((Float) animator.getAnimatedValue()))
-                    .onStart(animator -> appbarLayout.setVisibility(View.VISIBLE))
-                    .animate();
-            AnimUtils.just(bottomBar)
-                    .setTranY(0)
-                    .setInterpolator(interpolator)
-                    .setDuration(IntConst.DURATION_500)
-                    .onStart(animator -> bottomBar.setVisibility(View.VISIBLE))
-                    .animate();
-            AnimUtils.just(fab)
-                    .setScaleX(0)
-                    .setScaleY(0)
-                    .setInterpolator(interpolator)
-                    .setDuration(IntConst.DURATION_500)
-                    .onEnd(animator -> fab.setVisibility(View.GONE))
-                    .animate();
         }
 
+
+    }
+
+
+    private void setMargin(View view, float margin) {
+        if (view == null) {
+            return;
+        }
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(view.getLayoutParams());
+        lp.setMargins(lp.leftMargin, (int) margin,lp.rightMargin, (int) margin);
+        view.setLayoutParams(lp);
+        view.requestLayout();
     }
 
 
