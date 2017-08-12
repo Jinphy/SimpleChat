@@ -41,9 +41,9 @@ public interface MainContract {
 
         void selectTab(int position,boolean setItem);
 
-        void showNormalState();
+        void showNormalState(int position);
 
-        void showSelectedState();
+        void showSelectedState(int position);
 
         void animateBar(android.view.View view, float fromValue,float toValue,boolean showBar);
 

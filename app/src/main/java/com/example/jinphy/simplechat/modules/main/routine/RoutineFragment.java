@@ -11,9 +11,9 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.Preconditions;
+import com.example.jinphy.simplechat.utils.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,8 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
     private RoutineContract.Presenter presenter;
 
     FloatingActionButton fab;
+
+    private int density;
 
 
     public RoutineFragment() {
@@ -72,7 +74,7 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
         fab.setVisibility(View.VISIBLE);
         fab.setScaleX(1);
         fab.setScaleY(1);
-        fab.setTranslationY(-IntConst.TOOLBAR_HEIGHT);
+        fab.setTranslationY(-ScreenUtils.getToolbarHeight(getContext()));
         fab.setOnClickListener(this::fabAction);
     }
 
@@ -82,7 +84,13 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_routine, container, false);
+        View root = inflater.inflate(R.layout.fragment_routine, container, false);
+
+        initView(root);
+
+        initData();
+
+        return root;
     }
 
     @Override
@@ -108,7 +116,7 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
 
     @Override
     public void initData() {
-
+        density = (int) ScreenUtils.getDensity(getContext());
     }
 
     @Override

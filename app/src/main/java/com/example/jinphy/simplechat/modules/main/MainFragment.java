@@ -2,12 +2,10 @@ package com.example.jinphy.simplechat.modules.main;
 
 import android.animation.AnimatorSet;
 import android.os.Bundle;
-import android.support.annotation.IntRange;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -36,6 +34,7 @@ import com.example.jinphy.simplechat.modules.main.self.SelfPresenter;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
+import com.example.jinphy.simplechat.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +55,9 @@ public class MainFragment extends Fragment implements MainContract.View {
 
     private View appbarLayout;
     private Toolbar toolbar;
-    private CardView headView;
-    private ImageView avatarView;
-    private TextView nameText;
+//    private CardView headView;
+//    private ImageView avatarView;
+//    private TextView nameText;
 
     private View bottomBar;
     private FloatingActionButton fab;
@@ -74,6 +73,8 @@ public class MainFragment extends Fragment implements MainContract.View {
     private int[] iconsClose;
 
     private int selectedTab = 0;
+
+    private int density;
 
 
     public MainFragment() {
@@ -134,9 +135,9 @@ public class MainFragment extends Fragment implements MainContract.View {
 
         appbarLayout = activity.findViewById(R.id.appbar_layout);
         toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
-        headView = (CardView) activity.findViewById(R.id.head_view);
-        avatarView = headView.findViewById(R.id.avatar);
-        nameText = headView.findViewById(R.id.name);
+//        headView = (CardView) activity.findViewById(R.id.head_view);
+//        avatarView = headView.findViewById(R.id.avatar);
+//        nameText = headView.findViewById(R.id.name);
 
         fab = (FloatingActionButton) activity.findViewById(R.id.fab);
         viewPager = view.findViewById(R.id.view_pager);
@@ -154,171 +155,39 @@ public class MainFragment extends Fragment implements MainContract.View {
 
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            boolean isShowingHeadView = false;
-            int selectedTab = 0;
-
             @Override
             public void onPageScrolled(int position, float offset, int offsetPixels) {
                 // position表示当前第一个可见的pager的位置，
                 // offset表示position位置的pager的偏移百分比，正数
                 // offsetPixels表示position位置的pager的偏移像素，正数
                 // 当position 位置的pager位于正中间是，上面两个偏移量为0
-                activity.e("position = " + position);
-                activity.e("offset = " + offset);
-                activity.e("offsetPixels = " + offsetPixels);
-                activity.e("=============================================");
 
 
-                switch (position) {
-                    case 0:
-                        //  do nothing
-                        break;
-                    case 1:
-                        // 第二页中fab的动画
-                        if (offsetPixels <= 0) {
-                            fab.setTranslationY(0);
-                            scaleFab(0);
-                            fab.setImageResource(R.drawable.ic_arrow_up_24dp);
-                            fab.setVisibility(View.GONE);
-                        } else if (offsetPixels < 100) {
-                            fab.setVisibility(View.VISIBLE);
-                            fab.setTranslationY(-IntConst.TOOLBAR_HEIGHT);
-                            fab.setImageResource(R.drawable.ic_smile_24dp);
-                            scaleFab(offset);
-                        } else {
-                            scaleFab(offset);
-                        }
+                // 处理fab的动画
+                handleFabOnViewPagerScrolled(position,offset,offsetPixels);
 
-                        break;
-                    case 2: //当前可见的第一个pager为第三个fragment
-                        if (offsetPixels == 0) {
-                            //第三页在正中间
-                            if (isShowingHeadView) {
-                                setHeadViewTransY(1, baseTransY, distance);
-                                toolbar.setVisibility(View.VISIBLE);
-                                headView.setVisibility(View.GONE);
-                                isShowingHeadView = false;
-                                if (isHeadViewScrolledUp) {
-                                    isHeadViewScrolledUp = false;
-                                    avatarView.setTranslationX(0);
-                                    avatarView.setTranslationY(0);
-                                    avatarView.setScaleX(1);
-                                    avatarView.setScaleY(1);
-                                    nameText.setTranslationX(0);
-                                }
-                            }
-                        } else if (ScreenUtils.getScreenWidth(getContext()) - offsetPixels < 5) {
-                            toolbar.setVisibility(View.GONE);
-                            isShowingHeadView = true;
-                            setHeadViewTransY(1, baseTransY, distance);
-                        } else {
-                            if (isHeadViewScrolledUp) {
-                                avatarView.setAlpha(offset);
-                                nameText.setAlpha(offset);
-                            } else {
-                                headView.setVisibility(View.VISIBLE);
-                                toolbar.setVisibility(View.GONE);
-                                isShowingHeadView = true;
-                                setHeadViewTransY(offset, baseTransY, distance);
-                            }
-                        }
+                //处理appbar的动画
+                handleBarOnViewPagerScrolled(position, offset, offsetPixels);
 
-                        //fab 的动画
-                        if (offset < 0.5f) {
-                            fab.setImageResource(R.drawable.ic_smile_24dp);
-                            scaleFab(1 - offset * 2);
-                        } else {
-                            fab.setImageResource(R.drawable.ic_edit_24dp);
-                            scaleFab(offset * 2 - 1);
-                        }
-                        break;
-                    case 3:
-                        break;
-                    default:
-                        break;
-                }
+                // 第四页的动画处理
+                ((SelfFragment) adapter.getItem(3))
+                        .handleOnViewPagerScrolled(position, offset, offsetPixels);
 
             }
 
             @Override
             public void onPageSelected(int position) {
 
-                if (selectedTab == 3 && selectedTab - position > 1) {
-                    // 从第四页跳到第一或第二页,此时没有经过第三页，所以上面的回调函数将不处理动画
-                    // 所以这里要另外设置
-                    isShowingHeadView = false;
-                    if (isHeadViewScrolledUp) {
-                        AnimUtils.just()
-                                .setFloat(1,0)
-                                .setDuration(IntConst.DURATION_500)
-                                .setInterpolator(new AccelerateDecelerateInterpolator())
-                                .onUpdateFloat(animator -> {
-                                    float alpha = (float) animator.getAnimatedValue();
-                                    avatarView.setAlpha(alpha);
-                                    nameText.setAlpha(alpha);
-                                })
-                                .onEnd(animator -> {
-                                    isHeadViewScrolledUp = false;
-                                    avatarView.setTranslationX(0);
-                                    avatarView.setTranslationY(0);
-                                    avatarView.setScaleX(1);
-                                    avatarView.setScaleY(1);
-                                    nameText.setTranslationX(0);
+                // 处理toolbar和bottomBar
+                handleBarOnViewPagerSelected(position);
 
-                                    headView.setVisibility(View.GONE);
-                                    appbarLayout.setTranslationY(0);
-                                    toolbar.setVisibility(View.VISIBLE);
-                                    AnimUtils.just(toolbar)
-                                            .setAlpha(0, 1f)
-                                            .setDuration(IntConst.DURATION_500)
-                                            .animate();
+                // 处理Tab
+                handleTabOnViewPagerSelected(position);
 
-                                })
-                                .animate();
-
-                    } else {
-                        AnimUtils.just(appbarLayout)
-                                .setTranY(baseTransY)
-                                .setDuration(IntConst.DURATION_500)
-                                .setInterpolator(new AccelerateDecelerateInterpolator())
-                                .onEnd(animator -> {
-                                    headView.setVisibility(View.GONE);
-                                    appbarLayout.setTranslationY(0);
-                                    toolbar.setVisibility(View.VISIBLE);
-                                    AnimUtils.just(toolbar)
-                                            .setAlpha(0, 1f)
-                                            .setDuration(IntConst.DURATION_500)
-                                            .animate();
-                                })
-                                .animate();
-                    }
-
-                }
-
-
-                activity.e("============selected================");
-
-                if (selectedTab != position) {
-                    if (position == 0) {
-                        showBar(((MsgFragment) adapter.getItem(0)).getRecyclerView());
-                    } else if (position == 1) {
-                        showBar(((FriendsFragment) adapter.getItem(1)).getRecyclerView());
-                    } else {
-                        showBar(null);
-                    }
-                }
-                selectTab(position, false);
-
-                if (position == 3) {
-
-                } else {
-                    setToolbarAlpha(0);
-                }
+                // 处理fab
+                handleFabOnViewPagerSelected(position);
 
                 selectedTab = position;
-                // 设置fab
-                initFab();
-
             }
 
             @Override
@@ -329,10 +198,127 @@ public class MainFragment extends Fragment implements MainContract.View {
 
     }
 
-    private void scaleFab(float faction) {
-        fab.setScaleX(faction);
-        fab.setScaleY(faction);
+
+    private void handleFabOnViewPagerScrolled(int position, float offset, int offsetPixels) {
+        switch (position) {
+            case 0:
+                if (fab.getVisibility() == View.VISIBLE) {
+                    int result = selectedTab==0?animateFab(1-offset):animateFab(offset);
+                }
+                break;
+            case 1:// 第二页中fab的动画
+                if (offsetPixels <= 0) {
+                    animateFab(0, 0, R.drawable.ic_arrow_up_24dp, View.GONE);
+                } else if (offsetPixels < 100) {
+                    animateFab(offset, -ScreenUtils.getToolbarHeight(getContext()),
+                            R.drawable.ic_smile_24dp, View.VISIBLE);
+                } else {
+                    animateFab(offset);
+                }
+                break;
+            case 2: //当前可见的第一个pager为第三个fragment
+                if (offset < 0.5f) {
+                    animateFab(1 - offset * 2,  -ScreenUtils.getToolbarHeight(getContext()),
+                            R.drawable.ic_smile_24dp, View.VISIBLE);
+                } else {
+                    animateFab(offset * 2 - 1,  -ScreenUtils.getToolbarHeight(getContext()),
+                            R.drawable.ic_edit_24dp, View.VISIBLE);
+                }
+                break;
+            case 3:
+                break;
+            default:
+                break;
+        }
+
     }
+
+    private void handleBarOnViewPagerScrolled(int position, float offset, int offsetPixels) {
+        switch (position) {
+            case 0:
+                appbarLayout.setTranslationX(0);
+                break;
+            case 1:
+                appbarLayout.setTranslationX(0);
+                break;
+            case 2:
+                appbarLayout.setTranslationX(-offsetPixels);
+                break;
+            case 3:
+                appbarLayout.setTranslationX(-ScreenUtils.getScreenWidth(getContext()));
+                break;
+        }
+    }
+
+    private void handleFabOnViewPagerSelected(int position) {
+        switch (position) {
+            case 0:
+                ((MsgFragment) adapter.getItem(position)).initFab();
+                break;
+            case 1:
+                ((FriendsFragment) adapter.getItem(position)).initFab();
+                break;
+            case 2:
+                ((RoutineFragment) adapter.getItem(position)).initFab();
+                break;
+            case 3:
+                ((SelfFragment) adapter.getItem(position)).initFab();
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private void handleTabOnViewPagerSelected(int position) {
+        selectTab(position, false);
+    }
+
+    private void handleBarOnViewPagerSelected(int position) {
+        if (selectedTab != position) {
+            if (position == 0) {
+                showBar(((MsgFragment) adapter.getItem(0)).getRecyclerView());
+            } else if (position == 1) {
+                showBar(((FriendsFragment) adapter.getItem(1)).getRecyclerView());
+            } else {
+                showBar(null);
+            }
+        }
+    }
+
+
+    /**
+     *
+     * @param scale
+     * @param options 可选项，是个可变长度数组，接受前三个元素
+     *                第一个表示transY
+     *                第二个表示图片id
+     *                第三个表示Visibility
+     * */
+    private int animateFab(float scale, int... options) {
+        switch (options.length) {
+            case 0:
+                ViewUtils.setScaleXY(fab,scale);
+                break;
+            case 1:
+                ViewUtils.setScaleXY(fab,scale);
+                fab.setTranslationY(options[0]);
+                break;
+            case 2:
+                ViewUtils.setScaleXY(fab,scale);
+                fab.setTranslationY(options[0]);
+                fab.setImageResource(options[1]);
+                break;
+            default:
+                ViewUtils.setScaleXY(fab,scale);
+                fab.setTranslationY(options[0]);
+                fab.setImageResource(options[1]);
+                fab.setVisibility(options[2]);
+                break;
+        }
+        return 0;
+    }
+
 
     @Override
     public void initFab() {
@@ -362,16 +348,13 @@ public class MainFragment extends Fragment implements MainContract.View {
 
     @Override
     public void setHeadViewTransY(float faction, int baseTransY, int distance) {
-        appbarLayout.setTranslationY(baseTransY + faction * distance);
-        avatarView.setAlpha(faction);
-        nameText.setAlpha(faction);
+//        appbarLayout.setTranslationY(baseTransY + faction * distance);
+//        avatarView.setAlpha(faction);
+//        nameText.setAlpha(faction);
     }
 
     @Override
     public void initData() {
-        avatarViewTransYDistance = IntConst.POSITIVE_120 * ScreenUtils.getDensity(getContext());
-        avatarViewTransXDistance = IntConst.NAGETIVE_150 * ScreenUtils.getDensity(getContext());
-        nameTextTransXDistance =  IntConst.POSITIVE_50* ScreenUtils.getDensity(getContext());
         btn = new LinearLayout[]{
                 btnMsg,
                 btnFriends,
@@ -401,6 +384,8 @@ public class MainFragment extends Fragment implements MainContract.View {
 
         // 为viewpager中的每个item设置相应的fab属性
         initFab();
+
+        density = (int) ScreenUtils.getDensity(getContext());
     }
 
 
@@ -473,33 +458,45 @@ public class MainFragment extends Fragment implements MainContract.View {
     }
 
 
+    /**
+     * 选择指定的tab标签项
+     *
+     * */
     @Override
     public void selectTab(int position, boolean setItem) {
-        showNormalState();
-        selectedTab = position;
-        showSelectedState();
+        showNormalState(selectedTab);
+        showSelectedState(position);
         if (setItem) {
             viewPager.setCurrentItem(position);
         }
     }
 
+
+    /**
+     * 设置底部tab标签按钮额状态为未选择状态
+     * */
     @Override
-    public void showNormalState() {
-        ((ImageView) btn[selectedTab]
+    public void showNormalState(int position) {
+        ((ImageView) btn[position]
                 .getChildAt(0))
-                .setImageResource(iconsClose[selectedTab]);
-        ((TextView) btn[selectedTab]
+                .setImageResource(iconsClose[position]);
+        ((TextView) btn[position]
                 .getChildAt(1)).
                 setTextColor(ContextCompat.getColor(getContext(), R.color.half_alpha_gray));
     }
 
+    /**
+     * 设置底部tab标签按钮的状态为选择状态
+     *
+     *
+     * */
     @Override
-    public void showSelectedState() {
+    public void showSelectedState(int position) {
 
-        ((ImageView) btn[selectedTab]
+        ((ImageView) btn[position]
                 .getChildAt(0))
-                .setImageResource(iconsOpen[selectedTab]);
-        ((TextView) btn[selectedTab]
+                .setImageResource(iconsOpen[position]);
+        ((TextView) btn[position]
                 .getChildAt(1)).
                 setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
 
@@ -507,9 +504,14 @@ public class MainFragment extends Fragment implements MainContract.View {
 
     private boolean isBarVisible = true;
 
-    private boolean isAnimating = false;
     private AnimatorSet animatorSet = null;
 
+    /**
+     * 移动toolbar和bottomBar和scale fab
+     *
+     * @see MainFragment#showBar(View)
+     * @see MainFragment#hideBar(View)
+     * */
     @Override
     public void animateBar(View view, float fromValue, float toValue,boolean showBar) {
 
@@ -536,8 +538,7 @@ public class MainFragment extends Fragment implements MainContract.View {
                     float margin = appbarHeight * (1-value);
                     appbarLayout.setTranslationY(value * (-appbarHeight));
                     bottomBar.setTranslationY(value * bottomBarHeight);
-                    fab.setScaleX(value);
-                    fab.setScaleY(value);
+                    ViewUtils.setScaleXY(fab,value);
                     setMargin(view,margin);
                 })
                 .onEnd(animator -> {
@@ -553,6 +554,12 @@ public class MainFragment extends Fragment implements MainContract.View {
 
     }
 
+    /**
+     * 隐藏toolbar和bottomBar，同时显示fab
+     *
+     * @param view 是一个RecyclerView，传该参数的目的是为了在
+     * 移动toolbar和bottomBar时，更新RecyclerView的margin值
+     * */
     @Override
     public void hideBar(View view) {
         if (isBarVisible) {
@@ -563,6 +570,12 @@ public class MainFragment extends Fragment implements MainContract.View {
 
     }
 
+    /**
+     * 显示toolbar和bottomBar，同时隐藏fab
+     *
+     * @param view 是一个RecyclerView，传该参数的目的是为了在
+     * 移动toolbar和bottomBar时，更新RecyclerView的margin值
+     * */
     @Override
     public void showBar(View view) {
         if (!isBarVisible) {
@@ -575,6 +588,8 @@ public class MainFragment extends Fragment implements MainContract.View {
     }
 
 
+    //设置View的margin，用在移动toolbar和bottomBar时改变其他View
+    //的margin
     private void setMargin(View view, float margin) {
         if (view == null) {
             return;
@@ -585,122 +600,15 @@ public class MainFragment extends Fragment implements MainContract.View {
         view.requestLayout();
     }
 
-
-    int distance = IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT;
-    int baseTransY = -distance;
-    boolean isHeadViewScrolledUp = false;
-    boolean isActionMove = false;
-    float oldY = 0;
-
-    float avatarViewScaleTo = 0.32f;
-    float avatarViewScaleDistance = 1-0.32f;
-    float avatarViewTransYDistance;
-    float avatarViewTransXDistance;
-    float nameTextTransXDistance;
-    boolean isMoveToBound=false;
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-
-        if (selectedTab == 3 ) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    oldY = event.getY();
-                    isActionMove = false;
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    isActionMove = true;
-                    float deltaY = event.getY() - oldY;
-                    oldY = event.getY();
-                    float faction = getMoveFaction(deltaY);
-                    moveHeadView(faction);
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if (isActionMove) {
-                        float transY = -appbarLayout.getTranslationY();
-                        if (transY > distance / 2) {
-                            // 滑动超过一半
-                            isHeadViewScrolledUp = true;
-                            animateHeadView(1);
-
-                        } else {
-                            // 滑动未超过一半
-                            isHeadViewScrolledUp = false;
-                            animateHeadView(0);
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            // 判断是否移动到上下边界
-            if (isMoveToBound) {
-                // 返回false，继续传递事件
-                return false;
-            } else {
-                // 返回true，拦截事件
-                ((SelfFragment) adapter.getItem(3)).onTouch(event);
-                return true;
-            }
-
-
+        if (selectedTab == 3) {
+            return ((SelfFragment) adapter.getItem(3)).dispatchTouchEvent(event);
         }
-
         return false;
+
     }
 
-    // 获取当前headView应该滑动的百分比
-    private float getMoveFaction(float deltaY) {
-        float transY = appbarLayout.getTranslationY();
-        transY += deltaY;
-        if (deltaY < 0 && transY < baseTransY) {
-            //向上滑动,并且appbarLayout滑到最高上限
-            transY = baseTransY;
-            isMoveToBound = true;
-        } else if (deltaY > 0 && transY > 0) {
-            //向下滑动，并且appbarLayout滑到最低下限
-            transY = 0;
-            isMoveToBound = true;
-        } else {
-            isMoveToBound = false;
-        }
-
-        float faction = (-transY) / distance;
-
-        return faction;
-    }
-
-    // 这个函数在手指滑动是调用
-    private void moveHeadView(float faction) {
-        appbarLayout.setTranslationY(-faction*distance);
-        avatarView.setScaleX(1-faction*avatarViewScaleDistance);
-        avatarView.setScaleY(1-faction*avatarViewScaleDistance);
-        avatarView.setTranslationY(faction*avatarViewTransYDistance);
-        avatarView.setTranslationX(faction*avatarViewTransXDistance);
-        nameText.setTranslationX(faction * nameTextTransXDistance);
-    }
-
-    // 这个函数在手指松开是调用
-    // 0 表示打开，1 表示关上
-    private void animateHeadView(@IntRange(from = 0,to = 1) int faction) {
-        AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
-        float startFaction = -(appbarLayout.getTranslationY()/distance);
-        AnimUtils.just()
-                .setDuration(IntConst.DURATION_500)
-                .setInterpolator(interpolator)
-                .setFloat(startFaction,faction)
-                .onUpdateFloat(animator -> {
-                    float factor = (float) animator.getAnimatedValue();
-                    appbarLayout.setTranslationY(-factor*distance);
-                    avatarView.setScaleX(1-factor*avatarViewScaleDistance);
-                    avatarView.setScaleY(1-factor*avatarViewScaleDistance);
-                    avatarView.setTranslationX(factor*avatarViewTransXDistance);
-                    avatarView.setTranslationY(factor*avatarViewTransYDistance);
-                    nameText.setTranslationX(factor * nameTextTransXDistance);
-                })
-                .animate();
-    }
 
     @Override
     public int currentItemPosition() {

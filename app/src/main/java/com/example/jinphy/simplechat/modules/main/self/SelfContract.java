@@ -21,8 +21,9 @@ public interface SelfContract {
 
         void fabAction(android.view.View view);
 
+        boolean dispatchTouchEvent(MotionEvent event);
 
-        boolean onTouch(MotionEvent event);
+        void handleOnViewPagerScrolled(int position, float offset, int offsetPixels);
     }
 
     interface Presenter extends BasePresenter {
