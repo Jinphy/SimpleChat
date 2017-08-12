@@ -49,8 +49,7 @@ public class MainPresenter implements MainContract.Presenter {
                             float deltaY = Math.abs(event.getY() - downY);
                             if (deltaY+3 > deltaX) {
                                 moveVertical = true;
-                                view.dispatchTouchEvent(event);
-                                return true;
+                                return view.dispatchTouchEvent(event);
                             } else {
                                 moveVertical = false;
                                 return false;
@@ -60,8 +59,7 @@ public class MainPresenter implements MainContract.Presenter {
                     }
 
                 } else if (moveVertical) {
-                    view.dispatchTouchEvent(event);
-                    return true;
+                    return view.dispatchTouchEvent(event);
                 } else {
                     return false;
                 }

@@ -9,10 +9,12 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
+import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
@@ -26,6 +28,7 @@ public class SelfFragment extends Fragment implements SelfContract.View {
 
     private SelfContract.Presenter presenter;
 
+    private View rootView;
     private FloatingActionButton fab;
 
     public SelfFragment() {
@@ -96,6 +99,7 @@ public class SelfFragment extends Fragment implements SelfContract.View {
 
     @Override
     public void initView(View view) {
+        rootView = view;
 
     }
 
@@ -109,8 +113,45 @@ public class SelfFragment extends Fragment implements SelfContract.View {
         this.fragment = Preconditions.checkNotNull(mainFragment);
     }
 
+
+
+    int distance = IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT;
+    float oldY;
+
     @Override
     public boolean onTouch(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                oldY = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float deltaY = event.getY()-oldY;
+                oldY = event.getY();
+                float transY = rootView.getTranslationY() + deltaY;
+                rootView.setTranslationY(transY);
+                break;
+            case MotionEvent.ACTION_UP:
+                float movedDistance = -rootView.getTranslationY();
+                if (movedDistance > distance / 2) {
+                    // 滑动超过一半
+                    AnimUtils.just(rootView)
+                            .setDuration(IntConst.DURATION_500)
+                            .setInterpolator(new AccelerateDecelerateInterpolator())
+                            .setTranY(-distance)
+                            .animate();
+                } else {
+                    // 滑动未超过一半
+                    AnimUtils.just(rootView)
+                            .setDuration(IntConst.DURATION_500)
+                            .setInterpolator(new AccelerateDecelerateInterpolator())
+                            .setTranY(0)
+                            .animate();
+
+                }
+                break;
+            default:
+                break;
+        }
 
         return false;
     }

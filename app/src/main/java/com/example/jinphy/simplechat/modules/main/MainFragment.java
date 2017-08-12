@@ -170,15 +170,14 @@ public class MainFragment extends Fragment implements MainContract.View {
 
                 switch (position) {
                     case 0:
-                        //                        if (isShowingHeadView) {
-                        //                            headView.setVisibility(View.GONE);
-                        //                            isShowingHeadView=false;
-                        //                        }
+                        //  do nothing
                         break;
                     case 1:
+                        // 第二页中fab的动画
                         if (offsetPixels <= 0) {
                             fab.setTranslationY(0);
                             scaleFab(0);
+                            fab.setImageResource(R.drawable.ic_arrow_up_24dp);
                             fab.setVisibility(View.GONE);
                         } else if (offsetPixels < 100) {
                             fab.setVisibility(View.VISIBLE);
@@ -192,22 +191,38 @@ public class MainFragment extends Fragment implements MainContract.View {
                         break;
                     case 2: //当前可见的第一个pager为第三个fragment
                         if (offsetPixels == 0) {
+                            //第三页在正中间
                             if (isShowingHeadView) {
                                 setHeadViewTransY(1, baseTransY, distance);
                                 toolbar.setVisibility(View.VISIBLE);
                                 headView.setVisibility(View.GONE);
                                 isShowingHeadView = false;
+                                if (isHeadViewScrolledUp) {
+                                    isHeadViewScrolledUp = false;
+                                    avatarView.setTranslationX(0);
+                                    avatarView.setTranslationY(0);
+                                    avatarView.setScaleX(1);
+                                    avatarView.setScaleY(1);
+                                    nameText.setTranslationX(0);
+                                }
                             }
                         } else if (ScreenUtils.getScreenWidth(getContext()) - offsetPixels < 5) {
                             toolbar.setVisibility(View.GONE);
-                            setHeadViewTransY(1f, baseTransY, distance);
                             isShowingHeadView = true;
+                            setHeadViewTransY(1, baseTransY, distance);
                         } else {
-                            headView.setVisibility(View.VISIBLE);
-                            toolbar.setVisibility(View.VISIBLE);
-                            isShowingHeadView = true;
-                            setHeadViewTransY(offset, baseTransY, distance);
+                            if (isHeadViewScrolledUp) {
+                                avatarView.setAlpha(offset);
+                                nameText.setAlpha(offset);
+                            } else {
+                                headView.setVisibility(View.VISIBLE);
+                                toolbar.setVisibility(View.GONE);
+                                isShowingHeadView = true;
+                                setHeadViewTransY(offset, baseTransY, distance);
+                            }
                         }
+
+                        //fab 的动画
                         if (offset < 0.5f) {
                             fab.setImageResource(R.drawable.ic_smile_24dp);
                             scaleFab(1 - offset * 2);
@@ -232,6 +247,33 @@ public class MainFragment extends Fragment implements MainContract.View {
                     // 所以这里要另外设置
                     isShowingHeadView = false;
                     if (isHeadViewScrolledUp) {
+                        AnimUtils.just()
+                                .setFloat(1,0)
+                                .setDuration(IntConst.DURATION_500)
+                                .setInterpolator(new AccelerateDecelerateInterpolator())
+                                .onUpdateFloat(animator -> {
+                                    float alpha = (float) animator.getAnimatedValue();
+                                    avatarView.setAlpha(alpha);
+                                    nameText.setAlpha(alpha);
+                                })
+                                .onEnd(animator -> {
+                                    isHeadViewScrolledUp = false;
+                                    avatarView.setTranslationX(0);
+                                    avatarView.setTranslationY(0);
+                                    avatarView.setScaleX(1);
+                                    avatarView.setScaleY(1);
+                                    nameText.setTranslationX(0);
+
+                                    headView.setVisibility(View.GONE);
+                                    appbarLayout.setTranslationY(0);
+                                    toolbar.setVisibility(View.VISIBLE);
+                                    AnimUtils.just(toolbar)
+                                            .setAlpha(0, 1f)
+                                            .setDuration(IntConst.DURATION_500)
+                                            .animate();
+
+                                })
+                                .animate();
 
                     } else {
                         AnimUtils.just(appbarLayout)
@@ -521,8 +563,8 @@ public class MainFragment extends Fragment implements MainContract.View {
     }
 
 
-    int baseTransY = -(IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT);
-    int distance = -baseTransY;
+    int distance = IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT;
+    int baseTransY = -distance;
     boolean isHeadViewScrolledUp = false;
     boolean isActionMove = false;
     float oldY = 0;
@@ -532,6 +574,7 @@ public class MainFragment extends Fragment implements MainContract.View {
     float avatarViewTransYDistance;
     float avatarViewTransXDistance;
     float nameTextTransXDistance;
+    boolean isMoveToBound=false;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -540,12 +583,10 @@ public class MainFragment extends Fragment implements MainContract.View {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     oldY = event.getY();
-                    activity.e("down,y = "+ event.getY());
                     isActionMove = false;
                     break;
                 case MotionEvent.ACTION_MOVE:
                     isActionMove = true;
-                    activity.e("move,y = "+event.getY());
                     float deltaY = event.getY() - oldY;
                     oldY = event.getY();
                     float faction = getMoveFaction(deltaY);
@@ -553,7 +594,6 @@ public class MainFragment extends Fragment implements MainContract.View {
                     break;
                 case MotionEvent.ACTION_UP:
                     if (isActionMove) {
-                        activity.e("up,y = "+event.getY());
                         float transY = -appbarLayout.getTranslationY();
                         if (transY > distance / 2) {
                             // 滑动超过一半
@@ -570,7 +610,18 @@ public class MainFragment extends Fragment implements MainContract.View {
                 default:
                     break;
             }
-            ((SelfFragment) adapter.getItem(3)).onTouch(event);
+
+            // 判断是否移动到上下边界
+            if (isMoveToBound) {
+                // 返回false，继续传递事件
+                return false;
+            } else {
+                // 返回true，拦截事件
+                ((SelfFragment) adapter.getItem(3)).onTouch(event);
+                return true;
+            }
+
+
         }
 
         return false;
@@ -581,11 +632,15 @@ public class MainFragment extends Fragment implements MainContract.View {
         float transY = appbarLayout.getTranslationY();
         transY += deltaY;
         if (deltaY < 0 && transY < baseTransY) {
-            //向上滑动,并且appbarLayout还没有滑到最高上限
+            //向上滑动,并且appbarLayout滑到最高上限
             transY = baseTransY;
+            isMoveToBound = true;
         } else if (deltaY > 0 && transY > 0) {
-            //向下滑动，并且appbarLayout还没有滑到最低下限
+            //向下滑动，并且appbarLayout滑到最低下限
             transY = 0;
+            isMoveToBound = true;
+        } else {
+            isMoveToBound = false;
         }
 
         float faction = (-transY) / distance;
