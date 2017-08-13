@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.model.Friend;
+import com.example.jinphy.simplechat.model.MsgRecord;
 import com.example.jinphy.simplechat.modules.main.msg.MsgRecyclerViewAdapter;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
@@ -20,7 +21,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/10.
  */
 
-public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecyclerViewAdapter.ViewHolder> {
+public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecyclerViewAdapter.ViewHolder> {
 
     private List<Friend> friends;
 
@@ -30,17 +31,26 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecycler
     }
 
     @Override
-    public MsgRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public FriendsRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.main_tab_friends_item, parent, false);
 
-        return new MsgRecyclerViewAdapter.ViewHolder(view);
+        return new FriendsRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(MsgRecyclerViewAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         Friend friend = friends.get(position);
-        // TODO: 2017/8/10
+        // TODO: 2017/8/10 设置avatar等信息
+
+        if (click != null) {
+            holder.avatar.setOnClickListener(view -> click.onClick(view,friend));
+            holder.itemView.setOnClickListener(view -> click.onClick(view,friend));
+        }
+        if (longClick != null) {
+            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view,friend));
+            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,friend));
+        }
     }
 
     @Override
@@ -48,6 +58,22 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecycler
         return friends.size();
     }
 
+
+    private OnClickListener click;
+    private OnLongClickListener longClick;
+
+    public FriendsRecyclerViewAdapter onClick(OnClickListener listener) {
+        this.click = listener;
+        return this;
+    }
+
+    public FriendsRecyclerViewAdapter onLongClick(OnLongClickListener listener) {
+        this.longClick = listener;
+        return this;
+    }
+
+
+    //===============================================================\\
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private CircleImageView avatar;
@@ -67,6 +93,14 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecycler
             this.date = itemView.findViewById(R.id.date);
 
         }
+    }
+
+
+    public interface OnClickListener{
+        void onClick(View view, Friend item);
+    }
+    public interface OnLongClickListener{
+        boolean onLongClick(View view, Friend item);
     }
 }
 

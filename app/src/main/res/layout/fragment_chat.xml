@@ -1,0 +1,96 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.jinphy.simplechat.modules.chat.ChatFragment">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="?attr/actionBarSize"
+        android:layout_marginTop="?attr/actionBarSize">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="@dimen/dimen_10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:orientation="horizontal">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/voice_View"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="@dimen/dimen_5dp"
+                android:layout_marginLeft="@dimen/dimen_5dp"
+                android:src="@drawable/ic_voice_24dp"
+                app:civ_border_color="@color/colorAccent"
+                app:civ_border_width="1dp"/>
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/dimen_5dp"
+                android:paddingRight="@dimen/dimen_5dp"
+                android:hint="输入文本信息"
+                android:textSize="@dimen/size_15sp"
+                android:maxLines="10"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/more_view"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="bottom"
+                android:clickable="true"
+                android:src="@drawable/btn_more"
+                app:civ_border_width="1dp"
+                app:civ_border_color="@color/colorAccent"
+
+                android:layout_marginBottom="@dimen/dimen_5dp"
+                android:layout_marginLeft="@dimen/dimen_5dp"
+                android:layout_marginRight="@dimen/dimen_5dp"/>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/btn_send"
+                android:layout_width="60dp"
+                android:layout_height="43dp"
+                android:visibility="gone"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="@dimen/dimen_5dp"
+                android:layout_marginLeft="@dimen/dimen_5dp"
+                android:layout_marginRight="@dimen/dimen_5dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="@dimen/dimen_3dp"
+                app:cardElevation="@dimen/dimen_2dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/pic_chat_send_btn"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="发送"
+                    android:textColor="@color/white"/>
+
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>

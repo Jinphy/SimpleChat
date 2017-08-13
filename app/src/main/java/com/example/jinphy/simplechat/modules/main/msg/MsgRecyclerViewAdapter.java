@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.model.MsgRecord;
+import com.example.jinphy.simplechat.modules.chat.ChatRecyclerViewAdapter;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.List;
@@ -27,7 +28,6 @@ public class MsgRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecyclerView
     public MsgRecyclerViewAdapter(@NonNull List<MsgRecord> msgRecords) {
         this.msgRecords = Preconditions.checkNotNull(msgRecords);
 
-        Log.e("Main", msgRecords.size() + "");
     }
 
     @Override
@@ -40,17 +40,42 @@ public class MsgRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecyclerView
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        MsgRecord item = msgRecords.get(position);
+        MsgRecord msgRecord = msgRecords.get(position);
+        // TODO: 2017/8/10 设置avatar等信息
 
-        // TODO: 2017/8/10
+        if (click != null) {
+            holder.avatar.setOnClickListener(view -> click.onClick(view,msgRecord));
+            holder.itemView.setOnClickListener(view -> click.onClick(view,msgRecord));
+        }
+        if (longClick != null) {
+            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord));
+            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord));
+        }
+
 
     }
+
 
     @Override
     public int getItemCount() {
         return msgRecords.size();
     }
 
+    private OnClickListener click;
+    private OnLongClickListener longClick;
+
+    public MsgRecyclerViewAdapter onClick(OnClickListener listener) {
+        this.click = listener;
+        return this;
+    }
+
+    public MsgRecyclerViewAdapter onLongClick(OnLongClickListener listener) {
+        this.longClick = listener;
+        return this;
+    }
+
+
+    //===================================================================\\
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private CircleImageView avatar;
@@ -68,6 +93,13 @@ public class MsgRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecyclerView
             this.time = itemView.findViewById(R.id.time);
             this.itemView = itemView;
         }
+    }
+
+    public interface OnClickListener{
+        void onClick(View view, MsgRecord item);
+    }
+    public interface OnLongClickListener{
+        boolean onLongClick(View view, MsgRecord item);
     }
 }
 

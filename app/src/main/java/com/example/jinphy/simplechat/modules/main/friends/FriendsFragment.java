@@ -112,6 +112,8 @@ public class FriendsFragment extends Fragment implements FriendsContract.View {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(presenter.getAdapter());
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             int total = 0;
             @Override
@@ -135,12 +137,6 @@ public class FriendsFragment extends Fragment implements FriendsContract.View {
     @Override
     public void initData() {
 
-        List<Friend> list = new ArrayList<>(30);
-        for (int i = 0; i < 30; i++) {
-            list.add(new Friend());
-        }
-        FriendsRecyclerViewAdapter adapter = new FriendsRecyclerViewAdapter(list);
-        recyclerView.setAdapter(adapter);
     }
 
     @Override

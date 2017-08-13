@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.modules.main.msg;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.model.MsgRecord;
+import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
@@ -106,6 +108,7 @@ public class MsgFragment extends Fragment implements MsgContract.View{
         recyclerView = view.findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(presenter.getAdapter());
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             int total = 0;
@@ -129,12 +132,6 @@ public class MsgFragment extends Fragment implements MsgContract.View{
 
     @Override
     public void initData() {
-        List<MsgRecord> list = new ArrayList<>(30);
-        for (int i = 0; i < 30; i++) {
-            list.add(new MsgRecord());
-        }
-        MsgRecyclerViewAdapter adapter = new MsgRecyclerViewAdapter(list);
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -145,5 +142,11 @@ public class MsgFragment extends Fragment implements MsgContract.View{
     @Override
     public RecyclerView getRecyclerView() {
         return recyclerView;
+    }
+
+    @Override
+    public void showChatWindow(MsgRecord item) {
+        Intent intent = new Intent(getActivity(), ChatActivity.class);
+        startActivity(intent);
     }
 }

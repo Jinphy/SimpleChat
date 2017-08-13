@@ -6,4 +6,8 @@
     <color name="white">#ffffffff</color>
     <color name="half_alpha_gray">#7f333333</color>
     <color name="transparent">#00ffffff</color>
+    <color name="chat_send_msg_normal">#df4E342E</color>
+    <color name="chat_send_msg_pressed">#ff4E342E</color>
+    <color name="chat_receive_msg_pressed">#9f999999</color>
+    <color name="chat_send_btn_normal">#7f4E342E</color>
 </resources>
