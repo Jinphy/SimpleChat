@@ -24,126 +24,168 @@
         app:cardCornerRadius="0dp"
         app:cardElevation="@dimen/dimen_10dp">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <FrameLayout
-                android:id="@+id/btn_voice_and_keyboard"
-                android:layout_width="@dimen/dimen_40dp"
-                android:layout_height="@dimen/dimen_40dp"
-                android:layout_gravity="bottom"
-                android:layout_marginBottom="@dimen/dimen_5dp"
-                android:layout_marginLeft="@dimen/dimen_5dp">
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/voice_View"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_voice_24dp"
-                    app:civ_border_color="@color/colorAccent"
-                    app:civ_border_width="1dp"/>
-
-                <ImageView
-                    android:id="@+id/keyboard_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="gone"
-                    android:src="@drawable/ic_keyboard_24dp"/>
-
-            </FrameLayout>
-
-
-            <FrameLayout
-                android:id="@+id/input_text_and_voice"
-                android:layout_width="0dp"
+            <!--floatingActionButton-->
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_emotion"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="bottom">
+                android:layout_gravity="end"
+                android:layout_marginRight="@dimen/dimen_10dp"
+                android:src="@drawable/ic_smile_24dp"
+                android:tint="@color/colorAccent"
+                app:backgroundTint="@color/white"
+                app:rippleColor="@color/colorAccent"
+                app:fabSize="mini"/>
 
-                <EditText
-                    android:id="@+id/input_text"
-                    android:layout_width="match_parent"
+
+            <!--输入框和按钮栏的布局-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:id="@+id/btn_voice_and_keyboard"
+                    android:layout_width="@dimen/dimen_40dp"
+                    android:layout_height="@dimen/dimen_40dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="@dimen/dimen_5dp"
+                    android:layout_marginLeft="@dimen/dimen_5dp">
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/voice_View"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_voice_24dp"
+                        app:civ_border_color="@color/colorAccent"
+                        app:civ_border_width="1dp"/>
+
+                    <ImageView
+                        android:id="@+id/keyboard_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"
+                        android:src="@drawable/ic_keyboard_24dp"/>
+
+                </FrameLayout>
+
+
+                <FrameLayout
+                    android:id="@+id/input_text_and_voice"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="输入文本信息"
-                    android:maxLines="10"
-                    android:paddingLeft="@dimen/dimen_5dp"
-                    android:paddingRight="@dimen/dimen_5dp"
-                    android:textSize="@dimen/size_15sp"/>
+                    android:layout_weight="1"
+                    android:layout_gravity="bottom">
 
-                <android.support.v7.widget.CardView
-                    android:id="@+id/input_voice"
-                    app:cardBackgroundColor="@color/colorAccent"
-                    app:cardElevation="@dimen/dimen_2dp"
-                    app:cardCornerRadius="@dimen/dimen_3dp"
-                    android:visibility="gone"
+                    <EditText
+                        android:id="@+id/input_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="输入文本信息"
+                        android:maxLines="10"
+                        android:paddingLeft="@dimen/dimen_5dp"
+                        android:paddingRight="@dimen/dimen_5dp"
+                        android:textSize="@dimen/size_15sp"/>
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/input_voice"
+                        app:cardBackgroundColor="@color/colorAccent"
+                        app:cardElevation="@dimen/dimen_2dp"
+                        app:cardCornerRadius="@dimen/dimen_3dp"
+                        android:visibility="gone"
+                        android:layout_marginBottom="@dimen/dimen_5dp"
+                        android:layout_marginLeft="@dimen/dimen_5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dimen_40dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="@dimen/dimen_1dp"
+                            android:background="@drawable/btn_background"
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:text="按住，讲话"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/size_18sp"/>
+
+                    </android.support.v7.widget.CardView>
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/btn_more_and_send"
+                    android:layout_gravity="bottom"
                     android:layout_marginBottom="@dimen/dimen_5dp"
                     android:layout_marginLeft="@dimen/dimen_5dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_40dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_margin="@dimen/dimen_1dp"
-                        android:background="@drawable/btn_background"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:text="按住，讲话"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="@dimen/size_18sp"/>
-
-                </android.support.v7.widget.CardView>
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/btn_more_and_send"
-                android:layout_gravity="bottom"
-                android:layout_marginBottom="@dimen/dimen_5dp"
-                android:layout_marginLeft="@dimen/dimen_5dp"
-                android:layout_marginRight="@dimen/dimen_5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/more_view"
-                    android:layout_width="@dimen/dimen_40dp"
-                    android:layout_height="40dp"
-                    android:clickable="true"
                     android:layout_marginRight="@dimen/dimen_5dp"
-                    android:src="@drawable/ic_add_24dp"
-                    app:civ_border_width="1dp"
-                    app:civ_border_color="@color/colorAccent"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-                <android.support.v7.widget.CardView
-                    android:id="@+id/send_view_parent"
-                    android:layout_width="60dp"
-                    android:layout_height="43dp"
-                    android:visibility="gone"
-                    android:clickable="true"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="@dimen/dimen_3dp"
-                    app:cardElevation="@dimen/dimen_2dp">
-
-                    <TextView
-                        android:id="@+id/send_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/pic_chat_send_btn"
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/more_view"
+                        android:layout_width="@dimen/dimen_40dp"
+                        android:layout_height="40dp"
                         android:clickable="true"
-                        android:gravity="center"
-                        android:text="发送"
-                        android:textColor="@color/white"/>
+                        android:layout_marginRight="@dimen/dimen_5dp"
+                        android:src="@drawable/ic_add_24dp"
+                        app:civ_border_width="1dp"
+                        app:civ_border_color="@color/colorAccent"/>
 
-                </android.support.v7.widget.CardView>
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/send_view_parent"
+                        android:layout_width="60dp"
+                        android:layout_height="43dp"
+                        android:visibility="gone"
+                        android:clickable="true"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="@dimen/dimen_3dp"
+                        app:cardElevation="@dimen/dimen_2dp">
 
-            </FrameLayout>
+                        <TextView
+                            android:id="@+id/send_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/pic_chat_send_btn"
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:text="发送"
+                            android:textColor="@color/white"/>
 
+                    </android.support.v7.widget.CardView>
+
+                </FrameLayout>
+
+
+            </LinearLayout>
+
+            <!--更多功能的布局-->
+            <LinearLayout
+                android:id="@+id/more_layout"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/emotion_layout"
+                android:visibility="gone"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
+
 
 </RelativeLayout>

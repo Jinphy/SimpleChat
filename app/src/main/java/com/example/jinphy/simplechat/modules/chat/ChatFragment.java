@@ -45,6 +45,8 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private View bottomBar;
 
     private FloatingActionButton fab;
+    private FloatingActionButton fabEmotin;
+    private View emotionLayout;
 
     private FrameLayout btnVoiceAndKeyboard;
     private FrameLayout inputTextAndVoice;
@@ -111,11 +113,14 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private void findViewsById(View view) {
         appbarLayout = getActivity().findViewById(R.id.appbar_layout);
         fab = getActivity().findViewById(R.id.fab);
+        fabEmotin = view.findViewById(R.id.fab_emotion);
         bottomBar = view.findViewById(R.id.bottom_bar);
         recyclerView = view.findViewById(R.id.recycler_view);
         btnVoiceAndKeyboard = view.findViewById(R.id.btn_voice_and_keyboard);
         inputTextAndVoice = view.findViewById(R.id.input_text_and_voice);
         btnMoreAndSend = view.findViewById(R.id.btn_more_and_send);
+
+        emotionLayout = view.findViewById(R.id.emotion_layout);
 
     }
 
@@ -128,13 +133,14 @@ public class ChatFragment extends Fragment implements ChatContract.View {
 
 
 
-        Keyboard.open(getContext(), (EditText) findInputText());
+        Keyboard.open(getContext(), findInputText());
 
     }
 
     private void registerEvent() {
 
         fab.setOnClickListener(this::fabAction);
+        fabEmotin.setOnClickListener(this::fabAction);
 
         recyclerView.addOnScrollListener(getRecyclerViewListener());
         // 底部栏左边的按钮
@@ -169,8 +175,11 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private void onFocusChangeOfInputText(View view, boolean hasFocus) {
         if (hasFocus) {
             recyclerView.smoothScrollToPosition(presenter.getItemCount() - 1);
+            showFabEmotion();
+            hideEmotionLayout();
         } else {
             Keyboard.close(getContext(), findInputText());
+            hideFabEmotion();
         }
     }
 
@@ -243,8 +252,16 @@ public class ChatFragment extends Fragment implements ChatContract.View {
 
     @Override
     public void fabAction(View view) {
-        recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
-        showBar(recyclerView);
+        switch (view.getId()) {
+            case R.id.fab:
+                recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
+                showBar(recyclerView);
+                break;
+            case R.id.fab_emotion:
+                showEmotionLayout();
+                break;
+            default:break;
+        }
 
     }
 
@@ -327,6 +344,37 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         findInputVoice().setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void showEmotionLayout() {
+        emotionLayout.setVisibility(View.VISIBLE);
+        findInputText().clearFocus();
+    }
+
+    @Override
+    public void hideEmotionLayout() {
+        emotionLayout.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showFabEmotion() {
+        scaleFabEmotion(0,1,false);
+    }
+
+    @Override
+    public void hideFabEmotion() {
+        scaleFabEmotion(1,0,true);
+    }
+
+    private void scaleFabEmotion(float from,float to,final boolean gone) {
+        AnimUtils.just(fabEmotin)
+                .setScaleX(from,to)
+                .setScaleY(from,to)
+                .setDuration(IntConst.DURATION_250)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .onStart(a->{if(!gone)fabEmotin.setVisibility(View.VISIBLE);})
+                .onEnd(a->{if(gone)fabEmotin.setVisibility(View.GONE);})
+                .animate();
+    }
 
     //----------------------------------------------
     @Override

@@ -35,6 +35,14 @@ public interface ChatContract {
 
         void showVoiceInput();
 
+        void showEmotionLayout();
+
+        void hideEmotionLayout();
+
+        void showFabEmotion();
+
+        void hideFabEmotion();
+
     }
 
     interface Presenter extends BasePresenter {
