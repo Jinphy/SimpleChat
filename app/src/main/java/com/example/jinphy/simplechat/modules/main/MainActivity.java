@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
@@ -33,7 +35,10 @@ public class MainActivity extends BaseActivity {
         addFragment(fragment, R.id.fragment);
 
         presenter = getPresenter(fragment);
+
+
     }
+
 
     @Override
     public MainPresenter getPresenter(Fragment fragment) {

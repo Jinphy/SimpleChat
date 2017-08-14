@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -116,5 +118,15 @@ public class ImageUtil {
         int rawHeight = options.outHeight;
         return calculateInSampleSize(reqWidth, reqHeight, rawWidth, rawHeight);
     }
+
+    public static BitmapDrawable getDrawable(Context context, @DrawableRes int resourceId) {
+        return getDrawable(context.getResources(), resourceId);
+    }
+
+    public static BitmapDrawable getDrawable(Resources resources, @DrawableRes int resourceId) {
+        Bitmap bitmap = BitmapFactory.decodeResource(resources, resourceId);
+        return new BitmapDrawable(resources, bitmap);
+    }
+
 
 }

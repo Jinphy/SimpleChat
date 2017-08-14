@@ -1,7 +1,5 @@
 package com.example.jinphy.simplechat.modules.chat;
 
-import android.view.View;
-
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.model.Message;
@@ -24,6 +22,19 @@ public interface ChatContract {
         void animateBar(android.view.View view, float fromValue, float toValue, boolean showBar);
 
         void fabAction(android.view.View view);
+
+        void showSendBtn();
+
+        void showMoreBtn();
+
+        void showVoiceBtn();
+
+        void showKeyboardBtn();
+
+        void showTextInput();
+
+        void showVoiceInput();
+
     }
 
     interface Presenter extends BasePresenter {

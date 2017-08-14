@@ -4,20 +4,30 @@ import android.animation.AnimatorSet;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.listener_adapters.TextWatcherAdapter;
 import com.example.jinphy.simplechat.utils.AnimUtils;
+import com.example.jinphy.simplechat.utils.Keyboard;
 import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
@@ -31,12 +41,14 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private ChatContract.Presenter presenter;
 
     private RecyclerView recyclerView;
-
     private View appbarLayout;
-
     private View bottomBar;
 
     private FloatingActionButton fab;
+
+    private FrameLayout btnVoiceAndKeyboard;
+    private FrameLayout inputTextAndVoice;
+    private FrameLayout btnMoreAndSend;
 
 
     public ChatFragment() {
@@ -84,19 +96,127 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     @Override
     public void initView(View view) {
 
+        // 查找所有需要用到的View
+        findViewsById(view);
+
+        // 设置Views
+        setupViews();
+
+        // 为需要的View注册各种点击事件
+        registerEvent();
+
+
+    }
+
+    private void findViewsById(View view) {
         appbarLayout = getActivity().findViewById(R.id.appbar_layout);
         fab = getActivity().findViewById(R.id.fab);
         bottomBar = view.findViewById(R.id.bottom_bar);
         recyclerView = view.findViewById(R.id.recycler_view);
+        btnVoiceAndKeyboard = view.findViewById(R.id.btn_voice_and_keyboard);
+        inputTextAndVoice = view.findViewById(R.id.input_text_and_voice);
+        btnMoreAndSend = view.findViewById(R.id.btn_more_and_send);
+
+    }
+
+    private void setupViews(){
+        // 设置RecyclerView
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(presenter.getAdapter());
+        recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
+
+
+
+        Keyboard.open(getContext(), (EditText) findInputText());
+
+    }
+
+    private void registerEvent() {
 
         fab.setOnClickListener(this::fabAction);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.addOnScrollListener(getRecyclerViewListener());
+        // 底部栏左边的按钮
+        findBtnVoice().setOnClickListener(this::onClickOfBtnVoice);
+        findBtnKeyboard().setOnClickListener(this::onClickOfBtnKeyboard);
 
-        recyclerView.setAdapter(presenter.getAdapter());
-        recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        // 底部栏中间的文本输入和语音输入
+        EditText inputText = findInputText();
+        inputText.setOnFocusChangeListener(this::onFocusChangeOfInputText);
+        inputText.addTextChangedListener(getTextWatcher());
+        findInputVoice().setOnTouchListener(this::onTouchOfInputVoice);
+
+        // 底部栏右边的按钮
+        findBtnSend().setOnClickListener(this::onClickOfBtnSend);
+        findBtnMore().setOnClickListener(this::onClickOfBtnMore);
+
+    }
+
+    // 声音按钮的点击事件
+    private void onClickOfBtnVoice(View view) {
+        this.showKeyboardBtn();
+        this.showVoiceInput();
+    }
+
+    // 键盘按钮的点击事件
+    private void onClickOfBtnKeyboard(View view) {
+        this.showVoiceBtn();
+        this.showTextInput();
+    }
+
+    // 文本输入框的焦点改变事件
+    private void onFocusChangeOfInputText(View view, boolean hasFocus) {
+        if (hasFocus) {
+            recyclerView.smoothScrollToPosition(presenter.getItemCount() - 1);
+        } else {
+            Keyboard.close(getContext(), findInputText());
+        }
+    }
+
+    // 文本输入框的TextWatcher，监听文本的输入
+    private TextWatcher getTextWatcher() {
+        return new TextWatcherAdapter() {
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() == 0) {
+                    showMoreBtn();
+                } else {
+                    showSendBtn();
+                }
+            }
+        };
+    }
+
+
+    // 语音输入的触摸事件
+    private boolean onTouchOfInputVoice(View view, MotionEvent motionEvent) {
+        // TODO: 2017/8/14 录音功能
+
+
+        return false;
+    }
+
+    // 发送按钮的点击事件
+    private void onClickOfBtnSend(View view) {
+
+        EditText inputText =  findInputText();
+        String content = inputText.getText().toString();
+
+        inputText.setText("");
+        // TODO: 2017/8/14 发送消息逻辑
+
+
+    }
+
+    // 更多功能按钮的点击事件
+    private void onClickOfBtnMore(View view) {
+        // TODO: 2017/8/14 显示更多的逻辑
+    }
+
+    // RecyclerView的滑动事件
+    private RecyclerView.OnScrollListener getRecyclerViewListener() {
+        return new RecyclerView.OnScrollListener() {
             int total = 0;
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -112,7 +232,8 @@ public class ChatFragment extends Fragment implements ChatContract.View {
                     hideBar(recyclerView);
                 }
             }
-        });
+        };
+
     }
 
     @Override
@@ -127,6 +248,87 @@ public class ChatFragment extends Fragment implements ChatContract.View {
 
     }
 
+    //----------------------------------------------
+    private View findParentOfBtnSend() {
+        return btnMoreAndSend.findViewById(R.id.send_view_parent);
+    }
+
+    private View findBtnSend() {
+        return ((CardView) findParentOfBtnSend()).getChildAt(0);
+    }
+
+    private View findBtnMore() {
+        return btnMoreAndSend.findViewById(R.id.more_view);
+    }
+
+    @Override
+    public void showSendBtn() {
+        findParentOfBtnSend().setVisibility(View.VISIBLE);
+        findBtnMore().setVisibility(View.GONE);
+
+    }
+
+    @Override
+    public void showMoreBtn() {
+        findParentOfBtnSend().setVisibility(View.GONE);
+        findBtnMore().setVisibility(View.VISIBLE);
+    }
+
+
+
+    //----------------------------------------------
+
+    private View findBtnVoice() {
+        return btnVoiceAndKeyboard.findViewById(R.id.voice_View);
+    }
+    private View findBtnKeyboard() {
+        return btnVoiceAndKeyboard.findViewById(R.id.keyboard_view);
+    }
+
+    @Override
+    public void showVoiceBtn() {
+        findBtnVoice().setVisibility(View.VISIBLE);
+        findBtnKeyboard().setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showKeyboardBtn() {
+        findBtnVoice().setVisibility(View.GONE);
+        findBtnKeyboard().setVisibility(View.VISIBLE);
+
+    }
+
+
+    //----------------------------------------------
+
+    private EditText findInputText() {
+        return inputTextAndVoice.findViewById(R.id.input_text);
+    }
+    private View findInputVoice() {
+        return inputTextAndVoice.findViewById(R.id.input_voice);
+    }
+
+
+    @Override
+    public void showTextInput() {
+        EditText inputText = findInputText();
+        inputText.setVisibility(View.VISIBLE);
+        inputText.requestFocus();
+        Keyboard.open(getContext(),inputText);
+        recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
+        findInputVoice().setVisibility(View.GONE);
+
+
+    }
+
+    @Override
+    public void showVoiceInput() {
+        findInputText().setVisibility(View.GONE);
+        findInputVoice().setVisibility(View.VISIBLE);
+    }
+
+
+    //----------------------------------------------
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_chat_fragment,menu);
