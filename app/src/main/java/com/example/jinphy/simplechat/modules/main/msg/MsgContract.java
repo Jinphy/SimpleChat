@@ -34,7 +34,7 @@ public interface MsgContract {
 
     interface Presenter extends BasePresenter {
 
-        void handleItemEvent(android.view.View view, MsgRecord item);
+        <T> void handleItemEvent(android.view.View view, T item,int type,int position);
 
         List<MsgRecord> loadMsgRecord();
 

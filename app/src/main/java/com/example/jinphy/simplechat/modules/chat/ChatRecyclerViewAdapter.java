@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.model.Message;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
@@ -20,7 +21,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/13.
  */
 
-public class ChatRecyclerViewAdapter extends RecyclerView.Adapter{
+public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecyclerViewAdapter.ViewHolder> {
 
     private List<Message> messages;
 
@@ -30,7 +31,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter{
 
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int resourceId = 0;
         switch (Message.parseSourceType(viewType)) {
             case Message.TYPE_RECEIVE:
@@ -53,8 +54,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter{
 
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder tempHolder, int position) {
-        ViewHolder holder = ((ViewHolder) tempHolder);
+    public void onBindViewHolder(ViewHolder holder, int position) {
         Message message = messages.get(position);
 
         bindCommonView(holder,message,position);
@@ -140,21 +140,6 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter{
     }
 
 
-
-
-    private OnClickListener click;
-    private OnLongClickListener longClick;
-
-    public ChatRecyclerViewAdapter onClick(OnClickListener listener) {
-        this.click = listener;
-        return this;
-    }
-
-    public ChatRecyclerViewAdapter onLongClick(OnLongClickListener listener) {
-        this.longClick = listener;
-        return this;
-    }
-
     //==============================================================\\
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -222,16 +207,5 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter{
         }
     }
 
-
-
-    public interface OnClickListener {
-
-        void onClick(View view, Message item,int type,int position);
-    }
-
-    public interface OnLongClickListener {
-
-        boolean onLongClick(View view, Message item,int type,int position);
-    }
 }
 

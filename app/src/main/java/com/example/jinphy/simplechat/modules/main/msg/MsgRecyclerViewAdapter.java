@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.model.MsgRecord;
 import com.example.jinphy.simplechat.modules.chat.ChatRecyclerViewAdapter;
 import com.example.jinphy.simplechat.utils.Preconditions;
@@ -21,7 +22,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/10.
  */
 
-public class MsgRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecyclerViewAdapter.ViewHolder> {
+public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerViewAdapter.ViewHolder> {
 
     private List<MsgRecord> msgRecords;
 
@@ -44,12 +45,12 @@ public class MsgRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecyclerView
         // TODO: 2017/8/10 设置avatar等信息
 
         if (click != null) {
-            holder.avatar.setOnClickListener(view -> click.onClick(view,msgRecord));
-            holder.itemView.setOnClickListener(view -> click.onClick(view,msgRecord));
+            holder.avatar.setOnClickListener(view -> click.onClick(view,msgRecord,0,position));
+            holder.itemView.setOnClickListener(view -> click.onClick(view,msgRecord,0,position));
         }
         if (longClick != null) {
-            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord));
-            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord));
+            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord,0,position));
+            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord,0,position));
         }
 
 
@@ -59,19 +60,6 @@ public class MsgRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecyclerView
     @Override
     public int getItemCount() {
         return msgRecords.size();
-    }
-
-    private OnClickListener click;
-    private OnLongClickListener longClick;
-
-    public MsgRecyclerViewAdapter onClick(OnClickListener listener) {
-        this.click = listener;
-        return this;
-    }
-
-    public MsgRecyclerViewAdapter onLongClick(OnLongClickListener listener) {
-        this.longClick = listener;
-        return this;
     }
 
 
@@ -95,11 +83,5 @@ public class MsgRecyclerViewAdapter extends RecyclerView.Adapter<MsgRecyclerView
         }
     }
 
-    public interface OnClickListener{
-        void onClick(View view, MsgRecord item);
-    }
-    public interface OnLongClickListener{
-        boolean onLongClick(View view, MsgRecord item);
-    }
 }
 

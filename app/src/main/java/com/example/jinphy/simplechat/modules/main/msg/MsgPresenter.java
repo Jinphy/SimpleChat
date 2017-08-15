@@ -32,10 +32,10 @@ public class MsgPresenter implements MsgContract.Presenter {
 
 
     @Override
-    public void handleItemEvent(View view, MsgRecord item) {
+    public <T>void handleItemEvent(View view, T item,int type,int position) {
         switch (view.getId()) {
             case R.id.item_view:
-                MsgPresenter.this.view.showChatWindow(item);
+                MsgPresenter.this.view.showChatWindow((MsgRecord) item);
                 break;
         }
     }

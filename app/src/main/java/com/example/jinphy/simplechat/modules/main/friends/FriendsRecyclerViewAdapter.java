@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.model.Friend;
 import com.example.jinphy.simplechat.model.MsgRecord;
 import com.example.jinphy.simplechat.modules.main.msg.MsgRecyclerViewAdapter;
@@ -21,7 +22,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/10.
  */
 
-public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecyclerViewAdapter.ViewHolder> {
+public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsRecyclerViewAdapter.ViewHolder> {
 
     private List<Friend> friends;
 
@@ -44,32 +45,18 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
         // TODO: 2017/8/10 设置avatar等信息
 
         if (click != null) {
-            holder.avatar.setOnClickListener(view -> click.onClick(view,friend));
-            holder.itemView.setOnClickListener(view -> click.onClick(view,friend));
+            holder.avatar.setOnClickListener(view -> click.onClick(view,friend,0,position));
+            holder.itemView.setOnClickListener(view -> click.onClick(view,friend,0,position));
         }
         if (longClick != null) {
-            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view,friend));
-            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,friend));
+            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view,friend,0,position));
+            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,friend,0,position));
         }
     }
 
     @Override
     public int getItemCount() {
         return friends.size();
-    }
-
-
-    private OnClickListener click;
-    private OnLongClickListener longClick;
-
-    public FriendsRecyclerViewAdapter onClick(OnClickListener listener) {
-        this.click = listener;
-        return this;
-    }
-
-    public FriendsRecyclerViewAdapter onLongClick(OnLongClickListener listener) {
-        this.longClick = listener;
-        return this;
     }
 
 
@@ -95,12 +82,5 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
         }
     }
 
-
-    public interface OnClickListener{
-        void onClick(View view, Friend item);
-    }
-    public interface OnLongClickListener{
-        boolean onLongClick(View view, Friend item);
-    }
 }
 
