@@ -26,11 +26,9 @@ import java.util.List;
  * Use the {@link FriendsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FriendsFragment extends BaseFragment implements FriendsContract.View {
+public class FriendsFragment extends BaseFragment<FriendsPresenter> implements FriendsContract.View {
 
     private MainFragment fragment;
-
-    private FriendsContract.Presenter presenter;
 
     RecyclerView recyclerView;
 
@@ -56,8 +54,7 @@ public class FriendsFragment extends BaseFragment implements FriendsContract.Vie
     public void onResume() {
         super.onResume();
         if (presenter == null) {
-
-            this.presenter = fragment.getFriendsPresenter(this);
+            this.presenter = getPresenter();
         }
         this.presenter.start();
     }
@@ -78,10 +75,6 @@ public class FriendsFragment extends BaseFragment implements FriendsContract.Vie
     }
 
 
-    @Override
-    public void setPresenter(@NonNull FriendsContract.Presenter presenter) {
-        this.presenter = Preconditions.checkNotNull(presenter);
-    }
 
     private RecyclerView.OnScrollListener getOnScrollListener() {
         return new RecyclerView.OnScrollListener() {

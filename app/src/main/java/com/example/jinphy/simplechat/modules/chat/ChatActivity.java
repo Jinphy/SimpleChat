@@ -27,6 +27,7 @@ public class ChatActivity extends BaseActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left_24dp);
 
         ChatFragment fragment = ChatFragment.newInstance();
+        fragment.setCallback(this::getPresenter);
         addFragment(fragment, R.id.fragment);
 
         getPresenter(fragment);

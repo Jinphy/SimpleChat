@@ -27,18 +27,13 @@ import com.example.jinphy.simplechat.utils.Preconditions;
  * Use the {@link LoginFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LoginFragment extends BaseFragment implements LoginContract.View{
+public class LoginFragment extends BaseFragment<LoginPresenter> implements LoginContract.View{
 
 
     private TextInputEditText accountText;
     private TextInputEditText passwordText;
     private View gotoSignUp;
     private FloatingActionButton fab;
-
-    private LoginActivity activity;
-
-    private LoginContract.Presenter presenter;
-
 
 
     public LoginFragment() {
@@ -60,7 +55,7 @@ public class LoginFragment extends BaseFragment implements LoginContract.View{
     public void onResume() {
         super.onResume();
         if (this.presenter == null) {
-            this.presenter = activity.getPresenter(this);
+            this.presenter = getPresenter();
         }
         this.presenter.start();
     }
@@ -69,13 +64,8 @@ public class LoginFragment extends BaseFragment implements LoginContract.View{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        activity = null;
     }
 
-    @Override
-    public void setPresenter(LoginContract.Presenter presenter) {
-        this.presenter = Preconditions.checkNotNull(presenter);
-    }
 
 
     @Override
@@ -89,7 +79,6 @@ public class LoginFragment extends BaseFragment implements LoginContract.View{
 
     @Override
     protected void findViewsById(View view) {
-        activity = (LoginActivity) getActivity();
 
         accountText = view.findViewById(R.id.account_text);
         passwordText = view.findViewById(R.id.password_text);
@@ -115,6 +104,6 @@ public class LoginFragment extends BaseFragment implements LoginContract.View{
     }
 
     private void fabAction(View view) {
-        activity.showSnack(view,"you click the fab!");
+        ((LoginActivity) getActivity()).showSnack(view,"you click the fab!");
     }
 }

@@ -11,6 +11,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.modules.main.MainActivity;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.constants.IntConst;
@@ -24,13 +25,10 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
  * Use the {@link WelcomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WelcomeFragment extends BaseFragment implements WelcomeContract.View {
+public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements WelcomeContract.View {
 
 
 
-    private WelcomeActivity activity;
-
-    private WelcomeContract.Presenter presenter;
 
     private ImageView startView;
 
@@ -66,21 +64,21 @@ public class WelcomeFragment extends BaseFragment implements WelcomeContract.Vie
     public void onResume() {
         super.onResume();
         if (presenter == null) {
-            presenter = activity.getPresenter(this);
+            presenter = getPresenter();
         }
         presenter.start();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        activity = null;
-    }
+//    @Override
+//    protected WelcomePresenter getPresenter() {
+//        if (callback == null) {
+//            throw new NullPointerException(
+//                    "the callback cannot be null,you must invoke the fragment.setCallback() method");
+//        }
+//        return (WelcomePresenter) callback.getPresenter(this);
+//    }
 
-    @Override
-    public void setPresenter(@NonNull WelcomeContract.Presenter presenter) {
-        this.presenter = presenter;
-    }
+
 
     @Override
     protected int getResourceId() {
@@ -93,7 +91,6 @@ public class WelcomeFragment extends BaseFragment implements WelcomeContract.Vie
 
     @Override
     protected void findViewsById(View view) {
-        activity = (WelcomeActivity) getActivity();
 
         startView = view.findViewById(R.id.background);
         loginView = view.findViewById(R.id.btn_login);
@@ -127,23 +124,23 @@ public class WelcomeFragment extends BaseFragment implements WelcomeContract.Vie
 
     @Override
     public void showLoginView(View view) {
-        Intent intent = new Intent(activity, LoginActivity.class);
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
         startActivity(intent);
-        activity.finish();
+        getActivity().finish();
     }
 
     @Override
     public void showSignUpView(View view) {
-        Intent intent = new Intent(activity, SignUpActivity.class);
+        Intent intent = new Intent(getActivity(), SignUpActivity.class);
         startActivity(intent);
-        activity.finish();
+        getActivity().finish();
     }
 
     @Override
     public void showMainActivity() {
-        Intent intent = new Intent(activity, MainActivity.class);
+        Intent intent = new Intent(getActivity(), MainActivity.class);
         startActivity(intent);
-        activity.finish();
+        getActivity().finish();
     }
 
     @Override
@@ -151,7 +148,7 @@ public class WelcomeFragment extends BaseFragment implements WelcomeContract.Vie
         AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
         AnimUtils.just(appNameView)
                 .setAlpha(0f,appNameView.getAlpha())
-                .setTranY(-100* ScreenUtils.getDensity(activity),0)
+                .setTranY(-100* ScreenUtils.getDensity(getActivity()),0)
                 .setDuration(IntConst.DURATION_1500)
                 .setInterpolator(interpolator)
                 .onEnd(a->presenter.doAfterWelcome(getContext()))

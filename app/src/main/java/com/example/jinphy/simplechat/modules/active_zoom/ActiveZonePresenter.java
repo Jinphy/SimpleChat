@@ -14,7 +14,6 @@ public class ActiveZonePresenter implements ActiveZoneContract.Presenter {
     public ActiveZonePresenter(ActiveZoneFragment view) {
         this.view = Preconditions.checkNotNull(view);
 
-        this.view.setPresenter(this);
     }
 
     @Override

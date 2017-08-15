@@ -23,7 +23,6 @@ public class ChatPresenter implements ChatContract.Presenter {
     public ChatPresenter(@NonNull ChatContract.View view) {
         this.view = Preconditions.checkNotNull(view);
 
-        this.view.setPresenter(this);
     }
 
 

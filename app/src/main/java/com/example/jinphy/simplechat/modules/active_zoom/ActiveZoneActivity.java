@@ -1,11 +1,7 @@
 package com.example.jinphy.simplechat.modules.active_zoom;
 
-import android.graphics.Rect;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Window;
+import android.support.v4.app.Fragment;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
@@ -21,6 +17,7 @@ public class ActiveZoneActivity extends BaseActivity {
         ScreenUtils.setStatusBarColor(this,0xff000000);
 
         ActiveZoneFragment fragment = ActiveZoneFragment.newInstance();
+        fragment.setCallback(this::getPresenter);
         addFragment(fragment,R.id.fragment);
     }
 

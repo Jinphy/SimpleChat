@@ -15,7 +15,6 @@ public class LoginPresenter implements LoginContract.Presenter {
     public LoginPresenter(@NonNull LoginContract.View view) {
         this.view = Preconditions.checkNotNull(view);
 
-        this.view.setPresenter(this);
     }
 
 

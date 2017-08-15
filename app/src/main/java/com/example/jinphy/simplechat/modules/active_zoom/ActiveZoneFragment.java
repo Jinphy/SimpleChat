@@ -14,8 +14,9 @@ import com.example.jinphy.simplechat.utils.Preconditions;
  * Use the {@link ActiveZoneFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ActiveZoneFragment extends BaseFragment implements ActiveZoneContract.View {
-    private ActiveZoneContract.Presenter presenter;
+public class ActiveZoneFragment extends BaseFragment<ActiveZonePresenter>
+        implements ActiveZoneContract.View {
+
 
 
     private RecyclerView recyclerView;
@@ -30,6 +31,15 @@ public class ActiveZoneFragment extends BaseFragment implements ActiveZoneContra
     public ActiveZoneFragment() {
         // Required empty public constructor
     }
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if (this.presenter == null) {
+//            this.presenter = getPresenter();
+//        }
+//        this.presenter.start();
+//    }
 
     @Override
     protected int getResourceId() {
@@ -72,9 +82,4 @@ public class ActiveZoneFragment extends BaseFragment implements ActiveZoneContra
         return fragment;
     }
 
-
-    @Override
-    public void setPresenter(ActiveZoneContract.Presenter presenter) {
-        this.presenter = Preconditions.checkNotNull(presenter);
-    }
 }

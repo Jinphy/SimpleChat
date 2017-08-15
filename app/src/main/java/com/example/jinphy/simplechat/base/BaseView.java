@@ -6,7 +6,4 @@ package com.example.jinphy.simplechat.base;
 
 public interface BaseView<T> {
 
-    void setPresenter(T presenter);
-
-
 }

@@ -13,8 +13,6 @@ public class SelfPresenter implements SelfContract.Presenter {
 
     public SelfPresenter(@NonNull SelfContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-
-        this.view.setPresenter(this);
     }
 
     @Override

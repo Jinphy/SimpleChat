@@ -20,7 +20,6 @@ public class RoutinePresenter implements RoutineContract.Presenter {
 
         this.view = Preconditions.checkNotNull(view);
 
-        this.view.setPresenter(this);
     }
 
 

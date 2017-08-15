@@ -47,7 +47,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
 
-    public abstract <T> T getPresenter(Fragment fragment) ;
+    public abstract <T extends BasePresenter> T getPresenter(Fragment fragment) ;
 
 
     /**

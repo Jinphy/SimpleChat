@@ -18,7 +18,6 @@ public class WelcomePresenter implements WelcomeContract.Presenter {
     public WelcomePresenter(@NonNull WelcomeContract.View view) {
         this.view = Preconditions.checkNotNull(view);
 
-        this.view.setPresenter(this);
     }
 
     @Override

@@ -4,6 +4,8 @@ import android.support.annotation.IntRange;
 
 import com.example.jinphy.simplechat.utils.MathUtils;
 
+import java.util.function.Function;
+
 /**
  * Created by jinphy on 2017/8/13.
  */

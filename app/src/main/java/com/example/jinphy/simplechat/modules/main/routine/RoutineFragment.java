@@ -25,11 +25,9 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
  * Use the {@link RoutineFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoutineFragment extends BaseFragment implements RoutineContract.View {
+public class RoutineFragment extends BaseFragment<RoutinePresenter> implements RoutineContract.View {
 
     private MainFragment fragment;
-
-    private RoutineContract.Presenter presenter;
 
     FloatingActionButton fab;
 
@@ -60,7 +58,7 @@ public class RoutineFragment extends BaseFragment implements RoutineContract.Vie
     public void onResume() {
         super.onResume();
         if (this.presenter == null) {
-            this.presenter = fragment.getRoutinePresenter(this);
+            this.presenter = getPresenter();
         }
         this.presenter.start();
 
@@ -77,10 +75,6 @@ public class RoutineFragment extends BaseFragment implements RoutineContract.Vie
         fab.setOnClickListener(this::fabAction);
     }
 
-    @Override
-    public void setPresenter(RoutineContract.Presenter presenter) {
-        this.presenter = Preconditions.checkNotNull(presenter);
-    }
 
 
     @Override

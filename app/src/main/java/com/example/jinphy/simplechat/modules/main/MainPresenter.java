@@ -17,7 +17,6 @@ public class MainPresenter implements MainContract.Presenter {
     public MainPresenter(MainContract.View view) {
         this.view = Preconditions.checkNotNull(view);
 
-        this.view.setPresenter(this);
     }
 
     @Override

@@ -20,7 +20,6 @@ public class FriendsPresenter implements FriendsContract.Presenter {
     public FriendsPresenter(@NonNull FriendsContract.View view) {
         this.view = Preconditions.checkNotNull(view);
 
-        this.view.setPresenter(this);
     }
 
     @Override

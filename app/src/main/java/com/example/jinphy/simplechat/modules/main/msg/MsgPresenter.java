@@ -22,7 +22,6 @@ public class MsgPresenter implements MsgContract.Presenter {
     public MsgPresenter(@NonNull MsgContract.View view) {
         this.view = Preconditions.checkNotNull(view);
 
-        this.view.setPresenter(this);
     }
 
     @Override

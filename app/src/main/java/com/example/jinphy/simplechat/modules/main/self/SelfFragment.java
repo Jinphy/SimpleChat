@@ -39,11 +39,9 @@ import io.reactivex.schedulers.Schedulers;
  * Use the {@link SelfFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SelfFragment extends BaseFragment implements SelfContract.View {
+public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfContract.View {
 
     private MainFragment fragment;
-
-    private SelfContract.Presenter presenter;
 
     private FloatingActionButton fab;
 
@@ -76,7 +74,7 @@ public class SelfFragment extends BaseFragment implements SelfContract.View {
     public void onResume() {
         super.onResume();
         if (this.presenter == null) {
-            this.presenter = fragment.getSelfPresenter(this);
+            this.presenter = getPresenter();
         }
         this.presenter.start();
     }
@@ -97,11 +95,6 @@ public class SelfFragment extends BaseFragment implements SelfContract.View {
 
     }
 
-
-    @Override
-    public void setPresenter(SelfContract.Presenter presenter) {
-        this.presenter = Preconditions.checkNotNull(presenter);
-    }
 
     @Override
     protected int getResourceId() {

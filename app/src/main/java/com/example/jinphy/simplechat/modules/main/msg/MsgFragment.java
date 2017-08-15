@@ -28,11 +28,9 @@ import java.util.List;
  * Use the {@link MsgFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MsgFragment extends BaseFragment implements MsgContract.View{
+public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContract.View{
 
     private MainFragment fragment;
-
-    private MsgContract.Presenter presenter;
 
     private RecyclerView recyclerView;
 
@@ -58,7 +56,7 @@ public class MsgFragment extends BaseFragment implements MsgContract.View{
     public void onResume() {
         super.onResume();
         if (this.presenter == null) {
-            this.presenter = fragment.getMsgPresenter(this);
+            this.presenter = getPresenter();
         }
         this.presenter.start();
     }
@@ -75,11 +73,6 @@ public class MsgFragment extends BaseFragment implements MsgContract.View{
     public void fabAction(View view) {
         fragment.showBar(recyclerView);
         recyclerView.smoothScrollToPosition(0);
-    }
-
-    @Override
-    public void setPresenter(@NonNull MsgContract.Presenter presenter) {
-        this.presenter = Preconditions.checkNotNull(presenter);
     }
 
     private RecyclerView.OnScrollListener getOnScrollListener() {

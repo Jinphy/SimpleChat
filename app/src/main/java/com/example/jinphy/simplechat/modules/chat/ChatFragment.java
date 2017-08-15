@@ -1,24 +1,18 @@
 package com.example.jinphy.simplechat.modules.chat;
 
 import android.animation.AnimatorSet;
-import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -31,7 +25,6 @@ import com.example.jinphy.simplechat.listener_adapters.TextWatcherAdapter;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
-import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
@@ -40,16 +33,15 @@ import com.example.jinphy.simplechat.utils.ViewUtils;
  * Use the {@link ChatFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatFragment extends BaseFragment implements ChatContract.View {
+public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatContract.View {
 
-    private ChatContract.Presenter presenter;
 
     private RecyclerView recyclerView;
     private View appbarLayout;
     private View bottomBar;
 
     private FloatingActionButton fab;
-    private FloatingActionButton fabEmotin;
+    private FloatingActionButton fabEmotion;
     private View emotionLayout;
 
     private FrameLayout btnVoiceAndKeyboard;
@@ -84,12 +76,10 @@ public class ChatFragment extends BaseFragment implements ChatContract.View {
     @Override
     public void onResume() {
         super.onResume();
+        if (presenter == null) {
+            presenter = getPresenter();
+        }
         presenter.start();
-    }
-
-    @Override
-    public void setPresenter(ChatContract.Presenter presenter) {
-        this.presenter = Preconditions.checkNotNull(presenter);
     }
 
 
@@ -97,7 +87,7 @@ public class ChatFragment extends BaseFragment implements ChatContract.View {
     protected void findViewsById(View view) {
         appbarLayout = getActivity().findViewById(R.id.appbar_layout);
         fab = getActivity().findViewById(R.id.fab);
-        fabEmotin = view.findViewById(R.id.fab_emotion);
+        fabEmotion = view.findViewById(R.id.fab_emotion);
         bottomBar = view.findViewById(R.id.bottom_bar);
         recyclerView = view.findViewById(R.id.recycler_view);
         btnVoiceAndKeyboard = view.findViewById(R.id.btn_voice_and_keyboard);
@@ -127,7 +117,7 @@ public class ChatFragment extends BaseFragment implements ChatContract.View {
     protected void registerEvent() {
 
         fab.setOnClickListener(this::fabAction);
-        fabEmotin.setOnClickListener(this::fabAction);
+        fabEmotion.setOnClickListener(this::fabAction);
 
         recyclerView.addOnScrollListener(getRecyclerViewListener());
         // 底部栏左边的按钮
@@ -352,13 +342,13 @@ public class ChatFragment extends BaseFragment implements ChatContract.View {
     }
 
     private void scaleFabEmotion(float from,float to,final boolean gone) {
-        AnimUtils.just(fabEmotin)
+        AnimUtils.just(fabEmotion)
                 .setScaleX(from,to)
                 .setScaleY(from,to)
                 .setDuration(IntConst.DURATION_250)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
-                .onStart(a->{if(!gone)fabEmotin.setVisibility(View.VISIBLE);})
-                .onEnd(a->{if(gone)fabEmotin.setVisibility(View.GONE);})
+                .onStart(a->{if(!gone) fabEmotion.setVisibility(View.VISIBLE);})
+                .onEnd(a->{if(gone) fabEmotion.setVisibility(View.GONE);})
                 .animate();
     }
 

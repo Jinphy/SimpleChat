@@ -16,7 +16,6 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     public SignUpPresenter(@NonNull SignUpContract.View view) {
         this.view = Preconditions.checkNotNull(view);
 
-        this.view.setPresenter(this);
     }
 
     @Override

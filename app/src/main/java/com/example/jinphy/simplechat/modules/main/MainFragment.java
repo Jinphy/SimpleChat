@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsFragment;
@@ -46,17 +47,12 @@ import java.util.List;
  * Use the {@link MainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainFragment extends BaseFragment implements MainContract.View {
+public class MainFragment extends BaseFragment<MainPresenter> implements MainContract.View {
 
     public static final int MSG_FRAGMENT = 0;
     public static final int FRIEND_FRAGMENT = 1;
     public static final int ROUTINE_FRAGMENT = 2;
     public static final int SELF_FRAGMENT = 3;
-
-
-    private MainActivity activity;
-
-    private MainContract.Presenter presenter;
 
     private ViewPager viewPager;
 
@@ -106,17 +102,10 @@ public class MainFragment extends BaseFragment implements MainContract.View {
     public void onResume() {
         super.onResume();
         if (presenter == null) {
-            presenter = activity.getPresenter(this);
+            presenter = getPresenter();
         }
         presenter.start();
     }
-
-    @Override
-    public void setPresenter(MainContract.Presenter presenter) {
-        this.presenter = Preconditions.checkNotNull(presenter);
-    }
-
-
 
     @Override
     protected int getResourceId() {
@@ -155,12 +144,12 @@ public class MainFragment extends BaseFragment implements MainContract.View {
 
     private MainViewPagerAdapter getAdapter() {
         List<Fragment> fragments = generateFragments();
-        return new MainViewPagerAdapter(activity.getSupportFragmentManager(), fragments);
+        return new MainViewPagerAdapter(getActivity().getSupportFragmentManager(), fragments);
     }
 
     @Override
     protected void findViewsById(View view) {
-        activity = (MainActivity) getActivity();
+        MainActivity activity = (MainActivity) getActivity();
 
         appbarLayout = activity.findViewById(R.id.appbar_layout);
         toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
@@ -404,6 +393,11 @@ public class MainFragment extends BaseFragment implements MainContract.View {
         routineFragment = RoutineFragment.newInstance(this);
         selfFragment = SelfFragment.newInstance(this);
 
+        msgFragment.setCallback(this::getMsgPresenter);
+        friendsFragment.setCallback(this::getFriendsPresenter);
+        routineFragment.setCallback(this::getRoutinePresenter);
+        selfFragment.setCallback(this::getSelfPresenter);
+
         List<Fragment> fragments = new ArrayList<>(4);
         fragments.add(msgFragment);
         fragments.add(friendsFragment);
@@ -418,27 +412,27 @@ public class MainFragment extends BaseFragment implements MainContract.View {
     }
 
     @Override
-    public MsgPresenter getMsgPresenter(MsgContract.View view) {
+    public MsgPresenter getMsgPresenter(Fragment fragment) {
 
-        return new MsgPresenter(view);
+        return new MsgPresenter((MsgContract.View) fragment);
     }
 
     @Override
-    public FriendsPresenter getFriendsPresenter(FriendsContract.View view) {
+    public FriendsPresenter getFriendsPresenter(Fragment fragment) {
 
-        return new FriendsPresenter(view);
+        return new FriendsPresenter((FriendsContract.View) fragment);
     }
 
     @Override
-    public RoutinePresenter getRoutinePresenter(RoutineContract.View view) {
+    public RoutinePresenter getRoutinePresenter(Fragment fragment) {
 
-        return new RoutinePresenter(view);
+        return new RoutinePresenter((RoutineContract.View) fragment);
     }
 
     @Override
-    public SelfPresenter getSelfPresenter(SelfContract.View view) {
+    public SelfPresenter getSelfPresenter(Fragment fragment) {
 
-        return new SelfPresenter(view);
+        return new SelfPresenter((SelfContract.View) fragment);
     }
 
 

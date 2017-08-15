@@ -37,7 +37,7 @@ public abstract class BaseRecyclerViewAdapter<VH extends RecyclerView.ViewHolder
     }
 
 
-    public interface OnClickListener<T extends Object> {
+    public interface OnClickListener<T> {
 
         void onClick(View view, T item, int type, int position);
     }

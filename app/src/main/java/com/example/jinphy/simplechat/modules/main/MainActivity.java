@@ -32,6 +32,7 @@ public class MainActivity extends BaseActivity {
 
 
         MainFragment fragment = MainFragment.newInstance();
+        fragment.setCallback(this::getPresenter);
         addFragment(fragment, R.id.fragment);
 
         presenter = getPresenter(fragment);

@@ -28,6 +28,7 @@ public class SignUpActivity extends BaseActivity {
         actionBar.setTitle(R.string.sign_up);
 
         SignUpFragment fragment = SignUpFragment.newInstance();
+        fragment.setCallback(this::getPresenter);
         addFragment(fragment,R.id.fragment);
 
         getPresenter(fragment);

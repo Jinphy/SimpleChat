@@ -31,13 +31,13 @@ public interface MainContract {
 
         List<Fragment> generateFragments();
 
-        MsgPresenter getMsgPresenter(MsgContract.View view);
+        MsgPresenter getMsgPresenter(Fragment view);
 
-        FriendsPresenter getFriendsPresenter(FriendsContract.View view);
+        FriendsPresenter getFriendsPresenter(Fragment view);
 
-        RoutinePresenter getRoutinePresenter(RoutineContract.View view);
+        RoutinePresenter getRoutinePresenter(Fragment view);
 
-        SelfPresenter getSelfPresenter(SelfContract.View view);
+        SelfPresenter getSelfPresenter(Fragment view);
 
         void selectTab(int position,boolean setItem);
 
