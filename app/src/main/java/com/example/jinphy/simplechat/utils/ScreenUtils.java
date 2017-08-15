@@ -25,6 +25,10 @@ public class ScreenUtils {
 
 	}
 
+	public static int dp2px(int dpValue, float density) {
+		return (int) (dpValue*density+0.5f);
+	}
+
 	/**
 	 * 把像素单位转换为像素无关单位dp
 	 * @param context    上下文
@@ -122,4 +126,6 @@ public class ScreenUtils {
 	public static float getScaleDensity(Context context) {
 		return context.getResources().getDisplayMetrics().scaledDensity;
 	}
+
+
 }

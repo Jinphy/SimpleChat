@@ -1,7 +1,5 @@
 package com.example.jinphy.simplechat.base;
 
-import android.view.View;
-
 /**
  * Created by jinphy on 2017/8/9.
  */
@@ -9,10 +7,6 @@ import android.view.View;
 public interface BaseView<T> {
 
     void setPresenter(T presenter);
-
-    void initView(View view);
-
-    void initData();
 
 
 }

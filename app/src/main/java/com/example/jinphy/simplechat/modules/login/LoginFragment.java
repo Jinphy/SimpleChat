@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
@@ -26,7 +27,7 @@ import com.example.jinphy.simplechat.utils.Preconditions;
  * Use the {@link LoginFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LoginFragment extends Fragment  implements LoginContract.View{
+public class LoginFragment extends BaseFragment implements LoginContract.View{
 
 
     private TextInputEditText accountText;
@@ -64,12 +65,6 @@ public class LoginFragment extends Fragment  implements LoginContract.View{
         this.presenter.start();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
 
     @Override
     public void onDestroyView() {
@@ -78,41 +73,39 @@ public class LoginFragment extends Fragment  implements LoginContract.View{
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        activity = (LoginActivity) getActivity();
-
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_login, container, false);
-
-        initView(root);
-
-        initData();
-
-        return root;
-    }
-
-
-    @Override
     public void setPresenter(LoginContract.Presenter presenter) {
         this.presenter = Preconditions.checkNotNull(presenter);
     }
 
+
     @Override
-    public void initView(View view) {
-
-        accountText = view.findViewById(R.id.account_text);
-        passwordText = view.findViewById(R.id.password_text);
-        gotoSignUp = view.findViewById(R.id.goto_sign_up_text);
-        gotoSignUp.setOnClickListener(this::showSignUp);
-        fab = getActivity().findViewById(R.id.fab_login);
-        fab.setOnClickListener(this::fabAction);
-
+    protected int getResourceId() {
+        return R.layout.fragment_login;
     }
 
     @Override
     public void initData() {
+    }
 
+    @Override
+    protected void findViewsById(View view) {
+        activity = (LoginActivity) getActivity();
+
+        accountText = view.findViewById(R.id.account_text);
+        passwordText = view.findViewById(R.id.password_text);
+        gotoSignUp = view.findViewById(R.id.goto_sign_up_text);
+        fab = getActivity().findViewById(R.id.fab_login);
+    }
+
+    @Override
+    protected void setupViews() {
+
+    }
+
+    @Override
+    protected void registerEvent() {
+        gotoSignUp.setOnClickListener(this::showSignUp);
+        fab.setOnClickListener(this::fabAction);
     }
 
     @Override

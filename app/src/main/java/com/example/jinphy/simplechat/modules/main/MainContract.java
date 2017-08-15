@@ -51,11 +51,13 @@ public interface MainContract {
 
         void showBar(android.view.View view);
 
+        void setStatusBarColor(float factor);
+
         void setToolbarAlpha(float faction);
 
         void setHeadViewTransY(float faction,int baseTransY,int distance);
 
-        void initFab();
+        void initFab(int position);
 
         int currentItemPosition();
 

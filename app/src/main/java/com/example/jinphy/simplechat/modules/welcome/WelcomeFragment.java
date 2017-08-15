@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 
+import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.modules.main.MainActivity;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.constants.IntConst;
@@ -23,7 +24,7 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
  * Use the {@link WelcomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WelcomeFragment extends Fragment implements WelcomeContract.View {
+public class WelcomeFragment extends BaseFragment implements WelcomeContract.View {
 
 
 
@@ -59,28 +60,7 @@ public class WelcomeFragment extends Fragment implements WelcomeContract.View {
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        activity  = (WelcomeActivity) getActivity();
-
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_welcome, container, false);
-
-        initData();
-
-        initView(root);
-
-
-        return root;
-    }
 
     @Override
     public void onResume() {
@@ -103,33 +83,46 @@ public class WelcomeFragment extends Fragment implements WelcomeContract.View {
     }
 
     @Override
-    public void initView(View view) {
+    protected int getResourceId() {
+        return R.layout.fragment_welcome;
+    }
+
+    @Override
+    public void initData() {
+    }
+
+    @Override
+    protected void findViewsById(View view) {
+        activity = (WelcomeActivity) getActivity();
+
         startView = view.findViewById(R.id.background);
         loginView = view.findViewById(R.id.btn_login);
         signUpView = view.findViewById(R.id.btn_sign_up);
         appNameView = view.findViewById(R.id.app_name);
         btnLayout = view.findViewById(R.id.btn_layout);
-
-        showAnimator();
-        loginView.setOnClickListener(this::showLoginView);
-        signUpView.setOnClickListener(this::showSignUpView);
-
-
-//        ViewTreeObserver observer = view.getViewTreeObserver();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//            observer.addOnGlobalLayoutListener( () -> {
-//                if (!hasLoaded) {
-//                    ImageUtil.from(activity)
-//                            .with(R.drawable.pic_start)
-//                            .into(startView);
-//                    hasLoaded = true;
-//                }
-//            });
-//        }
     }
 
     @Override
-    public void initData() {
+    protected void setupViews() {
+
+        showAnimator();
+        //        ViewTreeObserver observer = view.getViewTreeObserver();
+        //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+        //            observer.addOnGlobalLayoutListener( () -> {
+        //                if (!hasLoaded) {
+        //                    ImageUtil.from(activity)
+        //                            .with(R.drawable.pic_start)
+        //                            .into(startView);
+        //                    hasLoaded = true;
+        //                }
+        //            });
+        //        }
+    }
+
+    @Override
+    protected void registerEvent() {
+        loginView.setOnClickListener(this::showLoginView);
+        signUpView.setOnClickListener(this::showSignUpView);
     }
 
     @Override

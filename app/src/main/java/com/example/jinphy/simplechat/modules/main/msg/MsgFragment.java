@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.model.MsgRecord;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
@@ -27,7 +28,7 @@ import java.util.List;
  * Use the {@link MsgFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MsgFragment extends Fragment implements MsgContract.View{
+public class MsgFragment extends BaseFragment implements MsgContract.View{
 
     private MainFragment fragment;
 
@@ -54,13 +55,6 @@ public class MsgFragment extends Fragment implements MsgContract.View{
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         if (this.presenter == null) {
@@ -84,33 +78,12 @@ public class MsgFragment extends Fragment implements MsgContract.View{
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_msg, container, false);
-
-        initView(root);
-
-        initData();
-
-        return root;
-    }
-
-    @Override
     public void setPresenter(@NonNull MsgContract.Presenter presenter) {
         this.presenter = Preconditions.checkNotNull(presenter);
     }
 
-    @Override
-    public void initView(View view) {
-
-        recyclerView = view.findViewById(R.id.recycler_view);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(presenter.getAdapter());
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+    private RecyclerView.OnScrollListener getOnScrollListener() {
+        return new RecyclerView.OnScrollListener() {
             int total = 0;
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -126,12 +99,35 @@ public class MsgFragment extends Fragment implements MsgContract.View{
                     fragment.showBar(recyclerView);
                 }
             }
-        });
+        };
+    }
+
+    @Override
+    protected int getResourceId() {
+        return R.layout.fragment_msg;
+    }
+
+    @Override
+    protected void initData() {
+    }
+
+    @Override
+    protected void findViewsById(View view) {
+        recyclerView = view.findViewById(R.id.recycler_view);
 
     }
 
     @Override
-    public void initData() {
+    protected void setupViews() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(presenter.getAdapter());
+
+    }
+
+    @Override
+    protected void registerEvent() {
+        recyclerView.addOnScrollListener(getOnScrollListener());
     }
 
     @Override

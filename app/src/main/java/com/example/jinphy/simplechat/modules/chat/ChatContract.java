@@ -43,6 +43,8 @@ public interface ChatContract {
 
         void hideFabEmotion();
 
+        void setStatusBarColor(float factor);
+
     }
 
     interface Presenter extends BasePresenter {

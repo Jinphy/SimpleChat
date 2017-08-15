@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
@@ -14,7 +15,7 @@ import com.example.jinphy.simplechat.utils.Preconditions;
  * Use the {@link SignUpFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SignUpFragment extends Fragment implements SignUpContract.View {
+public class SignUpFragment extends BaseFragment implements SignUpContract.View {
 
 
     private SignUpActivity activity;
@@ -32,17 +33,9 @@ public class SignUpFragment extends Fragment implements SignUpContract.View {
      *
      * @return A new instance of fragment SignUpFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static SignUpFragment newInstance() {
         SignUpFragment fragment = new SignUpFragment();
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        this.activity = (SignUpActivity) getActivity();
     }
 
     @Override
@@ -54,11 +47,11 @@ public class SignUpFragment extends Fragment implements SignUpContract.View {
         this.presenter.start();
     }
 
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sign_up, container, false);
+    public void onDestroyView() {
+        super.onDestroyView();
+        activity = null;
     }
 
     @Override
@@ -66,13 +59,28 @@ public class SignUpFragment extends Fragment implements SignUpContract.View {
         this.presenter = Preconditions.checkNotNull(presenter);
     }
 
-    @Override
-    public void initView(View view) {
 
+    @Override
+    protected int getResourceId() {
+        return R.layout.fragment_sign_up;
     }
 
     @Override
     public void initData() {
+    }
+
+    @Override
+    protected void findViewsById(View view) {
+        this.activity = (SignUpActivity) getActivity();
+    }
+
+    @Override
+    protected void setupViews() {
+
+    }
+
+    @Override
+    protected void registerEvent() {
 
     }
 }

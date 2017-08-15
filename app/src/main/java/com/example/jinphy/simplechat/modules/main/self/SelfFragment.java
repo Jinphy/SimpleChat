@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.AnimUtils;
@@ -38,7 +39,7 @@ import io.reactivex.schedulers.Schedulers;
  * Use the {@link SelfFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SelfFragment extends Fragment implements SelfContract.View {
+public class SelfFragment extends BaseFragment implements SelfContract.View {
 
     private MainFragment fragment;
 
@@ -52,7 +53,7 @@ public class SelfFragment extends Fragment implements SelfContract.View {
     private TextView nameText;
     private TextView dateText;
 
-    private int density;
+    private float density;
 
     public SelfFragment() {
         // Required empty public constructor
@@ -70,12 +71,6 @@ public class SelfFragment extends Fragment implements SelfContract.View {
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
 
     @Override
     public void onResume() {
@@ -102,18 +97,6 @@ public class SelfFragment extends Fragment implements SelfContract.View {
 
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_self, container, false);
-
-        initView(root);
-
-        initData();
-
-        return root;
-    }
 
     @Override
     public void setPresenter(SelfContract.Presenter presenter) {
@@ -121,7 +104,28 @@ public class SelfFragment extends Fragment implements SelfContract.View {
     }
 
     @Override
-    public void initView(View view) {
+    protected int getResourceId() {
+        return R.layout.fragment_self;
+    }
+
+    @Override
+    public void initData() {
+        density = ScreenUtils.getDensity(getContext());
+
+        distance = ScreenUtils.dp2px(IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT,density);
+        baseTransY = -distance;
+        avatarViewTransXDistance = ScreenUtils.dp2px(IntConst.NEGATIVE_150, density);
+        avatarViewTransYDistance = ScreenUtils.dp2px(IntConst.POSITIVE_120, density);
+        nameTextTransXDistance = ScreenUtils.dp2px(IntConst.POSITIVE_50, density);
+//        distance = (IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT)*density;
+//        baseTransY = -distance;
+//        avatarViewTransXDistance = IntConst.NEGATIVE_150 * density;
+//        avatarViewTransYDistance = IntConst.POSITIVE_120 * density;
+//        nameTextTransXDistance = IntConst.POSITIVE_50 * density;
+    }
+
+    @Override
+    protected void findViewsById(View view) {
         contentLayout = view.findViewById(R.id.content_layout);
         headView = view.findViewById(R.id.head_view);
         avatarView = headView.findViewById(R.id.avatar);
@@ -130,13 +134,13 @@ public class SelfFragment extends Fragment implements SelfContract.View {
     }
 
     @Override
-    public void initData() {
-        density = (int) ScreenUtils.getDensity(getContext());
-        distance = (IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT)*density;
-        baseTransY = -distance;
-        avatarViewTransXDistance = IntConst.NEGATIVE_150 * density;
-        avatarViewTransYDistance = IntConst.POSITIVE_120 * density;
-        nameTextTransXDistance = IntConst.POSITIVE_50 * density;
+    protected void setupViews() {
+
+    }
+
+    @Override
+    protected void registerEvent() {
+
     }
 
     @Override

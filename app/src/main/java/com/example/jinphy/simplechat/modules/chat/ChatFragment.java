@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,11 +25,14 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.listener_adapters.TextWatcherAdapter;
 import com.example.jinphy.simplechat.utils.AnimUtils;
+import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
 import com.example.jinphy.simplechat.utils.Preconditions;
+import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
 /**
@@ -36,7 +40,7 @@ import com.example.jinphy.simplechat.utils.ViewUtils;
  * Use the {@link ChatFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatFragment extends Fragment implements ChatContract.View {
+public class ChatFragment extends BaseFragment implements ChatContract.View {
 
     private ChatContract.Presenter presenter;
 
@@ -52,9 +56,19 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private FrameLayout inputTextAndVoice;
     private FrameLayout btnMoreAndSend;
 
+    // TODO: 2017/8/15 隐藏appBar时 statusBar 的初始颜色，从好友头像获取
+    int startStatusColor;
+    // 隐藏 appBar 后的statusBar的 最终颜色，为colorAccent
+    int endStatusColor;
+
 
     public ChatFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    protected int getResourceId() {
+        return R.layout.fragment_chat;
     }
 
     /**
@@ -68,26 +82,9 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_chat, container, false);
-
-        initView(root);
-
-        initData();
-
-        // Must set to true,if you want to use options menu in the fragment
-        setHasOptionsMenu(true);
-
-        return root;
+    public void onResume() {
+        super.onResume();
+        presenter.start();
     }
 
     @Override
@@ -95,22 +92,9 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         this.presenter = Preconditions.checkNotNull(presenter);
     }
 
+
     @Override
-    public void initView(View view) {
-
-        // 查找所有需要用到的View
-        findViewsById(view);
-
-        // 设置Views
-        setupViews();
-
-        // 为需要的View注册各种点击事件
-        registerEvent();
-
-
-    }
-
-    private void findViewsById(View view) {
+    protected void findViewsById(View view) {
         appbarLayout = getActivity().findViewById(R.id.appbar_layout);
         fab = getActivity().findViewById(R.id.fab);
         fabEmotin = view.findViewById(R.id.fab_emotion);
@@ -124,20 +108,23 @@ public class ChatFragment extends Fragment implements ChatContract.View {
 
     }
 
-    private void setupViews(){
+    @Override
+    protected void setupViews(){
         // 设置RecyclerView
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(presenter.getAdapter());
         recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
 
+        // TODO: 2017/8/15 根据好友的头像设置appbar颜色和statusBar颜色
 
-
+        // TODO: 2017/8/15 这个要放在数据获取完成后才执行
         Keyboard.open(getContext(), findInputText());
 
     }
 
-    private void registerEvent() {
+    @Override
+    protected void registerEvent() {
 
         fab.setOnClickListener(this::fabAction);
         fabEmotin.setOnClickListener(this::fabAction);
@@ -246,8 +233,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     }
 
     @Override
-    public void initData() {
-
+    protected void initData() {
     }
 
     @Override
@@ -462,6 +448,8 @@ public class ChatFragment extends Fragment implements ChatContract.View {
                     appbarLayout.setTranslationY(value * (-appbarHeight));
                     bottomBar.setTranslationY(value * bottomBarHeight);
                     ViewUtils.setScaleXY(fab,value);
+                    // TODO: 2017/8/15 设置statusBar的颜色
+                    //setStatusBarColor(value);
                     setMargin(view,marginTop,marginBottom);
                 })
                 .onEnd(animator -> {
@@ -474,6 +462,13 @@ public class ChatFragment extends Fragment implements ChatContract.View {
                 })
                 .build();
         animatorSet.start();
+    }
+
+
+    @Override
+    public void setStatusBarColor(float factor) {
+        int color = ColorUtils.rgbColorByFactor(startStatusColor, endStatusColor, factor);
+        ScreenUtils.setStatusBarColor(getActivity(),color);
     }
 
     //设置View的margin，用在移动toolbar和bottomBar时改变其他View

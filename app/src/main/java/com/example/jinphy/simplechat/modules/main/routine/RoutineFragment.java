@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
@@ -23,7 +24,7 @@ import java.util.List;
  * Use the {@link RoutineFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoutineFragment extends Fragment implements RoutineContract.View {
+public class RoutineFragment extends BaseFragment implements RoutineContract.View {
 
     private MainFragment fragment;
 
@@ -50,12 +51,6 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
 
     @Override
     public void onResume() {
@@ -78,37 +73,17 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
         fab.setOnClickListener(this::fabAction);
     }
 
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_routine, container, false);
-
-        initView(root);
-
-        initData();
-
-        return root;
-    }
-
     @Override
     public void setPresenter(RoutineContract.Presenter presenter) {
         this.presenter = Preconditions.checkNotNull(presenter);
     }
 
+
     @Override
-    public void initView(View view) {
-
-        GridLayout container = view.findViewById(R.id.grid_layout);
-
-        List<CardView> items = getAllCardView(container);
-
-        // TODO: 2017/8/11 设置图片，设置文字，设置点击监听,设置宽高
-
-
+    protected int getResourceId() {
+        return R.layout.fragment_routine;
     }
+
     @Override
     public void fabAction(View view) {
 
@@ -120,18 +95,33 @@ public class RoutineFragment extends Fragment implements RoutineContract.View {
     }
 
     @Override
+    protected void findViewsById(View view) {
+//        GridLayout container = view.findViewById(R.id.grid_layout);
+    }
+
+    @Override
+    protected void setupViews() {
+        // TODO: 2017/8/11 设置图片，设置文字，设置点击监听,设置宽高
+    }
+
+    @Override
+    protected void registerEvent() {
+
+    }
+
+    @Override
     public void setMainFragment(@NonNull MainFragment mainFragment) {
         this.fragment = Preconditions.checkNotNull(mainFragment);
     }
 
-    private List<CardView> getAllCardView(GridLayout parent) {
-        if (parent.getChildCount() == 0) {
-            return null;
-        }
-        List<CardView> result = new ArrayList<>(parent.getChildCount());
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            result.add((CardView) parent.getChildAt(i));
-        }
-        return result;
-    }
+//    private List<CardView> getAllCardView(GridLayout parent) {
+//        if (parent.getChildCount() == 0) {
+//            return null;
+//        }
+//        List<CardView> result = new ArrayList<>(parent.getChildCount());
+//        for (int i = 0; i < parent.getChildCount(); i++) {
+//            result.add((CardView) parent.getChildAt(i));
+//        }
+//        return result;
+//    }
 }

@@ -19,4 +19,13 @@
     <string name="social">社交</string>
     <string name="friend">friend</string>
     <string name="tip_empty_msg">不能发送空消息！</string>
+    <string name="active_zoom">活动空间</string>
+    <string name="translate">翻译</string>
+    <string name="bank_address">银行卡归属地</string>
+    <string name="certificates">证件识别</string>
+    <string name="scenic_spot">全国景点</string>
+    <string name="bus_route">公交线路</string>
+    <string name="food_menu">菜谱大全</string>
+    <string name="express">快递查询</string>
+    <string name="weather">天气</string>
 </resources>

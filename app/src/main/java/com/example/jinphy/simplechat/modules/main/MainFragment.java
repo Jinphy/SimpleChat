@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsFragment;
@@ -32,6 +33,7 @@ import com.example.jinphy.simplechat.modules.main.self.SelfContract;
 import com.example.jinphy.simplechat.modules.main.self.SelfFragment;
 import com.example.jinphy.simplechat.modules.main.self.SelfPresenter;
 import com.example.jinphy.simplechat.utils.AnimUtils;
+import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
@@ -44,20 +46,27 @@ import java.util.List;
  * Use the {@link MainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainFragment extends Fragment implements MainContract.View {
+public class MainFragment extends BaseFragment implements MainContract.View {
+
+    public static final int MSG_FRAGMENT = 0;
+    public static final int FRIEND_FRAGMENT = 1;
+    public static final int ROUTINE_FRAGMENT = 2;
+    public static final int SELF_FRAGMENT = 3;
+
 
     private MainActivity activity;
 
     private MainContract.Presenter presenter;
 
     private ViewPager viewPager;
-    private MainViewPagerAdapter adapter;
+
+    MsgFragment msgFragment ;
+    FriendsFragment friendsFragment ;
+    RoutineFragment routineFragment;
+    SelfFragment selfFragment;
 
     private View appbarLayout;
     private Toolbar toolbar;
-//    private CardView headView;
-//    private ImageView avatarView;
-//    private TextView nameText;
 
     private View bottomBar;
     private FloatingActionButton fab;
@@ -87,18 +96,11 @@ public class MainFragment extends Fragment implements MainContract.View {
      *
      * @return A new instance of fragment MainFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static MainFragment newInstance() {
         MainFragment fragment = new MainFragment();
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
 
     @Override
     public void onResume() {
@@ -110,34 +112,58 @@ public class MainFragment extends Fragment implements MainContract.View {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        this.activity = (MainActivity) getActivity();
-
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_main, container, false);
-
-        initView(root);
-
-        initData();
-
-        return root;
-    }
-
-    @Override
     public void setPresenter(MainContract.Presenter presenter) {
         this.presenter = Preconditions.checkNotNull(presenter);
     }
 
 
+
     @Override
-    public void initView(View view) {
+    protected int getResourceId() {
+        return R.layout.fragment_main;
+    }
+
+
+    @Override
+    public void initData() {
+        // 底部导航栏的按钮
+        btn = new LinearLayout[]{
+                btnMsg,
+                btnFriends,
+                btnRoutine,
+                btnSelf
+        };
+        // 底部导航栏按钮的打开图标
+        iconsOpen = new int[]{
+                R.drawable.ic_msg_open_24dp,
+                R.drawable.ic_friends_open_24dp,
+                R.drawable.ic_routine_open_24dp,
+                R.drawable.ic_self_open_24dp
+        };
+
+        // 底部导航栏按钮的关闭图标
+        iconsClose = new int[]{
+                R.drawable.ic_msg_close_24dp,
+                R.drawable.ic_friends_close_24dp,
+                R.drawable.ic_routine_close_24dp,
+                R.drawable.ic_self_close_24dp
+        };
+
+
+        density = (int) ScreenUtils.getDensity(getContext());
+    }
+
+    private MainViewPagerAdapter getAdapter() {
+        List<Fragment> fragments = generateFragments();
+        return new MainViewPagerAdapter(activity.getSupportFragmentManager(), fragments);
+    }
+
+    @Override
+    protected void findViewsById(View view) {
+        activity = (MainActivity) getActivity();
 
         appbarLayout = activity.findViewById(R.id.appbar_layout);
         toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
-//        headView = (CardView) activity.findViewById(R.id.head_view);
-//        avatarView = headView.findViewById(R.id.avatar);
-//        nameText = headView.findViewById(R.id.name);
 
         fab = (FloatingActionButton) activity.findViewById(R.id.fab);
         viewPager = view.findViewById(R.id.view_pager);
@@ -147,14 +173,28 @@ public class MainFragment extends Fragment implements MainContract.View {
         btnRoutine = view.findViewById(R.id.btn_routine);
         btnSelf = view.findViewById(R.id.btn_self);
 
+    }
 
+    @Override
+    protected void setupViews() {
+        viewPager.setAdapter(getAdapter());
+
+        // 为viewpager中的每个item设置相应的fab属性
+        initFab(selectedTab);
+    }
+
+    @Override
+    protected void registerEvent() {
         btnMsg.setOnClickListener(this::selectFragment);
         btnFriends.setOnClickListener(this::selectFragment);
         btnRoutine.setOnClickListener(this::selectFragment);
         btnSelf.setOnClickListener(this::selectFragment);
 
+        viewPager.addOnPageChangeListener(getPageChangeListener());
+    }
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+    private ViewPager.OnPageChangeListener getPageChangeListener() {
+        return new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float offset, int offsetPixels) {
                 // position表示当前第一个可见的pager的位置，
@@ -170,8 +210,7 @@ public class MainFragment extends Fragment implements MainContract.View {
                 handleBarOnViewPagerScrolled(position, offset, offsetPixels);
 
                 // 第四页的动画处理
-                ((SelfFragment) adapter.getItem(3))
-                        .handleOnViewPagerScrolled(position, offset, offsetPixels);
+                selfFragment.handleOnViewPagerScrolled(position, offset, offsetPixels);
 
             }
 
@@ -194,10 +233,8 @@ public class MainFragment extends Fragment implements MainContract.View {
             public void onPageScrollStateChanged(int state) {
 
             }
-        });
-
+        };
     }
-
 
     private void handleFabOnViewPagerScrolled(int position, float offset, int offsetPixels) {
         switch (position) {
@@ -251,23 +288,7 @@ public class MainFragment extends Fragment implements MainContract.View {
     }
 
     private void handleFabOnViewPagerSelected(int position) {
-        switch (position) {
-            case 0:
-                ((MsgFragment) adapter.getItem(position)).initFab();
-                break;
-            case 1:
-                ((FriendsFragment) adapter.getItem(position)).initFab();
-                break;
-            case 2:
-                ((RoutineFragment) adapter.getItem(position)).initFab();
-                break;
-            case 3:
-                ((SelfFragment) adapter.getItem(position)).initFab();
-                break;
-            default:
-                break;
-        }
-
+        initFab(position);
     }
 
     private void handleTabOnViewPagerSelected(int position) {
@@ -277,9 +298,9 @@ public class MainFragment extends Fragment implements MainContract.View {
     private void handleBarOnViewPagerSelected(int position) {
         if (selectedTab != position) {
             if (position == 0) {
-                showBar(((MsgFragment) adapter.getItem(0)).getRecyclerView());
+                showBar(msgFragment.getRecyclerView());
             } else if (position == 1) {
-                showBar(((FriendsFragment) adapter.getItem(1)).getRecyclerView());
+                showBar(friendsFragment.getRecyclerView());
             } else {
                 showBar(null);
             }
@@ -321,19 +342,19 @@ public class MainFragment extends Fragment implements MainContract.View {
 
 
     @Override
-    public void initFab() {
-        switch (selectedTab) {
-            case 0:
-                ((MsgFragment) adapter.getItem(selectedTab)).initFab();
+    public void initFab(int position) {
+        switch (position) {
+            case MSG_FRAGMENT:
+                msgFragment.initFab();
                 break;
-            case 1:
-                ((FriendsFragment) adapter.getItem(selectedTab)).initFab();
+            case FRIEND_FRAGMENT:
+                friendsFragment.initFab();
                 break;
-            case 2:
-                ((RoutineFragment) adapter.getItem(selectedTab)).initFab();
+            case ROUTINE_FRAGMENT:
+                routineFragment.initFab();
                 break;
-            case 3:
-                ((SelfFragment) adapter.getItem(selectedTab)).initFab();
+            case SELF_FRAGMENT:
+                selfFragment.initFab();
                 break;
             default:
                 break;
@@ -353,40 +374,6 @@ public class MainFragment extends Fragment implements MainContract.View {
 //        nameText.setAlpha(faction);
     }
 
-    @Override
-    public void initData() {
-        btn = new LinearLayout[]{
-                btnMsg,
-                btnFriends,
-                btnRoutine,
-                btnSelf
-        };
-        iconsOpen = new int[]{
-                R.drawable.ic_msg_open_24dp,
-                R.drawable.ic_friends_open_24dp,
-                R.drawable.ic_routine_open_24dp,
-                R.drawable.ic_self_open_24dp
-        };
-
-        iconsClose = new int[]{
-                R.drawable.ic_msg_close_24dp,
-                R.drawable.ic_friends_close_24dp,
-                R.drawable.ic_routine_close_24dp,
-                R.drawable.ic_self_close_24dp
-        };
-
-
-        List<Fragment> fragments = generateFragments();
-        adapter = new MainViewPagerAdapter(
-                activity.getSupportFragmentManager(), fragments);
-        viewPager.setAdapter(adapter);
-
-
-        // 为viewpager中的每个item设置相应的fab属性
-        initFab();
-
-        density = (int) ScreenUtils.getDensity(getContext());
-    }
 
 
     @Override
@@ -409,10 +396,6 @@ public class MainFragment extends Fragment implements MainContract.View {
         }
     }
 
-    MsgFragment msgFragment = MsgFragment.newInstance(this);
-    FriendsFragment friendsFragment = FriendsFragment.newInstance(this);
-    RoutineFragment routineFragment = RoutineFragment.newInstance(this);
-    SelfFragment selfFragment = SelfFragment.newInstance(this);
 
     @Override
     public List<Fragment> generateFragments() {
@@ -420,6 +403,7 @@ public class MainFragment extends Fragment implements MainContract.View {
         friendsFragment = FriendsFragment.newInstance(this);
         routineFragment = RoutineFragment.newInstance(this);
         selfFragment = SelfFragment.newInstance(this);
+
         List<Fragment> fragments = new ArrayList<>(4);
         fragments.add(msgFragment);
         fragments.add(friendsFragment);
@@ -539,6 +523,7 @@ public class MainFragment extends Fragment implements MainContract.View {
                     appbarLayout.setTranslationY(value * (-appbarHeight));
                     bottomBar.setTranslationY(value * bottomBarHeight);
                     ViewUtils.setScaleXY(fab,value);
+                    setStatusBarColor(value);
                     setMargin(view,margin);
                 })
                 .onEnd(animator -> {
@@ -570,6 +555,9 @@ public class MainFragment extends Fragment implements MainContract.View {
 
     }
 
+
+
+
     /**
      * 显示toolbar和bottomBar，同时隐藏fab
      *
@@ -583,10 +571,15 @@ public class MainFragment extends Fragment implements MainContract.View {
             animateBar(view,1,0,true);
 
         }
-
-
     }
 
+    @Override
+    public void setStatusBarColor(float factor) {
+        int primaryDark = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
+        int accent = ContextCompat.getColor(getContext(), R.color.colorAccent);
+        int color = ColorUtils.rgbColorByFactor(primaryDark, accent, factor);
+        ScreenUtils.setStatusBarColor(getActivity(),color);
+    }
 
     //设置View的margin，用在移动toolbar和bottomBar时改变其他View
     //的margin
@@ -603,7 +596,7 @@ public class MainFragment extends Fragment implements MainContract.View {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (selectedTab == 3) {
-            return ((SelfFragment) adapter.getItem(3)).dispatchTouchEvent(event);
+            return selfFragment.dispatchTouchEvent(event);
         }
         return false;
 
