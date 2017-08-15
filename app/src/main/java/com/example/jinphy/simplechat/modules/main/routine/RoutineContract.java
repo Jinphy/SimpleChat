@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
 import android.support.annotation.NonNull;
+import android.view.View;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
@@ -19,11 +20,15 @@ public interface RoutineContract {
         void initFab();
 
         void fabAction(android.view.View view);
+
+        void showActiveZoneActivity();
     }
 
     interface Presenter extends BasePresenter {
 
         RoutineRecyclerViewAdapter getAdapter();
+
+        void handleRecyclerViewEvent(android.view.View view, Object item, int type, int position);
     }
 }
 

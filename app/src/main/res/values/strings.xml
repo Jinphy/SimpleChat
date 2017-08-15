@@ -25,4 +25,7 @@
     <string name="routine_food_menu">菜谱大全</string>
     <string name="routine_express">快递查询</string>
     <string name="routine_weather">天气</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -23,7 +23,10 @@
         <activity android:name=".modules.main.MainActivity">
         </activity>
         <activity android:name=".modules.chat.ChatActivity">
-
+        </activity>
+        <activity
+            android:name=".modules.active_zoom.ActiveZoneActivity"
+            android:theme="@style/TranslucentTheme">
         </activity>
     </application>
 

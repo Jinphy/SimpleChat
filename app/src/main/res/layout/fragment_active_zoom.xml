@@ -1,0 +1,67 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.example.jinphy.simplechat.modules.active_zoom.ActiveZoneFragment">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/dimen_300dp">
+
+
+    </android.support.v7.widget.RecyclerView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/head_view"
+        android:layout_width="match_parent"
+        app:cardCornerRadius="@dimen/dimen_0dp"
+        app:cardMaxElevation="@dimen/dimen_8dp"
+        app:cardElevation="@dimen/dimen_0dp"
+        android:layout_height="@dimen/dimen_300dp">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/background_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/pic_1"/>
+
+            <View
+                android:id="@+id/foreground_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </FrameLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <RelativeLayout
+        android:id="@+id/tool_bar"
+        android:layout_width="match_parent"
+        android:alpha="0"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="@dimen/status_bar_height">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="@dimen/tool_bar_height"
+            android:layout_height="@dimen/tool_bar_height"
+            android:clickable="true"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/btn_alpha"
+            android:padding="@dimen/dimen_14dp"
+            android:src="@drawable/ic_arrow_left_24dp"/>
+
+    </RelativeLayout>
+
+
+
+
+</FrameLayout>

@@ -46,7 +46,12 @@ public class ScreenUtils {
 	 * @return 返回状态栏像素单位的高度
 	 * */
 	public static int getStatusBarHeight(Context context){
-		return dp2px(context,24);
+		int result = 0;
+		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+		if (resourceId > 0) {
+			result = context.getResources().getDimensionPixelSize(resourceId);
+		}
+		return result;
 	}
 	/**
 	 * 把状态栏设置为指定的颜色

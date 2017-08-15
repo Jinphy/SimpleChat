@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.model.Routine;
+import com.example.jinphy.simplechat.modules.active_zoom.ActiveZoneActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
@@ -116,32 +118,8 @@ public class RoutineFragment extends BaseFragment implements RoutineContract.Vie
 
     @Override
     protected void registerEvent() {
-        adapter.onClick((view, item, type, position) -> {
-            Routine routine = (Routine) item;
 
-
-            switch (routine.getTagId()) {
-                case R.string.routine_active_zoom:
-                    break;
-                case R.string.routine_translate:
-                    break;
-                case R.string.routine_credit_card_address:
-                    break;
-                case R.string.routine_certificates:
-                    break;
-                case R.string.routine_scenic_spot:
-                    break;
-                case R.string.routine_bus_route:
-                    break;
-                case R.string.routine_food_menu:
-                    break;
-                case R.string.routine_express:
-                    break;
-                case R.string.routine_weather:
-                    break;
-
-            }
-        });
+        adapter.onClick(presenter::handleRecyclerViewEvent);
     }
 
     @Override
@@ -159,4 +137,11 @@ public class RoutineFragment extends BaseFragment implements RoutineContract.Vie
     //        }
     //        return result;
     //    }
+
+
+    @Override
+    public void showActiveZoneActivity() {
+        Intent intent = new Intent(getActivity(), ActiveZoneActivity.class);
+        startActivity(intent);
+    }
 }
