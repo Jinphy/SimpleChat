@@ -13,6 +13,7 @@
     android:layout_height="120dp">
 
     <LinearLayout
+        android:id="@+id/item_view"
         android:background="@drawable/btn_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,19 +23,19 @@
 
         <ImageView
             android:id="@+id/icon_view"
-            android:src="@drawable/ic_social_48dp"
+            android:src="@drawable/ic_active_zoom_24dp"
             android:layout_marginBottom="5dp"
             android:layout_gravity="center_horizontal"
             android:layout_width="@dimen/dimen_48dp"
             android:layout_height="@dimen/dimen_48dp"/>
 
         <TextView
-            android:id="@+id/title_view"
+            android:id="@+id/tag_view"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"
             android:layout_gravity="center_horizontal"
             android:gravity="center"
-            android:text="@string/weather"
+            android:text="@string/routine_weather"
             android:layout_width="wrap_content"
             android:layout_height="20dp"/>
 

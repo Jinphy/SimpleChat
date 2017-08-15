@@ -1,23 +1,22 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
-import android.view.LayoutInflater;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.GridLayout;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.model.Routine;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,7 +31,10 @@ public class RoutineFragment extends BaseFragment implements RoutineContract.Vie
 
     FloatingActionButton fab;
 
+    private RecyclerView recyclerView;
+
     private int density;
+    private RoutineRecyclerViewAdapter adapter;
 
 
     public RoutineFragment() {
@@ -96,17 +98,50 @@ public class RoutineFragment extends BaseFragment implements RoutineContract.Vie
 
     @Override
     protected void findViewsById(View view) {
-//        GridLayout container = view.findViewById(R.id.grid_layout);
+        //        GridLayout container = view.findViewById(R.id.grid_layout);
+        recyclerView = view.findViewById(R.id.recycler_view);
     }
 
     @Override
     protected void setupViews() {
         // TODO: 2017/8/11 设置图片，设置文字，设置点击监听,设置宽高
+        adapter = presenter.getAdapter();
+        recyclerView.setAdapter(adapter);
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+
     }
+
 
     @Override
     protected void registerEvent() {
+        adapter.onClick((view, item, type, position) -> {
+            Routine routine = (Routine) item;
 
+
+            switch (routine.getTagId()) {
+                case R.string.routine_active_zoom:
+                    break;
+                case R.string.routine_translate:
+                    break;
+                case R.string.routine_credit_card_address:
+                    break;
+                case R.string.routine_certificates:
+                    break;
+                case R.string.routine_scenic_spot:
+                    break;
+                case R.string.routine_bus_route:
+                    break;
+                case R.string.routine_food_menu:
+                    break;
+                case R.string.routine_express:
+                    break;
+                case R.string.routine_weather:
+                    break;
+
+            }
+        });
     }
 
     @Override
@@ -114,14 +149,14 @@ public class RoutineFragment extends BaseFragment implements RoutineContract.Vie
         this.fragment = Preconditions.checkNotNull(mainFragment);
     }
 
-//    private List<CardView> getAllCardView(GridLayout parent) {
-//        if (parent.getChildCount() == 0) {
-//            return null;
-//        }
-//        List<CardView> result = new ArrayList<>(parent.getChildCount());
-//        for (int i = 0; i < parent.getChildCount(); i++) {
-//            result.add((CardView) parent.getChildAt(i));
-//        }
-//        return result;
-//    }
+    //    private List<CardView> getAllCardView(GridLayout parent) {
+    //        if (parent.getChildCount() == 0) {
+    //            return null;
+    //        }
+    //        List<CardView> result = new ArrayList<>(parent.getChildCount());
+    //        for (int i = 0; i < parent.getChildCount(); i++) {
+    //            result.add((CardView) parent.getChildAt(i));
+    //        }
+    //        return result;
+    //    }
 }

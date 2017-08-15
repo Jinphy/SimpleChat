@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.jinphy.simplechat.utils.Preconditions;
 
@@ -23,5 +24,11 @@ public class RoutinePresenter implements RoutineContract.Presenter {
     @Override
     public void start() {
 
+    }
+
+    @Override
+    public RoutineRecyclerViewAdapter getAdapter() {
+        Log.e("Main", "getAdapter");
+        return new RoutineRecyclerViewAdapter();
     }
 }

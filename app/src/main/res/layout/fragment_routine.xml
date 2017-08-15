@@ -1,92 +1,100 @@
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.jinphy.simplechat.modules.main.routine.RoutineFragment">
 
-    <ScrollView
-        android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginBottom="?attr/actionBarSize"
-        android:scrollbars="none"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <GridLayout
-            android:id="@+id/grid_layout"
-            android:columnCount="3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="?attr/actionBarSize"
+        android:layout_marginTop="?attr/actionBarSize">
 
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
+    </android.support.v7.widget.RecyclerView>
 
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
-            <include
-                layout="@layout/main_tab_routine_card_view_item"
-                android:layout_width="@dimen/dimen_120dp"
-                android:layout_height="@dimen/dimen_120dp"/>
+    <!--<ScrollView-->
+    <!--android:layout_marginTop="?attr/actionBarSize"-->
+    <!--android:layout_marginBottom="?attr/actionBarSize"-->
+    <!--android:scrollbars="none"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+    <!--<GridLayout-->
+    <!--android:id="@+id/grid_layout"-->
+    <!--android:columnCount="3"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content">-->
 
-        </GridLayout>
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
 
-    </ScrollView>
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+    <!--<include-->
+    <!--layout="@layout/main_tab_routine_item"-->
+    <!--android:layout_width="@dimen/dimen_120dp"-->
+    <!--android:layout_height="@dimen/dimen_120dp"/>-->
+
+    <!--</GridLayout>-->
+
+    <!--</ScrollView>-->
 
 
-
-</LinearLayout>
+</RelativeLayout>

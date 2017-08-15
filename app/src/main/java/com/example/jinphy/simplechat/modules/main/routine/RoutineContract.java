@@ -22,6 +22,8 @@ public interface RoutineContract {
     }
 
     interface Presenter extends BasePresenter {
+
+        RoutineRecyclerViewAdapter getAdapter();
     }
 }
 
