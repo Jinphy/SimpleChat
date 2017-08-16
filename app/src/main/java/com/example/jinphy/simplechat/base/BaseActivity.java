@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -70,11 +71,23 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param fragment 要添加的fragment
      * @param resId 添加fragment的容器的id，一般为某个FrameLayout
      * */
-    public void addFragment(@NonNull Fragment fragment, @IdRes int resId) {
+    public Fragment addFragment(@NonNull Fragment fragment, @IdRes int resId) {
         checkNotNull(fragment, "fragment cannot be null");
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(resId, fragment);
+
+        String tag = fragment.getClass().getSimpleName();
+
+        FragmentManager manager = getSupportFragmentManager();
+        Fragment temp = manager.findFragmentByTag(tag);
+
+        if (temp != null) {
+            return temp;
+        }
+
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(resId, fragment, tag);
         transaction.commit();
+
+        return fragment;
     }
 
     /**

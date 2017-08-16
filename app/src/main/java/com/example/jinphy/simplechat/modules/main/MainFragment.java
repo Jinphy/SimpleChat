@@ -1,13 +1,12 @@
 package com.example.jinphy.simplechat.modules.main;
 
 import android.animation.AnimatorSet;
-import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsFragment;
@@ -35,7 +33,6 @@ import com.example.jinphy.simplechat.modules.main.self.SelfFragment;
 import com.example.jinphy.simplechat.modules.main.self.SelfPresenter;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
-import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
@@ -97,22 +94,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         return fragment;
     }
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (presenter == null) {
-            presenter = getPresenter();
-        }
-        presenter.start();
-    }
-
-    @Override
-    protected int getResourceId() {
-        return R.layout.fragment_main;
-    }
-
-
     @Override
     public void initData() {
         // 底部导航栏的按钮
@@ -137,14 +118,13 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                 R.drawable.ic_routine_close_24dp,
                 R.drawable.ic_self_close_24dp
         };
-
-
         density = (int) ScreenUtils.getDensity(getContext());
     }
 
-    private MainViewPagerAdapter getAdapter() {
-        List<Fragment> fragments = generateFragments();
-        return new MainViewPagerAdapter(getActivity().getSupportFragmentManager(), fragments);
+
+    @Override
+    protected int getResourceId() {
+        return R.layout.fragment_main;
     }
 
     @Override
@@ -180,6 +160,12 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         btnSelf.setOnClickListener(this::selectFragment);
 
         viewPager.addOnPageChangeListener(getPageChangeListener());
+    }
+
+    private MainViewPagerAdapter getAdapter() {
+        List<Fragment> fragments = generateFragments();
+        FragmentManager manager = this.getChildFragmentManager();
+        return new MainViewPagerAdapter(manager, fragments);
     }
 
     private ViewPager.OnPageChangeListener getPageChangeListener() {
@@ -351,18 +337,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     }
 
-    @Override
-    public void setToolbarAlpha(float faction) {
-        toolbar.setAlpha(1 - faction);
-    }
-
-    @Override
-    public void setHeadViewTransY(float faction, int baseTransY, int distance) {
-//        appbarLayout.setTranslationY(baseTransY + faction * distance);
-//        avatarView.setAlpha(faction);
-//        nameText.setAlpha(faction);
-    }
-
 
 
     @Override
@@ -388,15 +362,21 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     @Override
     public List<Fragment> generateFragments() {
-        msgFragment = MsgFragment.newInstance(this);
-        friendsFragment = FriendsFragment.newInstance(this);
-        routineFragment = RoutineFragment.newInstance(this);
-        selfFragment = SelfFragment.newInstance(this);
 
-        msgFragment.setCallback(this::getMsgPresenter);
-        friendsFragment.setCallback(this::getFriendsPresenter);
-        routineFragment.setCallback(this::getRoutinePresenter);
-        selfFragment.setCallback(this::getSelfPresenter);
+        msgFragment = getFragment(MSG_FRAGMENT);
+        friendsFragment = getFragment(FRIEND_FRAGMENT);
+        routineFragment = getFragment(ROUTINE_FRAGMENT);
+        selfFragment = getFragment(SELF_FRAGMENT);
+
+        msgFragment.setPresenterCallback(this::getMsgPresenter);
+        friendsFragment.setPresenterCallback(this::getFriendsPresenter);
+        routineFragment.setPresenterCallback(this::getRoutinePresenter);
+        selfFragment.setPresenterCallback(this::getSelfPresenter);
+
+        msgFragment.setFragmentCallback(()->this);
+        friendsFragment.setFragmentCallback(()->this);
+        routineFragment.setFragmentCallback(()->this);
+        selfFragment.setFragmentCallback(()->this);
 
         List<Fragment> fragments = new ArrayList<>(4);
         fragments.add(msgFragment);
@@ -404,12 +384,33 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         fragments.add(routineFragment);
         fragments.add(selfFragment);
 
-        getMsgPresenter(msgFragment);
-        getFriendsPresenter(friendsFragment);
-        getRoutinePresenter(routineFragment);
-        getSelfPresenter(selfFragment);
         return fragments;
     }
+
+    // 获取一个fragment时，判断fragment是否存在于FragmentManager中，
+    // 如果存在，在从FragmentManager中获取，否则生成一个新的fragment对象实例
+    private <T extends Fragment> T getFragment(int position) {
+        String tag = MainViewPagerAdapter.getItemTag(viewPager, position);
+        Fragment fragment = this.getChildFragmentManager().findFragmentByTag(tag);
+        if (fragment != null) {
+            return (T) fragment;
+        }
+
+        switch (position) {
+            case MSG_FRAGMENT:
+                return (T) MsgFragment.newInstance();
+            case FRIEND_FRAGMENT:
+                return (T) FriendsFragment.newInstance();
+            case ROUTINE_FRAGMENT:
+                return (T) RoutineFragment.newInstance();
+            case SELF_FRAGMENT:
+                return (T) SelfFragment.newInstance();
+            default:
+                return null;
+        }
+    }
+
+
 
     @Override
     public MsgPresenter getMsgPresenter(Fragment fragment) {

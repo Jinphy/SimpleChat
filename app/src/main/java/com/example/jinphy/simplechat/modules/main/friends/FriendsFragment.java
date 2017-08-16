@@ -1,25 +1,16 @@
 package com.example.jinphy.simplechat.modules.main.friends;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.model.Friend;
-import com.example.jinphy.simplechat.model.MsgRecord;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
-import com.example.jinphy.simplechat.modules.main.msg.MsgRecyclerViewAdapter;
 import com.example.jinphy.simplechat.utils.Preconditions;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,8 +18,6 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class FriendsFragment extends BaseFragment<FriendsPresenter> implements FriendsContract.View {
-
-    private MainFragment fragment;
 
     RecyclerView recyclerView;
 
@@ -44,24 +33,14 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
      *
      * @return A new instance of fragment FriendsFragment.
      */
-    public static FriendsFragment newInstance(MainFragment mainFragment) {
+    public static FriendsFragment newInstance() {
         FriendsFragment fragment = new FriendsFragment();
-        fragment.setMainFragment(mainFragment);
         return fragment;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (presenter == null) {
-            this.presenter = getPresenter();
-        }
-        this.presenter.start();
-    }
-
-    @Override
     public void initFab() {
-        this.fab = fragment.getActivity().findViewById(R.id.fab);
+        this.fab = fragmentCallback.getFragment().getActivity().findViewById(R.id.fab);
         this.fab.setTranslationY(0);
         this.fab.setVisibility(View.GONE);
         this.fab.setImageResource(R.drawable.ic_arrow_up_24dp);
@@ -70,7 +49,7 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
 
     @Override
     public void fabAction(View view) {
-        fragment.showBar(recyclerView);
+        ((MainFragment) fragmentCallback.getFragment()).showBar(recyclerView);
         recyclerView.smoothScrollToPosition(0);
     }
 
@@ -86,11 +65,11 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
                 total+=dy;
                 if (total > 300) {
                     total=0;
-                    fragment.hideBar(recyclerView);
+                    ((MainFragment) fragmentCallback.getFragment()).hideBar(recyclerView);
                 }
                 if (total < -300) {
                     total=0;
-                    fragment.showBar(recyclerView);
+                    ((MainFragment) fragmentCallback.getFragment()).showBar(recyclerView);
                 }
             }
         };
@@ -108,7 +87,6 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
 
     @Override
     protected void findViewsById(View view) {
-
         recyclerView = view.findViewById(R.id.recycler_view);
     }
 
@@ -123,11 +101,6 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     protected void registerEvent() {
         recyclerView.addOnScrollListener(getOnScrollListener());
 
-    }
-
-    @Override
-    public void setMainFragment(@NonNull MainFragment fragment) {
-        this.fragment = Preconditions.checkNotNull(fragment);
     }
 
     @Override

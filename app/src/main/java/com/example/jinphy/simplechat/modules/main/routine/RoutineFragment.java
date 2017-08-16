@@ -27,8 +27,6 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
  */
 public class RoutineFragment extends BaseFragment<RoutinePresenter> implements RoutineContract.View {
 
-    private MainFragment fragment;
-
     FloatingActionButton fab;
 
     private RecyclerView recyclerView;
@@ -47,26 +45,15 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
      *
      * @return A new instance of fragment FriendsFragment.
      */
-    public static RoutineFragment newInstance(MainFragment mainFragment) {
+    public static RoutineFragment newInstance() {
         RoutineFragment fragment = new RoutineFragment();
-        fragment.setMainFragment(mainFragment);
         return fragment;
     }
 
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (this.presenter == null) {
-            this.presenter = getPresenter();
-        }
-        this.presenter.start();
-
-    }
-
-    @Override
     public void initFab() {
-        fab = fragment.getActivity().findViewById(R.id.fab);
+        fab = fragmentCallback.getFragment().getActivity().findViewById(R.id.fab);
         fab.setImageResource(R.drawable.ic_smile_24dp);
         fab.setVisibility(View.VISIBLE);
         fab.setScaleX(1);
@@ -114,11 +101,6 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     protected void registerEvent() {
 
         adapter.onClick(presenter::handleRecyclerViewEvent);
-    }
-
-    @Override
-    public void setMainFragment(@NonNull MainFragment mainFragment) {
-        this.fragment = Preconditions.checkNotNull(mainFragment);
     }
 
     //    private List<CardView> getAllCardView(GridLayout parent) {

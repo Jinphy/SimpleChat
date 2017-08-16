@@ -30,8 +30,6 @@ import java.util.List;
  */
 public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContract.View{
 
-    private MainFragment fragment;
-
     private RecyclerView recyclerView;
 
     private FloatingActionButton fab;
@@ -46,24 +44,15 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
      *
      * @return A new instance of fragment FriendsFragment.
      */
-    public static MsgFragment newInstance(@NonNull MainFragment mainFragment) {
+    public static MsgFragment newInstance() {
             MsgFragment fragment = new MsgFragment();
-        fragment.setMainFragment(mainFragment);
         return fragment;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (this.presenter == null) {
-            this.presenter = getPresenter();
-        }
-        this.presenter.start();
-    }
 
     @Override
     public void initFab() {
-        this.fab = fragment.getActivity().findViewById(R.id.fab);
+        this.fab = fragmentCallback.getFragment().getActivity().findViewById(R.id.fab);
         this.fab.setTranslationY(0);
         this.fab.setVisibility(View.GONE);
         this.fab.setImageResource(R.drawable.ic_arrow_up_24dp);
@@ -71,7 +60,7 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     }
     @Override
     public void fabAction(View view) {
-        fragment.showBar(recyclerView);
+        ((MainFragment) fragmentCallback.getFragment()).showBar(recyclerView);
         recyclerView.smoothScrollToPosition(0);
     }
 
@@ -85,11 +74,11 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
                 total+=dy;
                 if (total > 300) {
                     total=0;
-                    fragment.hideBar(recyclerView);
+                    ((MainFragment) fragmentCallback.getFragment()).hideBar(recyclerView);
                 }
                 if (total < -300) {
                     total=0;
-                    fragment.showBar(recyclerView);
+                    ((MainFragment) fragmentCallback.getFragment()).showBar(recyclerView);
                 }
             }
         };
@@ -121,11 +110,6 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     @Override
     protected void registerEvent() {
         recyclerView.addOnScrollListener(getOnScrollListener());
-    }
-
-    @Override
-    public void setMainFragment(@NonNull MainFragment fragment) {
-        this.fragment = Preconditions.checkNotNull(fragment);
     }
 
     @Override

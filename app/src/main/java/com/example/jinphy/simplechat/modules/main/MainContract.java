@@ -53,10 +53,6 @@ public interface MainContract {
 
         void setStatusBarColor(float factor);
 
-        void setToolbarAlpha(float faction);
-
-        void setHeadViewTransY(float faction,int baseTransY,int distance);
-
         void initFab(int position);
 
         int currentItemPosition();

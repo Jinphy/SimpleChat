@@ -15,8 +15,6 @@ public interface SelfContract {
 
     interface View extends BaseView<Presenter> {
 
-        void setMainFragment(@NonNull MainFragment mainFragment);
-
         void initFab();
 
         void fabAction(android.view.View view);

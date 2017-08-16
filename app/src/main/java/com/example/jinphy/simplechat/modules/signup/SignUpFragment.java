@@ -29,24 +29,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements Sig
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (this.presenter == null) {
-            this.presenter = getPresenter();
-        }
-        this.presenter.start();
-    }
-
-//    @Override
-//    protected SignUpPresenter getPresenter() {
-//        if (callback == null) {
-//            throw new NullPointerException(
-//                    "the callback cannot be null,you must invoke the fragment.setCallback() method");
-//        }
-//        return (SignUpPresenter) callback.getPresenter(this);
-//    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
     }

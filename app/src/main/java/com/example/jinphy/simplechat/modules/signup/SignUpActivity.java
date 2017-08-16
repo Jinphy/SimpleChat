@@ -2,7 +2,6 @@ package com.example.jinphy.simplechat.modules.signup;
 
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
@@ -28,10 +27,10 @@ public class SignUpActivity extends BaseActivity {
         actionBar.setTitle(R.string.sign_up);
 
         SignUpFragment fragment = SignUpFragment.newInstance();
-        fragment.setCallback(this::getPresenter);
-        addFragment(fragment,R.id.fragment);
 
-        getPresenter(fragment);
+        SignUpFragment returnFragment = (SignUpFragment) addFragment(fragment, R.id.fragment);
+        returnFragment.setPresenterCallback(this::getPresenter);
+        getPresenter(returnFragment);
     }
 
     @Override

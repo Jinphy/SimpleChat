@@ -41,8 +41,6 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfContract.View {
 
-    private MainFragment fragment;
-
     private FloatingActionButton fab;
 
     private LinearLayout contentLayout;
@@ -63,25 +61,15 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
      *
      * @return A new instance of fragment FriendsFragment.
      */
-    public static SelfFragment newInstance(MainFragment mainFragment) {
+    public static SelfFragment newInstance() {
         SelfFragment fragment = new SelfFragment();
-        fragment.setMainFragment(mainFragment);
         return fragment;
     }
 
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (this.presenter == null) {
-            this.presenter = getPresenter();
-        }
-        this.presenter.start();
-    }
-
-    @Override
     public void initFab() {
-        fab = fragment.getActivity().findViewById(R.id.fab);
+        fab = fragmentCallback.getFragment().getActivity().findViewById(R.id.fab);
         fab.setImageResource(R.drawable.ic_edit_24dp);
         fab.setVisibility(View.VISIBLE);
         fab.setScaleX(1);
@@ -128,17 +116,11 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
     @Override
     protected void setupViews() {
-
     }
 
     @Override
     protected void registerEvent() {
 
-    }
-
-    @Override
-    public void setMainFragment(@NonNull MainFragment mainFragment) {
-        this.fragment = Preconditions.checkNotNull(mainFragment);
     }
 
 

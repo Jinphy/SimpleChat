@@ -3,9 +3,7 @@ package com.example.jinphy.simplechat.modules.login;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
@@ -28,10 +26,10 @@ public class LoginActivity extends BaseActivity {
         actionBar.setTitle(R.string.login);
 
         LoginFragment fragment = LoginFragment.newInstance();
-        fragment.setCallback(this::getPresenter);
-        addFragment(fragment, R.id.fragment);
 
-        getPresenter(fragment);
+        LoginFragment returnFragment = (LoginFragment) addFragment(fragment, R.id.fragment);
+        returnFragment.setPresenterCallback(this::getPresenter);
+
     }
 
     @Override

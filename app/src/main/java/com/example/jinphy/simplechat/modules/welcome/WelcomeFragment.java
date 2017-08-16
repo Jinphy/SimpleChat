@@ -60,25 +60,6 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
 
 
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (presenter == null) {
-            presenter = getPresenter();
-        }
-        presenter.start();
-    }
-
-//    @Override
-//    protected WelcomePresenter getPresenter() {
-//        if (callback == null) {
-//            throw new NullPointerException(
-//                    "the callback cannot be null,you must invoke the fragment.setCallback() method");
-//        }
-//        return (WelcomePresenter) callback.getPresenter(this);
-//    }
-
-
 
     @Override
     protected int getResourceId() {

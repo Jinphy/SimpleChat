@@ -39,11 +39,18 @@ public interface ChatContract {
 
         void hideEmotionLayout();
 
+        void showMoreLayout();
+
+        void hideMoreLayout();
+
         void showFabEmotion();
 
         void hideFabEmotion();
 
         void setStatusBarColor(float factor);
+
+        void hideExtraBottomLayout();
+
 
     }
 

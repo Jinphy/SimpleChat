@@ -51,15 +51,6 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         return fragment;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (this.presenter == null) {
-            this.presenter = getPresenter();
-        }
-        this.presenter.start();
-    }
-
 
     @Override
     public void onDestroyView() {

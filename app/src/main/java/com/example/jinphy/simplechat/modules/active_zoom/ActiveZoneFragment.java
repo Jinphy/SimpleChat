@@ -32,14 +32,6 @@ public class ActiveZoneFragment extends BaseFragment<ActiveZonePresenter>
         // Required empty public constructor
     }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if (this.presenter == null) {
-//            this.presenter = getPresenter();
-//        }
-//        this.presenter.start();
-//    }
 
     @Override
     protected int getResourceId() {

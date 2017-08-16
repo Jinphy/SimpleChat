@@ -42,11 +42,11 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     private FloatingActionButton fab;
     private FloatingActionButton fabEmotion;
-    private View emotionLayout;
 
     private FrameLayout btnVoiceAndKeyboard;
     private FrameLayout inputTextAndVoice;
     private FrameLayout btnMoreAndSend;
+    private FrameLayout extraBottomLayout;
 
     // TODO: 2017/8/15 隐藏appBar时 statusBar 的初始颜色，从好友头像获取
     int startStatusColor;
@@ -73,15 +73,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         return fragment;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (presenter == null) {
-            presenter = getPresenter();
-        }
-        presenter.start();
-    }
-
 
     @Override
     protected void findViewsById(View view) {
@@ -93,8 +84,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         btnVoiceAndKeyboard = view.findViewById(R.id.btn_voice_and_keyboard);
         inputTextAndVoice = view.findViewById(R.id.input_text_and_voice);
         btnMoreAndSend = view.findViewById(R.id.btn_more_and_send);
-
-        emotionLayout = view.findViewById(R.id.emotion_layout);
+        extraBottomLayout = view.findViewById(R.id.extra_bottom_layout);
 
     }
 
@@ -197,7 +187,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     // 更多功能按钮的点击事件
     private void onClickOfBtnMore(View view) {
-        // TODO: 2017/8/14 显示更多的逻辑
+        showMoreLayout();
     }
 
     // RecyclerView的滑动事件
@@ -302,8 +292,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
 
+
     @Override
     public void showTextInput() {
+        hideExtraBottomLayout();
         EditText inputText = findInputText();
         inputText.setVisibility(View.VISIBLE);
         inputText.requestFocus();
@@ -311,25 +303,61 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
         findInputVoice().setVisibility(View.GONE);
 
-
     }
 
     @Override
     public void showVoiceInput() {
+        hideExtraBottomLayout();
         findInputText().setVisibility(View.GONE);
         findInputVoice().setVisibility(View.VISIBLE);
     }
 
+
+    //----------------------------------------------
+
+    private View findEmotionLayout() {
+        return extraBottomLayout.findViewById(R.id.emotion_layout);
+    }
+
+    private View findMoreLayout() {
+        return extraBottomLayout.findViewById(R.id.more_layout);
+    }
+
+
     @Override
     public void showEmotionLayout() {
-        emotionLayout.setVisibility(View.VISIBLE);
+        hideExtraBottomLayout();
+        findEmotionLayout().setVisibility(View.VISIBLE);
         findInputText().clearFocus();
     }
 
     @Override
     public void hideEmotionLayout() {
-        emotionLayout.setVisibility(View.GONE);
+        findEmotionLayout().setVisibility(View.GONE);
     }
+
+    @Override
+    public void showMoreLayout() {
+        hideExtraBottomLayout();
+        findMoreLayout().setVisibility(View.VISIBLE);
+        findInputText().clearFocus();
+    }
+
+    @Override
+    public void hideMoreLayout() {
+
+    }
+
+    @Override
+    public void hideExtraBottomLayout() {
+        int count = extraBottomLayout.getChildCount();
+        for (int i = 0; i < count; i++) {
+            extraBottomLayout.getChildAt(i).setVisibility(View.GONE);
+        }
+    }
+
+
+    //----------------------------------------------
 
     @Override
     public void showFabEmotion() {
@@ -364,7 +392,12 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             case R.id.menu_friend:
 
                 break;
-
+            case android.R.id.home:
+                Keyboard.close(getContext(),findInputText());
+                getActivity().onBackPressed();
+                break;
+            default:
+                break;
 
         }
         return super.onOptionsItemSelected(item);
@@ -472,4 +505,5 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         view.setLayoutParams(lp);
         view.requestLayout();
     }
+
 }

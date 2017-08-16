@@ -5,8 +5,6 @@ import android.support.v4.app.Fragment;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
-import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
 public class WelcomeActivity extends BaseActivity {
@@ -18,10 +16,10 @@ public class WelcomeActivity extends BaseActivity {
         setContentView(R.layout.activity_welcome);
 
         WelcomeFragment fragment = WelcomeFragment.newInstance();
-        fragment.setCallback(this::getPresenter);
-        addFragment(fragment,R.id.fragment);
 
-        getPresenter(fragment);
+        WelcomeFragment returnFragment = (WelcomeFragment) addFragment(fragment, R.id.fragment);
+        returnFragment.setPresenterCallback(this::getPresenter);
+        getPresenter(returnFragment);
 
     }
 

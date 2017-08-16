@@ -178,23 +178,30 @@
 
             </LinearLayout>
 
-            <!--更多功能的布局-->
-            <LinearLayout
-                android:id="@+id/more_layout"
-                android:visibility="gone"
+            <FrameLayout
+                android:id="@+id/extra_bottom_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-            </LinearLayout>
+                android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:id="@+id/emotion_layout"
-                android:visibility="gone"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="200dp">
+                <!--更多功能的布局-->
+                <LinearLayout
+                    android:id="@+id/more_layout"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:orientation="vertical">
+                </LinearLayout>
 
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/emotion_layout"
+                    android:visibility="gone"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp">
+
+                </LinearLayout>
+            </FrameLayout>
+
 
         </LinearLayout>
 

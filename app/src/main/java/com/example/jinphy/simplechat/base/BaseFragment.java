@@ -8,19 +8,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.jinphy.simplechat.modules.welcome.WelcomePresenter;
-
 /**
  * Created by jinphy on 2017/8/15.
  */
 
 public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
-    public BaseFragment(){}
+    public BaseFragment() {
+    }
 
     protected T presenter;
 
-    protected Callback callback;
+    protected PresenterCallback presenterCallback;
+
+    protected FragmentCallback fragmentCallback;
 
 
     @Override
@@ -31,8 +32,14 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
         View root = inflater.inflate(resourceId, container, false);
 
+        Log.e(this.getClass().getSimpleName(), "onCreateView");
+
+        Log.e(getClass().getSimpleName(), "onCreateView()--->before getPresenter()");
+
         this.presenter = getPresenter();
-        Log.e("Main", "this.presenter ="+this.presenter );
+
+        Log.e(getClass().getSimpleName(), "onCreateView()--->before getPresenter()");
+
 
         initView(root);
 
@@ -47,13 +54,14 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.e(getClass().getSimpleName(), "onResume()");
         if (this.presenter == null) {
             this.presenter = getPresenter();
         }
         this.presenter.start();
     }
 
-    private void initView(View view){
+    private void initView(View view) {
 
         // 查找所有需要用到的View
         findViewsById(view);
@@ -65,7 +73,9 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         registerEvent();
     }
 
-    protected abstract @LayoutRes int getResourceId();
+    protected abstract
+    @LayoutRes
+    int getResourceId();
 
     protected abstract void initData();
 
@@ -75,21 +85,44 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
     protected abstract void registerEvent();
 
-    protected T getPresenter(){
-
-        if (callback == null) {
+    protected T getPresenter() {
+        if (presenterCallback == null) {
             throw new NullPointerException(
-                    "the callback cannot be null,you must invoke the fragment.setCallback() method");
+                    "in " + this.getClass().getSimpleName() +
+                            " the presenterCallback cannot be null,you must invoke the fragment" +
+                            ".setPresenterCallback() method");
         }
-        return (T) callback.getPresenter(this);
+        return (T) presenterCallback.getPresenter(this);
     }
 
-    public void setCallback(Callback callback) {
-        this.callback = callback;
+    protected <V> V getFragment() {
+        if (fragmentCallback == null) {
+            throw new NullPointerException(
+                    "in " + this.getClass().getSimpleName() +
+                            " the fragmentCallback cannot be null,you must invoke the fragment" +
+                            ".setFragmentCallback() method");
+
+        }
+        return (V) fragmentCallback.getFragment();
     }
 
-    public interface Callback <T extends BasePresenter> {
+
+    public void setPresenterCallback(PresenterCallback callback) {
+        this.presenterCallback = callback;
+    }
+
+    public <V extends Fragment> void setFragmentCallback(FragmentCallback<V> callback) {
+        this.fragmentCallback = callback;
+    }
+
+
+    public interface PresenterCallback<T extends BasePresenter> {
         T getPresenter(Fragment fragment);
     }
+
+    public interface FragmentCallback<T extends Fragment> {
+        T getFragment();
+    }
+
 }
 
