@@ -67,6 +67,13 @@ public class ColorUtils {
         return Color.rgb(r,g,b);
     }
 
+    public static int setAlpha(@ColorInt int color, @FloatRange(from = 0, to = 1) float factor) {
+        int a = (int) (255 * factor);
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+        return Color.argb(a, r, g, b);
+    }
 
 
 }

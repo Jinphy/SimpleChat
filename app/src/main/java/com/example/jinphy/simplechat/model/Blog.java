@@ -6,6 +6,7 @@ package com.example.jinphy.simplechat.model;
 
 public class Blog {
 
+    private int id;
     private String content;
     private String time;
     private int publisherId;

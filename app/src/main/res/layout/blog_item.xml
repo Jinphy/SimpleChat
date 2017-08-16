@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/dimen_5dp"
+    app:cardElevation="@dimen/dimen_1dp"
+    app:cardUseCompatPadding="true"
+    android:layout_marginLeft="@dimen/dimen_5dp"
+    android:layout_marginRight="@dimen/dimen_5dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_58dp">
+
+            <ImageView
+                android:id="@+id/avatar_view"
+                android:layout_width="@dimen/dimen_48dp"
+                android:layout_height="@dimen/dimen_48dp"
+                android:layout_margin="@dimen/dimen_5dp"
+                android:background="#9faaaaaa"
+                android:src="@drawable/ic_person_48dp"/>
+
+            <TextView
+                android:id="@+id/name_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:layout_toRightOf="@id/avatar_view"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="@dimen/dimen_5dp"
+                android:textSize="@dimen/size_18sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:text="好友昵称"/>
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_1dp"
+            android:layout_marginBottom="@dimen/dimen_5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="#7f999999"/>
+
+        <LinearLayout
+            android:id="@+id/blog_content_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/content_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/size_16sp"
+                android:text="动态内容： This is the blog content,the user write some text to show here"/>
+            <GridLayout
+                android:id="@+id/picture_or_video_layout"
+                android:columnCount="3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </GridLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_marginLeft="20dp"
+            android:layout_width="match_parent"
+            android:layout_marginRight="@dimen/dimen_5dp"
+            android:layout_height="30dp">
+
+            <TextView
+                android:id="@+id/time_text"
+                android:gravity="center_vertical"
+                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
+                android:text="2017-8-16,上午"
+                android:textSize="12sp"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"/>
+
+
+            <ImageView
+                android:id="@+id/btn_comment"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:clickable="true"
+                android:background="@drawable/btn_alpha"
+                android:layout_centerInParent="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_comment_24dp"/>
+
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>

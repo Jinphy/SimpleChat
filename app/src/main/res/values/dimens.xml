@@ -27,4 +27,6 @@
     <dimen name="status_tool_bar_height">80dp</dimen>
     <dimen name="dimen_6dp">6dp</dimen>
     <dimen name="dimen_14dp">14dp</dimen>
+    <dimen name="dimen_58dp">58dp</dimen>
+    <dimen name="size_16sp">16sp</dimen>
 </resources>
