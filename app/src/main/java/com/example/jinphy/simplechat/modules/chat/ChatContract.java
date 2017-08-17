@@ -53,8 +53,6 @@ public interface ChatContract {
 
         void hideExtraBottomLayout();
 
-        boolean handleHorizontalTouchEvent(MotionEvent event);
-
         void moveHorizontal(float factor);
 
         void animateHorizontal(float fromFactor, float toFactor, boolean exit);
@@ -69,8 +67,6 @@ public interface ChatContract {
         ChatRecyclerViewAdapter getAdapter();
 
         int getItemCount();
-
-        boolean dispatchTouchEvent(MotionEvent event);
 
         void onBackPressed();
 

@@ -102,11 +102,11 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         return (V) fragmentCallback.getFragment();
     }
 
-    protected boolean handleHorizontalTouchEvent(MotionEvent event) {
+    public boolean handleHorizontalTouchEvent(MotionEvent event) {
         return false;
     }
 
-    protected boolean handleVerticalTouchEvent(MotionEvent event) {
+    public boolean handleVerticalTouchEvent(MotionEvent event) {
         return false;
     }
 

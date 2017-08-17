@@ -57,13 +57,10 @@ public interface MainContract {
 
         int currentItemPosition();
 
-        boolean dispatchTouchEvent(MotionEvent event);
-
     }
 
 
     interface Presenter extends BasePresenter{
 
-        boolean dispatchTouchEvent(MotionEvent event);
     }
 }

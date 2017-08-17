@@ -1,7 +1,5 @@
 package com.example.jinphy.simplechat.modules.active_zoom;
 
-import android.view.MotionEvent;
-
 import com.example.jinphy.simplechat.model.Blog;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
@@ -44,52 +42,6 @@ public class ActiveZonePresenter implements ActiveZoneContract.Presenter {
             return blogs.size();
         }
         return 0;
-    }
-
-
-    private float downX;
-    private float downY;
-    Boolean moveVertical = null;
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            moveVertical = null;
-            view.handleVerticalTouchEvent(event);
-            view.handleHorizontalTouchEvent(event);
-            return false;
-        } else {
-            if (moveVertical == null) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        downX = event.getX();
-                        downY = event.getY();
-                        view.handleVerticalTouchEvent(event);
-                        view.handleHorizontalTouchEvent(event);
-                        return false;
-                    case MotionEvent.ACTION_MOVE:
-                        float deltaX = Math.abs(event.getX() - downX);
-                        float deltaY = Math.abs(event.getY() - downY);
-                        if (deltaY+3 > deltaX) {
-                            moveVertical = true;
-                            return view.handleVerticalTouchEvent(event);
-                        } else {
-                            moveVertical = false;
-                            return view.handleHorizontalTouchEvent(event);
-                        }
-                    default:
-                        return false;
-                }
-
-            } else if (moveVertical) {
-                return view.handleVerticalTouchEvent(event);
-            } else {
-                return view.handleHorizontalTouchEvent(event);
-            }
-
-        }
-
-
     }
 
     @Override

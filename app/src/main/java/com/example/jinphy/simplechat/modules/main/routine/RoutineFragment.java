@@ -1,23 +1,16 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.model.Routine;
 import com.example.jinphy.simplechat.modules.active_zoom.ActiveZoneActivity;
-import com.example.jinphy.simplechat.modules.main.MainFragment;
-import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
 /**
@@ -91,7 +84,6 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
         adapter = presenter.getAdapter();
         recyclerView.setAdapter(adapter);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
     }

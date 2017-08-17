@@ -40,14 +40,6 @@ public class ChatActivity extends BaseActivity {
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (presenter.dispatchTouchEvent(ev)) {
-            return true;
-        }
-        return super.dispatchTouchEvent(ev);
-    }
-
-    @Override
     public void onBackPressed() {
         presenter.onBackPressed();
     }

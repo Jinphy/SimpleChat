@@ -1,36 +1,27 @@
 package com.example.jinphy.simplechat.modules.main.self;
 
-import android.graphics.Color;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
-import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
-import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
-import org.w3c.dom.Text;
-
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -41,9 +32,12 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfContract.View {
 
+    private static final int HORIZONTAL = 0;
+    private static final int VERTICAL = 1;
+
     private FloatingActionButton fab;
 
-    private LinearLayout contentLayout;
+    private RecyclerView recyclerView;
     private CardView headView;
     private ImageView avatarView;
     private TextView nameText;
@@ -93,13 +87,13 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     public void initData() {
         density = ScreenUtils.getDensity(getContext());
 
-        distance = ScreenUtils.dp2px(IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT,density);
-        baseTransY = -distance;
+        distanceVertical = ScreenUtils.dp2px(IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT,density);
+        baseTransY = -distanceVertical;
         avatarViewTransXDistance = ScreenUtils.dp2px(IntConst.NEGATIVE_150, density);
         avatarViewTransYDistance = ScreenUtils.dp2px(IntConst.POSITIVE_120, density);
         nameTextTransXDistance = ScreenUtils.dp2px(IntConst.POSITIVE_50, density);
-//        distance = (IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT)*density;
-//        baseTransY = -distance;
+//        distanceVertical = (IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT)*density;
+//        baseTransY = -distanceVertical;
 //        avatarViewTransXDistance = IntConst.NEGATIVE_150 * density;
 //        avatarViewTransYDistance = IntConst.POSITIVE_120 * density;
 //        nameTextTransXDistance = IntConst.POSITIVE_50 * density;
@@ -107,7 +101,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
     @Override
     protected void findViewsById(View view) {
-        contentLayout = view.findViewById(R.id.content_layout);
+        recyclerView = view.findViewById(R.id.recycler_view);
         headView = view.findViewById(R.id.head_view);
         avatarView = headView.findViewById(R.id.avatar);
         nameText = headView.findViewById(R.id.name);
@@ -116,6 +110,8 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
     @Override
     protected void setupViews() {
+        recyclerView.setAdapter(presenter.getAdapter());
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     @Override
@@ -124,7 +120,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     }
 
 
-    int distance;
+    int distanceVertical;
     float avatarViewScaleDistance = 0.68f;
     float avatarViewTransXDistance;
     float avatarViewTransYDistance;
@@ -135,31 +131,57 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     boolean isHeadViewMoveUp = false;
     boolean hasActionMove = false;
 
+    private int moveOrientation;
+
+    private float deltaY;
+
     @Override
-    public boolean handleTouchEvent(MotionEvent event) {
+    public boolean handleVerticalTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 oldY = event.getY();
                 return false;
             case MotionEvent.ACTION_MOVE:
+                moveOrientation = VERTICAL;
                 hasActionMove = true;
-                float deltaY = event.getY() - oldY;
+                deltaY = event.getY() - oldY;
                 oldY = event.getY();
-                float faction = getMoveFaction(deltaY);
-                transform(faction);
-                return true;
+                if (deltaY < 0 && canMoveUp()) {
+                    // 向上滑动
+                    moveVertical(getVerticalMoveFactor(deltaY));
+                    return true;
+                } else if (deltaY > 0 && canMoveDown()) {
+                    // 向下滑动
+                    moveVertical(getVerticalMoveFactor(deltaY));
+                    return true;
+                }
+                return false;
             case MotionEvent.ACTION_UP:
-                if (hasActionMove) {
+                if (hasActionMove && moveOrientation==VERTICAL) {
                     hasActionMove = false;
-                    float movedDistance = -headView.getTranslationY();
-                    if (movedDistance > distance / 2) {
-                        // 滑动超过一半
-                        animate(1);
-                        isHeadViewMoveUp = true;
+                    float factor = -headView.getTranslationY()*1.0f/distanceVertical;
+                    if (deltaY < 0) {
+                        // 向上滑动
+                        if (factor > 1.0f / 4) {
+                            // 收起
+                            animateVertical(factor, 1);
+                            isHeadViewMoveUp = true;
+                        } else {
+                            // 展开
+                            animateVertical(factor, 0);
+                            isHeadViewMoveUp = false;
+                        }
                     } else {
-                        // 滑动未超过一半
-                        animate(0);
-                        isHeadViewMoveUp = false;
+                        //向下滑动
+                        if (factor < 3.0f / 4) {
+                            // 展开
+                            animateVertical(factor, 0);
+                            isHeadViewMoveUp = false;
+                        } else {
+                            // 收起
+                            animateVertical(factor, 1);
+                            isHeadViewMoveUp = true;
+                        }
                     }
                 }
                 return false;
@@ -167,6 +189,28 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
                 return false;
         }
     }
+
+
+    @Override
+    public boolean canMoveUp() {
+        float transY = -headView.getTranslationY();
+        boolean can = transY< distanceVertical;
+        return can;
+    }
+
+    @Override
+    public boolean canMoveDown() {
+        float transY = headView.getTranslationY();
+        boolean can = transY < 0;
+
+        LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        int firstPosition = manager.findFirstCompletelyVisibleItemPosition();
+
+        can = can && (firstPosition == 0);
+        return can;
+    }
+
+
 
     private boolean checkViewNull(String str) throws Exception {
         int count=0;
@@ -185,18 +229,19 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     }
 
     // 手指移动过程中的动画转换
-    private void transform(float faction) {
+    @Override
+    public void moveVertical(float faction) {
         Observable.just("check null")
                 .map(this::checkViewNull)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isNull->transform(isNull,faction));
+                .subscribe(isNull-> moveVertical(isNull,faction));
     }
 
 
-    private void transform(boolean isNull, float faction) {
+    private void moveVertical(boolean isNull, float faction) {
         if (!isNull) {
-            headView.setTranslationY(-faction*distance);
+            headView.setTranslationY(-faction* distanceVertical);
             // TODO: 2017/8/13 headView和statusBar背景颜色初始值设置为相应头像的Palette颜色，
             // TODO: 2017/8/13 headView的结束颜色设置为R.color.colorPrimary
             // TODO: 2017/8/13 statusBar的结束颜色设置为 R.color.colorPrimaryDark
@@ -205,7 +250,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
                     ContextCompat.getColor(getContext(),R.color.colorPrimary),
                     faction
             ));
-            contentLayout.setTranslationY(distance*(1-faction));
+            recyclerView.setTranslationY(distanceVertical *(1-faction));
             ViewUtils.setScaleXY(avatarView,1-faction*avatarViewScaleDistance);
             avatarView.setTranslationX(faction*avatarViewTransXDistance);
             avatarView.setTranslationY(faction*avatarViewTransYDistance);
@@ -215,34 +260,35 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     }
 
     // 手指松开后的动画
-    private void animate(float faction) {
-        float startFaction = -headView.getTranslationY()/distance;
+    @Override
+    public void animateVertical(float fromFactor,float toFactor) {
+        float deltaFactor = Math.abs(toFactor - fromFactor);
         AnimUtils.just()
-                .setDuration(IntConst.DURATION_250)
+                .setDuration((long) (IntConst.DURATION_250*deltaFactor))
                 .setInterpolator(new AccelerateDecelerateInterpolator())
-                .setFloat(startFaction,faction)
+                .setFloat(fromFactor,toFactor)
                 .onUpdateFloat(animator -> {
                     float value = (float) animator.getAnimatedValue();
-                    transform(value);
+                    moveVertical(value);
                 })
                 .animate();
     }
 
 
     //获取当前headView应该滑动的百分比
-    private float getMoveFaction(float deltaY) {
+    private float getVerticalMoveFactor(float deltaY) {
         float transY = headView.getTranslationY();
         transY += deltaY;
-        if (deltaY < 0 && transY < baseTransY) {
+        transY = -transY;
+        if (deltaY < 0 && transY > distanceVertical) {
             //向上滑动,并且appbarLayout滑到最高上限
-            transY = baseTransY;
-        } else if (deltaY > 0 && transY > 0) {
+            transY = distanceVertical;
+        } else if (deltaY > 0 && transY < 0) {
             //向下滑动，并且appbarLayout滑到最低下限
             transY = 0;
-        } else {
         }
 
-        float faction = -transY / distance;
+        float faction = transY / distanceVertical;
 
         return faction;
     }
@@ -256,10 +302,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
                 break;
             case 2:
                 if (isHeadViewMoveUp) {
-                    transform(1);
+                    moveVertical(1);
                     ViewUtils.setAlpha(offset,avatarView,nameText);
                 } else {
-                    transform(1-offset);
+                    moveVertical(1-offset);
                 }
                 break;
             case 3:

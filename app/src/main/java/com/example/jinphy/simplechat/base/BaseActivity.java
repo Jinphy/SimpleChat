@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -28,6 +29,8 @@ import static com.example.jinphy.simplechat.utils.Preconditions.checkNotNull;
 public abstract class BaseActivity extends AppCompatActivity {
 
     private static List<AppCompatActivity> activities = new ArrayList<>();
+
+    protected BaseFragment baseFragment;
 
     private static Toast toast;
     private static Snackbar snackbar;
@@ -80,12 +83,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         Fragment temp = manager.findFragmentByTag(tag);
 
         if (temp != null) {
+            baseFragment = (BaseFragment) temp;
             return temp;
         }
 
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.add(resId, fragment, tag);
         transaction.commit();
+        try {
+            baseFragment = (BaseFragment) fragment;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return fragment;
     }
@@ -268,6 +277,67 @@ public abstract class BaseActivity extends AppCompatActivity {
         } else {
             Log.e(TAG, msg.toString());
         }
+    }
+
+    protected boolean handleTouchEvent() {
+        return true;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (handleTouchEvent()
+                && baseFragment != null
+                && dispatchTouchEvent(baseFragment, ev)) {
+            return true;
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+
+
+    private float downX;
+    private float downY;
+    private Boolean moveVertical = null;
+
+
+    boolean dispatchTouchEvent(BaseFragment view, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            moveVertical = null;
+            view.handleVerticalTouchEvent(event);
+            view.handleHorizontalTouchEvent(event);
+            return false;
+        } else {
+            if (moveVertical == null) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        downX = event.getX();
+                        downY = event.getY();
+                        view.handleVerticalTouchEvent(event);
+                        view.handleHorizontalTouchEvent(event);
+                        return false;
+                    case MotionEvent.ACTION_MOVE:
+                        float deltaX = Math.abs(event.getX() - downX);
+                        float deltaY = Math.abs(event.getY() - downY);
+                        if (deltaY + 3 > deltaX) {
+                            moveVertical = true;
+                            return view.handleVerticalTouchEvent(event);
+                        } else {
+                            moveVertical = false;
+                            return view.handleHorizontalTouchEvent(event);
+                        }
+                    default:
+                        return false;
+                }
+
+            } else if (moveVertical) {
+                return view.handleVerticalTouchEvent(event);
+            } else {
+                return view.handleHorizontalTouchEvent(event);
+            }
+
+        }
+
+
     }
 
 }

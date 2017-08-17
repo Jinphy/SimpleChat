@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.model;
+package com.example.jinphy.simplechat.model.menu;
 
 /**
  * Created by jinphy on 2017/8/15.

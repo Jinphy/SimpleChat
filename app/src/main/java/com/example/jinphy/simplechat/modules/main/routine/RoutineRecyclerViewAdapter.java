@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.model.Routine;
+import com.example.jinphy.simplechat.model.menu.Routine;
 
 import java.util.ArrayList;
 import java.util.List;

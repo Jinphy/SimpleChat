@@ -54,10 +54,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (presenter.dispatchTouchEvent(ev)) {
-            return true;
-        }
-        return super.dispatchTouchEvent(ev);
+    protected boolean handleTouchEvent() {
+        return ((MainFragment) baseFragment).currentItemPosition()==3;
     }
 }

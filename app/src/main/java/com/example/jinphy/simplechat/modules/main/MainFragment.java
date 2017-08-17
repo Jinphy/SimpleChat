@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsFragment;
@@ -589,12 +591,11 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
+    public boolean handleVerticalTouchEvent(MotionEvent event) {
         if (selectedTab == 3) {
-            return selfFragment.handleTouchEvent(event);
+            return selfFragment.handleVerticalTouchEvent(event);
         }
         return false;
-
     }
 
 

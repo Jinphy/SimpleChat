@@ -66,54 +66,6 @@ public class ChatPresenter implements ChatContract.Presenter {
         return 0;
     }
 
-
-    private float downX;
-    private float downY;
-    Boolean moveVertical = null;
-
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            moveVertical = null;
-//            view.handleVerticalTouchEvent(event);
-            view.handleHorizontalTouchEvent(event);
-            return false;
-        } else {
-            if (moveVertical == null) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        downX = event.getX();
-                        downY = event.getY();
-//                        view.handleVerticalTouchEvent(event);
-                        view.handleHorizontalTouchEvent(event);
-                        return false;
-                    case MotionEvent.ACTION_MOVE:
-                        float deltaX = Math.abs(event.getX() - downX);
-                        float deltaY = Math.abs(event.getY() - downY);
-                        if (deltaY+3 > deltaX) {
-                            moveVertical = true;
-//                            return view.handleVerticalTouchEvent(event);
-                        } else {
-                            moveVertical = false;
-                            return view.handleHorizontalTouchEvent(event);
-                        }
-                    default:
-                        return false;
-                }
-
-            } else if (moveVertical) {
-//                return view.handleVerticalTouchEvent(event);
-                return false;
-            } else {
-                return view.handleHorizontalTouchEvent(event);
-            }
-
-        }
-
-
-    }
-
     @Override
     public void onBackPressed() {
         view.onBackPressed();

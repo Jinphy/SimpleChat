@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/white"
+    app:cardElevation="@dimen/dimen_1dp"
+    app:cardCornerRadius="@dimen/dimen_5dp"
+    android:layout_marginBottom="@dimen/dimen_5dp"
+    android:layout_marginTop="@dimen/dimen_5dp"
+    android:layout_marginRight="@dimen/dimen_10dp"
+    android:layout_marginLeft="@dimen/dimen_10dp">
+
+    <LinearLayout
+        android:id="@+id/item_view"
+        android:clickable="true"
+        android:background="@drawable/btn_alpha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/icon_view"
+            android:src="@drawable/ic_certificates_24dp"
+            android:layout_margin="@dimen/dimen_10dp"
+            android:layout_gravity="center_vertical"
+            android:layout_width="@dimen/dimen_48dp"
+            android:layout_height="@dimen/dimen_48dp"/>
+
+        <TextView
+            android:id="@+id/tag_view"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/size_18sp"
+            android:text="各种菜单项"/>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

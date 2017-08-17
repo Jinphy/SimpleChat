@@ -6,78 +6,14 @@
     android:layout_height="match_parent"
     tools:context="com.example.jinphy.simplechat.modules.main.self.SelfFragment">
 
-    <LinearLayout
-        android:id="@+id/content_layout"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_marginTop="@dimen/tool_bar_height"
+        android:translationY="244dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:padding="@dimen/dimen_5dp"
-        android:translationY="244dp">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="@dimen/dimen_5dp"
-            app:cardElevation="@dimen/dimen_2dp"
-            app:cardUseCompatPadding="true">
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="@dimen/dimen_5dp"
-            app:cardElevation="@dimen/dimen_2dp"
-            app:cardUseCompatPadding="true">
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="@dimen/dimen_5dp"
-            app:cardElevation="@dimen/dimen_2dp"
-            app:cardUseCompatPadding="true">
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="@dimen/dimen_5dp"
-            app:cardElevation="@dimen/dimen_2dp"
-            app:cardUseCompatPadding="true">
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="@dimen/dimen_5dp"
-            app:cardElevation="@dimen/dimen_2dp"
-            app:cardUseCompatPadding="true">
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="@dimen/dimen_5dp"
-            app:cardElevation="@dimen/dimen_2dp"
-            app:cardUseCompatPadding="true">
-
-        </android.support.v7.widget.CardView>
-
-
-    </LinearLayout>
+    </android.support.v7.widget.RecyclerView>
 
 
     <android.support.v7.widget.CardView

@@ -172,11 +172,11 @@ public class ActiveZoneFragment extends BaseFragment<ActiveZonePresenter>
     private boolean canMoveUp() {
         float transY = -headView.getTranslationY();
         boolean can = transY< distanceVertical;
-
-        LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
-        int lastPosition = manager.findLastCompletelyVisibleItemPosition();
-
-        can = can && (lastPosition < presenter.getItemCount() - 1);
+//
+//        LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
+//        int lastPosition = manager.findLastCompletelyVisibleItemPosition();
+//
+//        can = can && (lastPosition < presenter.getItemCount() - 1);
         return can;
     }
 

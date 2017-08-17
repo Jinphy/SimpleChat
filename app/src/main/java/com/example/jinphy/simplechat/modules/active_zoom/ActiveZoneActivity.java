@@ -34,17 +34,6 @@ public class ActiveZoneActivity extends BaseActivity {
         return new ActiveZonePresenter((ActiveZoneFragment) fragment);
     }
 
-    int count = 0;
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        count++;
-        if (presenter.dispatchTouchEvent(ev)) {
-            return true;
-        }
-        return super.dispatchTouchEvent(ev);
-    }
-
 
     @Override
     public void onBackPressed() {
