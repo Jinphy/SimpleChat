@@ -136,7 +136,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     boolean hasActionMove = false;
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
+    public boolean handleTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 oldY = event.getY();

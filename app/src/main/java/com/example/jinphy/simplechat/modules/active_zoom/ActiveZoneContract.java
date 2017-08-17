@@ -13,7 +13,20 @@ public interface ActiveZoneContract {
 
 
     interface View extends BaseView<Presenter> {
-        boolean dispatchTouchEvent(MotionEvent event);
+        boolean handleVerticalTouchEvent(MotionEvent event);
+
+        boolean handleHorizontalTouchEvent(MotionEvent event);
+
+
+
+        void moveVertical(float factor);
+
+        void moveHorizontal(float factor);
+
+        void animateHorizontal(float fromFactor, float toFactor,boolean exit);
+
+        void onBackPressed();
+
     }
 
 
@@ -25,6 +38,9 @@ public interface ActiveZoneContract {
         int getItemCount();
 
         boolean dispatchTouchEvent(MotionEvent event);
+
+
+        void onBackPressed();
     }
 }
 

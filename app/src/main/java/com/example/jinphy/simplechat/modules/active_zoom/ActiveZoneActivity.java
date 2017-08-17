@@ -44,4 +44,10 @@ public class ActiveZoneActivity extends BaseActivity {
         }
         return super.dispatchTouchEvent(ev);
     }
+
+
+    @Override
+    public void onBackPressed() {
+        presenter.onBackPressed();
+    }
 }

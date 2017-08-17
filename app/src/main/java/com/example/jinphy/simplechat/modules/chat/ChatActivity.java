@@ -5,12 +5,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.MotionEvent;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
 
 public class ChatActivity extends BaseActivity {
 
+
+    private ChatPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +31,7 @@ public class ChatActivity extends BaseActivity {
 
         ChatFragment returnFragment = (ChatFragment) addFragment(fragment, R.id.fragment);
         returnFragment.setPresenterCallback(this::getPresenter);
-
+        presenter = getPresenter(returnFragment);
     }
 
     @Override
@@ -36,4 +39,16 @@ public class ChatActivity extends BaseActivity {
         return new ChatPresenter((ChatContract.View) fragment);
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (presenter.dispatchTouchEvent(ev)) {
+            return true;
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public void onBackPressed() {
+        presenter.onBackPressed();
+    }
 }

@@ -1,6 +1,5 @@
 package com.example.jinphy.simplechat.modules.active_zoom;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.example.jinphy.simplechat.model.Blog;
@@ -56,7 +55,8 @@ public class ActiveZonePresenter implements ActiveZoneContract.Presenter {
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
             moveVertical = null;
-            view.dispatchTouchEvent(event);
+            view.handleVerticalTouchEvent(event);
+            view.handleHorizontalTouchEvent(event);
             return false;
         } else {
             if (moveVertical == null) {
@@ -64,31 +64,36 @@ public class ActiveZonePresenter implements ActiveZoneContract.Presenter {
                     case MotionEvent.ACTION_DOWN:
                         downX = event.getX();
                         downY = event.getY();
-                        view.dispatchTouchEvent(event);
+                        view.handleVerticalTouchEvent(event);
+                        view.handleHorizontalTouchEvent(event);
                         return false;
                     case MotionEvent.ACTION_MOVE:
                         float deltaX = Math.abs(event.getX() - downX);
                         float deltaY = Math.abs(event.getY() - downY);
                         if (deltaY+3 > deltaX) {
                             moveVertical = true;
-                            return view.dispatchTouchEvent(event);
+                            return view.handleVerticalTouchEvent(event);
                         } else {
                             moveVertical = false;
-                            return false;
+                            return view.handleHorizontalTouchEvent(event);
                         }
                     default:
-                        break;
+                        return false;
                 }
 
             } else if (moveVertical) {
-                return view.dispatchTouchEvent(event);
+                return view.handleVerticalTouchEvent(event);
             } else {
-                return false;
+                return view.handleHorizontalTouchEvent(event);
             }
 
         }
 
 
-        return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        view.onBackPressed();
     }
 }

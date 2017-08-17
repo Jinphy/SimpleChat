@@ -1,6 +1,5 @@
 package com.example.jinphy.simplechat.modules.main;
 
-import android.support.v7.view.menu.MenuView;
 import android.view.MotionEvent;
 
 import com.example.jinphy.simplechat.utils.Preconditions;
@@ -54,7 +53,7 @@ public class MainPresenter implements MainContract.Presenter {
                                 return false;
                             }
                         default:
-                            break;
+                            return false;
                     }
 
                 } else if (moveVertical) {

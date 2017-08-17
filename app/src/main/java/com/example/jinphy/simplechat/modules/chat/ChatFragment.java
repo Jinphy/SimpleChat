@@ -1,13 +1,17 @@
 package com.example.jinphy.simplechat.modules.chat;
 
 import android.animation.AnimatorSet;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,10 +39,13 @@ import com.example.jinphy.simplechat.utils.ViewUtils;
  */
 public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatContract.View {
 
+    private static final int HORIZONTAL = 0;
+    private static final int VERTICAL = 1;
 
     private RecyclerView recyclerView;
     private View appbarLayout;
     private View bottomBar;
+    private Toolbar toolbar;
 
     private FloatingActionButton fab;
     private FloatingActionButton fabEmotion;
@@ -76,6 +83,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     @Override
     protected void findViewsById(View view) {
+        toolbar = getActivity().findViewById(R.id.toolbar);
         appbarLayout = getActivity().findViewById(R.id.appbar_layout);
         fab = getActivity().findViewById(R.id.fab);
         fabEmotion = view.findViewById(R.id.fab_emotion);
@@ -90,6 +98,9 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     @Override
     protected void setupViews(){
+
+        appbarLayout.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
+
         // 设置RecyclerView
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -140,10 +151,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     // 文本输入框的焦点改变事件
     private void onFocusChangeOfInputText(View view, boolean hasFocus) {
+        Log.e(getClass().getSimpleName(), "height" + fabEmotion.getHeight());
         if (hasFocus) {
-            recyclerView.smoothScrollToPosition(presenter.getItemCount() - 1);
+            hideExtraBottomLayout();
             showFabEmotion();
-            hideEmotionLayout();
         } else {
             Keyboard.close(getContext(), findInputText());
             hideFabEmotion();
@@ -214,6 +225,9 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     @Override
     protected void initData() {
+        screenWidth = ScreenUtils.getScreenWidth(getContext());
+        onThirdScreenWidth = screenWidth/3;
+        maxElevation = ScreenUtils.dp2px(getContext(), 20);
     }
 
     @Override
@@ -376,7 +390,17 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 .setDuration(IntConst.DURATION_250)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .onStart(a->{if(!gone) fabEmotion.setVisibility(View.VISIBLE);})
-                .onEnd(a->{if(gone) fabEmotion.setVisibility(View.GONE);})
+                .onEnd(a->{
+                    if (gone) {
+                        fabEmotion.setVisibility(View.GONE);
+                    } else {
+                        setMargin(
+                                recyclerView,
+                                appbarLayout.getMeasuredHeight(),
+                                bottomBar.getMeasuredHeight());
+                        recyclerView.smoothScrollToPosition(presenter.getItemCount() - 1);
+                    }
+                })
                 .animate();
     }
 
@@ -393,8 +417,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
                 break;
             case android.R.id.home:
-                Keyboard.close(getContext(),findInputText());
-                getActivity().onBackPressed();
+                onBackPressed();
                 break;
             default:
                 break;
@@ -435,8 +458,8 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     public void hideBar(View view) {
         if (isBarVisible) {
             isBarVisible = false;
+            fabEmotion.setVisibility(View.GONE);
             animateBar(view,0,1,false);
-
         }
     }
 
@@ -506,4 +529,101 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         view.requestLayout();
     }
 
+    private int moveOrientation;
+    private float oldX;
+    private float deltaX;
+    private float downX;
+    private float onThirdScreenWidth;
+    private float screenWidth;
+    private int maxElevation;
+
+    @Override
+    public boolean handleHorizontalTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                downX = event.getX();
+                oldX = downX;
+                return false;
+            case MotionEvent.ACTION_MOVE:
+                Log.e(getClass().getSimpleName(), "move");
+                moveOrientation = HORIZONTAL;
+                deltaX = event.getX()-oldX;
+                oldX = event.getX();
+                if (canMoveHorizontal()) {
+                    float factor = getHorizontalMoveFactor(deltaX);
+                    moveHorizontal(factor);
+                }
+                return true;
+            case MotionEvent.ACTION_UP:
+                if (moveOrientation == HORIZONTAL) {
+                    float factor  = rootView.getTranslationX()/screenWidth;
+                    if (factor < 1.0f / 3) {
+                        animateHorizontal(factor,0,false);
+                    } else {
+                        animateHorizontal(factor,1f,true);
+                    }
+                }
+
+                return false;
+            default:
+                return false;
+        }
+
+    }
+
+    private boolean canMoveHorizontal() {
+        return (downX < onThirdScreenWidth) && (rootView.getTranslationX()>=0);
+    }
+
+    @Override
+    public void moveHorizontal(float factor) {
+        float transX = factor * screenWidth;
+        rootView.setTranslationX(transX);
+        appbarLayout.setTranslationX(transX);
+        recyclerView.setAlpha(1-factor);
+        toolbar.setAlpha((1-factor));
+        bottomBar.setAlpha(1-factor);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            rootView.setElevation((float) (maxElevation *(1-factor*0.5)));
+        }
+    }
+
+    private float getHorizontalMoveFactor(float deltaX) {
+        float transX = rootView.getTranslationX();
+        transX +=deltaX;
+
+        if (deltaX < 0 && transX<0) {
+            // 向左滑动
+            transX = 0;
+        }
+
+        float factor = transX / screenWidth;
+
+        return factor;
+    }
+
+    @Override
+    public void animateHorizontal(float fromFactor, float toFactor,boolean exit) {
+        float deltaFactor = Math.abs(toFactor-fromFactor);
+        AnimUtils.just()
+                .setFloat(fromFactor,toFactor)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .setDuration((long) (IntConst.DURATION_500 * deltaFactor))
+                .onUpdateFloat(animator -> {
+                    float factor = (float) animator.getAnimatedValue();
+                    moveHorizontal(factor);
+                })
+                .onEnd(animator -> {
+                    if (exit) {
+                        Keyboard.close(getContext(),findInputText());
+                        getActivity().finish();
+                    }
+                })
+                .animate();
+    }
+
+    @Override
+    public void onBackPressed() {
+        animateHorizontal(0,1,true);
+    }
 }

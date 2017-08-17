@@ -3,8 +3,8 @@ package com.example.jinphy.simplechat.base;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -17,6 +17,8 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     public BaseFragment() {
     }
 
+    protected View rootView;
+
     protected T presenter;
 
     protected PresenterCallback presenterCallback;
@@ -28,18 +30,13 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        this.presenter = getPresenter();
+
         int resourceId = getResourceId();
 
         View root = inflater.inflate(resourceId, container, false);
 
-        Log.e(this.getClass().getSimpleName(), "onCreateView");
-
-        Log.e(getClass().getSimpleName(), "onCreateView()--->before getPresenter()");
-
-        this.presenter = getPresenter();
-
-        Log.e(getClass().getSimpleName(), "onCreateView()--->before getPresenter()");
-
+        rootView = root;
 
         initView(root);
 
@@ -54,7 +51,6 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.e(getClass().getSimpleName(), "onResume()");
         if (this.presenter == null) {
             this.presenter = getPresenter();
         }
@@ -106,6 +102,15 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         return (V) fragmentCallback.getFragment();
     }
 
+    protected boolean handleHorizontalTouchEvent(MotionEvent event) {
+        return false;
+    }
+
+    protected boolean handleVerticalTouchEvent(MotionEvent event) {
+        return false;
+    }
+
+    //========================================================\\
 
     public void setPresenterCallback(PresenterCallback callback) {
         this.presenterCallback = callback;

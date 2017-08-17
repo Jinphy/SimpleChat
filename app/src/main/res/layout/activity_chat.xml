@@ -34,5 +34,6 @@
             app:layout_anchorGravity="bottom|right|end"/>
     </android.support.design.widget.CoordinatorLayout>
 
-    <include layout="@layout/layout_appbar"/>
+    <include
+        layout="@layout/layout_appbar"/>
 </FrameLayout>

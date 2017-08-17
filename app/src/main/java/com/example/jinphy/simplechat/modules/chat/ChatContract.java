@@ -1,5 +1,7 @@
 package com.example.jinphy.simplechat.modules.chat;
 
+import android.view.MotionEvent;
+
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.model.Message;
@@ -51,7 +53,13 @@ public interface ChatContract {
 
         void hideExtraBottomLayout();
 
+        boolean handleHorizontalTouchEvent(MotionEvent event);
 
+        void moveHorizontal(float factor);
+
+        void animateHorizontal(float fromFactor, float toFactor, boolean exit);
+
+        void onBackPressed();
     }
 
     interface Presenter extends BasePresenter {
@@ -61,6 +69,11 @@ public interface ChatContract {
         ChatRecyclerViewAdapter getAdapter();
 
         int getItemCount();
+
+        boolean dispatchTouchEvent(MotionEvent event);
+
+        void onBackPressed();
+
     }
 }
 

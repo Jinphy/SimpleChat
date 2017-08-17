@@ -591,7 +591,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (selectedTab == 3) {
-            return selfFragment.dispatchTouchEvent(event);
+            return selfFragment.handleTouchEvent(event);
         }
         return false;
 

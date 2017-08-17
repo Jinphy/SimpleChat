@@ -121,6 +121,7 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
     public void showMainActivity() {
         Intent intent = new Intent(getActivity(), MainActivity.class);
         startActivity(intent);
+        getActivity().overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
         getActivity().finish();
     }
 

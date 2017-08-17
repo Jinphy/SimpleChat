@@ -19,7 +19,7 @@ public interface SelfContract {
 
         void fabAction(android.view.View view);
 
-        boolean dispatchTouchEvent(MotionEvent event);
+        boolean handleTouchEvent(MotionEvent event);
 
         void handleOnViewPagerScrolled(int position, float offset, int offsetPixels);
     }
