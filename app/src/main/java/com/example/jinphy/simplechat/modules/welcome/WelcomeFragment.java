@@ -152,6 +152,7 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
                 .setDuration(IntConst.DURATION_1500)
                 .onStart(animator -> btnLayout.setVisibility(View.VISIBLE))
                 .animate();
+
     }
 
 
