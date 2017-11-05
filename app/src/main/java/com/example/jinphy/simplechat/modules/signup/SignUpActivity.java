@@ -1,12 +1,19 @@
 package com.example.jinphy.simplechat.modules.signup;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
+import com.mob.MobSDK;
+
+import cn.smssdk.EventHandler;
+import cn.smssdk.SMSSDK;
+
 
 public class SignUpActivity extends BaseActivity {
 
@@ -43,6 +50,7 @@ public class SignUpActivity extends BaseActivity {
         onBackPressed();
         return true;
     }
+
 
 
 }

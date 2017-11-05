@@ -89,7 +89,9 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
      *
      * @return A new instance of fragment MainFragment.
      */
-    public static MainFragment newInstance() {
+    public static MainFragment newInstance() throws Exception{
+        Thread.sleep(1000);
+
         MainFragment fragment = new MainFragment();
         return fragment;
     }

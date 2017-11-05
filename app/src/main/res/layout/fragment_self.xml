@@ -9,6 +9,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_marginTop="@dimen/tool_bar_height"
+        android:layout_marginBottom="@dimen/tool_bar_height"
         android:translationY="244dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -37,7 +38,8 @@
                 android:src="@drawable/ic_person_48dp"
                 app:civ_border_color="@color/white"
                 app:civ_border_width="@dimen/dimen_3dp"
-                app:civ_fill_color="@color/colorPrimaryDark"/>
+                app:civ_fill_color="@color/colorPrimaryDark"
+                tools:ignore="VectorDrawableCompat"/>
 
             <TextView
                 android:id="@+id/name"

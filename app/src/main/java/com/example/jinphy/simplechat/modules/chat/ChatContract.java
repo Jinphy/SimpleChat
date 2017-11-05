@@ -1,7 +1,5 @@
 package com.example.jinphy.simplechat.modules.chat;
 
-import android.view.MotionEvent;
-
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.model.Message;

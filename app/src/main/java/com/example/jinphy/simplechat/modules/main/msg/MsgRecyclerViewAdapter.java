@@ -2,7 +2,6 @@ package com.example.jinphy.simplechat.modules.main.msg;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.model.MsgRecord;
-import com.example.jinphy.simplechat.modules.chat.ChatRecyclerViewAdapter;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.List;
@@ -52,7 +50,6 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
             holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord,0,position));
             holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord,0,position));
         }
-
 
     }
 

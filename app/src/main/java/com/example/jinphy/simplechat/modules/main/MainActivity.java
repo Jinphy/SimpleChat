@@ -14,6 +14,11 @@ import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class MainActivity extends BaseActivity {
 
     private ActionBar actionBar;
@@ -31,13 +36,16 @@ public class MainActivity extends BaseActivity {
 //        actionBar.setDisplayShowHomeEnabled(true);
 //        actionBar.setHomeAsUpIndicator(R.drawable.ic_back_24dp);
         actionBar.setTitle(R.string.app_name);
-        MainFragment fragment = MainFragment.newInstance();
+        MainFragment fragment = null;
+        try {
+            fragment = MainFragment.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         MainFragment returnFragment = (MainFragment) addFragment(fragment, R.id.fragment);
         returnFragment.setPresenterCallback(this::getPresenter);
         presenter = getPresenter(returnFragment);
-
-
 
     }
 

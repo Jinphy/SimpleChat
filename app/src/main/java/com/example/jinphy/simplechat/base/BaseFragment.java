@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.base;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,11 +26,13 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
     protected FragmentCallback fragmentCallback;
 
+    private static final String TAG = "BaseFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Log.d(TAG, "onCreateView: ");
         this.presenter = getPresenter();
 
         int resourceId = getResourceId();
