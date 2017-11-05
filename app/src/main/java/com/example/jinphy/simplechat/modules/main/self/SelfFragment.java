@@ -1,12 +1,12 @@
 package com.example.jinphy.simplechat.modules.main.self;
 
+import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
@@ -62,8 +63,8 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
 
     @Override
-    public void initFab() {
-        fab = fragmentCallback.getFragment().getActivity().findViewById(R.id.fab);
+    public void initFab(Activity activity) {
+        fab = activity.findViewById(R.id.fab);
         fab.setImageResource(R.drawable.ic_edit_24dp);
         fab.setVisibility(View.VISIBLE);
         fab.setScaleX(1);
@@ -117,6 +118,13 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     @Override
     protected void registerEvent() {
 
+    }
+
+
+    @Override
+    protected SelfPresenter getPresenter() {
+        MainFragment parentFragment = (MainFragment) getParentFragment();
+        return parentFragment.getSelfPresenter(this);
     }
 
 

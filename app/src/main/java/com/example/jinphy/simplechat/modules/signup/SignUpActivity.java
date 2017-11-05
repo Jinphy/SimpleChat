@@ -36,7 +36,6 @@ public class SignUpActivity extends BaseActivity {
         SignUpFragment fragment = SignUpFragment.newInstance();
 
         SignUpFragment returnFragment = (SignUpFragment) addFragment(fragment, R.id.fragment);
-        returnFragment.setPresenterCallback(this::getPresenter);
         getPresenter(returnFragment);
     }
 

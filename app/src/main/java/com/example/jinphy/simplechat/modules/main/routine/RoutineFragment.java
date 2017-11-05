@@ -1,16 +1,17 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.modules.active_zoom.ActiveZoneActivity;
+import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
 /**
@@ -45,8 +46,8 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
 
 
     @Override
-    public void initFab() {
-        fab = fragmentCallback.getFragment().getActivity().findViewById(R.id.fab);
+    public void initFab(Activity activity) {
+        fab = activity.findViewById(R.id.fab);
         fab.setImageResource(R.drawable.ic_smile_24dp);
         fab.setVisibility(View.VISIBLE);
         fab.setScaleX(1);
@@ -93,6 +94,13 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     protected void registerEvent() {
 
         adapter.onClick(presenter::handleRecyclerViewEvent);
+    }
+
+
+    @Override
+    protected RoutinePresenter getPresenter() {
+        MainFragment parentFragment = (MainFragment) getParentFragment();
+        return parentFragment.getRoutinePresenter(this);
     }
 
     //    private List<CardView> getAllCardView(GridLayout parent) {

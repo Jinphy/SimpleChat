@@ -1,6 +1,6 @@
 package com.example.jinphy.simplechat.modules.main.friends;
 
-import android.support.annotation.NonNull;
+import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,7 +10,6 @@ import android.view.View;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
-import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,8 +38,8 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     }
 
     @Override
-    public void initFab() {
-        this.fab = fragmentCallback.getFragment().getActivity().findViewById(R.id.fab);
+    public void initFab(Activity activity) {
+        this.fab = activity.findViewById(R.id.fab);
         this.fab.setTranslationY(0);
         this.fab.setVisibility(View.GONE);
         this.fab.setImageResource(R.drawable.ic_arrow_up_24dp);
@@ -49,7 +48,7 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
 
     @Override
     public void fabAction(View view) {
-        ((MainFragment) fragmentCallback.getFragment()).showBar(recyclerView);
+        ((MainFragment) getParentFragment()).showBar(recyclerView);
         recyclerView.smoothScrollToPosition(0);
     }
 
@@ -65,11 +64,11 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
                 total+=dy;
                 if (total > 300) {
                     total=0;
-                    ((MainFragment) fragmentCallback.getFragment()).hideBar(recyclerView);
+                    ((MainFragment) getParentFragment()).hideBar(recyclerView);
                 }
                 if (total < -300) {
                     total=0;
-                    ((MainFragment) fragmentCallback.getFragment()).showBar(recyclerView);
+                    ((MainFragment) getParentFragment()).showBar(recyclerView);
                 }
             }
         };
@@ -101,6 +100,13 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     protected void registerEvent() {
         recyclerView.addOnScrollListener(getOnScrollListener());
 
+    }
+
+
+    @Override
+    protected FriendsPresenter getPresenter() {
+        MainFragment parentFragment = (MainFragment) getParentFragment();
+        return parentFragment.getFriendsPresenter(this);
     }
 
     @Override

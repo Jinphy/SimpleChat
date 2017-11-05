@@ -28,7 +28,6 @@ public class LoginActivity extends BaseActivity {
         LoginFragment fragment = LoginFragment.newInstance();
 
         LoginFragment returnFragment = (LoginFragment) addFragment(fragment, R.id.fragment);
-        returnFragment.setPresenterCallback(this::getPresenter);
 
     }
 

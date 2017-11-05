@@ -18,7 +18,6 @@ public class WelcomeActivity extends BaseActivity {
         WelcomeFragment fragment = WelcomeFragment.newInstance();
 
         WelcomeFragment returnFragment = (WelcomeFragment) addFragment(fragment, R.id.fragment);
-        returnFragment.setPresenterCallback(this::getPresenter);
         getPresenter(returnFragment);
 
     }

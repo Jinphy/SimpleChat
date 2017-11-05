@@ -98,13 +98,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     @Override
     public void initData() {
-        // 底部导航栏的按钮
-        btn = new LinearLayout[]{
-                btnMsg,
-                btnFriends,
-                btnRoutine,
-                btnSelf
-        };
         // 底部导航栏按钮的打开图标
         iconsOpen = new int[]{
                 R.drawable.ic_msg_open_24dp,
@@ -135,9 +128,9 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         MainActivity activity = (MainActivity) getActivity();
 
         appbarLayout = activity.findViewById(R.id.appbar_layout);
-        toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
+        toolbar =  activity.findViewById(R.id.toolbar);
 
-        fab = (FloatingActionButton) activity.findViewById(R.id.fab);
+        fab =  activity.findViewById(R.id.fab);
         viewPager = view.findViewById(R.id.view_pager);
         bottomBar = view.findViewById(R.id.bottom_bar);
         btnMsg = view.findViewById(R.id.btn_msg);
@@ -150,6 +143,14 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     @Override
     protected void setupViews() {
         viewPager.setAdapter(getAdapter());
+
+        // 底部导航栏的按钮
+        btn = new LinearLayout[]{
+                btnMsg,
+                btnFriends,
+                btnRoutine,
+                btnSelf
+        };
 
         // 为viewpager中的每个item设置相应的fab属性
         initFab(selectedTab);
@@ -323,16 +324,16 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     public void initFab(int position) {
         switch (position) {
             case MSG_FRAGMENT:
-                msgFragment.initFab();
+                msgFragment.initFab(getActivity());
                 break;
             case FRIEND_FRAGMENT:
-                friendsFragment.initFab();
+                friendsFragment.initFab(getActivity());
                 break;
             case ROUTINE_FRAGMENT:
-                routineFragment.initFab();
+                routineFragment.initFab(getActivity());
                 break;
             case SELF_FRAGMENT:
-                selfFragment.initFab();
+                selfFragment.initFab(getActivity());
                 break;
             default:
                 break;
@@ -370,16 +371,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         friendsFragment = getFragment(FRIEND_FRAGMENT);
         routineFragment = getFragment(ROUTINE_FRAGMENT);
         selfFragment = getFragment(SELF_FRAGMENT);
-
-        msgFragment.setPresenterCallback(this::getMsgPresenter);
-        friendsFragment.setPresenterCallback(this::getFriendsPresenter);
-        routineFragment.setPresenterCallback(this::getRoutinePresenter);
-        selfFragment.setPresenterCallback(this::getSelfPresenter);
-
-        msgFragment.setFragmentCallback(()->this);
-        friendsFragment.setFragmentCallback(()->this);
-        routineFragment.setFragmentCallback(()->this);
-        selfFragment.setFragmentCallback(()->this);
 
         List<Fragment> fragments = new ArrayList<>(4);
         fragments.add(msgFragment);

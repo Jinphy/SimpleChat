@@ -30,7 +30,7 @@ public class WelcomePresenter implements WelcomeContract.Presenter {
         SharedPreferences preferences =
                 context.getSharedPreferences(StringConst.PREFERENCES_NAME_USER, Context.MODE_PRIVATE);
         boolean hasLogin = preferences.getBoolean(StringConst.PREFERENCES_KEY_HAS_LOGIN, false);
-//        hasLogin = true;
+        hasLogin = true;
         if (hasLogin) {
             view.showMainActivity();
         } else {

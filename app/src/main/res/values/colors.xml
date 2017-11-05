@@ -12,4 +12,6 @@
     <color name="chat_send_btn_normal">#7f4E342E</color>
     <color name="half_alpha_black">#7f000000</color>
     <color name="background">#fff7f7f7</color>
+    <color name="color_ffcccccc">#ffcccccc</color>
+    <color name="colorAccentLighter">#9f4E342E</color>
 </resources>

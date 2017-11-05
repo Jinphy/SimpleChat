@@ -22,10 +22,6 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
     protected T presenter;
 
-    protected PresenterCallback presenterCallback;
-
-    protected FragmentCallback fragmentCallback;
-
     private static final String TAG = "BaseFragment";
 
     @Override
@@ -39,11 +35,12 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
         View root = inflater.inflate(resourceId, container, false);
 
+        initData();
+
         rootView = root;
 
         initView(root);
 
-        initData();
 
         // Must set to true,if you want to use options menu in the fragment
         setHasOptionsMenu(true);
@@ -85,24 +82,16 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     protected abstract void registerEvent();
 
     protected T getPresenter() {
-        if (presenterCallback == null) {
-            throw new NullPointerException(
-                    "in " + this.getClass().getSimpleName() +
-                            " the presenterCallback cannot be null,you must invoke the fragment" +
-                            ".setPresenterCallback() method");
-        }
-        return (T) presenterCallback.getPresenter(this);
-    }
+        BaseActivity activity = (BaseActivity) getActivity();
+        return activity.getPresenter(this);
 
-    protected <V> V getFragment() {
-        if (fragmentCallback == null) {
-            throw new NullPointerException(
-                    "in " + this.getClass().getSimpleName() +
-                            " the fragmentCallback cannot be null,you must invoke the fragment" +
-                            ".setFragmentCallback() method");
-
-        }
-        return (V) fragmentCallback.getFragment();
+        //        if (presenterCallback == null) {
+        //            throw new NullPointerException(
+        //                    "in " + this.getClass().getSimpleName() +
+        //                            " the presenterCallback cannot be null,you must invoke the fragment" +
+        //                            ".setPresenterCallback() method");
+        //        }
+//        return (T) presenterCallback.getPresenter(this);
     }
 
     public boolean handleHorizontalTouchEvent(MotionEvent event) {
@@ -114,23 +103,6 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     }
 
     //========================================================\\
-
-    public void setPresenterCallback(PresenterCallback callback) {
-        this.presenterCallback = callback;
-    }
-
-    public <V extends Fragment> void setFragmentCallback(FragmentCallback<V> callback) {
-        this.fragmentCallback = callback;
-    }
-
-
-    public interface PresenterCallback<T extends BasePresenter> {
-        T getPresenter(Fragment fragment);
-    }
-
-    public interface FragmentCallback<T extends Fragment> {
-        T getFragment();
-    }
 
 }
 

@@ -23,7 +23,6 @@ public class ActiveZoneActivity extends BaseActivity {
         ActiveZoneFragment fragment = ActiveZoneFragment.newInstance();
 
         ActiveZoneFragment returnFragment = (ActiveZoneFragment) addFragment(fragment, R.id.fragment);
-        returnFragment.setPresenterCallback(this::getPresenter);
 
         presenter = getPresenter(returnFragment);
 

@@ -44,7 +44,6 @@ public class MainActivity extends BaseActivity {
         }
 
         MainFragment returnFragment = (MainFragment) addFragment(fragment, R.id.fragment);
-        returnFragment.setPresenterCallback(this::getPresenter);
         presenter = getPresenter(returnFragment);
 
     }

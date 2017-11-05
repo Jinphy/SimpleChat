@@ -30,7 +30,6 @@ public class ChatActivity extends BaseActivity {
         ChatFragment fragment = ChatFragment.newInstance();
 
         ChatFragment returnFragment = (ChatFragment) addFragment(fragment, R.id.fragment);
-        returnFragment.setPresenterCallback(this::getPresenter);
         presenter = getPresenter(returnFragment);
     }
 

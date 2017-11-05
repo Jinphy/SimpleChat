@@ -1,27 +1,18 @@
 package com.example.jinphy.simplechat.modules.main.msg;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.DragEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.model.MsgRecord;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
-import com.example.jinphy.simplechat.utils.Preconditions;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,10 +40,15 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
         return fragment;
     }
 
+    @Override
+    protected MsgPresenter getPresenter() {
+        MainFragment parentFragment = (MainFragment) getParentFragment();
+        return parentFragment.getMsgPresenter(this);
+    }
 
     @Override
-    public void initFab() {
-        this.fab = fragmentCallback.getFragment().getActivity().findViewById(R.id.fab);
+    public void initFab(Activity activity) {
+        this.fab = activity.findViewById(R.id.fab);
         this.fab.setTranslationY(0);
         this.fab.setVisibility(View.GONE);
         this.fab.setImageResource(R.drawable.ic_arrow_up_24dp);
@@ -60,7 +56,7 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     }
     @Override
     public void fabAction(View view) {
-        ((MainFragment) fragmentCallback.getFragment()).showBar(recyclerView);
+        ((MainFragment) getParentFragment()).showBar(recyclerView);
         recyclerView.smoothScrollToPosition(0);
     }
 
@@ -74,11 +70,11 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
                 total+=dy;
                 if (total > 300) {
                     total=0;
-                    ((MainFragment) fragmentCallback.getFragment()).hideBar(recyclerView);
+                    ((MainFragment) getParentFragment()).hideBar(recyclerView);
                 }
                 if (total < -300) {
                     total=0;
-                    ((MainFragment) fragmentCallback.getFragment()).showBar(recyclerView);
+                    ((MainFragment) getParentFragment()).showBar(recyclerView);
                 }
             }
         };

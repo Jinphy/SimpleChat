@@ -27,9 +27,6 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
  */
 public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements WelcomeContract.View {
 
-
-
-
     private ImageView startView;
 
     private View loginView;

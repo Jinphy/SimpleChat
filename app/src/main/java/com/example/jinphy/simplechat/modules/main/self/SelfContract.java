@@ -1,8 +1,9 @@
 package com.example.jinphy.simplechat.modules.main.self;
 
+import android.app.Activity;
+
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
-import com.example.jinphy.simplechat.model.menu.Self;
 
 /**
  * Created by jinphy on 2017/8/10.
@@ -12,7 +13,7 @@ public interface SelfContract {
 
     interface View extends BaseView<Presenter> {
 
-        void initFab();
+        void initFab(Activity activity);
 
         void fabAction(android.view.View view);
 

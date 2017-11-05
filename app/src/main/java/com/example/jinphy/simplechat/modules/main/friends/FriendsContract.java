@@ -1,15 +1,11 @@
 package com.example.jinphy.simplechat.modules.main.friends;
 
-import android.support.annotation.NonNull;
+import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.model.Friend;
-import com.example.jinphy.simplechat.model.MsgRecord;
-import com.example.jinphy.simplechat.modules.main.MainFragment;
-import com.example.jinphy.simplechat.modules.main.msg.MsgRecyclerViewAdapter;
 
 import java.util.List;
 
@@ -21,7 +17,7 @@ public interface FriendsContract {
 
     interface View extends BaseView<Presenter> {
 
-        void initFab();
+        void initFab(Activity activity);
 
         void fabAction(android.view.View view);
 
