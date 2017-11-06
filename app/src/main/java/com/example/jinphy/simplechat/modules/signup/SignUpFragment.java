@@ -7,32 +7,34 @@ import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.custom_view.CustomVerticalStepperFormLayout;
 import com.example.jinphy.simplechat.listener_adapters.TextWatcherAdapter;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
-import com.mob.MobSDK;
+import com.example.jinphy.simplechat.utils.ViewUtils;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.concurrent.TimeUnit;
 
-import cn.smssdk.EventHandler;
-import cn.smssdk.SMSSDK;
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,15 +49,32 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     public static final int STEP_PASSWORD = 2;
     private static final int STEP_CONFIRM_PASSWORD = 3;
 
+    private static final String KEY_ACCOUNT_IN_VIEW = "KEY_ACCOUNT_IN_VIEW";
+    private static final String KEY_VERIFICATION_CODE_IN_VIEW = "KEY_VERIFICATION_CODE_IN_VIEW";
+    private static final String KEY_PASSWORD_IN_VIEW = "KEY_PASSWORD_IN_VIEW";
+    private static final String KEY_CONFIRM_PASSWORD_IN_VIEW = "KEY_CONFIRM_PASSWORD_IN_VIEW";
+
+    private static final String KEY_HAS_GET_VERIFICATION_CODE = "KEY_HAS_GET_VERIFICATION_CODE";
+    private static final String KEY_HAS_VERIFIED = "KEY_HAS_VERIFIED";
+    private static final String KEY_VERIFIED_PHONE = "KEY_VERIFIED_PHONE";
+    private static final String KEY_PASSWORD = "KEY_PASSWORD";
+
     private View accountView;
     private View verificationCodeView;
     private View passwordView;
     private View confirmPasswordView;
 
-    private VerticalStepperFormLayout verticalStepperForm;
+    private CustomVerticalStepperFormLayout verticalStepperForm;
     private int colorPrimary;
     private int colorPrimaryDark;
     private String[] titles;
+
+    private boolean hasGetVerificationCode;
+    private boolean hasVerified;
+    private String verifiedPhone;
+    private String password;
+
+
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -73,19 +92,13 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-
-    @Override
     protected int getResourceId() {
         return R.layout.fragment_sign_up;
     }
 
     @Override
     public void initData() {
-        titles  = new String[] {
+        titles = new String[]{
                 getString(R.string.account),
                 getString(R.string.verification_code),
                 getString(R.string.password),
@@ -104,8 +117,8 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
 
     @Override
     protected void setupViews() {
-        colorPrimary = ContextCompat.getColor(getContext(), R.color.colorPrimary);
-        colorPrimaryDark = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
+        colorPrimary = ContextCompat.getColor(getContext(), R.color.color_red_D50000);
+        colorPrimaryDark = ContextCompat.getColor(getContext(), R.color.color_red_light_B71C1C);
         VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, titles, this,
                 getActivity())
                 .primaryColor(colorPrimary)
@@ -114,7 +127,12 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 .hideKeyboard(true)
                 .materialDesignInDisabledSteps(true)
                 .showVerticalLineWhenStepsAreCollapsed(true)
+                .stepTitleTextColor(ContextCompat.getColor(getContext(),R.color.colorAccent))
                 .init();
+        verticalStepperForm.hideScrollBar()
+                .setNextStepButtonTexts(R.string.next_step)
+                .setButtonTextOfConfirmStep(R.string.confirm)
+                .setConfirmStepTitle(getString(R.string.commit_data));
 
 
     }
@@ -127,7 +145,47 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (presenter == null) {
+            this.presenter = getPresenter();
+        }
         this.presenter.registerSMSSDK(getContext());
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
+            savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+
+        if (savedInstanceState != null) {
+            setText(accountView,savedInstanceState.getString(KEY_ACCOUNT_IN_VIEW,""));
+            setText(verificationCodeView,savedInstanceState
+                    .getString(KEY_VERIFICATION_CODE_IN_VIEW,""));
+            setText(passwordView,savedInstanceState.getString(KEY_PASSWORD_IN_VIEW,""));
+            setText(confirmPasswordView,savedInstanceState
+                    .getString(KEY_CONFIRM_PASSWORD_IN_VIEW,""));
+
+            hasGetVerificationCode = savedInstanceState
+                    .getBoolean(KEY_HAS_GET_VERIFICATION_CODE,false);
+            hasVerified = savedInstanceState.getBoolean(KEY_HAS_VERIFIED,false);
+            verifiedPhone = savedInstanceState.getString(KEY_VERIFIED_PHONE,"");
+            password = savedInstanceState.getString(KEY_PASSWORD,"");
+        }
+
+        return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_ACCOUNT_IN_VIEW,getText(accountView));
+        outState.putString(KEY_VERIFICATION_CODE_IN_VIEW,getText(verificationCodeView));
+        outState.putString(KEY_PASSWORD_IN_VIEW,getText(passwordView));
+        outState.putString(KEY_CONFIRM_PASSWORD_IN_VIEW,getText(confirmPasswordView));
+
+        outState.putBoolean(KEY_HAS_GET_VERIFICATION_CODE, hasGetVerificationCode);
+        outState.putBoolean(KEY_HAS_VERIFIED,hasVerified);
+        outState.putString(KEY_VERIFIED_PHONE,verifiedPhone);
+        outState.putString(KEY_PASSWORD, password);
     }
 
     @Override
@@ -158,28 +216,87 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     public void onStepOpening(int stepNumber) {
         switch (stepNumber) {
             case STEP_ACCOUNT:
-                String account = ((TextInputEditText) accountView
-                        .findViewById(R.id.input_text)).getText().toString();
+                String account = getText(accountView,stepNumber);
                 checkAccount(account, account.length());
                 break;
             case STEP_VERIFICATION_CODE:
-                String verificationCode = ((TextInputEditText) verificationCodeView
-                        .findViewById(R.id.input_text)).getText().toString();
+                doOnVerificationCodeStepOpen();
+                String verificationCode = getText(verificationCodeView,stepNumber);
                 checkVerificationCode(verificationCode, verificationCode.length());
                 break;
             case STEP_PASSWORD:
-                String password = ((TextInputEditText) passwordView
-                        .findViewById(R.id.input_text)).getText().toString();
-                checkPassword(password,password.length());
+                String password = getText(passwordView,stepNumber);
+                checkPassword(password, password.length());
                 break;
             case STEP_CONFIRM_PASSWORD:
-                String confirmPassword = ((TextInputEditText) accountView
-                        .findViewById(R.id.input_text)).getText().toString();
+                String confirmPassword = getText(confirmPasswordView,stepNumber);
                 checkConfirmPassword(confirmPassword, confirmPassword.length());
                 break;
             default:
                 break;
         }
+    }
+
+    private String getText(View view) {
+        TextInputEditText editText = view.findViewById(R.id.input_text);
+        return editText.getText().toString();
+    }
+
+    private void setText(View view,String text) {
+        TextInputEditText editText = view.findViewById(R.id.input_text);
+        editText.setText(text);
+    }
+
+    private String getText(View view,int stepNumber){
+        TextInputEditText editText = view.findViewById(R.id.input_text);
+        if (stepNumber == STEP_ACCOUNT || stepNumber == STEP_VERIFICATION_CODE) {
+            ViewUtils.showExpressText(editText);
+        } else {
+            ViewUtils.showCipherText(editText);
+        }
+        return editText.getText().toString();
+    }
+
+    private void doOnVerificationCodeStepOpen(){
+        AppCompatButton nextStepButton = verticalStepperForm.
+                getNextStepButton(STEP_VERIFICATION_CODE);
+
+        String currentPhone = ((TextInputEditText) accountView
+                .findViewById(R.id.input_text)).getText().toString();
+
+        if (StringUtils.notEqual(currentPhone, verifiedPhone)) {
+            hasVerified = false;
+        }
+        if (hasVerified) {
+            // 已经通过验证
+            verticalStepperForm.setActiveStepAsCompleted();
+            nextStepButton.setText(R.string.next_step);
+            verificationCodeView.findViewById(R.id.input_layout).setVisibility(View.GONE);
+            verificationCodeView.findViewById(R.id.verify_successfully_view).setVisibility(View.VISIBLE);
+        }else {
+            // 没有通过验证
+            verificationCodeView.findViewById(R.id.input_layout).setVisibility(View.VISIBLE);
+            verificationCodeView.findViewById(R.id.verify_successfully_view).setVisibility(View.GONE);
+            nextStepButton.setText(R.string.confirm);
+            TextInputEditText editText = verificationCodeView.findViewById(R.id.input_text);
+            String verificationCode = editText.getText().toString();
+            if (hasGetVerificationCode && verificationCode.length()>0) {
+                verticalStepperForm.setActiveStepAsCompleted();
+            } else {
+                verticalStepperForm.setStepAsUncompleted(STEP_VERIFICATION_CODE,null);
+            }
+        }
+        nextStepButton.setOnClickListener(v->{
+            if (hasVerified) {
+                verticalStepperForm.next(STEP_VERIFICATION_CODE);
+            } else {
+                TextInputEditText editText = verificationCodeView.findViewById(R.id.input_text);
+                String verificationCode = editText.getText().toString();
+                presenter.submitVerificationCode(verifiedPhone,verificationCode);
+            }
+
+        });
+
     }
 
     @Override
@@ -202,11 +319,11 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
             verificationCodeButton.setVisibility(View.VISIBLE);
             verificationCodeButton.setOnClickListener(this::getVerificationCode);
         } else {
-            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) inputLayout.getLayoutParams();
-            layoutParams.width = ScreenUtils.dp2px(getContext(),200);
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) inputLayout
+                    .getLayoutParams();
+            layoutParams.width = ScreenUtils.dp2px(getContext(), 200);
             inputLayout.setLayoutParams(layoutParams);
         }
-
         return inflate;
     }
 
@@ -263,21 +380,41 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         }
     }
 
+
     private void checkVerificationCode(String text, int length) {
-
-
-
-
-
+        Log.d(TAG, "checkVerificationCode: "+text);
+        if (hasVerified) {
+            return;
+        }
+        if (hasGetVerificationCode && length > 0) {
+            verticalStepperForm.setActiveStepAsCompleted();
+        }else {
+            verticalStepperForm.setStepAsUncompleted(STEP_VERIFICATION_CODE, null);
+        }
     }
 
     private void checkPassword(String text, int length) {
-        verticalStepperForm.setActiveStepAsCompleted();
+        TextInputLayout inputLayout = passwordView.findViewById(R.id.text_input_layout);
+        if (StringUtils.isNumberOrLetter(text)) {
+            password = text;
+            verticalStepperForm.setActiveStepAsCompleted();
+            inputLayout.setErrorEnabled(false);
+        }else {
+            password = null;
+            verticalStepperForm.setStepAsUncompleted(STEP_PASSWORD, null);
+            inputLayout.setErrorEnabled(true);
+            inputLayout.setError("密码必须是6-20数字或字母！");
+        }
     }
 
     private void checkConfirmPassword(String text, int length) {
-        verticalStepperForm.setActiveStepAsCompleted();
+        if (StringUtils.equal(text, password)) {
+            verticalStepperForm.setActiveStepAsCompleted();
+        } else {
+            verticalStepperForm.setStepAsUncompleted(STEP_CONFIRM_PASSWORD,null);
+        }
     }
+
 
     // 获取验证码按钮的点击事件
     private void getVerificationCode(View view) {
@@ -285,19 +422,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         TextInputEditText editText = accountView.findViewById(R.id.input_text);
         String phone = editText.getText().toString();
         presenter.getVerificationCode(phone);
-        Flowable.intervalRange(1, 60, 1, 1, TimeUnit.SECONDS)
-                .map(value -> {
-                    value = 60 - value;
-                    String out = getString(R.string.re_get);
-                    return out.replace(" ", value + "");
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(((TextView)view)::setText)
-                .doOnComplete(()->{
-                    view.setEnabled(true);
-                    ((TextView) view).setText(R.string.get_verification_code);
-                })
-                .subscribe();
+
     }
 
     @Override
@@ -309,8 +434,8 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
             String description = object.optString("detail");//错误描述
             int status = object.optInt("status");//错误代码
             Log.d(TAG, "afterEvent: -------------请求失败--------------------");
-            Log.d(TAG, "afterEvent: 错误代码："+status);
-            Log.d(TAG, "afterEvent: 错误描述："+description);
+            Log.d(TAG, "afterEvent: 错误代码：" + status);
+            Log.d(TAG, "afterEvent: 错误描述：" + description);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -318,13 +443,68 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
 
     @Override
     public void showResultOfGetVerificationCode(String message) {
+        Log.d(TAG, "showResultOfGetVerificationCode: "+message);
         Flowable.just(message)
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(s -> {
-                    Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
-                    return null;
+                .doOnComplete(() -> {
+                    Toast.makeText(BaseApplication.INSTANCE, message, Toast.LENGTH_LONG).show();
+                })
+                .subscribe();
+    }
+
+    @Override
+    public synchronized void setText(TextView view, String text) {
+
+        view.setText(text);
+    }
+
+    @Override
+    public void changeViewAfterSubmittingVerificationSuccessfully(String phone) {
+        hasVerified = true;
+//        verticalStepperForm.next(STEP_VERIFICATION_CODE);
+        verticalStepperForm.goToNextStep();
+    }
+
+    @Override
+    public void changeViewAfterGettingVerificationSuccessfully() {
+        TextInputEditText editText = accountView.findViewById(R.id.input_text);
+        verifiedPhone = editText.getText().toString();
+        Log.d(TAG, "changeViewAfterGettingVerificationSuccessfully: verifiedPhone = "+verifiedPhone);
+        hasVerified = false;
+        hasGetVerificationCode = true;
+
+        String text = BaseApplication.INSTANCE.getString(R.string.re_get);
+
+        View view = verificationCodeView.findViewById(R.id.verification_code_button);
+
+        Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
+                .map(value -> {
+                    value = 60 - value;
+                    return text.replace(" ", value + "");
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(value -> setText((TextView) view, value))
+                .doOnComplete(() -> {
+                    view.setEnabled(true);
+                    setText( ((TextView) view),
+                            BaseApplication.INSTANCE.getString(R.string.get_verification_code));
                 })
                 .subscribe();
 
+    }
+
+
+    @Override
+    public void changeViewAfterSubmittingVerificationUnSuccessfully() {
+        hasVerified = false;
+    }
+
+    @Override
+    public void changeViewAfterGettingVerificationUnsuccessfully() {
+        verifiedPhone = null;
+        hasGetVerificationCode = false;
+        hasVerified = false;
+        verificationCodeView.findViewById(R.id.verification_code_button).setEnabled(true);
     }
 }

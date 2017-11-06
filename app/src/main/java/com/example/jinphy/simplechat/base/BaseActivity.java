@@ -28,13 +28,14 @@ import static com.example.jinphy.simplechat.utils.Preconditions.checkNotNull;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
+
     private static List<AppCompatActivity> activities = new ArrayList<>();
 
     protected BaseFragment baseFragment;
 
     private static Toast toast;
     private static Snackbar snackbar;
-    private static String TAG;
+    public static String TAG;
 
 
     @Override

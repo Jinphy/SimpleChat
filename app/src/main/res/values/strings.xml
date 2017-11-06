@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Simple Chat</string>
+    <string name="app_name">简聊</string>
 
     <string name="no_account_goto_sign_up"><![CDATA[没有账号？ >>去注册]]></string>
     <string name="login">Login</string>
-    <string name="sign_up">Sign up</string>
+    <string name="sign_up">注 册</string>
 
     <string name="self">自己</string>
     <string name="routine">日常</string>
@@ -34,14 +34,14 @@
     <string name="apply_account">申请账号</string>
     <string name="next_step">下一步</string>
     <string name="commit_data">提交信息</string>
-    <string name="confirm">确定</string>
+    <string name="confirm">确 定</string>
     
     <string name="app_key">222286c4a82a4</string>
     <string name="app_secret">fe79cb01da7800fc3439ea8d07b50a25</string>
     <string name="account">账号</string>
     <string name="verification_code">验证码</string>
     <string name="password">密码</string>
-    <string name="confirm_password">确认密码</string>
-    <string name="re_get">重获(s)</string>
+    <string name="confirm_password">重复密码</string>
+    <string name="re_get">重获( s)</string>
     <string name="get_verification_code">获取验证码</string>
 </resources>

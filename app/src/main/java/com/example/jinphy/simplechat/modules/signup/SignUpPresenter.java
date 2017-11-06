@@ -3,12 +3,13 @@ package com.example.jinphy.simplechat.modules.signup;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.jinphy.simplechat.repositories.smssdk.SMSSDKRepository;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
-import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import cn.smssdk.SMSSDK;
 import io.reactivex.Flowable;
@@ -59,28 +60,46 @@ public class SignUpPresenter implements SignUpContract.Presenter,SMSSDKRepositor
 
     @Override
     public void afterEvent(int event, int result, Object data) {
-        Log.d(TAG, "afterEvent: ================================");
-        if (result == SMSSDK.RESULT_ERROR) {
-            view.logErrorMessageOfSMSSDK(data);
-            // 根据服务器返回的网络错误，给toast提示
-            switch (event) {
-                case SMSSDK.EVENT_GET_VERIFICATION_CODE:
-                    view.showResultOfGetVerificationCode("获取验证码失败！");
-                    break;
-                default:
-                    break;
-            }
+        Flowable.just("start")
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(value -> {
+                    if (result == SMSSDK.RESULT_ERROR) {
+                        view.logErrorMessageOfSMSSDK(data);
+                        // 根据服务器返回的网络错误，给toast提示
+                        switch (event) {
+                            case SMSSDK.EVENT_GET_VERIFICATION_CODE:
+                                view.showResultOfGetVerificationCode("获取验证码失败！");
+                                view.changeViewAfterGettingVerificationUnsuccessfully();
+                                break;
+                            case SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE:
+                                view.showResultOfGetVerificationCode("验证失败，请输入正确的验证码！");
+                                view.changeViewAfterSubmittingVerificationUnSuccessfully();
+                            default:
+                                break;
+                        }
 
-        } else {
-            switch (event) {
-                case SMSSDK.EVENT_GET_VERIFICATION_CODE:
-                    view.showResultOfGetVerificationCode("验证码已发送，请正确输入！");
-                    break;
+                    } else {
+                        switch (event) {
+                            case SMSSDK.EVENT_GET_VERIFICATION_CODE:
+                                view.showResultOfGetVerificationCode("验证码已发送，请正确输入！");
+                                view.changeViewAfterGettingVerificationSuccessfully();
+                                break;
+                            case SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE:
+                                view.showResultOfGetVerificationCode("已验证，请继续！");
+                                // TODO: 2017/11/5
+                                HashMap<String, String> map = (HashMap<String, String>) data;
+//                                String country = map.get("country");
+                                String phone = map.get("phone");
+                                view.changeViewAfterSubmittingVerificationSuccessfully(phone);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
 
-                default:
-                    break;
-            }
-        }
+                })
+                .subscribe();
+
     }
 
 }

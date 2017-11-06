@@ -16,4 +16,5 @@ public class BaseApplication extends Application {
         super.onCreate();
         INSTANCE = this;
     }
+
 }

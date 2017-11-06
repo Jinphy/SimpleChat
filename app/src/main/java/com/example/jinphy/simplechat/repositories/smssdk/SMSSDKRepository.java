@@ -1,20 +1,13 @@
 package com.example.jinphy.simplechat.repositories.smssdk;
 
 import android.content.Context;
-import android.view.View;
-import android.widget.TextView;
+import android.util.Log;
 
 import com.example.jinphy.simplechat.R;
 import com.mob.MobSDK;
 
-import java.util.concurrent.TimeUnit;
-
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by jinphy on 2017/11/5.
@@ -22,7 +15,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class SMSSDKRepository {
 
-    public static String countryChina = "中国";
+    private static final String TAG = "SMSSDKRepository";
+    public static String countryChina = "86";
 
     public EventHandler eventHandler;
 
