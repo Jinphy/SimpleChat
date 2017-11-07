@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.constants;
 
 /**
  * Created by jinphy on 2017/8/9.
+ *
  */
 
 public class IntConst {

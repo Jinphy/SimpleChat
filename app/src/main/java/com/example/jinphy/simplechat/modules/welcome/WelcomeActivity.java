@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.StackingBehavior;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.DBApplication;
 import com.example.jinphy.simplechat.base.BaseActivity;
@@ -27,6 +29,8 @@ public class WelcomeActivity extends BaseActivity {
 
         WelcomeFragment returnFragment = (WelcomeFragment) addFragment(fragment, R.id.fragment);
         getPresenter(returnFragment);
+
+
 
     }
 

@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
-import com.example.jinphy.simplechat.model.Friend;
+import com.example.jinphy.simplechat.model.friend.Friend;
 
 import java.util.List;
 

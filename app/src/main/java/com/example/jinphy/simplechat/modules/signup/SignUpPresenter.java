@@ -4,12 +4,15 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.example.jinphy.simplechat.repositories.smssdk.SMSSDKRepository;
+import com.example.jinphy.simplechat.api.Consumer;
+import com.example.jinphy.simplechat.api.NetworkManager;
+import com.example.jinphy.simplechat.api.SMSSDKApi;
+import com.example.jinphy.simplechat.application.DBApplication;
+import com.example.jinphy.simplechat.model.user.User;
+import com.example.jinphy.simplechat.model.user.UserRepository;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import cn.smssdk.SMSSDK;
 import io.reactivex.Flowable;
@@ -19,16 +22,20 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
  * Created by jinphy on 2017/8/9.
  */
 
-public class SignUpPresenter implements SignUpContract.Presenter,SMSSDKRepository.Callback {
+public class SignUpPresenter implements SignUpContract.Presenter {
 
     private static final String TAG = "SignUpPresenter";
     private final SignUpContract.View view;
-    private SMSSDKRepository smssdkRepository;
+    private SMSSDKApi smssdkApi;
+    private NetworkManager networkManager;
+    private UserRepository userRepository;
 
 
     public SignUpPresenter(@NonNull SignUpContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-        this.smssdkRepository = new SMSSDKRepository(this);
+        this.smssdkApi = SMSSDKApi.getInstance();
+        this.networkManager = ((DBApplication) DBApplication.INSTANCE).getNetworkManager();
+        this.userRepository = UserRepository.getInstance();
     }
 
     @Override
@@ -40,66 +47,45 @@ public class SignUpPresenter implements SignUpContract.Presenter,SMSSDKRepositor
 
     @Override
     public void registerSMSSDK(Context context) {
-        smssdkRepository.register(context);
+        smssdkApi.register(context);
     }
 
     @Override
     public void unregisterSMSSDK() {
-        smssdkRepository.unregister();
+        smssdkApi.unregister();
     }
 
     @Override
-    public void getVerificationCode(String phone) {
-        smssdkRepository.getVerificationCode(phone);
+    public void getVerificationCode(String phone,Consumer callback) {
+        smssdkApi.getVerificationCode(phone,callback);
     }
 
     @Override
-    public void submitVerificationCode(String phone, String verificationCode) {
-        smssdkRepository.submitVerificationCode(phone, verificationCode);
+    public void submitVerificationCode(String phone, String verificationCode,Consumer callback) {
+        smssdkApi.submitVerificationCode(phone, verificationCode,callback);
     }
 
     @Override
-    public void afterEvent(int event, int result, Object data) {
-        Flowable.just("start")
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(value -> {
-                    if (result == SMSSDK.RESULT_ERROR) {
-                        view.logErrorMessageOfSMSSDK(data);
-                        // 根据服务器返回的网络错误，给toast提示
-                        switch (event) {
-                            case SMSSDK.EVENT_GET_VERIFICATION_CODE:
-                                view.showResultOfGetVerificationCode("获取验证码失败！");
-                                view.changeViewAfterGettingVerificationUnsuccessfully();
-                                break;
-                            case SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE:
-                                view.showResultOfGetVerificationCode("验证失败，请输入正确的验证码！");
-                                view.changeViewAfterSubmittingVerificationUnSuccessfully();
-                            default:
-                                break;
-                        }
-
-                    } else {
-                        switch (event) {
-                            case SMSSDK.EVENT_GET_VERIFICATION_CODE:
-                                view.showResultOfGetVerificationCode("验证码已发送，请正确输入！");
-                                view.changeViewAfterGettingVerificationSuccessfully();
-                                break;
-                            case SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE:
-                                view.showResultOfGetVerificationCode("已验证，请继续！");
-                                // TODO: 2017/11/5
-                                HashMap<String, String> map = (HashMap<String, String>) data;
-//                                String country = map.get("country");
-                                String phone = map.get("phone");
-                                view.changeViewAfterSubmittingVerificationSuccessfully(phone);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                })
-                .subscribe();
-
+    public void findUser(String account, Consumer callback) {
+        networkManager.findUser(account,callback);
     }
+
+    @Override
+    public void createNewUser(String account, String password,String date, Consumer callback) {
+        networkManager.createNewUser(account,password,date,callback);
+    }
+
+    @Override
+    public User saveUser(String account, String password,long date) {
+        // TODO: 2017/11/7
+        User user = new User();
+        user.setAccount(account);
+        user.setPassword(password);
+        user.setDate(date);
+        userRepository.saveUser(user);
+        return user;
+    }
+
+
 
 }

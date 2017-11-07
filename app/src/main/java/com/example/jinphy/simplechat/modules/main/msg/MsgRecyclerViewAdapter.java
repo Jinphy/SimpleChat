@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.model.MsgRecord;
+import com.example.jinphy.simplechat.model.message_record.MessageRecord;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.List;
@@ -22,10 +22,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerViewAdapter.ViewHolder> {
 
-    private List<MsgRecord> msgRecords;
+    private List<MessageRecord> messageRecords;
 
-    public MsgRecyclerViewAdapter(@NonNull List<MsgRecord> msgRecords) {
-        this.msgRecords = Preconditions.checkNotNull(msgRecords);
+    public MsgRecyclerViewAdapter(@NonNull List<MessageRecord> messageRecords) {
+        this.messageRecords = Preconditions.checkNotNull(messageRecords);
 
     }
 
@@ -39,16 +39,16 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        MsgRecord msgRecord = msgRecords.get(position);
+        MessageRecord messageRecord = messageRecords.get(position);
         // TODO: 2017/8/10 设置avatar等信息
 
         if (click != null) {
-            holder.avatar.setOnClickListener(view -> click.onClick(view,msgRecord,0,position));
-            holder.itemView.setOnClickListener(view -> click.onClick(view,msgRecord,0,position));
+            holder.avatar.setOnClickListener(view -> click.onClick(view, messageRecord,0,position));
+            holder.itemView.setOnClickListener(view -> click.onClick(view, messageRecord,0,position));
         }
         if (longClick != null) {
-            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord,0,position));
-            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,msgRecord,0,position));
+            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view, messageRecord,0,position));
+            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view, messageRecord,0,position));
         }
 
     }
@@ -56,7 +56,7 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
 
     @Override
     public int getItemCount() {
-        return msgRecords.size();
+        return messageRecords.size();
     }
 
 

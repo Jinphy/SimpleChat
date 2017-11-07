@@ -1,6 +1,5 @@
 package com.example.jinphy.simplechat.modules.active_zoom;
 
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +10,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.model.Blog;
+import com.example.jinphy.simplechat.model.blog.Blog;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.List;

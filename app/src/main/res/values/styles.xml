@@ -14,7 +14,15 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
-    <style name="AppTheme" parent="Base.AppTheme" />
+    <style name="AppTheme" parent="Base.AppTheme" >
+        <item name="md_dark_theme">false</item>
+        <item name="md_title_color">@color/colorPrimary</item>
+        <item name="md_content_color">@color/colorAccent</item>
+        <item name="md_positive_color">@color/colorPrimaryDark</item>
+        <item name="md_negative_color">#D50000</item>
+        <item name="md_neutral_color">#ff777777</item>
+        <item name="md_widget_color">@color/colorAccent</item>
+    </style>
 
     <style name="AppTheme.OverlapSystemBar" parent="Base.AppTheme" />
 

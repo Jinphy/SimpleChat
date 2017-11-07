@@ -1,5 +1,7 @@
 package com.example.jinphy.simplechat.utils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,5 +41,22 @@ public class StringUtils {
 
     public static boolean notEqual(String one, String two) {
         return !equal(one, two);
+    }
+
+    public static String generateURI(String host, String port, String path, HashMap<String,
+            String> params) {
+        StringBuilder build = new StringBuilder();
+        build.append(host)
+                .append(":")
+                .append(port)
+                .append(path)
+                .append("/?");
+        if (params != null && params.size() > 0) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                build.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            }
+            build.deleteCharAt(build.length() - 1);
+        }
+        return build.toString();
     }
 }

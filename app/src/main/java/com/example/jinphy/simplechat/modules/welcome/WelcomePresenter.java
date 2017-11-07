@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.example.jinphy.simplechat.constants.StringConst;
+import com.example.jinphy.simplechat.model.user.User;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
@@ -36,5 +37,15 @@ public class WelcomePresenter implements WelcomeContract.Presenter {
         } else {
             view.showBtn();
         }
+    }
+
+    @Override
+    public boolean checkIfAccountAvailable(String account) {
+        return false;
+    }
+
+    @Override
+    public void doSignUp(User newUser) {
+
     }
 }

@@ -10,7 +10,7 @@ import android.view.View;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.model.MsgRecord;
+import com.example.jinphy.simplechat.model.message_record.MessageRecord;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 
@@ -114,7 +114,7 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     }
 
     @Override
-    public void showChatWindow(MsgRecord item) {
+    public void showChatWindow(MessageRecord item) {
         Intent intent = new Intent(getActivity(), ChatActivity.class);
         startActivity(intent);
     }

@@ -6,6 +6,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
@@ -30,41 +31,11 @@ public class CustomVerticalStepperFormLayout extends VerticalStepperFormLayout {
         super(context, attrs, defStyleAttr);
     }
 
-//    /**
-//     * 重写该函数设置 最后一步的注册按钮的文本
-//     * */
-//    @Override
-//    protected void setUpStepLayoutAsConfirmationStepLayout(LinearLayout stepLayout) {
-//        super.setUpStepLayoutAsConfirmationStepLayout(stepLayout);
-//
-//        confirmationButton = stepLayout.findViewById(ernestoyaquello.com
-//                .verticalstepperform.R.id.next_step);
-//
-//        confirmationButton.setText(R.string.confirm);
-//    }
-
-//
-//    /**
-//     * 重写该函数设置最后一步的title
-//     * */
-//    @Override
-//    protected void addConfirmationStepToStepsList() {
-//        String confirmationStepText = context.getString(R.string.commit_data);
-//        steps.add(confirmationStepText);
-//    }
-
-//    /**
-//     * 重写该函数设置每一步的下一步按钮的文本 “下一步”
-//     * */
-//    @Override
-//    protected LinearLayout createStepLayout(final int stepNumber) {
-//        LinearLayout stepLayout = super.createStepLayout(stepNumber);
-//
-//        AppCompatButton nextButton = stepLayout.findViewById(ernestoyaquello
-//                .com.verticalstepperform.R.id.next_step);
-//        nextButton.setText(R.string.next_step);
-//        return stepLayout;
-//    }
+    @Override
+    public void setStepAsCompleted(int stepNumber) {
+        super.setStepAsCompleted(stepNumber);
+        nextStepButton.setEnabled(false);
+    }
 
     public CustomVerticalStepperFormLayout setNextStepButtonText(int stepNumber, String text) {
         getNextStepButton(stepNumber).setText(text);
@@ -73,6 +44,7 @@ public class CustomVerticalStepperFormLayout extends VerticalStepperFormLayout {
 
     public CustomVerticalStepperFormLayout setNextStepButtonText(int stepNumber, @StringRes int resourceId) {
         getNextStepButton(stepNumber).setText(resourceId);
+
         return this;
     }
 
@@ -133,5 +105,29 @@ public class CustomVerticalStepperFormLayout extends VerticalStepperFormLayout {
 
     public void next(int currentStepNumber) {
         goToStep((currentStepNumber + 1), false);
+    }
+
+    public View getStepHeader(int stepNumber) {
+        LinearLayout stepLayout = stepLayouts.get(stepNumber);
+        RelativeLayout stepHeader = stepLayout.findViewById(ernestoyaquello.com
+                .verticalstepperform.R.id.step_header);
+        return stepHeader;
+    }
+
+    public View getPreviousBottomButton(){
+        return previousStepButton;
+    }
+    public View getNextBottomButton(){
+        return nextStepButton;
+    }
+
+    public CustomVerticalStepperFormLayout setPreviousBottomButtonEnable(boolean enable) {
+        previousStepButton.setEnabled(enable);
+        return this;
+    }
+
+    public CustomVerticalStepperFormLayout setNextBottomButtonEnable(boolean enable) {
+        nextStepButton.setEnabled(enable);
+        return this;
     }
 }

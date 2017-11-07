@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.model.MsgRecord;
+import com.example.jinphy.simplechat.model.message_record.MessageRecord;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.List;
 public class MsgPresenter implements MsgContract.Presenter {
     MsgContract.View view;
 
-    private List<MsgRecord> msgRecords;
+    private List<MessageRecord> messageRecords;
 
     public MsgPresenter(@NonNull MsgContract.View view) {
         this.view = Preconditions.checkNotNull(view);
@@ -34,18 +34,18 @@ public class MsgPresenter implements MsgContract.Presenter {
     public <T>void handleItemEvent(View view, T item,int type,int position) {
         switch (view.getId()) {
             case R.id.item_view:
-                MsgPresenter.this.view.showChatWindow((MsgRecord) item);
+                MsgPresenter.this.view.showChatWindow((MessageRecord) item);
                 break;
         }
     }
 
     @Override
-    public List<MsgRecord> loadMsgRecord() {
-        msgRecords = new ArrayList<>(30);
+    public List<MessageRecord> loadMsgRecord() {
+        messageRecords = new ArrayList<>(30);
         for (int i = 0; i < 30; i++) {
-            msgRecords.add(new MsgRecord());
+            messageRecords.add(new MessageRecord());
         }
-        return msgRecords;
+        return messageRecords;
     }
 
     @Override

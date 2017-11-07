@@ -20,6 +20,8 @@ import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
+import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link WelcomeFragment#newInstance} factory method to

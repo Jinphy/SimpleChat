@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.model.user.User;
 
 /**
  * Created by jinphy on 2017/8/9.
@@ -26,5 +27,9 @@ public interface WelcomeContract {
     interface Presenter extends BasePresenter{
 
         void doAfterWelcome(Context context);
+
+        boolean checkIfAccountAvailable(String account);
+
+        void doSignUp(User newUser);
     }
 }

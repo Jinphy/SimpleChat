@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
-import com.example.jinphy.simplechat.model.MsgRecord;
+import com.example.jinphy.simplechat.model.message_record.MessageRecord;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public interface MsgContract {
 
         RecyclerView getRecyclerView();
 
-        void showChatWindow(MsgRecord item);
+        void showChatWindow(MessageRecord item);
     }
 
 
@@ -33,7 +33,7 @@ public interface MsgContract {
 
         <T> void handleItemEvent(android.view.View view, T item,int type,int position);
 
-        List<MsgRecord> loadMsgRecord();
+        List<MessageRecord> loadMsgRecord();
 
         MsgRecyclerViewAdapter getAdapter();
     }

@@ -2,7 +2,7 @@ package com.example.jinphy.simplechat.modules.main.friends;
 
 import android.support.annotation.NonNull;
 
-import com.example.jinphy.simplechat.model.Friend;
+import com.example.jinphy.simplechat.model.friend.Friend;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;

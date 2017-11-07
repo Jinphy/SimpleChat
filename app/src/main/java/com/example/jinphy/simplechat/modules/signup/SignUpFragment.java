@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.signup;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputEditText;
@@ -13,20 +14,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.api.Response;
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_view.CustomVerticalStepperFormLayout;
 import com.example.jinphy.simplechat.listener_adapters.TextWatcherAdapter;
+import com.example.jinphy.simplechat.model.user.User;
+import com.example.jinphy.simplechat.utils.Encrypt;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
-
-import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -104,6 +108,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 getString(R.string.password),
                 getString(R.string.confirm_password)
         };
+
     }
 
     @Override
@@ -132,7 +137,8 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         verticalStepperForm.hideScrollBar()
                 .setNextStepButtonTexts(R.string.next_step)
                 .setButtonTextOfConfirmStep(R.string.confirm)
-                .setConfirmStepTitle(getString(R.string.commit_data));
+                .setConfirmStepTitle(getString(R.string.commit_data))
+                .setNextBottomButtonEnable(false);
 
 
     }
@@ -214,6 +220,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
 
     @Override
     public void onStepOpening(int stepNumber) {
+        setNextStepButtonListener(stepNumber);
         switch (stepNumber) {
             case STEP_ACCOUNT:
                 String account = getText(accountView,stepNumber);
@@ -237,16 +244,26 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         }
     }
 
+    /*
+    * 获取对应步骤的输入框的文本
+    * */
     private String getText(View view) {
         TextInputEditText editText = view.findViewById(R.id.input_text);
         return editText.getText().toString();
     }
 
+
+    /*
+    * 设置对应步骤的输入框的文本
+    * */
     private void setText(View view,String text) {
         TextInputEditText editText = view.findViewById(R.id.input_text);
         editText.setText(text);
     }
 
+    /*
+    * 获取对应步骤的输入框的文本，并设置是否明文显示，在对应步骤打开时调用
+    * */
     private String getText(View view,int stepNumber){
         TextInputEditText editText = view.findViewById(R.id.input_text);
         if (stepNumber == STEP_ACCOUNT || stepNumber == STEP_VERIFICATION_CODE) {
@@ -257,6 +274,116 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         return editText.getText().toString();
     }
 
+    /*
+    * 设置 “下一步” 按钮的点击事件
+    *
+    * */
+    private void setNextStepButtonListener(int stepNumber) {
+        // 判断是否有下一步
+        if (stepNumber < verticalStepperForm.getSteps()) {
+            // 有下一步，则设置下一步骤的头部的点击事件
+            verticalStepperForm.getStepHeader(stepNumber+1).setOnClickListener(v->{
+                if (verticalStepperForm.isStepCompleted(stepNumber + 1)) {
+                    verticalStepperForm.next(stepNumber);
+                    verticalStepperForm.setNextBottomButtonEnable(true);
+                } else {
+                    verticalStepperForm.setNextBottomButtonEnable(false);
+                }
+            });
+        }
+
+        AppCompatButton nextStepButton = verticalStepperForm.getNextStepButton(stepNumber);
+        switch (stepNumber) {
+            case STEP_ACCOUNT:
+                nextStepButton.setOnClickListener(v -> {
+                    // 如果此时该账号已经获取过验证码，说明该账号是可以注册的，则直接进行下一步
+                    if (hasGetVerificationCode) {
+                        verticalStepperForm.next(STEP_ACCOUNT);
+                        return;
+                    }
+                    // 当前输入账号还未获取过验证码，需要检测账号是否合法，合法则进行下一步
+                    // 返回 yes 说明该账号已经注册过，所以不合法
+                    presenter.findUser(getText(accountView), response -> {
+                        String yes = "该账号已被注册过，可直接登录！";
+                        String error = "服务器异常，请稍后再试！";
+                        handleResponse(response,yes,null,error,false);
+                        updateViewAfterFindUser(response);
+                    });
+
+                });
+                break;
+            case STEP_VERIFICATION_CODE:
+                nextStepButton.setOnClickListener(v->{
+                    // 判断当前账号是否验证过
+                    if (hasVerified) {
+                        // 验证过，则可以进行下一步
+                        verticalStepperForm.next(STEP_VERIFICATION_CODE);
+                    } else {
+                        // 没有验证过，则进行验证，如果成功则下一步，否则显示验证不成功
+                        TextInputEditText editText = verificationCodeView.findViewById(R.id.input_text);
+                        String verificationCode = editText.getText().toString();
+                        presenter.submitVerificationCode(verifiedPhone,verificationCode,response -> {
+                            String yes = "已验证，请继续！";
+                            String no = "验证失败，请输入正确的验证码！";
+                            handleResponse(response,yes,no,null,true);
+                            updateViewAfterSubmittingVerificationCode(response);
+                        });
+                    }
+
+                });
+                break;
+            case STEP_PASSWORD:
+                break;
+            case STEP_CONFIRM_PASSWORD:
+                break;
+            default:
+                nextStepButton.setOnClickListener(v -> {
+                    showToast("正在注册......", true);
+                    long date = System.currentTimeMillis();
+                    presenter.createNewUser(
+                            verifiedPhone,
+                            Encrypt.md5(password),
+                            String.valueOf(date),
+                            response -> {
+                        String yes = "恭喜您，账号注册成功！";
+                        String no = "服务器异常，请稍后再试！";
+                        String error = "网络异常，请检查网络是否正常连接！";
+                        handleResponse(response, yes, no, error, false);
+                        updateViewAfterCreateNewUser(response,date);
+                    });
+                });
+                break;
+        }
+    }
+
+    private void handleResponse(Response response,String yes,String no,String error,boolean isLong) {
+        Flowable.just(response)
+                .map(value->value.message)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(message -> {
+                    if (Response.yes.equals(message)) {
+                        if (yes != null) {
+                            showToast(yes,isLong);
+                        }
+                    } else if (Response.no.equals(message)) {
+                        if (no != null) {
+                            showToast(no,isLong);
+                        }
+                    }else if(Response.error.equals(message)){
+                        if (error != null) {
+                            showToast(error,isLong);
+                        }
+                    } else {
+                        showToast("网络连接错误，请检查网络是否连接！",isLong);
+                    }
+                })
+                .subscribe();
+
+    }
+
+    /*
+    * 当验证码步骤打开时调用，根据不同状态设置不同视图
+    * */
     private void doOnVerificationCodeStepOpen(){
         AppCompatButton nextStepButton = verticalStepperForm.
                 getNextStepButton(STEP_VERIFICATION_CODE);
@@ -286,16 +413,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 verticalStepperForm.setStepAsUncompleted(STEP_VERIFICATION_CODE,null);
             }
         }
-        nextStepButton.setOnClickListener(v->{
-            if (hasVerified) {
-                verticalStepperForm.next(STEP_VERIFICATION_CODE);
-            } else {
-                TextInputEditText editText = verificationCodeView.findViewById(R.id.input_text);
-                String verificationCode = editText.getText().toString();
-                presenter.submitVerificationCode(verifiedPhone,verificationCode);
-            }
-
-        });
 
     }
 
@@ -380,9 +497,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         }
     }
 
-
     private void checkVerificationCode(String text, int length) {
-        Log.d(TAG, "checkVerificationCode: "+text);
         if (hasVerified) {
             return;
         }
@@ -415,41 +530,18 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         }
     }
 
-
     // 获取验证码按钮的点击事件
     private void getVerificationCode(View view) {
         view.setEnabled(false);
         TextInputEditText editText = accountView.findViewById(R.id.input_text);
         String phone = editText.getText().toString();
-        presenter.getVerificationCode(phone);
+        presenter.getVerificationCode(phone,response -> {
+            String yes = "验证码已发送，请正确输入！";
+            String no = "获取验证码失败！";
+            handleResponse(response, yes, no, null, true);
+            updateViewAfterGettingVerificationCode(response);
+        });
 
-    }
-
-    @Override
-    public void logErrorMessageOfSMSSDK(Object data) {
-        try {
-            Throwable throwable = (Throwable) data;
-            throwable.printStackTrace();
-            JSONObject object = new JSONObject(throwable.getMessage());
-            String description = object.optString("detail");//错误描述
-            int status = object.optInt("status");//错误代码
-            Log.d(TAG, "afterEvent: -------------请求失败--------------------");
-            Log.d(TAG, "afterEvent: 错误代码：" + status);
-            Log.d(TAG, "afterEvent: 错误描述：" + description);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void showResultOfGetVerificationCode(String message) {
-        Log.d(TAG, "showResultOfGetVerificationCode: "+message);
-        Flowable.just(message)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete(() -> {
-                    Toast.makeText(BaseApplication.INSTANCE, message, Toast.LENGTH_LONG).show();
-                })
-                .subscribe();
     }
 
     @Override
@@ -459,52 +551,118 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     }
 
     @Override
-    public void changeViewAfterSubmittingVerificationSuccessfully(String phone) {
-        hasVerified = true;
-//        verticalStepperForm.next(STEP_VERIFICATION_CODE);
-        verticalStepperForm.goToNextStep();
+    public void updateViewAfterSubmittingVerificationCode(Response response) {
+        Flowable.just(response)
+                .map(value -> value.message)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(message -> {
+                    if (Response.yes.equals(message)) {
+                        hasVerified = true;
+                        //        verticalStepperForm.next(STEP_VERIFICATION_CODE);
+                        verticalStepperForm.goToNextStep();
+                    } else {
+                        hasVerified = false;
+                    }
+                })
+                .subscribe();
     }
 
     @Override
-    public void changeViewAfterGettingVerificationSuccessfully() {
-        TextInputEditText editText = accountView.findViewById(R.id.input_text);
-        verifiedPhone = editText.getText().toString();
-        Log.d(TAG, "changeViewAfterGettingVerificationSuccessfully: verifiedPhone = "+verifiedPhone);
-        hasVerified = false;
-        hasGetVerificationCode = true;
-
-        String text = BaseApplication.INSTANCE.getString(R.string.re_get);
-
-        View view = verificationCodeView.findViewById(R.id.verification_code_button);
-
-        Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
-                .map(value -> {
-                    value = 60 - value;
-                    return text.replace(" ", value + "");
-                })
-                .subscribeOn(Schedulers.newThread())
+    public void updateViewAfterGettingVerificationCode(Response response) {
+        Flowable.just(response)
+                .map(value -> value.message)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(value -> setText((TextView) view, value))
-                .doOnComplete(() -> {
-                    view.setEnabled(true);
-                    setText( ((TextView) view),
-                            BaseApplication.INSTANCE.getString(R.string.get_verification_code));
+                .doOnNext(message -> {
+                    if (Response.yes.equals(message)) {
+                        TextInputEditText editText = accountView.findViewById(R.id.input_text);
+                        verifiedPhone = editText.getText().toString();
+                        hasVerified = false;
+                        hasGetVerificationCode = true;
+
+                        String text = BaseApplication.INSTANCE.getString(R.string.re_get);
+
+                        View view = verificationCodeView.findViewById(R.id.verification_code_button);
+
+                        Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
+                                .map(value -> {
+                                    value = 60 - value;
+                                    return text.replace(" ", value + "");
+                                })
+                                .subscribeOn(Schedulers.newThread())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .doOnNext(value -> setText((TextView) view, value))
+                                .doOnComplete(() -> {
+                                    view.setEnabled(true);
+                                    setText(((TextView) view),
+                                            BaseApplication.INSTANCE.getString(R.string.get_verification_code));
+                                })
+                                .subscribe();
+
+                    } else {
+                        verifiedPhone = null;
+                        hasGetVerificationCode = false;
+                        hasVerified = false;
+                        verificationCodeView.findViewById(R.id.verification_code_button).setEnabled(true);
+                    }
                 })
                 .subscribe();
 
     }
 
-
     @Override
-    public void changeViewAfterSubmittingVerificationUnSuccessfully() {
-        hasVerified = false;
+    public void updateViewAfterCreateNewUser(Response response,long date) {
+        Flowable.just(response)
+                .map(value -> value.message)
+                .map(message -> {
+                    if (Response.yes.equals(message)) {
+                        User user = presenter.saveUser(
+                                verifiedPhone,
+                                Encrypt.md5(password),
+                                date);
+                        return user;
+                    }
+                    return Response.no;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(user -> {
+                    if (user instanceof User) {
+                        new MaterialDialog.Builder(getContext())
+                                .title("注册成功")
+                                .iconRes(R.drawable.ic_done)
+                                .content("恭喜你成功注册账号，是否立即登录？")
+                                .positiveText("马上登录")
+                                .negativeText("不了不了")
+                                .titleColorRes(R.color.color_red_D50000)
+                                .positiveColorRes(R.color.half_alpha_gray)
+                                .onPositive((dialog, which) -> {
+                                    // TODO: 2017/11/7 执行登录操作
+                                })
+                                .onNeutral((dialog, which) -> {
+                                    getActivity().finish();
+                                })
+                                .show();
+                    }
+                })
+                .subscribe();
+
+
     }
 
     @Override
-    public void changeViewAfterGettingVerificationUnsuccessfully() {
-        verifiedPhone = null;
-        hasGetVerificationCode = false;
-        hasVerified = false;
-        verificationCodeView.findViewById(R.id.verification_code_button).setEnabled(true);
+    public void updateViewAfterFindUser(Response response) {
+        Flowable.just(response)
+                .map(value -> value.message)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(message -> {
+                    if (Response.yes.equals(message)) {
+                        // do nothing
+                    } else if (Response.no.equals(message)) {
+                        verticalStepperForm.next(STEP_ACCOUNT);
+                    } else {
+                        // do nothing
+                    }
+                })
+                .subscribe();
     }
 }

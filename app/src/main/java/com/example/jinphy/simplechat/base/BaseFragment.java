@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 /**
  * Created by jinphy on 2017/8/15.
@@ -23,6 +24,8 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     protected T presenter;
 
     private static final String TAG = "BaseFragment";
+
+    private Toast toast;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,6 +58,7 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
             this.presenter = getPresenter();
         }
         this.presenter.start();
+        this.toast = Toast.makeText(getContext(), "", Toast.LENGTH_SHORT);
     }
 
     private void initView(View view) {
@@ -69,9 +73,7 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         registerEvent();
     }
 
-    protected abstract
-    @LayoutRes
-    int getResourceId();
+    protected abstract @LayoutRes int getResourceId();
 
     protected abstract void initData();
 
@@ -100,6 +102,19 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
     public boolean handleVerticalTouchEvent(MotionEvent event) {
         return false;
+    }
+
+    protected void showToast(String text, boolean isLong) {
+        if (toast == null) {
+            toast = BaseApplication.INSTANCE.getToast();
+        }
+        if (isLong) {
+            toast.setDuration(Toast.LENGTH_LONG);
+        } else {
+            toast.setDuration(Toast.LENGTH_SHORT);
+        }
+        toast.setText(text);
+        toast.show();
     }
 
     //========================================================\\
