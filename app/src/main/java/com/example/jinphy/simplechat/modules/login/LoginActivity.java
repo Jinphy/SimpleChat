@@ -10,25 +10,16 @@ import com.example.jinphy.simplechat.base.BaseActivity;
 
 public class LoginActivity extends BaseActivity {
 
-    private ActionBar actionBar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_back_24dp);
-        actionBar.setTitle(R.string.login);
-
         LoginFragment fragment = LoginFragment.newInstance();
 
         LoginFragment returnFragment = (LoginFragment) addFragment(fragment, R.id.fragment);
 
+        getPresenter(returnFragment);
     }
 
     @Override

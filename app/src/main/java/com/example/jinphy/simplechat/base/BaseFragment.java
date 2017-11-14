@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.base;
 
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -104,18 +105,8 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         return false;
     }
 
-    protected void showToast(String text, boolean isLong) {
-        if (toast == null) {
-            toast = BaseApplication.INSTANCE.getToast();
-        }
-        if (isLong) {
-            toast.setDuration(Toast.LENGTH_LONG);
-        } else {
-            toast.setDuration(Toast.LENGTH_SHORT);
-        }
-        toast.setText(text);
-        toast.show();
-    }
+
+
 
     //========================================================\\
 

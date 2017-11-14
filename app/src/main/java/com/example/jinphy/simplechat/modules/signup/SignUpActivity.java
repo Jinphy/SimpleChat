@@ -18,9 +18,6 @@ public class SignUpActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        ScreenUtils.setStatusBarColor(this,
-                ContextCompat.getColor(this,R.color.color_red_D50000));
-
         SignUpFragment fragment = SignUpFragment.newInstance();
 
         SignUpFragment returnFragment = (SignUpFragment) addFragment(fragment, R.id.fragment);

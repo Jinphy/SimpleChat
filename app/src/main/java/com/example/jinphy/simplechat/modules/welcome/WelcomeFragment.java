@@ -57,9 +57,6 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
         return fragment;
     }
 
-
-
-
     @Override
     protected int getResourceId() {
         return R.layout.fragment_welcome;

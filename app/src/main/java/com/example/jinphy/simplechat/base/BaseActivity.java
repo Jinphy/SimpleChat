@@ -33,9 +33,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected BaseFragment baseFragment;
 
-    private static Toast toast;
-    private static Snackbar snackbar;
-    public static String TAG;
+    protected static Toast toast;
+    protected static Snackbar snackbar;
+    protected static String TAG;
 
 
     @Override
@@ -128,33 +128,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    /**
-     * 显示toast
-     *
-     * @param text 要显示的文本内容
-     * */
-    public  <T> void showToast(T text) {
-        if (toast == null) {
-            toast = Toast.makeText(getApplicationContext(), text.toString(), Toast.LENGTH_SHORT);
-        } else {
-            toast.setText(text.toString());
-        }
-        toast.show();
-    }
-
-    /**
-     * 显示toast
-     *
-     * @param textId 要显示的文本内容的资源id
-     * */
-    public void showToast(@StringRes int textId) {
-        if (toast == null) {
-            toast = Toast.makeText(getApplicationContext(), textId, Toast.LENGTH_SHORT);
-        } else {
-            toast.setText(textId);
-        }
-        toast.show();
-    }
 
     /**
      * 显示snackBar
@@ -220,65 +193,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
 
-
-    /**
-     * log日志，等级为V
-     * */
-    public  <T> void v(T msg) {
-        if (msg == null) {
-            Log.e(TAG, "null");
-        } else {
-            Log.v(TAG, msg.toString());
-        }
-    }
-
-    /**
-     * log日志，等级为D
-     * */
-    public  <T> void d(T msg) {
-        if (msg == null) {
-            Log.e(TAG, "null");
-        } else {
-            Log.d(TAG, msg.toString());
-        }
-    }
-
-
-    /**
-     * log日志，等级为I
-     * */
-    public  <T> void i(T msg) {
-        if (msg == null) {
-            Log.e(TAG, "null");
-        } else {
-            Log.i(TAG, msg.toString());
-        }
-
-    }
-
-
-    /**
-     * log日志，等级为W
-     * */
-    public  <T> void w(T msg) {
-        if (msg == null) {
-            Log.e(TAG, "null");
-        } else {
-            Log.w(TAG, msg.toString());
-        }
-    }
-
-
-    /**
-     * log日志，等级为E
-     * */
-    public  <T> void e(T msg) {
-        if (msg == null) {
-            Log.e(TAG, "null");
-        } else {
-            Log.e(TAG, msg.toString());
-        }
-    }
 
     protected boolean handleTouchEvent() {
         return true;

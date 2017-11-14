@@ -16,7 +16,8 @@ import io.reactivex.annotations.NonNull;
 
 public class NetworkManager {
 
-    public static final String HOST = "ws://192.168.0.3";
+//    public static final String HOST = "ws://192.168.0.3";
+    public static final String HOST = "ws://192.168.3.21";
     public static final String PUSH_PORT = "4540";
     public static final String SEND_PORT = "4541";
     public static final String COMMON_PORT = "4542";

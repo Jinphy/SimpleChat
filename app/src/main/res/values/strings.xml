@@ -2,7 +2,7 @@
     <string name="app_name">简聊</string>
 
     <string name="no_account_goto_sign_up"><![CDATA[没有账号？ >>去注册]]></string>
-    <string name="login">Login</string>
+    <string name="login">登 录</string>
     <string name="sign_up">注 册</string>
 
     <string name="self">自己</string>

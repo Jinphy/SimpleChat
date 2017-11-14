@@ -26,8 +26,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/tool_bar_height"
-                android:background="@color/color_red_D50000"
-                android:elevation="@dimen/dimen_1dp">
+                android:background="@color/color_red_D50000">
 
                 <TextView
                     android:layout_width="wrap_content"

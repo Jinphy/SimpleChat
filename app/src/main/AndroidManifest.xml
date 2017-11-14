@@ -35,9 +35,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".modules.signup.SignUpActivity">
+        <activity
+            android:name=".modules.signup.SignUpActivity"
+            android:theme="@style/SignUpActivityTheme">
         </activity>
-        <activity android:name=".modules.login.LoginActivity">
+        <activity
+            android:name=".modules.login.LoginActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:theme="@style/LoginActivityTheme">
         </activity>
         <activity android:name=".modules.main.MainActivity">
         </activity>

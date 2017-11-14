@@ -14,6 +14,19 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
+    <style name="SignUpActivityTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/color_red_D50000</item>
+        <item name="colorPrimaryDark">@color/color_red_light_B71C1C</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="LoginActivityTheme" parent="AppTheme">
+        <item name="colorPrimary">#FF8F00</item>
+        <item name="colorPrimaryDark">#FF6F00</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
+
     <style name="AppTheme" parent="Base.AppTheme" >
         <item name="md_dark_theme">false</item>
         <item name="md_title_color">@color/colorPrimary</item>

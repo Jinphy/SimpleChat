@@ -79,9 +79,13 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     private String password;
 
 
+    interface M{
+        int x=0;
+    }
 
     public SignUpFragment() {
         // Required empty public constructor
+
     }
 
     /**
@@ -338,7 +342,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 break;
             default:
                 nextStepButton.setOnClickListener(v -> {
-                    showToast("正在注册......", true);
+                    BaseApplication.showToast("正在注册......", true );
                     long date = System.currentTimeMillis();
                     presenter.createNewUser(
                             verifiedPhone,
@@ -363,18 +367,18 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 .doOnNext(message -> {
                     if (Response.yes.equals(message)) {
                         if (yes != null) {
-                            showToast(yes,isLong);
+                            BaseApplication.showToast(yes, isLong );
                         }
                     } else if (Response.no.equals(message)) {
                         if (no != null) {
-                            showToast(no,isLong);
+                            BaseApplication.showToast(no,isLong);
                         }
                     }else if(Response.error.equals(message)){
                         if (error != null) {
-                            showToast(error,isLong);
+                            BaseApplication.showToast(error,isLong );
                         }
                     } else {
-                        showToast("网络连接错误，请检查网络是否连接！",isLong);
+                        BaseApplication.showToast("网络连接错误，请检查网络是否连接！", isLong);
                     }
                 })
                 .subscribe();
@@ -579,7 +583,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                         hasVerified = false;
                         hasGetVerificationCode = true;
 
-                        String text = BaseApplication.INSTANCE.getString(R.string.re_get);
+                        String text = BaseApplication.instance().getString(R.string.re_get);
 
                         View view = verificationCodeView.findViewById(R.id.verification_code_button);
 
@@ -594,7 +598,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                                 .doOnComplete(() -> {
                                     view.setEnabled(true);
                                     setText(((TextView) view),
-                                            BaseApplication.INSTANCE.getString(R.string.get_verification_code));
+                                            BaseApplication.instance().getString(R.string.get_verification_code));
                                 })
                                 .subscribe();
 

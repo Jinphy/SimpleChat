@@ -18,8 +18,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
+import com.example.jinphy.simplechat.utils.Keyboard;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
@@ -33,7 +35,6 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
     private TextInputEditText accountText;
     private TextInputEditText passwordText;
     private View gotoSignUp;
-    private FloatingActionButton fab;
 
 
     public LoginFragment() {
@@ -74,27 +75,20 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         accountText = view.findViewById(R.id.account_text);
         passwordText = view.findViewById(R.id.password_text);
         gotoSignUp = view.findViewById(R.id.goto_sign_up_text);
-        fab = getActivity().findViewById(R.id.fab_login);
     }
 
     @Override
     protected void setupViews() {
-
     }
 
     @Override
     protected void registerEvent() {
         gotoSignUp.setOnClickListener(this::showSignUp);
-        fab.setOnClickListener(this::fabAction);
     }
 
     @Override
     public void showSignUp(View view) {
         Intent intent = new Intent(getActivity(), SignUpActivity.class);
         startActivity(intent);
-    }
-
-    private void fabAction(View view) {
-        ((LoginActivity) getActivity()).showSnack(view,"you click the fab!");
     }
 }

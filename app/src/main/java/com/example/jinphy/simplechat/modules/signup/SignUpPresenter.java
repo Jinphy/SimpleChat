@@ -34,7 +34,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     public SignUpPresenter(@NonNull SignUpContract.View view) {
         this.view = Preconditions.checkNotNull(view);
         this.smssdkApi = SMSSDKApi.getInstance();
-        this.networkManager = ((DBApplication) DBApplication.INSTANCE).getNetworkManager();
+        this.networkManager = ((DBApplication) DBApplication.instance()).getNetworkManager();
         this.userRepository = UserRepository.getInstance();
     }
 
