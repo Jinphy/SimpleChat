@@ -43,5 +43,7 @@ public interface SignUpContract {
         void createNewUser(String account, String password,String date, Consumer callback);
 
         User saveUser(String account, String password,long date);
+
+        void login(String account, String password, String deviceId,Consumer callback);
     }
 }

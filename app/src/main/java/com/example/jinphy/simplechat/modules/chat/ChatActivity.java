@@ -37,9 +37,4 @@ public class ChatActivity extends BaseActivity {
     public ChatPresenter getPresenter(@NonNull Fragment fragment) {
         return new ChatPresenter((ChatContract.View) fragment);
     }
-
-    @Override
-    public void onBackPressed() {
-        presenter.onBackPressed();
-    }
 }

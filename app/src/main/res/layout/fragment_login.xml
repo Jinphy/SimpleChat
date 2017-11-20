@@ -7,8 +7,9 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
         android:layout_width="330dp"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
         app:cardCornerRadius="10dp"
         app:cardBackgroundColor="@color/white"
         app:cardElevation="5dp"
@@ -18,8 +19,9 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
+            <!--the header-->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/tool_bar_height"
@@ -35,116 +37,151 @@
 
             </RelativeLayout>
 
-            <ScrollView
-                android:scrollbars="none"
-                android:layout_weight="1"
+            <!--center layout-->
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/dimen_20dp"
+                android:layout_marginLeft="@dimen/dimen_30dp"
+                android:layout_marginRight="@dimen/dimen_30dp"
                 android:layout_width="match_parent"
-                android:layout_height="0dp">
+                android:layout_height="wrap_content">
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_marginTop="@dimen/dimen_20dp"
-                    android:layout_marginLeft="@dimen/dimen_30dp"
-                    android:layout_marginRight="@dimen/dimen_30dp"
+                <!--account layout-->
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/account_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/account_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:hint="@string/account"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+                <!--password layout-->
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/password_layout"
+                    android:visibility="gone"
+                    android:layout_marginTop="@dimen/dimen_10dp"
+                    android:layout_marginBottom="@dimen/dimen_30dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <android.support.design.widget.TextInputLayout
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/password_text"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:hint="@string/password"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <!--verification layout-->
+                <RelativeLayout
+                    android:id="@+id/verification_code_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/verification_code_layout"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginTop="@dimen/dimen_10dp"
+                        android:layout_marginBottom="@dimen/dimen_30dp">
                         <android.support.design.widget.TextInputEditText
-                            android:id="@+id/account_text"
+                            android:id="@+id/verification_code_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number"
                             android:maxLines="1"
-                            android:hint="@string/account"/>
+                            android:hint="验证码"/>
 
                     </android.support.design.widget.TextInputLayout>
 
+                    <android.support.v7.widget.CardView
+                        app:cardCornerRadius="@dimen/dimen_3dp"
+                        app:cardUseCompatPadding="true"
+                        android:layout_width="110dp"
+                        android:layout_centerInParent="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_height="45dp">
 
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/password_layout"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <android.support.design.widget.TextInputEditText
-                            android:id="@+id/password_text"
+                        <TextView
+                            android:id="@+id/get_verification_code_button"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textPassword"
-                            android:maxLines="1"
-                            android:hint="@string/password"/>
-                    </android.support.design.widget.TextInputLayout>
+                            android:layout_height="match_parent"
+                            android:text="获取验证码"
+                            android:clickable="true"
+                            android:enabled="false"
+                            android:background="@drawable/btn_alpha"
+                            android:gravity="center"/>
 
-                    <RelativeLayout
-                        android:id="@+id/verification_code_view"
-                        android:layout_width="match_parent"
+                    </android.support.v7.widget.CardView>
+
+
+
+                </RelativeLayout>
+
+                <!--goto sign up view and checkbox layout-->
+                <RelativeLayout
+                    android:layout_marginBottom="@dimen/dimen_10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <!--go to sign up view -->
+                    <TextView
+                        android:id="@+id/goto_sign_up_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginLeft="@dimen/dimen_3dp"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/colorAccent"
+                        android:maxLines="1"
+                        android:text="@string/no_account_goto_sign_up"/>
+
+                    <LinearLayout
+                        android:id="@+id/remember_password_layout"
+                        android:orientation="horizontal"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-
-                        <android.support.design.widget.TextInputLayout
-                            android:layout_marginTop="@dimen/dimen_10dp"
-                            android:layout_width="130dp"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_alignParentLeft="true"
-                            android:layout_marginBottom="@dimen/dimen_30dp">
-                            <android.support.design.widget.TextInputEditText
-                                android:id="@+id/verification_code_text"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="number"
-                                android:maxLines="1"
-                                android:hint="验证码"/>
-
-                        </android.support.design.widget.TextInputLayout>
-
-                        <android.support.v7.widget.CardView
-                            app:cardCornerRadius="@dimen/dimen_3dp"
-                            app:cardUseCompatPadding="true"
-                            android:layout_width="110dp"
-                            android:layout_centerInParent="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_height="45dp">
-
-                            <TextView
-                                android:id="@+id/get_verification_code_button"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:text="获取验证码"
-                                android:clickable="true"
-                                android:background="@drawable/btn_alpha"
-                                android:gravity="center"/>
-                        </android.support.v7.widget.CardView>
+                        <CheckBox
+                            android:id="@+id/remember_password_checkbox"
+                            android:checked="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/remember_password_text"
+                            android:text="@string/remember_me"
+                            android:textColor="@color/half_alpha_gray"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
 
 
+                </RelativeLayout>
 
-                    </RelativeLayout>
+            </LinearLayout>
 
-                </LinearLayout>
-
-            </ScrollView>
-
-            <TextView
-                android:id="@+id/goto_sign_up_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textColor="@color/colorPrimary"
-                android:maxLines="1"
-                android:layout_marginTop="@dimen/dimen_10dp"
-                android:layout_marginBottom="20dp"
-                android:layout_marginLeft="@dimen/dimen_30dp"
-                android:text="@string/no_account_goto_sign_up"/>
-
+            <!--the bottom layout with two button-->
             <LinearLayout
                 android:orientation="horizontal"
+                android:layout_marginTop="@dimen/dimen_10dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/tool_bar_height">
 
+                <!--button type of login-->
                 <android.support.v7.widget.CardView
                     app:cardCornerRadius="@dimen/dimen_3dp"
                     app:cardUseCompatPadding="true"
@@ -152,14 +189,17 @@
                     android:layout_height="45dp">
 
                     <TextView
+                        android:id="@+id/login_type_button"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="验证登录"
+                        android:text="@string/password_type"
                         android:clickable="true"
                         android:background="@drawable/btn_alpha"
                         android:gravity="center"/>
+
                 </android.support.v7.widget.CardView>
 
+                <!--button login-->
                 <android.support.v7.widget.CardView
                     app:cardCornerRadius="@dimen/dimen_3dp"
                     app:cardUseCompatPadding="true"
@@ -168,9 +208,10 @@
                     android:layout_height="45dp">
 
                     <TextView
+                        android:id="@+id/login_button"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="马上登录"
+                        android:text="@string/login_now"
                         android:clickable="true"
                         android:background="@drawable/btn_alpha"
                         android:gravity="center"/>

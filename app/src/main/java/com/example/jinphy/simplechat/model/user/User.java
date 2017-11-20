@@ -2,6 +2,8 @@ package com.example.jinphy.simplechat.model.user;
 
 import com.example.jinphy.simplechat.model.friend.Friend;
 
+import java.io.Serializable;
+
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
 import io.objectbox.relation.ToMany;
@@ -12,7 +14,7 @@ import io.reactivex.annotations.NonNull;
  */
 
 @Entity
-public class User {
+public class User implements Serializable{
     @Id
     protected long id;
 

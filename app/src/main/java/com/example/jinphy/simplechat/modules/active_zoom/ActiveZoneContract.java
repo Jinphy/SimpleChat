@@ -20,8 +20,6 @@ public interface ActiveZoneContract {
 
         void animateHorizontal(float fromFactor, float toFactor,boolean exit);
 
-        void onBackPressed();
-
     }
 
 
@@ -31,8 +29,6 @@ public interface ActiveZoneContract {
         ActiveZoneRecyclerViewAdapter getAdapter();
 
         int getItemCount();
-
-        void onBackPressed();
 
     }
 }

@@ -623,7 +623,8 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
     @Override
-    public void onBackPressed() {
+    public boolean onBackPressed() {
         animateHorizontal(0,1,true);
+        return false;
     }
 }

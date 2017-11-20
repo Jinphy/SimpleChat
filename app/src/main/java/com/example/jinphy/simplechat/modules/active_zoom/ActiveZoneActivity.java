@@ -33,9 +33,4 @@ public class ActiveZoneActivity extends BaseActivity {
         return new ActiveZonePresenter((ActiveZoneFragment) fragment);
     }
 
-
-    @Override
-    public void onBackPressed() {
-        presenter.onBackPressed();
-    }
 }

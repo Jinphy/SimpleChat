@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.login;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -18,8 +19,9 @@ public class LoginActivity extends BaseActivity {
         LoginFragment fragment = LoginFragment.newInstance();
 
         LoginFragment returnFragment = (LoginFragment) addFragment(fragment, R.id.fragment);
-
         getPresenter(returnFragment);
+
+
     }
 
     @Override

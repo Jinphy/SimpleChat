@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.api;
 
+import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.java_websocket.handshake.ServerHandshake;
@@ -16,14 +17,17 @@ import io.reactivex.annotations.NonNull;
 
 public class NetworkManager {
 
+    // 宿舍WiFi
 //    public static final String HOST = "ws://192.168.0.3";
+//    成和WiFi
     public static final String HOST = "ws://192.168.3.21";
+//    我的手机WiFi
+//    public static final String HOST = "ws://192.168.43.224";
     public static final String PUSH_PORT = "4540";
     public static final String SEND_PORT = "4541";
     public static final String COMMON_PORT = "4542";
     public static final String sendMsgClientURI =
             StringUtils.generateURI(HOST, SEND_PORT, "/send", null);
-
 
     private static NetworkManager instance;
     private MyWebSocketClient sendMsgClient;// 聊天室发送信息的专用客户端
@@ -127,6 +131,32 @@ public class NetworkManager {
         }
     }
 
+    private static final String TAG = "NetworkManager";
+    public void login(String account, String password,String deviceId, Consumer callback) {
+        BaseApplication.e(TAG, "login: password = "+password);
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put("account", account);
+            params.put("password", password);
+            params.put("deviceId", deviceId);
+            String createNewUserUri = StringUtils
+                    .generateURI(HOST, COMMON_PORT, "/user/login", params);
+            MyWebSocketClient client = MyWebSocketClient.newInstance(createNewUserUri);
+            client.doOnMessage(message -> {
+                BaseApplication.e(TAG, "login: message = "+message);
+                callback.accept(new Response(message));
+                client.close();
+            })
+                    .doOnError(ex -> {
+                        ex.printStackTrace();
+                        callback.accept(new Response(ex));
+                        client.close();
+                    })
+                    .connect();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
     //-----------------------请求服务器回调函数-------------------------
     //================================================================

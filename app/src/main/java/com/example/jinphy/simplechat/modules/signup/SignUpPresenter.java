@@ -87,5 +87,9 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     }
 
 
+    @Override
+    public void login(String account, String password, String deviceId,Consumer callback) {
+        networkManager.login(account, password, deviceId,callback);
+    }
 
 }

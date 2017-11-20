@@ -15,6 +15,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.jinphy.simplechat.model.event_bus.EBActivity;
+import com.example.jinphy.simplechat.model.event_bus.EBFinishActivity;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,32 +35,44 @@ import static com.example.jinphy.simplechat.utils.Preconditions.checkNotNull;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-
-    private static List<AppCompatActivity> activities = new ArrayList<>();
-
     protected BaseFragment baseFragment;
-
-    protected static Toast toast;
     protected static Snackbar snackbar;
     protected static String TAG;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TAG = this.getClass().getSimpleName();
-        activities.add(this);
+        EventBus.getDefault().register(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        activities.remove(this);
+        EventBus.getDefault().unregister(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBus.getDefault().post(new EBActivity(this,true));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.getDefault().post(new EBActivity(this, false));
+    }
 
     public abstract <T extends BasePresenter> T getPresenter(Fragment fragment) ;
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void finishMe(EBFinishActivity message) {
+        if (message.which == EBFinishActivity.ALL || message.which == this.getClass()) {
+            finish();
+        }
+    }
 
     /**
      *
@@ -61,12 +80,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * */
     public static void exit() {
-        for (AppCompatActivity activity : activities) {
-            if (activity != null && !activity.isFinishing()) {
-                activity.finish();
-            }
-        }
-        activities.clear();
+        EventBus.getDefault().post(new EBFinishActivity());
     }
 
     /**
@@ -214,7 +228,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     private float downY;
     private Boolean moveVertical = null;
 
-
     boolean dispatchTouchEvent(BaseFragment view, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
             moveVertical = null;
@@ -255,4 +268,11 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     }
 
+
+    @Override
+    public void onBackPressed() {
+        if (baseFragment.onBackPressed()) {
+            super.onBackPressed();
+        }
+    }
 }

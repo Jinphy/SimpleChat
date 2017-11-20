@@ -31,9 +31,12 @@ public class WelcomePresenter implements WelcomeContract.Presenter {
         SharedPreferences preferences =
                 context.getSharedPreferences(StringConst.PREFERENCES_NAME_USER, Context.MODE_PRIVATE);
         boolean hasLogin = preferences.getBoolean(StringConst.PREFERENCES_KEY_HAS_LOGIN, false);
-//        hasLogin = true;
-        if (hasLogin) {
-            view.showMainActivity();
+        boolean rememberPassword = preferences.getBoolean(StringConst.PREFERENCES_KEY_REMEMBER_PASSWORD, false);
+        String account = preferences.getString(StringConst.PREFERENCES_KEY_CURRENT_ACCOUNT, null);
+        String password = preferences.getString(StringConst.PREFERENCES_KEY_PASSWORD, null);
+        rememberPassword = false;
+        if (hasLogin && rememberPassword) {
+            view.showMainActivity(account,password);
         } else {
             view.showBtn();
         }
@@ -44,8 +47,4 @@ public class WelcomePresenter implements WelcomeContract.Presenter {
         return false;
     }
 
-    @Override
-    public void doSignUp(User newUser) {
-
-    }
 }

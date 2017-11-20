@@ -17,8 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.model.event_bus.EBLoginInfo;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsFragment;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsPresenter;
@@ -36,6 +38,9 @@ import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +51,7 @@ import java.util.List;
  */
 public class MainFragment extends BaseFragment<MainPresenter> implements MainContract.View {
 
+    private static final String TAG = "MainFragment";
     public static final int MSG_FRAGMENT = 0;
     public static final int FRIEND_FRAGMENT = 1;
     public static final int ROUTINE_FRAGMENT = 2;
@@ -165,6 +171,8 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
         viewPager.addOnPageChangeListener(getPageChangeListener());
     }
+
+    //---------------私有函数---------------------------------------------
 
     private MainViewPagerAdapter getAdapter() {
         List<Fragment> fragments = generateFragments();
@@ -286,7 +294,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         }
     }
 
-
     /**
      *
      * @param scale
@@ -319,68 +326,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         return 0;
     }
 
-
-    @Override
-    public void initFab(int position) {
-        switch (position) {
-            case MSG_FRAGMENT:
-                msgFragment.initFab(getActivity());
-                break;
-            case FRIEND_FRAGMENT:
-                friendsFragment.initFab(getActivity());
-                break;
-            case ROUTINE_FRAGMENT:
-                routineFragment.initFab(getActivity());
-                break;
-            case SELF_FRAGMENT:
-                selfFragment.initFab(getActivity());
-                break;
-            default:
-                break;
-        }
-
-    }
-
-
-
-    @Override
-    public void selectFragment(View view) {
-        switch (view.getId()) {
-            case R.id.btn_msg:
-                selectTab(0, true);
-                break;
-            case R.id.btn_friends:
-                selectTab(1, true);
-                break;
-            case R.id.btn_routine:
-                selectTab(2, true);
-                break;
-            case R.id.btn_self:
-                selectTab(3, true);
-                break;
-            default:
-                break;
-        }
-    }
-
-
-    @Override
-    public List<Fragment> generateFragments() {
-
-        msgFragment = getFragment(MSG_FRAGMENT);
-        friendsFragment = getFragment(FRIEND_FRAGMENT);
-        routineFragment = getFragment(ROUTINE_FRAGMENT);
-        selfFragment = getFragment(SELF_FRAGMENT);
-
-        List<Fragment> fragments = new ArrayList<>(4);
-        fragments.add(msgFragment);
-        fragments.add(friendsFragment);
-        fragments.add(routineFragment);
-        fragments.add(selfFragment);
-
-        return fragments;
-    }
-
     // 获取一个fragment时，判断fragment是否存在于FragmentManager中，
     // 如果存在，在从FragmentManager中获取，否则生成一个新的fragment对象实例
     private <T extends Fragment> T getFragment(int position) {
@@ -404,7 +349,86 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         }
     }
 
+    //----------EventBus--------------------------------------------------
 
+    // 接受来自登录界面或者欢迎页传递过来的account，然后根据account获取用户信息
+    @Subscribe(threadMode = ThreadMode.BACKGROUND, sticky = true)
+    public void accountEvent(EBLoginInfo info) {
+        BaseApplication.e(TAG, "accountEvent: account = " + info.account);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //----------mvp中的View函数--------------------------------------------
+
+    @Override
+    public void initFab(int position) {
+
+        switch (position) {
+            case MSG_FRAGMENT:
+                msgFragment.initFab(getActivity());
+                break;
+            case FRIEND_FRAGMENT:
+                friendsFragment.initFab(getActivity());
+                break;
+            case ROUTINE_FRAGMENT:
+                routineFragment.initFab(getActivity());
+                break;
+            case SELF_FRAGMENT:
+                selfFragment.initFab(getActivity());
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    @Override
+    public void selectFragment(View view) {
+        switch (view.getId()) {
+            case R.id.btn_msg:
+                selectTab(0, true);
+                break;
+            case R.id.btn_friends:
+                selectTab(1, true);
+                break;
+            case R.id.btn_routine:
+                selectTab(2, true);
+                break;
+            case R.id.btn_self:
+                selectTab(3, true);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public List<Fragment> generateFragments() {
+
+        msgFragment = getFragment(MSG_FRAGMENT);
+        friendsFragment = getFragment(FRIEND_FRAGMENT);
+        routineFragment = getFragment(ROUTINE_FRAGMENT);
+        selfFragment = getFragment(SELF_FRAGMENT);
+
+        List<Fragment> fragments = new ArrayList<>(4);
+        fragments.add(msgFragment);
+        fragments.add(friendsFragment);
+        fragments.add(routineFragment);
+        fragments.add(selfFragment);
+
+        return fragments;
+    }
 
     @Override
     public MsgPresenter getMsgPresenter(Fragment fragment) {
@@ -429,7 +453,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
         return new SelfPresenter((SelfContract.View) fragment);
     }
-
 
     /**
      * 选择指定的tab标签项
@@ -544,9 +567,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     }
 
-
-
-
     /**
      * 显示toolbar和bottomBar，同时隐藏fab
      *
@@ -589,7 +609,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         }
         return false;
     }
-
 
     @Override
     public int currentItemPosition() {

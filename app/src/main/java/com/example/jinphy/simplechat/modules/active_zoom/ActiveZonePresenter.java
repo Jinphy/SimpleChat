@@ -43,9 +43,4 @@ public class ActiveZonePresenter implements ActiveZoneContract.Presenter {
         }
         return 0;
     }
-
-    @Override
-    public void onBackPressed() {
-        view.onBackPressed();
-    }
 }

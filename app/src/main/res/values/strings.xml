@@ -44,4 +44,10 @@
     <string name="confirm_password">重复密码</string>
     <string name="re_get">重获( s)</string>
     <string name="get_verification_code">获取验证码</string>
+    <string name="remember_me">记住我！</string>
+    <string name="login_with_verification">验证登录</string>
+    <string name="password_type">密码方式</string>
+    <string name="login_now">马上登录</string>
+    <string name="forget_password_and_find"><![CDATA[忘记密码？ >>去找回]]></string>
+    <string name="verification_type">验证方式</string>
 </resources>

@@ -65,8 +65,4 @@ public class ChatPresenter implements ChatContract.Presenter {
         return 0;
     }
 
-    @Override
-    public void onBackPressed() {
-        view.onBackPressed();
-    }
 }

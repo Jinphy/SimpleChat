@@ -26,12 +26,20 @@ import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_view.CustomVerticalStepperFormLayout;
 import com.example.jinphy.simplechat.listener_adapters.TextWatcherAdapter;
+import com.example.jinphy.simplechat.model.event_bus.EBFinishActivity;
 import com.example.jinphy.simplechat.model.user.User;
+import com.example.jinphy.simplechat.modules.login.LoginActivity;
+import com.example.jinphy.simplechat.modules.main.MainActivity;
+import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;
+import com.example.jinphy.simplechat.utils.DeviceUtils;
 import com.example.jinphy.simplechat.utils.Encrypt;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
+import org.greenrobot.eventbus.EventBus;
+
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
@@ -77,11 +85,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     private boolean hasVerified;
     private String verifiedPhone;
     private String password;
-
-
-    interface M{
-        int x=0;
-    }
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -203,7 +206,15 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         super.onDestroy();
         this.presenter.unregisterSMSSDK();
     }
-    //-----------------------------------------------
+
+    @Override
+    public boolean onBackPressed() {
+        finishActivity();
+        getActivity().overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
+        return false;
+    }
+
+    //----------VerticalStepperForm 的回调函数-------------------------------------
 
     @Override
     public View createStepContentView(int stepNumber) {
@@ -220,7 +231,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 return null;
         }
     }
-
 
     @Override
     public void onStepOpening(int stepNumber) {
@@ -248,6 +258,13 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         }
     }
 
+
+    @Override
+    public void sendData() {
+
+    }
+
+    //------------私有函数--------------------------------------------
     /*
     * 获取对应步骤的输入框的文本
     * */
@@ -255,7 +272,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         TextInputEditText editText = view.findViewById(R.id.input_text);
         return editText.getText().toString();
     }
-
 
     /*
     * 设置对应步骤的输入框的文本
@@ -360,31 +376,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         }
     }
 
-    private void handleResponse(Response response,String yes,String no,String error,boolean isLong) {
-        Flowable.just(response)
-                .map(value->value.message)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(message -> {
-                    if (Response.yes.equals(message)) {
-                        if (yes != null) {
-                            BaseApplication.showToast(yes, isLong );
-                        }
-                    } else if (Response.no.equals(message)) {
-                        if (no != null) {
-                            BaseApplication.showToast(no,isLong);
-                        }
-                    }else if(Response.error.equals(message)){
-                        if (error != null) {
-                            BaseApplication.showToast(error,isLong );
-                        }
-                    } else {
-                        BaseApplication.showToast("网络连接错误，请检查网络是否连接！", isLong);
-                    }
-                })
-                .subscribe();
-
-    }
-
     /*
     * 当验证码步骤打开时调用，根据不同状态设置不同视图
     * */
@@ -420,11 +411,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
 
     }
 
-    @Override
-    public void sendData() {
-
-    }
-
+//    创建每一步的视图
     private View createStepView(@StringRes int hintId) {
         String hint = getString(hintId);
         LinearLayout inflate = (LinearLayout) LayoutInflater.from(getContext()).inflate(
@@ -447,7 +434,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         }
         return inflate;
     }
-
+//    创建输入框的输入监听事件
     private TextWatcherAdapter createTextWatcher(@StringRes int hintId) {
         return new TextWatcherAdapter() {
             @Override
@@ -474,7 +461,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         };
 
     }
-
+//    账号输入框的监听函数
     private void checkAccount(String text, int length) {
         TextInputLayout textInputLayout = accountView.findViewById(R.id.text_input_layout);
         if (StringUtils.isPhoneNumber(text)) {
@@ -500,7 +487,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
             }
         }
     }
-
+//    验证码输入框的监听函数
     private void checkVerificationCode(String text, int length) {
         if (hasVerified) {
             return;
@@ -511,7 +498,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
             verticalStepperForm.setStepAsUncompleted(STEP_VERIFICATION_CODE, null);
         }
     }
-
+//    密码输入框的监听函数
     private void checkPassword(String text, int length) {
         TextInputLayout inputLayout = passwordView.findViewById(R.id.text_input_layout);
         if (StringUtils.isNumberOrLetter(text)) {
@@ -525,7 +512,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
             inputLayout.setError("密码必须是6-20数字或字母！");
         }
     }
-
+//    确认密码输入框的监听函数
     private void checkConfirmPassword(String text, int length) {
         if (StringUtils.equal(text, password)) {
             verticalStepperForm.setActiveStepAsCompleted();
@@ -533,7 +520,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
             verticalStepperForm.setStepAsUncompleted(STEP_CONFIRM_PASSWORD,null);
         }
     }
-
     // 获取验证码按钮的点击事件
     private void getVerificationCode(View view) {
         view.setEnabled(false);
@@ -548,11 +534,13 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
 
     }
 
+    //------------mvp中View的函数----------------------------------------
+
     @Override
     public synchronized void setText(TextView view, String text) {
-
         view.setText(text);
     }
+
 
     @Override
     public void updateViewAfterSubmittingVerificationCode(Response response) {
@@ -573,8 +561,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
 
     @Override
     public void updateViewAfterGettingVerificationCode(Response response) {
-        Flowable.just(response)
-                .map(value -> value.message)
+        Flowable.just(response.message)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(message -> {
                     if (Response.yes.equals(message)) {
@@ -582,10 +569,11 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                         verifiedPhone = editText.getText().toString();
                         hasVerified = false;
                         hasGetVerificationCode = true;
+                        TextView view = verificationCodeView.findViewById(R.id.verification_code_button);
 
+                        String origin = view.getText().toString();
                         String text = BaseApplication.instance().getString(R.string.re_get);
 
-                        View view = verificationCodeView.findViewById(R.id.verification_code_button);
 
                         Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
                                 .map(value -> {
@@ -594,13 +582,11 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                                 })
                                 .subscribeOn(Schedulers.newThread())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .doOnNext(value -> setText((TextView) view, value))
+                                .doOnNext(value -> view.setText(value))
                                 .doOnComplete(() -> {
                                     view.setEnabled(true);
-                                    setText(((TextView) view),
-                                            BaseApplication.instance().getString(R.string.get_verification_code));
-                                })
-                                .subscribe();
+                                    view.setText(origin);
+                                }).subscribe();
 
                     } else {
                         verifiedPhone = null;
@@ -621,7 +607,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                     if (Response.yes.equals(message)) {
                         User user = presenter.saveUser(
                                 verifiedPhone,
-                                Encrypt.md5(password),
+                                password,
                                 date);
                         return user;
                     }
@@ -629,22 +615,46 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(user -> {
+                .doOnNext((Serializable user) -> {
                     if (user instanceof User) {
+                        User newUser = (User) user;
                         new MaterialDialog.Builder(getContext())
                                 .title("注册成功")
-                                .iconRes(R.drawable.ic_done)
+                                .iconRes(R.drawable.ic_smile_red_24dp)
                                 .content("恭喜你成功注册账号，是否立即登录？")
                                 .positiveText("马上登录")
                                 .negativeText("不了不了")
                                 .titleColorRes(R.color.color_red_D50000)
-                                .positiveColorRes(R.color.half_alpha_gray)
+                                .negativeColorRes(R.color.half_alpha_gray)
+                                .positiveColorRes(R.color.color_red_D50000)
+                                .cancelable(false)
                                 .onPositive((dialog, which) -> {
                                     // TODO: 2017/11/7 执行登录操作
+                                    presenter.login(
+                                            newUser.getAccount(),
+                                            "null",
+                                            Encrypt.md5(DeviceUtils.devceId()),
+                                            loginResponse -> {
+                                                handleResponse(
+                                                        loginResponse,
+                                                        "登陆成功！",
+                                                        "登录失败！",
+                                                        "服务器错误，请稍后再试！",
+                                                        false
+                                                );
+                                                if (Response.yes.equals(loginResponse.message)) {
+                                                    MainActivity.start(getActivity(), newUser,
+                                                            true);
+                                                    EventBus.getDefault().post(new
+                                                            EBFinishActivity(WelcomeActivity.class));
+                                                    EventBus.getDefault().post(new
+                                                            EBFinishActivity(LoginActivity.class));
+                                                }
+                                                finishActivity();
+                                            });
+
                                 })
-                                .onNeutral((dialog, which) -> {
-                                    getActivity().finish();
-                                })
+                                .onNegative((dialog,which)-> finishActivity())
                                 .show();
                     }
                 })
@@ -652,6 +662,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
 
 
     }
+
 
     @Override
     public void updateViewAfterFindUser(Response response) {
@@ -669,4 +680,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 })
                 .subscribe();
     }
+
+
 }

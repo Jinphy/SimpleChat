@@ -17,7 +17,7 @@ public interface WelcomeContract {
 
         void showSignUpView(android.view.View view);
 
-        void showMainActivity();
+        void showMainActivity(String account,String password);
 
         void showAnimator();
 
@@ -30,6 +30,5 @@ public interface WelcomeContract {
 
         boolean checkIfAccountAvailable(String account);
 
-        void doSignUp(User newUser);
     }
 }

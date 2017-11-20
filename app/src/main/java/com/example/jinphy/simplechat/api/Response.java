@@ -9,9 +9,16 @@ public class Response {
     public static final String yes = "yes";
     public static final String no = "no";
     public static final String error = "error";
+    public Object message;
+
+    public Object object;
 
     public Response(Object message) {
         this.message = message;
     }
-    public Object message;
+
+    public Response(Object message, Object object) {
+        this.message = message;
+        this.object = object;
+    }
 }

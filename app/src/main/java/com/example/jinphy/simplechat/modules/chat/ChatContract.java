@@ -55,7 +55,6 @@ public interface ChatContract {
 
         void animateHorizontal(float fromFactor, float toFactor, boolean exit);
 
-        void onBackPressed();
     }
 
     interface Presenter extends BasePresenter {
@@ -65,8 +64,6 @@ public interface ChatContract {
         ChatRecyclerViewAdapter getAdapter();
 
         int getItemCount();
-
-        void onBackPressed();
 
     }
 }

@@ -306,7 +306,8 @@ public class ActiveZoneFragment extends BaseFragment<ActiveZonePresenter>
     }
 
     @Override
-    public void onBackPressed() {
+    public boolean onBackPressed() {
         animateHorizontal(0,1,true);
+        return false;
     }
 }

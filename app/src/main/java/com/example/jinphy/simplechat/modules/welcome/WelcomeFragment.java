@@ -12,6 +12,8 @@ import android.widget.ImageView;
 
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.base.BasePresenter;
+import com.example.jinphy.simplechat.model.event_bus.EBLoginInfo;
+import com.example.jinphy.simplechat.model.user.User;
 import com.example.jinphy.simplechat.modules.main.MainActivity;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.constants.IntConst;
@@ -19,6 +21,8 @@ import com.example.jinphy.simplechat.modules.login.LoginActivity;
 import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
 
@@ -103,7 +107,7 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
     public void showLoginView(View view) {
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         startActivity(intent);
-        getActivity().finish();
+        getActivity().overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
     }
 
     @Override
@@ -111,15 +115,15 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
         Intent intent = new Intent(getActivity(), SignUpActivity.class);
         startActivity(intent);
         getActivity().overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
-        getActivity().finish();
     }
 
     @Override
-    public void showMainActivity() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
-        getActivity().finish();
+    public void showMainActivity(String account,String password) {
+        User user = new User();
+        user.setAccount(account);
+        user.setPassword(password);
+        MainActivity.start(getActivity(),user,true);
+        finishActivity();
     }
 
     @Override
@@ -149,7 +153,6 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
                 .setDuration(IntConst.DURATION_1500)
                 .onStart(animator -> btnLayout.setVisibility(View.VISIBLE))
                 .animate();
-
     }
 
 
