@@ -43,7 +43,7 @@ public class StringUtils {
         return !equal(one, two);
     }
 
-    public static String generateURI(String host, String port, String path, HashMap<String,
+    public static String generateURI(String host, String port, String path, Map<String,
             String> params) {
         StringBuilder build = new StringBuilder();
         build.append(host)

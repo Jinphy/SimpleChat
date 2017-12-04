@@ -16,6 +16,7 @@ import com.example.jinphy.simplechat.utils.Preconditions;
 import io.reactivex.Flowable;
 
 /**
+ *
  * Created by jinphy on 2017/8/10.
  */
 
