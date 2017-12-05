@@ -79,6 +79,11 @@ public class CommonApi {
         return new CommonApi(context);
     }
 
+    public static SMSSDKApi sms(Context context) {
+        return new SMSSDKApi(context);
+    }
+
+
     /*
      * DESC: 私有化构造函数
      * Created by jinphy, on 2017/12/4, at 22:17
@@ -185,7 +190,7 @@ public class CommonApi {
             return client;
         } catch (URISyntaxException e) {
             e.printStackTrace();
-            BaseApplication.showToast("uri语法不正确！", false);
+            BaseApplication.showToast("uri不正确！", false);
             return null;
         }
 
@@ -315,6 +320,7 @@ public class CommonApi {
                     .map(value -> GsonUtils.toBean(value, Response.class))
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(onNext::call)
+                    .doOnComplete(this::close)
                     .subscribe();
         }
 
@@ -344,49 +350,49 @@ public class CommonApi {
 
 
     //==================请求返回结果==============================================
-    public static class Response{
-        public static String YES = "1";
-        public static String NO = "0";
-
-
-        private String code;
-        private String msg;
-        private String data;
-
-        public Response() {
-
-        }
-
-        public Response(String code, String msg, String data) {
-            this.code = code;
-            this.msg = msg;
-            this.data = data;
-        }
-
-        public String getCode() {
-            return code;
-        }
-
-        public void setCode(String code) {
-            this.code = code;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-
-        public void setMsg(String msg) {
-            this.msg = msg;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public void setData(String data) {
-            this.data = data;
-        }
-    }
+//    public static class Response{
+//        public static String YES = "1";
+//        public static String NO = "0";
+//
+//
+//        private String code;
+//        private String msg;
+//        private String data;
+//
+//        public Response() {
+//
+//        }
+//
+//        public Response(String code, String msg, String data) {
+//            this.code = code;
+//            this.msg = msg;
+//            this.data = data;
+//        }
+//
+//        public String getCode() {
+//            return code;
+//        }
+//
+//        public void setCode(String code) {
+//            this.code = code;
+//        }
+//
+//        public String getMsg() {
+//            return msg;
+//        }
+//
+//        public void setMsg(String msg) {
+//            this.msg = msg;
+//        }
+//
+//        public String getData() {
+//            return data;
+//        }
+//
+//        public void setData(String data) {
+//            this.data = data;
+//        }
+//    }
 
     //==================请求接口 Path=============================================
 
@@ -398,6 +404,8 @@ public class CommonApi {
         String login = "/user/login";
         String findUser = "/user/findUser";
         String createNewUser = "/user/createNewUser";
+        String getVerificationCode = "sms/getVerificationCode";
+        String submitVerificationCode = "sms/submitVerificationCode";
     }
 
     //===================参数key==========================================================
@@ -406,6 +414,8 @@ public class CommonApi {
      * Created by jinphy, on 2017/12/4, at 23:55
      */
     interface Key{
+        String phone = "phone";
+        String verificationCode = "verificationCode";
 
     }
 

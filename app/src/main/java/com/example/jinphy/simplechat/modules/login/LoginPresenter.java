@@ -2,18 +2,10 @@ package com.example.jinphy.simplechat.modules.login;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.TextView;
 
-import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.api.Consumer;
 import com.example.jinphy.simplechat.api.NetworkManager;
-import com.example.jinphy.simplechat.api.Response;
-import com.example.jinphy.simplechat.api.SMSSDKApi;
 import com.example.jinphy.simplechat.utils.Preconditions;
-
-import io.reactivex.Flowable;
 
 /**
  *
@@ -23,12 +15,10 @@ import io.reactivex.Flowable;
 public class LoginPresenter implements LoginContract.Presenter {
 
     private LoginContract.View view;
-    private SMSSDKApi smssdkApi;
     private NetworkManager networkManager;
 
     public LoginPresenter(@NonNull LoginContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-        smssdkApi = SMSSDKApi.getInstance();
         networkManager = NetworkManager.getInstance();
 
     }
@@ -40,12 +30,12 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void registerSMSSDK(Context context) {
-        smssdkApi.register(context);
+//        smssdkApi.register(context);
     }
 
     @Override
     public void unregisterSMSSDK() {
-        smssdkApi.unregister();
+//        smssdkApi.unregister();
     }
 
     @Override
