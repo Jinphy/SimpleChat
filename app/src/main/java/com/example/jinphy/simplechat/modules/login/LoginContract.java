@@ -1,11 +1,8 @@
 package com.example.jinphy.simplechat.modules.login;
 
 import android.content.Context;
-import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
-import com.example.jinphy.simplechat.api.Consumer;
+import com.example.jinphy.simplechat.api.Api.Response;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 
@@ -27,8 +24,19 @@ public interface LoginContract {
 
         String getPassword();
 
+        String getCode();
+
+        String getDeviceId();
+
         boolean isLoginByPassword();
 
+        void findUserOnNext(Response response, String tag);
+
+        void loginOnNext(Response response,String account,String password);
+
+        void getVerificationCodeOnNext(Response response,String account);
+
+        void submitVerificationCodeOnNext(Response response);
     }
 
     interface Presenter extends BasePresenter{
@@ -36,13 +44,12 @@ public interface LoginContract {
 
         void  unregisterSMSSDK();
 
-        void findUser(String account, Consumer callback);
+        void findUser(Context context, String account, String hint, String tag);
 
-        void getVerificationCode(String account, Consumer callback);
+        void getVerificationCode(Context context, String account);
 
+        void submitVerificationCode(Context context, String phone, String verificationCode,String hint);
 
-        void submitVerificationCode(String phone, String verificationCode, Consumer callback);
-
-        void login(String account, String password,String deviceId, Consumer callback);
+        void login(Context context, String account, String password, String deviceId);
     }
 }

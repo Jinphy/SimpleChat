@@ -3,10 +3,7 @@ package com.example.jinphy.simplechat.modules.signup;
 import android.content.Context;
 import android.widget.TextView;
 
-import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.api.Consumer;
-import com.example.jinphy.simplechat.api.NetworkManager;
-import com.example.jinphy.simplechat.api.Response;
+import com.example.jinphy.simplechat.api.Api;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.model.user.User;
@@ -21,29 +18,39 @@ public interface SignUpContract {
 
         void setText(TextView view, String text);
 
-        void updateViewAfterSubmittingVerificationCode(Response response);
+        void getVerificationCodeOnNext(Api.Response response);
 
-        void updateViewAfterGettingVerificationCode(Response response);
+        void submitVerificationCodeOnNext(Api.Response response);
 
-        void updateViewAfterCreateNewUser(Response response,long date);
+        void findUserOnNext(Api.Response response);
 
-        void updateViewAfterFindUser(Response response);
+        void createNewUserOnNext(Api.Response response, long date);
+
+        void loginOnNext(Api.Response response, User user);
+//
+//        void updateViewAfterSubmittingVerificationCode(Api.Response response);
+//
+//        void updateViewAfterGettingVerificationCode(Api.Response response);
+//
+//        void updateViewAfterCreateNewUser(Api.Response response, long date);
+//
+//        void updateViewAfterFindUser(Api.Response response);
     }
     interface Presenter extends BasePresenter{
         void registerSMSSDK(Context context);
 
         void  unregisterSMSSDK();
 
-        void getVerificationCode(String phone,Consumer callback);
+        void getVerificationCode(Context context, String phone);
 
-        void submitVerificationCode(String phone, String verificationCode,Consumer callback);
+        void submitVerificationCode(Context context, String phone, String verificationCode);
 
-        void findUser(String account, Consumer callback);
+        void findUser(Context context, String account);
 
-        void createNewUser(String account, String password,String date, Consumer callback);
+        void createNewUser(Context context, String account, String password, String date);
 
         User saveUser(String account, String password,long date);
 
-        void login(String account, String password, String deviceId,Consumer callback);
+        void login(Context context, User user, String deviceId);
     }
 }

@@ -7,18 +7,18 @@ import android.app.Activity;
  * Created by jinphy on 2017/11/18.
  */
 
-public class EBFinishActivity {
+public class EBFinishActivityMsg {
     // 销毁所有的activity
     public static final Class<?extends Activity> ALL = Activity.class;
 
     // 要销毁的activity
     public Class<? extends Activity> which;
 
-    public EBFinishActivity(){
+    public EBFinishActivityMsg(){
         this.which = ALL;
     }
 
-    public EBFinishActivity(Class<? extends Activity> which) {
+    public EBFinishActivityMsg(Class<? extends Activity> which) {
         this.which = which;
     }
 

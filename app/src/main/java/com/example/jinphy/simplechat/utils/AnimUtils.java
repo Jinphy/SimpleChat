@@ -49,7 +49,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Utility methods for working with animations.
+ * Utility methods for working create animations.
  */
 public class AnimUtils {
 
@@ -1027,11 +1027,11 @@ public class AnimUtils {
     }
 
     /**
-     * An implementation of {@link Property} to be used specifically with fields of
+     * An implementation of {@link Property} to be used specifically create fields of
      * type
      * <code>float</code>. This type-specific subclass enables performance benefit by allowing
      * calls to a {@link #set(Object, Float) set()} function that takes the primitive
-     * <code>float</code> type and avoids autoboxing and other overhead associated with the
+     * <code>float</code> type and avoids autoboxing and other overhead associated create the
      * <code>Float</code> class.
      *
      * @param <T> The class on which the Property is declared.
@@ -1043,7 +1043,7 @@ public class AnimUtils {
 
         /**
          * A type-specific override of the {@link #set(Object, Float)} that is faster when dealing
-         * with fields of type <code>float</code>.
+         * create fields of type <code>float</code>.
          */
         public abstract void setValue(T object, float value);
 
@@ -1055,11 +1055,11 @@ public class AnimUtils {
 
 
     /**
-     * An implementation of {@link Property} to be used specifically with fields of
+     * An implementation of {@link Property} to be used specifically create fields of
      * type
      * <code>int</code>. This type-specific subclass enables performance benefit by allowing
      * calls to a {@link #set(Object, Integer) set()} function that takes the primitive
-     * <code>int</code> type and avoids autoboxing and other overhead associated with the
+     * <code>int</code> type and avoids autoboxing and other overhead associated create the
      * <code>Integer</code> class.
      *
      * @param <T> The class on which the Property is declared.
@@ -1072,7 +1072,7 @@ public class AnimUtils {
 
         /**
          * A type-specific override of the {@link #set(Object, Integer)} that is faster when dealing
-         * with fields of type <code>int</code>.
+         * create fields of type <code>int</code>.
          */
         public abstract void setValue(T object, int value);
 

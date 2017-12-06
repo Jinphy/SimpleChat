@@ -89,7 +89,7 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
         //            observer.addOnGlobalLayoutListener( () -> {
         //                if (!hasLoaded) {
         //                    ImageUtil.from(activity)
-        //                            .with(R.drawable.pic_start)
+        //                            .create(R.drawable.pic_start)
         //                            .into(startView);
         //                    hasLoaded = true;
         //                }

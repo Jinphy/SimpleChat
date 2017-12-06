@@ -24,13 +24,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
  * Created by jinphy on 2017/12/4.
  */
 
-public class CommonApi {
+class CommonApi implements ApiInterface<WebSocket> {
     // 宿舍WiFi
     //    public static String BASE_URL = "ws://192.168.0.3";
     //    成和WiFi
-    public static String BASE_URL = "ws://192.168.3.21";
+//    public static String BASE_URL = "ws://192.168.3.21";
     //    我的手机WiFi
     //    public static String BASE_URL = "ws://192.168.43.224";
+    //    公司WiFi
+    public static String BASE_URL = "ws://172.16.11.134";
 
 
     /**
@@ -63,11 +65,11 @@ public class CommonApi {
     protected int connectTimeout;
     protected String path;
 
-    protected OnStart onStart;
-    protected OnOpen onOpen;
-    protected OnNext onNext;
-    protected OnError onError;
-    protected OnClose onClose;
+    protected Api.OnStart onStart;
+    protected Api.OnOpen onOpen;
+    protected Api.OnNext onNext;
+    protected Api.OnError onError;
+    protected Api.OnClose onClose;
 
     //====================方法===============================================
 
@@ -75,14 +77,9 @@ public class CommonApi {
      * DESC: 创建一个网络请求api
      * Created by jinphy, on 2017/12/4, at 22:17
      */
-    public static CommonApi with(Context context) {
+    public static ApiInterface create(Context context) {
         return new CommonApi(context);
     }
-
-    public static SMSSDKApi sms(Context context) {
-        return new SMSSDKApi(context);
-    }
-
 
     /*
      * DESC: 私有化构造函数
@@ -110,7 +107,7 @@ public class CommonApi {
      * DESC: 设置baseUrl
      * Created by jinphy, on 2017/12/4, at 22:08
      */
-    public CommonApi baseUrl(String baseUrl) {
+    public ApiInterface baseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
         return this;
     }
@@ -119,7 +116,7 @@ public class CommonApi {
      * DESC: 设置请求端口
      * Created by jinphy, on 2017/12/4, at 22:08
      */
-    public CommonApi port(String port) {
+    public ApiInterface port(String port) {
         this.port = port;
         return this;
     }
@@ -128,7 +125,8 @@ public class CommonApi {
      * DESC: 设置接口路径
      * Created by jinphy, on 2017/12/4, at 23:38
      */
-    public CommonApi path(String path) {
+    @Override
+    public ApiInterface path(String path) {
         this.path = path;
         return this;
     }
@@ -137,7 +135,7 @@ public class CommonApi {
      * DESC: 设置header
      * Created by jinphy, on 2017/12/4, at 22:28
      */
-    public CommonApi header(String key, String value) {
+    public ApiInterface header(String key, String value) {
         if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
             return this;
         }
@@ -149,11 +147,12 @@ public class CommonApi {
      * DESC: 添加请求参数
      * Created by jinphy, on 2017/12/4, at 21:43
      */
-    public CommonApi param(String key, String value) {
-        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
+    @Override
+    public ApiInterface param(String key, Object value) {
+        if (TextUtils.isEmpty(key) || value == null || value.toString().trim().length() == 0) {
             return this;
         }
-        this.params.put(key, value);
+        this.params.put(key, value.toString());
         return this;
     }
 
@@ -161,7 +160,8 @@ public class CommonApi {
      * DESC: 设置连接超时
      * Created by jinphy, on 2017/12/4, at 22:34
      */
-    public CommonApi connectTimeout(int timeout ) {
+    @Override
+    public ApiInterface connectTimeout(int timeout) {
         this.connectTimeout = timeout;
         return this;
     }
@@ -170,7 +170,8 @@ public class CommonApi {
      * DESC: 设置网络请求是显示进度条
      * Created by jinphy, on 2017/12/4, at 21:47
      */
-    public CommonApi showProgress() {
+    @Override
+    public ApiInterface showProgress() {
         this.showProgress = true;
         return this;
     }
@@ -198,60 +199,30 @@ public class CommonApi {
 
 
     //=================回调接口============================================================
-    /**
-     * DESC: 请求成功回调
-     * Created by jinphy, on 2017/12/4, at 21:56
-     */
-    public interface OnNext {
-        void call(Response result);
-    }
 
     /**
      * DESC: 设置成功回调
      * Created by jinphy, on 2017/12/4, at 21:58
      */
-    public CommonApi onNext(OnNext onNext ) {
+    public ApiInterface onNext(Api.OnNext onNext ) {
         this.onNext = onNext;
         return this;
-    }
-
-    /**
-     * DESC: 请求异常回调
-     * Created by jinphy, on 2017/12/4, at 21:56
-     */
-    public interface OnError {
-        void call(Exception e);
     }
 
     /**
      * DESC: 设置异常回调
      * Created by jinphy, on 2017/12/4, at 21:59
      */
-    public CommonApi onError(OnError onError) {
+    public ApiInterface onError(Api.OnError onError) {
         this.onError = onError;
         return this;
-    }
-    /**
-     * DESC: 连接打开时回调
-     * Created by jinphy, on 2017/12/4, at 21:56
-     */
-    public interface OnOpen {
-        void call(WebSocket webSocket);
-    }
-
-    /**
-     * DESC: 连接打开时回调
-     * Created by jinphy, on 2017/12/4, at 23:24
-     */
-    public interface OnStart{
-        void call();
     }
 
     /**
      * DESC: 设置开始回调
      * Created by jinphy, on 2017/12/4, at 23:24
      */
-    public CommonApi onStart(OnStart onStart ) {
+    public ApiInterface onStart(Api.OnStart onStart ) {
         this.onStart = onStart;
         return this;
     }
@@ -260,24 +231,17 @@ public class CommonApi {
      * DESC: 设置开始回调
      * Created by jinphy, on 2017/12/4, at 22:00
      */
-    public CommonApi onOpen(OnOpen onOpen ) {
+    public ApiInterface onOpen(Api.OnOpen onOpen ) {
         this.onOpen = onOpen;
         return this;
     }
 
-    /**
-     * DESC: 请求结束时回调
-     * Created by jinphy, on 2017/12/4, at 21:57
-     */
-    public interface OnClose {
-        void call();
-    }
 
     /**
      * DESC: 设置关闭回调
      * Created by jinphy, on 2017/12/4, at 22:01
      */
-    public CommonApi onClose(OnClose onClose ) {
+    public ApiInterface onClose(Api.OnClose onClose ) {
         this.onClose = onClose;
         return this;
     }
@@ -317,7 +281,7 @@ public class CommonApi {
                 return;
             }
             Flowable.just(message)
-                    .map(value -> GsonUtils.toBean(value, Response.class))
+                    .map(value -> GsonUtils.toBean(value, Api.Response.class))
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(onNext::call)
                     .doOnComplete(this::close)
@@ -348,75 +312,9 @@ public class CommonApi {
         }
     }
 
-
     //==================请求返回结果==============================================
-//    public static class Response{
-//        public static String YES = "1";
-//        public static String NO = "0";
-//
-//
-//        private String code;
-//        private String msg;
-//        private String data;
-//
-//        public Response() {
-//
-//        }
-//
-//        public Response(String code, String msg, String data) {
-//            this.code = code;
-//            this.msg = msg;
-//            this.data = data;
-//        }
-//
-//        public String getCode() {
-//            return code;
-//        }
-//
-//        public void setCode(String code) {
-//            this.code = code;
-//        }
-//
-//        public String getMsg() {
-//            return msg;
-//        }
-//
-//        public void setMsg(String msg) {
-//            this.msg = msg;
-//        }
-//
-//        public String getData() {
-//            return data;
-//        }
-//
-//        public void setData(String data) {
-//            this.data = data;
-//        }
-//    }
 
     //==================请求接口 Path=============================================
 
-    /**
-     * DESC: 网络请求路径
-     * Created by jinphy, on 2017/12/4, at 21:38
-     */
-    interface Path{
-        String login = "/user/login";
-        String findUser = "/user/findUser";
-        String createNewUser = "/user/createNewUser";
-        String getVerificationCode = "sms/getVerificationCode";
-        String submitVerificationCode = "sms/submitVerificationCode";
-    }
-
-    //===================参数key==========================================================
-    /**
-     * DESC: 参数的key
-     * Created by jinphy, on 2017/12/4, at 23:55
-     */
-    interface Key{
-        String phone = "phone";
-        String verificationCode = "verificationCode";
-
-    }
 
 }

@@ -10,22 +10,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.jinphy.simplechat.model.event_bus.EBActivity;
-import com.example.jinphy.simplechat.model.event_bus.EBFinishActivity;
+import com.example.jinphy.simplechat.model.event_bus.EBFinishActivityMsg;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static com.example.jinphy.simplechat.utils.Preconditions.checkNotNull;
 
@@ -68,8 +61,8 @@ public abstract class BaseActivity extends AppCompatActivity {
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void finishMe(EBFinishActivity message) {
-        if (message.which == EBFinishActivity.ALL || message.which == this.getClass()) {
+    public void finishMe(EBFinishActivityMsg message) {
+        if (message.which == EBFinishActivityMsg.ALL || message.which == this.getClass()) {
             finish();
         }
     }
@@ -80,7 +73,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * */
     public static void exit() {
-        EventBus.getDefault().post(new EBFinishActivity());
+        EventBus.getDefault().post(new EBFinishActivityMsg());
     }
 
     /**

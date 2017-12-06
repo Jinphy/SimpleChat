@@ -25,7 +25,7 @@ import android.widget.RelativeLayout;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
-import com.example.jinphy.simplechat.listener_adapters.TextWatcherAdapter;
+import com.example.jinphy.simplechat.listener_adapters.TextListener;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
@@ -163,7 +163,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     // 文本输入框的TextWatcher，监听文本的输入
     private TextWatcher getTextWatcher() {
-        return new TextWatcherAdapter() {
+        return new TextListener() {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (editable.length() == 0) {

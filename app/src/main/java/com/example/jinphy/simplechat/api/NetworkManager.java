@@ -75,11 +75,11 @@ public class NetworkManager {
             sendMsgClient = null;
         }
     }
-
-    /**
+/*
+    *//**
      * 向服务器查找给定账号的用户是否存在，如果存在则返回字符串"yes",
      * 如果不存在则返回字符串"no"，如果出现异常则返回异常
-     */
+     *//*
     public void findUser(String account, @NonNull Consumer callback) {
         try {
             HashMap<String, String> params = new HashMap<>();
@@ -101,10 +101,10 @@ public class NetworkManager {
         }
     }
 
-    /**
+    *//**
      * 向服务器中创建新用户，如果创建成功则返回字符串"yes",如果不成功则返回 字符串"no"
      * 否则返回错误
-     */
+     *//*
     public void createNewUser(String account, String password, String date,Consumer callback) {
         try {
             HashMap<String, String> params = new HashMap<>();
@@ -131,7 +131,6 @@ public class NetworkManager {
         }
     }
 
-    private static final String TAG = "NetworkManager";
     public void login(String account, String password,String deviceId, Consumer callback) {
         BaseApplication.e(TAG, "login: password = "+password);
         try {
@@ -157,6 +156,8 @@ public class NetworkManager {
             e.printStackTrace();
         }
     }
+    */
+    private static final String TAG = "NetworkManager";
 
     //-----------------------请求服务器回调函数-------------------------
     //================================================================
