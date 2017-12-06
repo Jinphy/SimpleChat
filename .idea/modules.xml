@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SimpleChat.iml" filepath="$PROJECT_DIR$/.idea/SimpleChat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SimpleChat.iml" filepath="$PROJECT_DIR$/SimpleChat.iml" />
+      <module fileurl="file://C:\workspace\Android\2017\SimpleChat\.idea\SimpleChat.iml" filepath="C:\workspace\Android\2017\SimpleChat\.idea\SimpleChat.iml" />
       <module fileurl="file://C:\Users\Jinphy\StudioProjects\SimpleChat\SimpleChat.iml" filepath="C:\Users\Jinphy\StudioProjects\SimpleChat\SimpleChat.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://C:\Users\Jinphy\StudioProjects\SimpleChat\app\app.iml" filepath="C:\Users\Jinphy\StudioProjects\SimpleChat\app\app.iml" />

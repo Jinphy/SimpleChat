@@ -46,9 +46,7 @@ public class LoginPresenter implements LoginContract.Presenter {
                 .showProgress()
                 .path(Api.Path.findUser)
                 .onStart(()-> BaseApplication.showToast(hint, true))
-                .onNext(response -> {
-
-                })
+                .onNext(response -> view.findUserOnNext(response,tag))
                 .request();
     }
 
@@ -60,8 +58,6 @@ public class LoginPresenter implements LoginContract.Presenter {
                 .path(Api.Path.getVerificationCode)
                 .onNext(response -> view.getVerificationCodeOnNext(response, phone))
                 .request();
-
-
     }
 
 

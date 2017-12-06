@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.api;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
@@ -8,6 +9,8 @@ import com.mob.MobSDK;
 
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * 包可见
@@ -44,28 +47,40 @@ class SMSSDKApi implements ApiInterface<Void> {
         eventHandler = new EventHandler() {
             @Override
             public void afterEvent(int eventCode, int resultCode, Object data) {
-                if (Api.Path.getVerificationCode.equals(path)) {
-                    if (onNext != null) {
-                        if (resultCode == SMSSDK.RESULT_ERROR) {
-                            onNext.call(new Api.Response(Api.Response.NO, "获取验证码失败！", null));
-                        } else {
-                            onNext.call(new Api.Response(Api.Response.YES, "验证码已发，请输入！", null));
-                        }
-                    }
-                } else if (Api.Path.submitVerificationCode.equals(path)) {
-                    if (onNext != null) {
-                        if (resultCode == SMSSDK.RESULT_ERROR) {
-                            onNext.call(new Api.Response(Api.Response.NO, "验证失败，请输入正确的验证码！", null));
-                        } else {
-                            onNext.call(new Api.Response(Api.Response.YES, "验证成功，请继续！", null));
-                        }
-                    }
-                }
                 unregister();
                 context = null;
+                Flowable.just(resultCode)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnNext(SMSSDKApi.this::parseResponse)
+                        .subscribe();
             }
         };
         register(context);
+    }
+
+
+    /*
+     * DESC: 处理网络请求结果
+     * Created by jinphy, on 2017/12/6, at 23:43
+     */
+    protected void parseResponse(int resultCode) {
+        if (Api.Path.getVerificationCode.equals(path)) {
+            if (onNext != null) {
+                if (resultCode == SMSSDK.RESULT_ERROR) {
+                    onNext.call(new Api.Response(Api.Response.NO, "获取验证码失败！", null));
+                } else {
+                    onNext.call(new Api.Response(Api.Response.YES, "验证码已发，请输入！", null));
+                }
+            }
+        } else if (Api.Path.submitVerificationCode.equals(path)) {
+            if (onNext != null) {
+                if (resultCode == SMSSDK.RESULT_ERROR) {
+                    onNext.call(new Api.Response(Api.Response.NO, "验证失败，请输入正确的验证码！", null));
+                } else {
+                    onNext.call(new Api.Response(Api.Response.YES, "验证成功，请继续！", null));
+                }
+            }
+        }
     }
 
     /**
@@ -85,9 +100,6 @@ class SMSSDKApi implements ApiInterface<Void> {
     }
 
     protected void register(Context context) {
-        String appKey = context.getString(R.string.app_key);
-        String appSecret = context.getString(R.string.app_secret);
-        MobSDK.init(context, appKey, appSecret);
         SMSSDK.registerEventHandler(eventHandler);
     }
 
@@ -129,7 +141,6 @@ class SMSSDKApi implements ApiInterface<Void> {
         // no-op
         return this;
     }
-
 
     /**
      * DESC: 设置请求路径
@@ -198,8 +209,10 @@ class SMSSDKApi implements ApiInterface<Void> {
         ObjectHelper.requareNonNull(phone, "请设置手机号码！");
         ObjectHelper.requareNonNull(onNext, "请设置回调接口！");
         if (Api.Path.getVerificationCode.equals(path)) {
+            Log.e(TAG, "request: getVerificationCode");
             SMSSDK.getVerificationCode(countryChina, phone);
         } else if (Api.Path.submitVerificationCode.equals(path)) {
+            Log.e(TAG, "request: submitVerificationCode");
             ObjectHelper.requareNonNull(verificationCode, "请设置验证码！");
             SMSSDK.submitVerificationCode(countryChina, phone, verificationCode);
         } else {

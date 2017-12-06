@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.api;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.utils.GsonUtils;
@@ -28,11 +29,11 @@ class CommonApi implements ApiInterface<WebSocket> {
     // 宿舍WiFi
     //    public static String BASE_URL = "ws://192.168.0.3";
     //    成和WiFi
-//    public static String BASE_URL = "ws://192.168.3.21";
+    public static String BASE_URL = "ws://192.168.3.21";
     //    我的手机WiFi
     //    public static String BASE_URL = "ws://192.168.43.224";
     //    公司WiFi
-    public static String BASE_URL = "ws://172.16.11.134";
+//    public static String BASE_URL = "ws://172.16.11.134";
 
 
     /**
@@ -266,6 +267,7 @@ class CommonApi implements ApiInterface<WebSocket> {
 
         @Override
         public void onOpen(ServerHandshake handshakedata) {
+            Log.e(TAG, "onOpen: "+handshakedata.getHttpStatusMessage());
             if (onOpen == null) {
                 return;
             }
@@ -275,9 +277,12 @@ class CommonApi implements ApiInterface<WebSocket> {
                     .subscribe();
         }
 
+        private static final String TAG = "CustomWebSocketClient";
         @Override
         public void onMessage(String message) {
+            Log.e(TAG, "onMessage: "+message);
             if (onNext == null) {
+                this.close();
                 return;
             }
             Flowable.just(message)
@@ -290,6 +295,7 @@ class CommonApi implements ApiInterface<WebSocket> {
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
+            Log.e(TAG, "onClose: reason = " + reason);
             // TODO: 2017/12/4 在这里关闭进度条
             if (onClose == null) {
                 return;
@@ -302,6 +308,7 @@ class CommonApi implements ApiInterface<WebSocket> {
 
         @Override
         public void onError(Exception ex) {
+            Log.e(TAG, "onError: "+ex.getMessage());
             if (onError == null) {
                 return;
             }

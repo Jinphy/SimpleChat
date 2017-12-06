@@ -6,7 +6,9 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.model.event_bus.EBActivity;
+import com.mob.MobSDK;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -41,6 +43,9 @@ public class BaseApplication extends Application {
         INSTANCE = this;
         initToast();
         EventBus.getDefault().register(this);
+        String appKey = getString(R.string.app_key);
+        String appSecret = getString(R.string.app_secret);
+        MobSDK.init(this, appKey, appSecret);
     }
 
     @Subscribe(priority = 100, threadMode = ThreadMode.BACKGROUND)
