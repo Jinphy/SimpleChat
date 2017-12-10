@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.api;
 
 import android.content.Context;
+import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -29,11 +30,13 @@ class CommonApi implements ApiInterface<WebSocket> {
     // 宿舍WiFi
     //    public static String BASE_URL = "ws://192.168.0.3";
     //    成和WiFi
-    public static String BASE_URL = "ws://192.168.3.21";
+//    public static String BASE_URL = "ws://192.168.3.21";
     //    我的手机WiFi
     //    public static String BASE_URL = "ws://192.168.43.224";
     //    公司WiFi
 //    public static String BASE_URL = "ws://172.16.11.134";
+    // jysb3 wifi
+    public static String BASE_URL = "ws://192.168.1.200";
 
 
     /**
@@ -108,6 +111,7 @@ class CommonApi implements ApiInterface<WebSocket> {
      * DESC: 设置baseUrl
      * Created by jinphy, on 2017/12/4, at 22:08
      */
+    @CallSuper
     public ApiInterface baseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
         return this;

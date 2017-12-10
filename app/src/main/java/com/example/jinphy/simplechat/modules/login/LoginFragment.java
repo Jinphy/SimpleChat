@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.modules.login;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -29,6 +30,7 @@ import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.DeviceUtils;
 import com.example.jinphy.simplechat.utils.Encrypt;
+import com.example.jinphy.simplechat.utils.PermissionUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -226,6 +228,16 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         }
         // 登陆前先查询账号是否存在
         presenter.findUser(getContext(), account, "正在登录，请稍等……","doLoginByPassword");
+
+
+        PermissionUtils.getInstance(getActivity())
+                .permission(Manifest.permission.ACCESS_CHECKIN_PROPERTIES)
+                .permission(Manifest.permission.READ_CALENDAR)
+                .permission(Manifest.permission.GET_ACCOUNTS)
+                .onGrant(()->{/* do something */})
+                .onReject(()->{/* do something */})
+                .execute();
+
     }
 
     /**
