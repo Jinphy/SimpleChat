@@ -229,15 +229,6 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         // 登陆前先查询账号是否存在
         presenter.findUser(getContext(), account, "正在登录，请稍等……","doLoginByPassword");
 
-
-        PermissionUtils.getInstance(getActivity())
-                .permission(Manifest.permission.ACCESS_CHECKIN_PROPERTIES)
-                .permission(Manifest.permission.READ_CALENDAR)
-                .permission(Manifest.permission.GET_ACCOUNTS)
-                .onGrant(()->{/* do something */})
-                .onReject(()->{/* do something */})
-                .execute();
-
     }
 
     /**
