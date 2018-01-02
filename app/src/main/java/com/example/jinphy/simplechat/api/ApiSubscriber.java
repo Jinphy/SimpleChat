@@ -99,7 +99,6 @@ class ApiSubscriber<T> implements Observer<T> {
      */
     @Override
     public void onError(Throwable e) {
-        e.printStackTrace();
         this.apiCallback.doOnError(e);
         this.apiCallback.doOnFinal();
         dismissDialog();
@@ -118,7 +117,9 @@ class ApiSubscriber<T> implements Observer<T> {
         }
         LogUtils.e("网络请求异常：\n\n" +
                 "[ Url      ]: "+api.url()+"\n\n" +
-                "[ Response ]: "+e);
+                "[ Error    ]: "+e);
+
+        e.printStackTrace();
     }
 
     @Override

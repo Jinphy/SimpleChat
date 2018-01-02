@@ -80,8 +80,6 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
                 .doOnSubscribe(disposable -> this.disposable = disposable)
                 .doOnNext(time->{
                     if (this.emitter != null && !this.emitter.isDisposed()) {
-                        emitter.onError(new ServerException("服务器无响应！"));
-                        emitter = null;
                         this.close(500);
                     }
                 })
@@ -118,13 +116,28 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
             }
             emitter.onNext(GsonUtils.toBean(message, jsonType));
         }
-        this.close();
+        this.close(200);
     }
 
+    /**
+     * DESC: 注意：网路连接超时时会回调该方法而不是onError方法，但是没有网络时会回调onError方法
+     * Created by jinphy, on 2018/1/2, at 21:36
+     */
     @Override
     public void onClose(int code, String reason, boolean remote) {
+        LogUtils.e("onClose");
         if (emitter != null && !emitter.isDisposed()) {
-            emitter.onComplete();
+            switch (code) {
+                case 200:
+                    emitter.onComplete();
+                    break;
+                case 500:
+                    emitter.onError(new ServerException("服务器无响应！"));
+                    break;
+                default:
+                    emitter.onError(new ServerException("网络连接超时！"));
+                    break;
+            }
             emitter = null;
         }
     }
