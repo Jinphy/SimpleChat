@@ -35,7 +35,7 @@ import com.example.jinphy.simplechat.utils.ViewUtils;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ChatFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * create an app of this fragment.
  */
 public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatContract.View {
 
@@ -71,9 +71,9 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
     /**
-     * Use this factory method to create a new instance of
+     * Use this factory method to create a new app of
      * this fragment using the provided parameters.
-     * @return A new instance of fragment ChatFragment.
+     * @return A new app of fragment ChatFragment.
      */
     public static ChatFragment newInstance() {
         ChatFragment fragment = new ChatFragment();
@@ -128,7 +128,13 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         // 底部栏中间的文本输入和语音输入
         EditText inputText = findInputText();
         inputText.setOnFocusChangeListener(this::onFocusChangeOfInputText);
-        inputText.addTextChangedListener(getTextWatcher());
+        inputText.addTextChangedListener((TextListener.After) editable -> {
+            if (editable.length() == 0) {
+                showMoreBtn();
+            } else {
+                showSendBtn();
+            }
+        });
         findInputVoice().setOnTouchListener(this::onTouchOfInputVoice);
 
         // 底部栏右边的按钮
@@ -159,20 +165,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             Keyboard.close(getContext(), findInputText());
             hideFabEmotion();
         }
-    }
-
-    // 文本输入框的TextWatcher，监听文本的输入
-    private TextWatcher getTextWatcher() {
-        return new TextListener() {
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (editable.length() == 0) {
-                    showMoreBtn();
-                } else {
-                    showSendBtn();
-                }
-            }
-        };
     }
 
 

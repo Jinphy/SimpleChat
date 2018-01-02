@@ -1,11 +1,10 @@
 package com.example.jinphy.simplechat.api;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.custom_view.LoadingDialog;
+import com.example.jinphy.simplechat.utils.DialogUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
-import com.mob.MobSDK;
 
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
@@ -17,24 +16,28 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
  * Created by jinphy on 2017/11/5.
  */
 
-class SMSSDKApi implements ApiInterface<Void> {
+class SMSSDKApi implements ApiInterface<Response<String>> {
 
     private static final String TAG = "SMSSDKApi";
     private static String countryChina = "86";
 
     private Context context;
     private EventHandler eventHandler;
-    protected Api.OnNext onNext;
+    protected ApiCallback.OnResponseYes<Response<String>> onResponseYes;
+    protected ApiCallback.OnResponseNo<Response<String>> onResponseNo;
     protected String phone;
     protected String verificationCode;
     protected String path;
     protected boolean showProgress;
+    private LoadingDialog dialog;
+    private CharSequence hint = "加载中...";
+    private boolean autoShowNo = true;  // 当返回码错误时，是否自动显示对话框，默认显示
 
     /**
      * DESC: 创建对象
      * Created by Jinphy, on 2017/12/6, at 13:00
      */
-    public static ApiInterface create(Context context) {
+    public static ApiInterface<Response<String>> create(Context context) {
         return new SMSSDKApi(context);
     }
 
@@ -56,6 +59,7 @@ class SMSSDKApi implements ApiInterface<Void> {
             }
         };
         register(context);
+
     }
 
 
@@ -64,21 +68,30 @@ class SMSSDKApi implements ApiInterface<Void> {
      * Created by jinphy, on 2017/12/6, at 23:43
      */
     protected void parseResponse(int resultCode) {
-        if (Api.Path.getVerificationCode.equals(path)) {
-            if (onNext != null) {
-                if (resultCode == SMSSDK.RESULT_ERROR) {
-                    onNext.call(new Api.Response(Api.Response.NO, "获取验证码失败！", null));
-                } else {
-                    onNext.call(new Api.Response(Api.Response.YES, "验证码已发，请输入！", null));
-                }
+        if (showProgress) {
+            dialog.dismiss();
+        }
+        Response<String> response;
+        if (resultCode == SMSSDK.RESULT_ERROR) {
+            if (Api.Path.getVerificationCode.equals(path)) {
+                response = new Response<>(Response.NO, "获取验证码失败！", "");
+            } else {
+                response = new Response<>(Response.NO, "验证失败，请输入正确的验证码！", "");
             }
-        } else if (Api.Path.submitVerificationCode.equals(path)) {
-            if (onNext != null) {
-                if (resultCode == SMSSDK.RESULT_ERROR) {
-                    onNext.call(new Api.Response(Api.Response.NO, "验证失败，请输入正确的验证码！", null));
-                } else {
-                    onNext.call(new Api.Response(Api.Response.YES, "验证成功，请继续！", null));
-                }
+            if (autoShowNo) {
+                DialogUtils.showResponseNo(response, context);
+            }
+            if (this.onResponseNo != null) {
+                this.onResponseNo.call(response);
+            }
+        } else {
+            if (Api.Path.getVerificationCode.equals(path)) {
+                response = new Response<>(Response.YES, "验证码已发，请输入！", "");
+            } else {
+                response = new Response<>(Response.YES, "验证成功，请继续！", "");
+            }
+            if (this.onResponseYes != null) {
+                this.onResponseYes.call(response);
             }
         }
     }
@@ -112,7 +125,7 @@ class SMSSDKApi implements ApiInterface<Void> {
      * Created by jinphy, on 2017/12/6, at 0:22
      */
     @Override
-    public ApiInterface param(String key, Object value) {
+    public ApiInterface<Response<String>> param(String key, Object value) {
         if (Api.Key.phone.equals(key)) {
             phone(value.toString());
         } else if (Api.Key.verificationCode.equals(key)) {
@@ -121,24 +134,71 @@ class SMSSDKApi implements ApiInterface<Void> {
         return this;
     }
 
+    @Override
+    public <U> ApiInterface<Response<String>> api(ApiInterface<U> api) {
+        ObjectHelper.throwRuntime("SMSSDKApi cannot invoke this method");
+        return null;
+    }
+
     /**
      * DESC: 设置是否显示进度条
      * Created by Jinphy, on 2017/12/6, at 9:21
      */
     @Override
-    public ApiInterface showProgress() {
-        this.showProgress = true;
+    public ApiInterface<Response<String>> showProgress(boolean... show) {
+        if (show.length > 0 && !show[0]) {
+            this.showProgress = false;
+        } else {
+            this.showProgress = true;
+            dialog = LoadingDialog.builder(context).title(hint).cancellable(false).build();
+        }
         return this;
     }
 
+    /**
+     * DESC: 当返回码错误时，是否自动显示对话框，默认显示
+     * Created by jinphy, on 2018/1/2, at 20:13
+     */
+    @Override
+    public ApiInterface<Response<String>> autoShowNo(boolean showNo) {
+        this.autoShowNo = showNo;
+        return this;
+    }
 
     /**
      * DESC: 设置连接超时
      * Created by jinphy, on 2017/12/4, at 22:34
      */
     @Override
-    public ApiInterface connectTimeout(int timeout) {
+    public ApiInterface<Response<String>> connectTimeout(int timeout) {
         // no-op
+        return this;
+    }
+
+
+    /**
+     * DESC: 设置读取超时
+     * Created by jinphy, on 2017/12/4, at 22:34
+     */
+    @Override
+    public ApiInterface<Response<String>> readTimeout(int timeout) {
+        // no-op
+        return this;
+    }
+
+
+
+    @Override
+    public ApiInterface<Response<String>> cancellable(boolean... cancel) {
+        return this;
+    }
+
+    @Override
+    public ApiInterface<Response<String>> hint(CharSequence hint) {
+        this.hint = hint;
+        if (this.dialog != null) {
+            this.dialog.title(this.hint);
+        }
         return this;
     }
 
@@ -147,77 +207,86 @@ class SMSSDKApi implements ApiInterface<Void> {
      * Created by jinphy, on 2017/12/6, at 0:05
      */
     @Override
-    public ApiInterface path(String path) {
+    public ApiInterface<Response<String>> path(String path) {
         this.path = path;
         return this;
     }
 
     @Override
-    public ApiInterface onNext(Api.OnNext onNext) {
-        this.onNext = onNext;
+    public ApiInterface<Response<String>> onResponse(ApiCallback.OnResponse<Response<String>> onResponse) {
         return this;
     }
 
     @Override
-    public ApiInterface baseUrl(String baseUrl) {
+    public ApiInterface<Response<String>> onResponseYes(ApiCallback.OnResponseYes<Response<String>> onResponseYes) {
+        this.onResponseYes = onResponseYes;
+        return this;
+    }
+
+    @Override
+    public ApiInterface<Response<String>> onResponseNo(ApiCallback.OnResponseNo<Response<String>> onResponseNo) {
+        this.onResponseNo = onResponseNo;
+        return this;
+    }
+
+    @Override
+    public ApiInterface<Response<String>> baseUrl(String baseUrl) {
         // no-op
         return this;
     }
 
     @Override
-    public ApiInterface port(String port) {
+    public ApiInterface<Response<String>> port(String port) {
         // no-op
         return this;
     }
 
     @Override
-    public ApiInterface header(String key, String value) {
+    public ApiInterface<Response<String>> header(String key, String value) {
         // no-op
         return this;
     }
 
     @Override
-    public ApiInterface onError(Api.OnError onError) {
+    public ApiInterface<Response<String>> onError(ApiCallback.OnError onError) {
         // no-op
         return this;
     }
 
     @Override
-    public ApiInterface onStart(Api.OnStart onStart) {
+    public ApiInterface<Response<String>> onStart(ApiCallback.OnStart onStart) {
         // no-op
         return this;
     }
 
     @Override
-    public ApiInterface onOpen(Api.OnOpen onOpen) {
-        // no-op
+    public ApiInterface<Response<String>> onFinal(ApiCallback.OnFinal onFinal) {
         return this;
     }
 
     @Override
-    public ApiInterface onClose(Api.OnClose onClose) {
-        // no-op
+    public ApiInterface<Response<String>> onCancel(ApiCallback.OnCancel onCancel) {
         return this;
     }
+
 
     /**
      * DESC: 请求网络
      * Created by jinphy, on 2017/12/6, at 0:06
      */
-    public Void request() {
-        ObjectHelper.requareNonNull(path, "请设置网络请求接口！");
-        ObjectHelper.requareNonNull(phone, "请设置手机号码！");
-        ObjectHelper.requareNonNull(onNext, "请设置回调接口！");
+    public void request() {
+        ObjectHelper.requireNonNull(path, "请设置网络请求接口！");
+        ObjectHelper.requireNonNull(phone, "请设置手机号码！");
+        if (this.showProgress) {
+            dialog.show();
+        }
         if (Api.Path.getVerificationCode.equals(path)) {
-            Log.e(TAG, "request: getVerificationCode");
             SMSSDK.getVerificationCode(countryChina, phone);
         } else if (Api.Path.submitVerificationCode.equals(path)) {
-            Log.e(TAG, "request: submitVerificationCode");
-            ObjectHelper.requareNonNull(verificationCode, "请设置验证码！");
+            ObjectHelper.requireNonNull(verificationCode, "请设置验证码！");
             SMSSDK.submitVerificationCode(countryChina, phone, verificationCode);
         } else {
             throw new RuntimeException("请设置正确的请求路径！");
         }
-        return null;
     }
 }

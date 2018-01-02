@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.utils;
 
 /**
+ * 数学相关工具类
  * Created by jinphy on 2017/8/13.
  */
 

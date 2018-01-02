@@ -2,7 +2,7 @@ package com.example.jinphy.simplechat.modules.login;
 
 import android.content.Context;
 
-import com.example.jinphy.simplechat.api.Api.Response;
+import com.example.jinphy.simplechat.api.Response;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 
@@ -44,11 +44,11 @@ public interface LoginContract {
 
         void  unregisterSMSSDK();
 
-        void findUser(Context context, String account, String hint, String tag);
+        void findUser(Context context, String account, String tag);
 
         void getVerificationCode(Context context, String account);
 
-        void submitVerificationCode(Context context, String phone, String verificationCode,String hint);
+        void submitVerificationCode(Context context, String phone, String verificationCode);
 
         void login(Context context, String account, String password, String deviceId);
     }

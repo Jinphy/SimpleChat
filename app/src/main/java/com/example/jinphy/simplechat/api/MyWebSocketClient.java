@@ -97,6 +97,6 @@ public class MyWebSocketClient extends WebSocketClient implements Serializable{
     }
 
     interface OnError extends Serializable{
-        public void onError(Exception ex);
+        void onError(Exception ex);
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.api.Api;
+import com.example.jinphy.simplechat.api.Response;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.model.user.User;
@@ -18,15 +19,15 @@ public interface SignUpContract {
 
         void setText(TextView view, String text);
 
-        void getVerificationCodeOnNext(Api.Response response);
+        void getVerificationCodeOnNext(Response response);
 
-        void submitVerificationCodeOnNext(Api.Response response);
+        void submitVerificationCodeOnNext(Response response);
 
-        void findUserOnNext(Api.Response response);
+        void findUserOnNext(Response response);
 
-        void createNewUserOnNext(Api.Response response, long date);
+        void createNewUserOnNext(Response response, long date);
 
-        void loginOnNext(Api.Response response, User user);
+        void loginOnNext(Response response, User user);
 //
 //        void updateViewAfterSubmittingVerificationCode(Api.Response response);
 //

@@ -205,7 +205,7 @@ public class AnimUtils {
 
         /**
          * Builder创建器
-         * 调用该方法，如果没有调用 {@code setTarget(View)}来设置目标对象，需要为动画添加
+         * 调用该方法，如果没有调用 {@code setParentWidth(View)}来设置目标对象，需要为动画添加
          * 更新监听器{@code onUpdate(UpdateListener) } 手动设置动画的对应属性值，
          * 需要注意的是，更新监听器只对{@code setInt（int）}、
          * {@code setFloat(float)}\{@code setColor(int)} 函数所设置的值有限

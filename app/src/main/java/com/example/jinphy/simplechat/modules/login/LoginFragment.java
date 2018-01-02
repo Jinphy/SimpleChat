@@ -1,6 +1,5 @@
 package com.example.jinphy.simplechat.modules.login;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -8,8 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -18,7 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.api.Api.Response;
+import com.example.jinphy.simplechat.api.Response;
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
@@ -29,8 +26,7 @@ import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.DeviceUtils;
-import com.example.jinphy.simplechat.utils.Encrypt;
-import com.example.jinphy.simplechat.utils.PermissionUtils;
+import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -44,7 +40,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LoginFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * create an app of this fragment.
  */
 public class LoginFragment extends BaseFragment<LoginPresenter> implements LoginContract.View{
 
@@ -72,10 +68,10 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
     }
 
     /**
-     * Use this factory method to create a new instance of
+     * Use this factory method to create a new app of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment LoginFragment.
+     * @return A new app of fragment LoginFragment.
      */
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
@@ -139,7 +135,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         rememberPasswordView.setOnClickListener(this::onClick);
 
         TextInputEditText editText = accountLayout.findViewById(R.id.account_text);
-        editText.addTextChangedListener((TextListener) editable -> {
+        editText.addTextChangedListener((TextListener.After) editable -> {
             String text = editable.toString();
             LoginFragment.this.checkAccount(text, text.length());
         });
@@ -192,7 +188,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         getVerificationCodeButton.setEnabled(false);
 
         // 在获取验证码之前要先判断当前账号是否存在
-        presenter.findUser(getContext(),account,"正在获取验证码，请稍等！","getVerificationCode");
+        presenter.findUser(getContext(),account,"getVerificationCode");
     }
 
     /**
@@ -227,7 +223,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
             return;
         }
         // 登陆前先查询账号是否存在
-        presenter.findUser(getContext(), account, "正在登录，请稍等……","doLoginByPassword");
+        presenter.findUser(getContext(), account, "doLoginByPassword");
 
     }
 
@@ -239,7 +235,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         String account = getAccount();
         String code = getCode();
         if (StringUtils.equal(account, verifiedAccount)) {
-            presenter.submitVerificationCode(getContext(),account,code,"正在登录，请稍等……");
+            presenter.submitVerificationCode(getContext(),account,code);
         } else {
             BaseApplication.showToast("请先验证账号！", false);
         }
@@ -283,7 +279,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
                     break;
                 }
                 // 查询用户成功
-                presenter.login(getContext(), getAccount(), Encrypt.md5(getPassword()), getDeviceId());
+                presenter.login(getContext(), getAccount(), EncryptUtils.md5(getPassword()), getDeviceId());
             default:
                 break;
 
@@ -319,7 +315,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         verifiedAccount = account;
         // 倒计时获取验证码按钮
         String origin = getVerificationCodeButton.getText().toString();
-        String text = BaseApplication.instance().getString(R.string.re_get);
+        String text = BaseApplication.app().getString(R.string.re_get);
         Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
                 .map(value -> text.replace(" ", (60 - value) + ""))
                 .subscribeOn(Schedulers.newThread())
@@ -435,7 +431,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
      * Created by Jinphy, on 2017/12/6, at 15:51
      */
     public String getDeviceId() {
-        return Encrypt.md5(DeviceUtils.devceId());
+        return EncryptUtils.md5(DeviceUtils.devceId());
     }
 
     @Override

@@ -50,7 +50,7 @@
             android:layout_marginTop="5dp"
             android:textSize="15sp"
             android:maxLines="1"
-            android:text="the last message"/>
+            android:text="the last title"/>
 
         <TextView
             android:id="@+id/time"

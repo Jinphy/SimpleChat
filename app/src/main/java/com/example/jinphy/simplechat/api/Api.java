@@ -2,6 +2,9 @@ package com.example.jinphy.simplechat.api;
 
 import android.content.Context;
 
+import com.example.jinphy.simplechat.annotations.Get;
+import com.example.jinphy.simplechat.annotations.Post;
+
 import org.java_websocket.WebSocket;
 
 /**
@@ -12,20 +15,59 @@ import org.java_websocket.WebSocket;
 
 public abstract class Api {
 
+    // 宿舍WiFi
+    //    public static String BASE_URL = "ws://192.168.0.3";
+    //    成和WiFi
+    //    public static String BASE_URL = "ws://192.168.3.21";
+    //    我的手机WiFi
+        public static String BASE_URL = "ws://192.168.43.224";
+    //    公司WiFi
+    //    public static String BASE_URL = "ws://172.16.11.134";
+    // jysb3 wifi
+//    public static String BASE_URL = "ws://192.168.1.200";
+
+    /**
+     * DESC: 推送通道端口
+     * Created by jinphy, on 2017/12/4, at 21:33
+     */
+    public static String PUSH_PORT = "4540";
+
+    /**
+     * DESC: 发送信息通道端口
+     * Created by jinphy, on 2017/12/4, at 21:33
+     */
+    public static String SEND_PORT = "4541";
+
+    /**
+     * DESC: 普通网络请求端口
+     * Created by jinphy, on 2017/12/4, at 21:34
+     */
+    public static String COMMON_PORT = "4542";
+
     //===================工厂方法==========================================================
     /**
      * DESC: 创建一个通用网络请求API
      * Created by Jinphy, on 2017/12/6, at 13:03
      */
-    public static ApiInterface common(Context context) {
+    public static<U> ApiInterface<Response<U>> common(Context context) {
         return CommonApi.create(context);
     }
+
+    /**
+     * DESC: 创建一个合并网络请求Api
+     * Created by Jinphy, on 2017/12/6, at 13:03
+     */
+    public static<U> ApiInterface<Response<U>[]> zipper(Context context) {
+        return ZipApi.create(context);
+    }
+
+
 
     /**
      * DESC: 创建一个短信接口API
      * Created by Jinphy, on 2017/12/6, at 13:05
      */
-    public static ApiInterface sms(Context context) {
+    public static ApiInterface<Response<String>> sms(Context context) {
         return SMSSDKApi.create(context);
     }
 
@@ -36,10 +78,16 @@ public abstract class Api {
      * Created by jinphy, on 2017/12/4, at 21:38
      */
     public interface Path {
+
+        @Post
         String login = "/user/login";
+        @Get
         String findUser = "/user/findUser";
+        @Post
         String createNewUser = "/user/createNewUser";
+        @Get
         String getVerificationCode = "sms/getVerificationCode";
+        @Get
         String submitVerificationCode = "sms/submitVerificationCode";
     }
 
@@ -60,96 +108,7 @@ public abstract class Api {
 
 
     //===================请求结果==========================================================
-    /**
-     * DESC: 网络请求结果类
-     * Created by Jinphy, on 2017/12/6, at 13:06
-     */
-    public static class Response {
-        public static String YES = "1";// 成功状态码
-        public static String NO = "0";//  失败状态码
-//        返回状态码
-        private String code;
-//        返回信息
-        private String msg;
-//        返回数据
-        private String data;
-
-        public Response() {
-
-        }
-
-        public Response(String code, String msg, String data) {
-            this.code = code;
-            this.msg = msg;
-            this.data = data;
-        }
-
-        public String getCode() {
-            return code;
-        }
-
-        public void setCode(String code) {
-            this.code = code;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-
-        public void setMsg(String msg) {
-            this.msg = msg;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public void setData(String data) {
-            this.data = data;
-        }
-    }
 
 
     //===================网络回调==========================================================
-
-    /**
-     * DESC: 请求成功回调
-     * Created by jinphy, on 2017/12/4, at 21:56
-     */
-    public interface OnNext {
-        void call(Response response);
-    }
-
-    /**
-     * DESC: 请求异常回调
-     * Created by jinphy, on 2017/12/4, at 21:56
-     */
-    public interface OnError {
-        void call(Exception e);
-    }
-
-    /**
-     * DESC: 连接打开时回调
-     * Created by jinphy, on 2017/12/4, at 21:56
-     */
-    public interface OnOpen {
-        void call(WebSocket webSocket);
-    }
-
-    /**
-     * DESC: 连接打开时回调
-     * Created by jinphy, on 2017/12/4, at 23:24
-     */
-    public interface OnStart {
-        void call();
-    }
-
-    /**
-     * DESC: 请求结束时回调
-     * Created by jinphy, on 2017/12/4, at 21:57
-     */
-    public interface OnClose {
-        void call();
-    }
-
 }

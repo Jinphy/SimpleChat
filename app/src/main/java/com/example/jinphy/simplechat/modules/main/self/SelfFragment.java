@@ -29,7 +29,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SelfFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * create an app of this fragment.
  */
 public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfContract.View {
 
@@ -51,10 +51,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     }
 
     /**
-     * Use this factory method to create a new instance of
+     * Use this factory method to create a new app of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment FriendsFragment.
+     * @return A new app of fragment FriendsFragment.
      */
     public static SelfFragment newInstance() {
         SelfFragment fragment = new SelfFragment();

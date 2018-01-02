@@ -1,28 +1,20 @@
 package com.example.jinphy.simplechat.modules.welcome;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.StackingBehavior;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.application.DBApplication;
+import com.example.jinphy.simplechat.api.Api;
 import com.example.jinphy.simplechat.base.BaseActivity;
-import com.example.jinphy.simplechat.base.BaseApplication;
-import com.example.jinphy.simplechat.utils.PermissionUtils;
+import com.example.jinphy.simplechat.custom_view.LoadingDialog;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import java.util.List;
+import java.lang.reflect.Field;
 
-import io.objectbox.Box;
-import io.objectbox.BoxStore;
-import io.objectbox.query.Query;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 public class WelcomeActivity extends BaseActivity {
 
@@ -36,8 +28,6 @@ public class WelcomeActivity extends BaseActivity {
 
         WelcomeFragment returnFragment = (WelcomeFragment) addFragment(fragment, R.id.fragment);
         getPresenter(returnFragment);
-
-
     }
 
     @Override

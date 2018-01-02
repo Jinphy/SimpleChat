@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.modules.signup;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -8,7 +9,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +17,10 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.api.Api;
+import com.example.jinphy.simplechat.api.Response;
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
 import com.example.jinphy.simplechat.custom_view.CustomVerticalStepperFormLayout;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
 import com.example.jinphy.simplechat.model.event_bus.EBFinishActivityMsg;
@@ -28,14 +29,13 @@ import com.example.jinphy.simplechat.modules.login.LoginActivity;
 import com.example.jinphy.simplechat.modules.main.MainActivity;
 import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;
 import com.example.jinphy.simplechat.utils.DeviceUtils;
-import com.example.jinphy.simplechat.utils.Encrypt;
+import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
@@ -47,7 +47,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SignUpFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * create an app of this fragment.
  */
 public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         SignUpContract.View, VerticalStepperForm {
@@ -88,10 +88,10 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     }
 
     /**
-     * Use this factory method to create a new instance of
+     * Use this factory method to create a new app of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment SignUpFragment.
+     * @return A new app of fragment SignUpFragment.
      */
     public static SignUpFragment newInstance() {
         SignUpFragment fragment = new SignUpFragment();
@@ -206,8 +206,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     @Override
     public boolean onBackPressed() {
         finishActivity();
-        getActivity().overridePendingTransition(R.anim.in_main_activity, R.anim
-                .out_welcome_activity);
+        getActivity().overridePendingTransition(R.anim.in_main_activity, R.anim.out_welcome_activity);
         return false;
     }
 
@@ -347,10 +346,8 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 break;
             default:
                 nextStepButton.setOnClickListener(v -> {
-                    BaseApplication.showToast("正在注册......", true);
                     String date = System.currentTimeMillis() + "";
-                    presenter.createNewUser(getContext(), verifiedPhone, Encrypt.md5(password),
-                            date);
+                    presenter.createNewUser(getContext(), verifiedPhone, EncryptUtils.md5(password),date);
                 });
                 break;
         }
@@ -418,28 +415,25 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     }
 
     //    创建输入框的输入监听事件
-    private TextListener createTextWatcher(@StringRes int hintId) {
-        return new TextListener() {
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String text = editable.toString();
-                int length = editable.length();
-                switch (hintId) {
-                    case R.string.hint_account:
-                        checkAccount(text, length);
-                        break;
-                    case R.string.hint_verification_code:
-                        checkVerificationCode(text, length);
-                        break;
-                    case R.string.hint_password:
-                        checkPassword(text, length);
-                        break;
-                    case R.string.hint_confirm_password:
-                        checkConfirmPassword(text, length);
-                        break;
-                    default:
-                        break;
-                }
+    private TextListener.After createTextWatcher(@StringRes int hintId) {
+        return editable -> {
+            String text = editable.toString();
+            int length = editable.length();
+            switch (hintId) {
+                case R.string.hint_account:
+                    checkAccount(text, length);
+                    break;
+                case R.string.hint_verification_code:
+                    checkVerificationCode(text, length);
+                    break;
+                case R.string.hint_password:
+                    checkPassword(text, length);
+                    break;
+                case R.string.hint_confirm_password:
+                    checkConfirmPassword(text, length);
+                    break;
+                default:
+                    break;
             }
         };
 
@@ -513,16 +507,16 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         view.setEnabled(false);
         TextInputEditText editText = accountView.findViewById(R.id.input_text);
         String phone = editText.getText().toString();
-        presenter.getVerificationCode(getContext(),phone);
+        presenter.getVerificationCode(getContext(), phone);
     }
 
     //------------mvp中View的函数----------------------------------------
 
 
     @Override
-    public void getVerificationCodeOnNext(Api.Response response) {
+    public void getVerificationCodeOnNext(Response response) {
         BaseApplication.showToast(response.getMsg(), false);
-        if (Api.Response.YES.equals(response.getCode())) {
+        if (Response.YES.equals(response.getCode())) {
             TextInputEditText editText = accountView.findViewById(R.id.input_text);
             verifiedPhone = editText.getText().toString();
             hasVerified = false;
@@ -530,7 +524,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
             TextView view = verificationCodeView.findViewById(R.id.verification_code_button);
 
             String origin = view.getText().toString();
-            String text = BaseApplication.instance().getString(R.string.re_get);
+            String text = BaseApplication.app().getString(R.string.re_get);
 
             Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
                     .map(value -> text.replace(" ", (60 - value) + ""))
@@ -541,7 +535,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                         view.setEnabled(true);
                         view.setText(origin);
                     }).subscribe();
-        }else {
+        } else {
             verifiedPhone = null;
             hasGetVerificationCode = false;
             hasVerified = false;
@@ -551,9 +545,9 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     }
 
     @Override
-    public void submitVerificationCodeOnNext(Api.Response response) {
+    public void submitVerificationCodeOnNext(Response response) {
         BaseApplication.showToast(response.getMsg(), false);
-        if (Api.Response.YES.equals(response.getCode())) {
+        if (Response.YES.equals(response.getCode())) {
             hasVerified = true;
             //        verticalStepperForm.next(STEP_VERIFICATION_CODE);
             verticalStepperForm.goToNextStep();
@@ -563,8 +557,8 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     }
 
     @Override
-    public void findUserOnNext(Api.Response response) {
-        if (Api.Response.YES.equals(response.getCode())) {
+    public void findUserOnNext(Response response) {
+        if (Response.YES.equals(response.getCode())) {
             BaseApplication.showToast("该账号已被注册过，可直接登录！", false);
             return;
         }
@@ -572,9 +566,8 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     }
 
     @Override
-    public void createNewUserOnNext(Api.Response response, long date) {
-        BaseApplication.showToast(response.getMsg(), false);
-        if (Api.Response.YES.equals(response.getCode())) {
+    public void createNewUserOnNext(Response response, long date) {
+        if (Response.YES.equals(response.getCode())) {
             User user = presenter.saveUser(verifiedPhone, password, date);
             new MaterialDialog.Builder(getContext())
                     .title("注册成功")
@@ -586,7 +579,17 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                     .negativeColorRes(R.color.half_alpha_gray)
                     .positiveColorRes(R.color.color_red_D50000)
                     .cancelable(false)
-                    .onPositive((dialog, which) -> presenter.login(getContext(),user, Encrypt.md5(DeviceUtils.devceId())))
+                    .onPositive((dialog, which) -> {
+                        RuntimePermission.getInstance(getActivity())
+                                .permission(Manifest.permission.READ_PHONE_STATE)
+                                .onGranted(()->{
+                                    presenter.login(
+                                            getContext(),
+                                            user,
+                                            EncryptUtils.md5(DeviceUtils.devceId()));
+                                })
+                                .execute();
+                    })
                     .onNegative((dialog, which) -> finishActivity())
                     .show();
 
@@ -594,9 +597,9 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     }
 
     @Override
-    public void loginOnNext(Api.Response response, User user) {
+    public void loginOnNext(Response response, User user) {
         BaseApplication.showToast(response.getMsg(), false);
-        if (Api.Response.YES.equals(response.getCode())) {
+        if (Response.YES.equals(response.getCode())) {
             MainActivity.start(getActivity(), user, true);
             EventBus.getDefault().post(new EBFinishActivityMsg(WelcomeActivity.class));
             EventBus.getDefault().post(new EBFinishActivityMsg(LoginActivity.class));
@@ -608,150 +611,4 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     public synchronized void setText(TextView view, String text) {
         view.setText(text);
     }
-
-//
-//    @Override
-//    public void updateViewAfterSubmittingVerificationCode(Api.Response response) {
-//        Flowable.just(response)
-//                .map(value -> value.message)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .doOnNext(message -> {
-//                    if (Response.yes.equals(message)) {
-//                        hasVerified = true;
-//                        //        verticalStepperForm.next(STEP_VERIFICATION_CODE);
-//                        verticalStepperForm.goToNextStep();
-//                    } else {
-//                        hasVerified = false;
-//                    }
-//                })
-//                .subscribe();
-//    }
-//
-//    @Override
-//    public void updateViewAfterGettingVerificationCode(Api.Response response) {
-//        Flowable.just(response.message)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .doOnNext(message -> {
-//                    if (Response.yes.equals(message)) {
-//                        TextInputEditText editText = accountView.findViewById(R.id.input_text);
-//                        verifiedPhone = editText.getText().toString();
-//                        hasVerified = false;
-//                        hasGetVerificationCode = true;
-//                        TextView view = verificationCodeView.findViewById(R.id
-//                                .verification_code_button);
-//
-//                        String origin = view.getText().toString();
-//                        String text = BaseApplication.instance().getString(R.string.re_get);
-//
-//
-//                        Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
-//                                .map(value -> {
-//                                    value = 60 - value;
-//                                    return text.replace(" ", value + "");
-//                                })
-//                                .subscribeOn(Schedulers.newThread())
-//                                .observeOn(AndroidSchedulers.mainThread())
-//                                .doOnNext(value -> view.setText(value))
-//                                .doOnComplete(() -> {
-//                                    view.setEnabled(true);
-//                                    view.setText(origin);
-//                                }).subscribe();
-//
-//                    } else {
-//                        verifiedPhone = null;
-//                        hasGetVerificationCode = false;
-//                        hasVerified = false;
-//                        verificationCodeView.findViewById(R.id.verification_code_button)
-//                                .setEnabled(true);
-//                    }
-//                })
-//                .subscribe();
-//
-//    }
-//
-//    @Override
-//    public void updateViewAfterCreateNewUser(Api.Response response, long date) {
-//        Flowable.just(response)
-//                .map(value -> value.message)
-//                .map(message -> {
-//                    if (Response.yes.equals(message)) {
-//                        User user = presenter.saveUser(
-//                                verifiedPhone,
-//                                password,
-//                                date);
-//                        return user;
-//                    }
-//                    return Response.no;
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .doOnNext((Serializable user) -> {
-//                    if (user instanceof User) {
-//                        User newUser = (User) user;
-//                        new MaterialDialog.Builder(getContext())
-//                                .title("注册成功")
-//                                .iconRes(R.drawable.ic_smile_red_24dp)
-//                                .content("恭喜你成功注册账号，是否立即登录？")
-//                                .positiveText("马上登录")
-//                                .negativeText("不了不了")
-//                                .titleColorRes(R.color.color_red_D50000)
-//                                .negativeColorRes(R.color.half_alpha_gray)
-//                                .positiveColorRes(R.color.color_red_D50000)
-//                                .cancelable(false)
-//                                .onPositive((dialog, which) -> {
-//                                    // TODO: 2017/11/7 执行登录操作
-//                                    presenter.login(
-//                                            newUser.getAccount(),
-//                                            "null",
-//                                            Encrypt.md5(DeviceUtils.devceId()),
-//                                            loginResponse -> {
-//                                                handleResponse(
-//                                                        loginResponse,
-//                                                        "登陆成功！",
-//                                                        "登录失败！",
-//                                                        "服务器错误，请稍后再试！",
-//                                                        false
-//                                                );
-//                                                if (Response.yes.equals(loginResponse.message)) {
-//                                                    MainActivity.start(getActivity(), newUser,
-//                                                            true);
-//                                                    EventBus.getDefault().post(new
-//                                                            EBFinishActivityMsg(WelcomeActivity
-//                                                            .class));
-//                                                    EventBus.getDefault().post(new
-//                                                            EBFinishActivityMsg(LoginActivity
-//                                                            .class));
-//                                                }
-//                                                finishActivity();
-//                                            });
-//
-//                                })
-//                                .onNegative((dialog, which) -> finishActivity())
-//                                .show();
-//                    }
-//                })
-//                .subscribe();
-//
-//
-//    }
-//
-//
-//    @Override
-//    public void updateViewAfterFindUser(Api.Response response) {
-//        Flowable.just(response)
-//                .map(value -> value.message)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .doOnNext(message -> {
-//                    if (Response.yes.equals(message)) {
-//                        // do nothing
-//                    } else if (Response.no.equals(message)) {
-//                        verticalStepperForm.next(STEP_ACCOUNT);
-//                    } else {
-//                        // do nothing
-//                    }
-//                })
-//                .subscribe();
-//    }
-
-
 }

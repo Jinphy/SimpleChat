@@ -1,17 +1,10 @@
 package com.example.jinphy.simplechat.model.user;
 
-import android.content.Context;
-
 import com.example.jinphy.simplechat.application.DBApplication;
-import com.example.jinphy.simplechat.model.user.User;
-import com.example.jinphy.simplechat.model.user.UserDataSource;
 
-import io.objectbox.Box;
 import io.objectbox.BoxStore;
-import io.objectbox.rx.RxBoxStore;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -45,7 +38,7 @@ public class LocalUserDataSource implements UserDataSource {
         if (boxStore != null) {
             return boxStore;
         }
-        boxStore =  ((DBApplication) DBApplication.instance()).getBoxStore();
+        boxStore =  ((DBApplication) DBApplication.app()).getBoxStore();
         return boxStore;
     }
 

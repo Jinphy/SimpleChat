@@ -25,7 +25,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
 
     public SignUpPresenter(@NonNull SignUpContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-        this.networkManager = ((DBApplication) DBApplication.instance()).getNetworkManager();
+        this.networkManager = ((DBApplication) DBApplication.app()).getNetworkManager();
         this.userRepository = UserRepository.getInstance();
     }
 
@@ -50,9 +50,10 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     public void getVerificationCode(Context context, String phone) {
         Api.sms(context)
                 .param(Api.Key.phone, phone)
+                .hint("正在获取...")
                 .showProgress()
                 .path(Api.Path.getVerificationCode)
-                .onNext(view::getVerificationCodeOnNext)
+                .onResponseYes(view::getVerificationCodeOnNext)
                 .request();
     }
 
@@ -62,9 +63,10 @@ public class SignUpPresenter implements SignUpContract.Presenter {
         Api.sms(context)
                 .param(Api.Key.phone, phone)
                 .param(Api.Key.verificationCode, verificationCode)
+                .hint("验证中...")
                 .showProgress()
                 .path(Api.Path.submitVerificationCode)
-                .onNext(view::submitVerificationCodeOnNext)
+                .onResponseYes(view::submitVerificationCodeOnNext)
                 .request();
     }
 
@@ -74,7 +76,9 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                 .param(Api.Key.account, account)
                 .showProgress()
                 .path(Api.Path.findUser)
-                .onNext(view::findUserOnNext)
+                .autoShowNo(false)
+                .onResponseYes(response -> BaseApplication.showToast(response.getMsg(), false))
+                .onResponseNo(view::findUserOnNext)
                 .request();
     }
 
@@ -84,10 +88,10 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                 .param(Api.Key.account, account)
                 .param(Api.Key.password, password)
                 .param(Api.Key.date, date)
+                .hint("正在注册...")
                 .showProgress()
                 .path(Api.Path.createNewUser)
-                .onStart(() -> BaseApplication.showToast("正在注册......", true))
-                .onNext(response -> view.createNewUserOnNext(response, Long.valueOf(date)))
+                .onResponseYes(response -> view.createNewUserOnNext(response, Long.valueOf(date)))
                 .request();
 
     }
@@ -109,9 +113,10 @@ public class SignUpPresenter implements SignUpContract.Presenter {
         Api.common(context)
                 .param(Api.Key.account, user.getAccount())
                 .param(Api.Key.password, "null")
+                .hint("正在登录...")
                 .showProgress()
                 .path(Api.Path.login)
-                .onNext(response -> view.loginOnNext(response,user))
+                .onResponseYes(response -> view.loginOnNext(response,user))
                 .request();
     }
 

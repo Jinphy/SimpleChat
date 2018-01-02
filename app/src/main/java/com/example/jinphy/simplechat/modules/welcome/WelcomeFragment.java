@@ -29,7 +29,7 @@ import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link WelcomeFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * create an app of this fragment.
  */
 public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements WelcomeContract.View {
 
@@ -51,10 +51,10 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
     }
 
     /**
-     * Use this factory method to create a new instance of
+     * Use this factory method to create a new app of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment WelcomeFragment.
+     * @return A new app of fragment WelcomeFragment.
      */
     public static WelcomeFragment newInstance() {
         WelcomeFragment fragment = new WelcomeFragment();

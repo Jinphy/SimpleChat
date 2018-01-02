@@ -1,20 +1,20 @@
 package com.example.jinphy.simplechat.base;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
-import android.support.design.widget.Snackbar;
+import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.model.event_bus.EBActivity;
+import com.example.jinphy.simplechat.utils.AppUtils;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.mob.MobSDK;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 
 import io.reactivex.annotations.NonNull;
 
@@ -23,18 +23,30 @@ import io.reactivex.annotations.NonNull;
  * Created by jinphy on 2017/8/18.
  */
 
-public class BaseApplication extends Application {
+@SuppressLint("Registered")
+public class BaseApplication extends Application implements Application.ActivityLifecycleCallbacks {
 
     private static final String TAG = "BaseApplication";
 
     private static BaseApplication INSTANCE;
     private static Toast toast;
     private static boolean DEBUG = true;
-    private static SoftReference<Activity> currentActivity;
+    private static WeakReference<Activity> currentActivity=null;
 
 
-    public static BaseApplication instance(){
+    public static BaseApplication app(){
         return INSTANCE;
+    }
+
+
+    /**
+     * 获取当前正在前台的Activity
+     * */
+    public static BaseActivity activity(){
+        if (ObjectHelper.reference(currentActivity)) {
+            return (BaseActivity) currentActivity.get();
+        }
+        return null;
     }
 
     @Override
@@ -42,45 +54,40 @@ public class BaseApplication extends Application {
         super.onCreate();
         INSTANCE = this;
         initToast();
-        EventBus.getDefault().register(this);
+        registerActivityLifecycleCallbacks(this);
+//        EventBus.getDefault().register(this);
         String appKey = getString(R.string.app_key);
         String appSecret = getString(R.string.app_secret);
         MobSDK.init(this, appKey, appSecret);
+        LogUtils.getLogConfig()
+                .configAllowLog(AppUtils.debug())
+                .configTagPrefix("Jinphy");
     }
 
-    @Subscribe(priority = 100, threadMode = ThreadMode.BACKGROUND)
-    public synchronized void onActivityResumed(EBActivity event) {
-        if (!event.resume) {
-            return;
-        }
-        if (currentActivity == null || currentActivity.get() != event.activity) {
-            currentActivity = new SoftReference<>(event.activity);
-        }
-        BaseApplication.e(TAG, "onActivityResumed: resumed activity = "+
-                event.activity.getClass().getSimpleName());
-    }
+//    @Subscribe(priority = 100, threadMode = ThreadMode.BACKGROUND)
+//    public synchronized void onActivityResumed(EBActivity event) {
+//        if (!event.resume) {
+//            return;
+//        }
+//        if (currentActivity == null || currentActivity.get() != event.activity) {
+//            currentActivity = new WeakReference<Activity>(event.activity);
+//        }
+//        BaseApplication.e(TAG, "onActivityResumed: resumed activity = "+
+//                event.activity.getClass().getSimpleName());
+//    }
 
-    @Subscribe(priority = 100, threadMode = ThreadMode.BACKGROUND)
-    public synchronized void onActivityPaused(EBActivity event) {
-        if (event.resume) {
-            return;
-        }
-        if (currentActivity != null && currentActivity.get() == event.activity) {
-            currentActivity = null;
-        }
-        BaseApplication.e(TAG, "onActivityResumed: paused activity = "+
-                event.activity.getClass().getSimpleName());
-    }
+//    @Subscribe(priority = 100, threadMode = ThreadMode.BACKGROUND)
+//    public synchronized void onActivityPaused(EBActivity event) {
+//        if (event.resume) {
+//            return;
+//        }
+//        if (currentActivity != null && currentActivity.get() == event.activity) {
+//            currentActivity = null;
+//        }
+//        BaseApplication.e(TAG, "onActivityResumed: paused activity = "+
+//                event.activity.getClass().getSimpleName());
+//    }
 
-    /**
-     * 获取当前正在前台的Activity
-     * */
-    public static Activity currentActivity() {
-        if (currentActivity != null) {
-            return currentActivity.get();
-        }
-        return null;
-    }
 
 
     public static void showToast(@NonNull  Object msg, boolean isLong){
@@ -121,7 +128,7 @@ public class BaseApplication extends Application {
     /**
      * log日志，等级为I
      * */
-    public static   void i(String tag, @NonNull Object msg) {
+    public static void i(String tag, @NonNull Object msg) {
         if (DEBUG) {
             Log.i(tag, msg.toString());
         }
@@ -147,9 +154,43 @@ public class BaseApplication extends Application {
 
     //------------private--------------------------------
 
+    @SuppressLint("ShowToast")
     private static void initToast() {
 
         toast = Toast.makeText(INSTANCE, "", Toast.LENGTH_SHORT);
     }
 
+    @Override
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+        currentActivity = new WeakReference<>(activity);
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+
+    }
 }

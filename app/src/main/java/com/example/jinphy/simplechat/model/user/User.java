@@ -33,6 +33,19 @@ public class User implements Serializable{
 
     protected String status;
 
+    /**
+     * DESC：由三部分组成
+     *  1、设备id：  IMEI
+     *  2、账号：    account
+     *  3、登录时间： 登录时生成(time)，时间由System.currentTimeMillis() 获取
+     *
+     *  把上面三部分拼接成一个字符串，格式为： IMEI&account&time
+     *  然后在经过编码加密生成最终的accessToken，该字段有后台生成，在每次执行登录操作时更新
+     *
+     * Created by jinphy, on 2018/1/2, at 19:52
+     */
+    protected String accessToken;
+
     public ToMany<Friend> friends;
 
     public User(){}
@@ -107,5 +120,13 @@ public class User implements Serializable{
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 }

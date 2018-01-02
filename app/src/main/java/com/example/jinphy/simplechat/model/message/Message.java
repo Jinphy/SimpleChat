@@ -61,7 +61,7 @@ public class Message {
     public void setSourceType(@IntRange(from = TYPE_SEND, to = TYPE_RECEIVE) int sourceType) {
         if (!MathUtils.within(sourceType,TYPE_SEND,TYPE_RECEIVE)) {
             throw new IllegalArgumentException(
-                    "the message sourceType is neither Message.TYPE_SEND or TYPE_RECEIVE");
+                    "the title sourceType is neither Message.TYPE_SEND or TYPE_RECEIVE");
         }
         this.sourceType = sourceType;
     }
@@ -73,7 +73,7 @@ public class Message {
     public void setContentType(@IntRange(from = TYPE_TEXT, to = TYPE_FILE) int contentType) {
         if (!MathUtils.within(contentType,TYPE_TEXT,TYPE_FILE)) {
             throw new IllegalArgumentException(
-                    "the message sourceType must be Message.TYPE_TEXT etc.");
+                    "the title sourceType must be Message.TYPE_TEXT etc.");
         }
         this.contentType = contentType;
     }

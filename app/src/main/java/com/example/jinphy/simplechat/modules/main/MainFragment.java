@@ -47,7 +47,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MainFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * create an app of this fragment.
  */
 public class MainFragment extends BaseFragment<MainPresenter> implements MainContract.View {
 
@@ -90,10 +90,10 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     }
 
     /**
-     * Use this factory method to create a new instance of
+     * Use this factory method to create a new app of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment MainFragment.
+     * @return A new app of fragment MainFragment.
      */
     public static MainFragment newInstance() throws Exception{
         Thread.sleep(1000);

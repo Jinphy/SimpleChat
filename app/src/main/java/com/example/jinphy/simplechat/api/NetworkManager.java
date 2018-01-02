@@ -1,14 +1,10 @@
 package com.example.jinphy.simplechat.api;
 
-import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URISyntaxException;
-import java.util.HashMap;
-
-import io.reactivex.annotations.NonNull;
 
 
 /**
@@ -23,6 +19,7 @@ public class NetworkManager {
     public static final String HOST = "ws://192.168.3.21";
 //    我的手机WiFi
 //    public static final String HOST = "ws://192.168.43.224";
+
     public static final String PUSH_PORT = "4540";
     public static final String SEND_PORT = "4541";
     public static final String COMMON_PORT = "4542";
@@ -87,8 +84,8 @@ public class NetworkManager {
             String findUserURI =
                     StringUtils.generateURI(HOST, COMMON_PORT, "/user/findUser", params);
             MyWebSocketClient client = MyWebSocketClient.newInstance(findUserURI);
-            client.doOnMessage(message -> {
-                callback.accept(new Response(message));
+            client.doOnMessage(title -> {
+                callback.accept(new Response(title));
                 client.close();
             })
                     .doOnError(ex -> {
@@ -115,8 +112,8 @@ public class NetworkManager {
                     .generateURI(HOST, COMMON_PORT, "/user/createNewUser", params);
 
             MyWebSocketClient client = MyWebSocketClient.newInstance(createNewUserUri);
-            client.doOnMessage(message -> {
-                callback.accept(new Response(message));
+            client.doOnMessage(title -> {
+                callback.accept(new Response(title));
                 client.close();
             })
                     .doOnError(ex -> {
@@ -141,9 +138,9 @@ public class NetworkManager {
             String createNewUserUri = StringUtils
                     .generateURI(HOST, COMMON_PORT, "/user/login", params);
             MyWebSocketClient client = MyWebSocketClient.newInstance(createNewUserUri);
-            client.doOnMessage(message -> {
-                BaseApplication.e(TAG, "login: message = "+message);
-                callback.accept(new Response(message));
+            client.doOnMessage(title -> {
+                BaseApplication.e(TAG, "login: title = "+title);
+                callback.accept(new Response(title));
                 client.close();
             })
                     .doOnError(ex -> {

@@ -42,7 +42,7 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
                 break;
             default:
                 throw new IllegalArgumentException(
-                        "the resourceType of message item is illegal,sourceType="+
+                        "the resourceType of title item is illegal,sourceType="+
                 Message.parseSourceType(viewType));
         }
 
@@ -77,7 +77,7 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
                 break;
             default:
                 throw new IllegalArgumentException(
-                        "the contentType of message item is illegal,contentType="+
+                        "the contentType of title item is illegal,contentType="+
                                 Message.parseContentType(holder.type));
         }
     }
@@ -102,7 +102,7 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
     private void bindTextMsgView(ViewHolder holder, Message message) {
         holder.textMsg_content.setVisibility(View.VISIBLE);
         // TODO: 2017/8/13
-        //holder.textMsg_content.setText(message.getContent());
+        //holder.textMsg_content.setText(title.getContent());
 
     }
 

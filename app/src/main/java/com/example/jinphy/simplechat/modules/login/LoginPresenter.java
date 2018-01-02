@@ -40,13 +40,12 @@ public class LoginPresenter implements LoginContract.Presenter {
     }
 
     @Override
-    public void findUser(Context context, String account, String hint, String tag) {
+    public void findUser(Context context, String account, String tag) {
         Api.common(context)
                 .param(Api.Key.account, account)
                 .showProgress()
                 .path(Api.Path.findUser)
-                .onStart(()-> BaseApplication.showToast(hint, true))
-                .onNext(response -> view.findUserOnNext(response,tag))
+                .onResponseYes(response -> view.findUserOnNext(response,tag))
                 .request();
     }
 
@@ -54,34 +53,38 @@ public class LoginPresenter implements LoginContract.Presenter {
     public void getVerificationCode(Context context, String phone) {
         Api.sms(context)
                 .param(Api.Key.phone,phone)
+                .hint("正在获取...")
                 .showProgress()
                 .path(Api.Path.getVerificationCode)
-                .onNext(response -> view.getVerificationCodeOnNext(response, phone))
+                .onResponseYes(response -> view.getVerificationCodeOnNext(response, phone))
+                .onResponseNo(response -> BaseApplication.showToast(response.getMsg(),false))
                 .request();
     }
 
 
     @Override
-    public void submitVerificationCode(Context context, String phone, String verificationCode,String hint) {
+    public void submitVerificationCode(Context context, String phone, String verificationCode) {
         Api.sms(context)
                 .param(Api.Key.phone, phone)
                 .param(Api.Key.verificationCode, verificationCode)
+                .hint("验证中...")
                 .showProgress()
                 .path(Api.Path.submitVerificationCode)
-                .onStart(() -> BaseApplication.showToast(hint, true))
-                .onNext(response -> view.submitVerificationCodeOnNext(response))
+                .onResponseYes(response -> view.submitVerificationCodeOnNext(response))
+                .onResponseNo(response -> BaseApplication.showToast(response.getMsg(),false))
                 .request();
     }
 
     @Override
     public void login(Context context, String account, String password, String deviceId) {
-        Api.common(context)
+        Api.<String>common(context)
                 .param(Api.Key.account, account)
                 .param(Api.Key.password, password)
                 .param(Api.Key.deviceId, deviceId)
+                .hint("正在登录...")
                 .showProgress()
                 .path(Api.Path.login)
-                .onNext(response -> view.loginOnNext(response,account,password))
+                .onResponseYes(response -> view.loginOnNext(response,account,password))
                 .request();
 
     }

@@ -1,5 +1,7 @@
 package com.example.jinphy.simplechat.base;
 
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -267,5 +269,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (baseFragment.onBackPressed()) {
             super.onBackPressed();
         }
+    }
+
+
+    /**
+     * DESC: 重写该方法，是的界面显示的字体等属性不随系统配置变化而变化
+     * Created by Jinphy, on 2017/12/8, at 15:30
+     */
+    @Override
+    public Resources getResources() {
+        Resources res = super.getResources();
+        Configuration config = new Configuration();
+        config.setToDefaults();
+        res.updateConfiguration(config, res.getDisplayMetrics());
+        return res;
     }
 }
