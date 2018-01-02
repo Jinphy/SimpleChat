@@ -6,6 +6,8 @@ import com.example.jinphy.simplechat.custom_view.LoadingDialog;
 import com.example.jinphy.simplechat.utils.DialogUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 
+import java.lang.ref.WeakReference;
+
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 import io.reactivex.Flowable;
@@ -21,7 +23,7 @@ class SMSSDKApi implements ApiInterface<Response<String>> {
     private static final String TAG = "SMSSDKApi";
     private static String countryChina = "86";
 
-    private Context context;
+    private WeakReference<Context> context;
     private EventHandler eventHandler;
     protected ApiCallback.OnResponseYes<Response<String>> onResponseYes;
     protected ApiCallback.OnResponseNo<Response<String>> onResponseNo;
@@ -42,16 +44,15 @@ class SMSSDKApi implements ApiInterface<Response<String>> {
     }
 
     protected SMSSDKApi(Context context) {
-        this.context = context;
-        init();
+        this.context = new WeakReference<>(context);
+        init(context);
     }
 
-    protected void init(){
+    protected void init(Context context) {
         eventHandler = new EventHandler() {
             @Override
             public void afterEvent(int eventCode, int resultCode, Object data) {
                 unregister();
-                context = null;
                 Flowable.just(resultCode)
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnNext(SMSSDKApi.this::parseResponse)
@@ -78,8 +79,8 @@ class SMSSDKApi implements ApiInterface<Response<String>> {
             } else {
                 response = new Response<>(Response.NO, "验证失败，请输入正确的验证码！", "");
             }
-            if (autoShowNo) {
-                DialogUtils.showResponseNo(response, context);
+            if (autoShowNo&& ObjectHelper.reference(context)) {
+                DialogUtils.showResponseNo(response, context.get());
             }
             if (this.onResponseNo != null) {
                 this.onResponseNo.call(response);
@@ -150,7 +151,7 @@ class SMSSDKApi implements ApiInterface<Response<String>> {
             this.showProgress = false;
         } else {
             this.showProgress = true;
-            dialog = LoadingDialog.builder(context).title(hint).cancellable(false).build();
+            dialog = LoadingDialog.builder(context.get()).title(hint).cancellable(false).build();
         }
         return this;
     }

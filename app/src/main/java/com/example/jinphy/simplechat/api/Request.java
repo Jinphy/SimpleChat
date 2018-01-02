@@ -13,8 +13,10 @@ import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.google.gson.reflect.TypeToken;
 
+import org.java_websocket.WebSocketImpl;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
+import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.UnsupportedEncodingException;
@@ -41,6 +43,9 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Response<T>> {
+
+
+
 
     private ObservableEmitter<Response<T>> emitter;
     private Method method;
@@ -80,7 +85,9 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
                 .doOnSubscribe(disposable -> this.disposable = disposable)
                 .doOnNext(time->{
                     if (this.emitter != null && !this.emitter.isDisposed()) {
-                        this.close(500);
+                        emitter.onError(new ServerException("服务器无响应！"));
+                        emitter = null;
+                        this.close();
                     }
                 })
                 .subscribe();
@@ -110,13 +117,15 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
             }
             Type jsonType = new TypeToken<Response<T>>() {}.getType();
             try {
-                Thread.sleep(500);//为了能够在网络条件好的情况下显示对话框，延迟0.3毫秒再返回数据
+                Thread.sleep(102);//为了能够在网络条件好的情况下显示对话框，延迟0.3毫秒再返回数据
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             emitter.onNext(GsonUtils.toBean(message, jsonType));
+            emitter.onComplete();
+            emitter = null;
         }
-        this.close(200);
+        this.close();
     }
 
     /**
@@ -125,19 +134,9 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
      */
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        LogUtils.e("onClose");
+        LogUtils.e("onClose code = " + code+", msg = "+reason);
         if (emitter != null && !emitter.isDisposed()) {
-            switch (code) {
-                case 200:
-                    emitter.onComplete();
-                    break;
-                case 500:
-                    emitter.onError(new ServerException("服务器无响应！"));
-                    break;
-                default:
-                    emitter.onError(new ServerException("网络连接超时！"));
-                    break;
-            }
+            emitter.onError(new ServerException("网络连接超时！"));
             emitter = null;
         }
     }

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 
 import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.api.Response;
@@ -25,18 +26,20 @@ public class DialogUtils {
     public static void showResponseNo(Response responseNo, Context context) {
         int red = ContextCompat.getColor(context, R.color.color_red_D50000);
         CharSequence content = responseNo.getMsg();
+        SChain sChain = SChain.with(content).sizeRelative(0.85f);
         MaterialDialog.SingleButtonCallback onPositiveClick;
         switch (responseNo.getCode()) {
             case Response.NO_FIND_USER:
-                content = SChain.with(content).colorForText(red,2,13).make();
+                sChain.colorForText(red,2,13);
                 break;
             default:
                 break;
         }
         new MaterialDialog.Builder(context)
-                .title("错误")
+                .title(SChain.with("错误").sizeRelative(0.8f).make())
                 .iconRes(R.drawable.ic_cry_red_24dp)
-                .content(content)
+                .content(sChain.make())
+                .contentGravity(GravityEnum.CENTER)
                 .positiveText("确定")
                 .titleColorRes(R.color.color_red_D50000)
                 .positiveColorRes(R.color.color_red_D50000)

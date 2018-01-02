@@ -16,11 +16,11 @@ import org.java_websocket.WebSocket;
 public abstract class Api {
 
     // 宿舍WiFi
-    //    public static String BASE_URL = "ws://192.168.0.3";
+        public static String BASE_URL = "ws://192.168.0.3";
     //    成和WiFi
     //    public static String BASE_URL = "ws://192.168.3.21";
     //    我的手机WiFi
-        public static String BASE_URL = "ws://192.168.43.224";
+//        public static String BASE_URL = "ws://192.168.43.224";
     //    公司WiFi
     //    public static String BASE_URL = "ws://172.16.11.134";
     // jysb3 wifi
