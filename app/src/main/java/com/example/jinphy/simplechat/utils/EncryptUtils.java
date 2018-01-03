@@ -5,6 +5,8 @@ import android.support.annotation.IntRange;
 import com.example.jinphy.simplechat.constants.StringConst;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -152,6 +154,41 @@ public class EncryptUtils {
     }
 
 
+    /**
+     * DESC: 先编码再用AES加密
+     * Created by jinphy, on 2018/1/3, at 10:48
+     */
+    public static String encodeThenEncrypt(String value) {
+        String out = value;
+        try {
+            // 编码
+            out = URLEncoder.encode(out, UTF_8);
+            // 加密
+            out = EncryptUtils.aesEncrypt(out);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            out = value;// 有异常则返回原字符串
+        }
+        return out;
+    }
+
+    /**
+     * DESC: 先用AES解密再反编码
+     * Created by jinphy, on 2018/1/3, at 10:48
+     */
+    public static String decryptThenDecode(String value) {
+        String out = value;
+        try {
+            // 解密
+            out = EncryptUtils.aesDecrypt(out);
+            // 反编码
+            out = URLDecoder.decode(out, UTF_8);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            out = value;// 有异常则返回原字符串
+        }
+        return out;
+    }
 
 
 

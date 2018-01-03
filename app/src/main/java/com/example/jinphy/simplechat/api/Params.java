@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
+import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -75,16 +76,7 @@ class Params extends HashMap<String, String> {
     }
 
     public String getEncrypted(Object key) {
-        String value = this.get(key);
-        try {
-            // 编码
-            value = URLEncoder.encode(value,"UTF-8");
-            // 加密
-            value = EncryptUtils.aesEncrypt(value);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return value;
+        return EncryptUtils.encodeThenEncrypt(this.get(key));
     }
 
     /**
@@ -102,16 +94,7 @@ class Params extends HashMap<String, String> {
         for (Entry<String, String> param : entrySet()) {
             params[i++] = param.getKey() + "=" + param.getValue();
         }
-        String content = TextUtils.join("&", params);
-        try {
-            // 编码
-            content = URLEncoder.encode(content, "UTF-8");
-            // 加密
-            content = EncryptUtils.aesEncrypt(content);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return content;
+        return EncryptUtils.encodeThenEncrypt(TextUtils.join("&", params));
     }
 
 

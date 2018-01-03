@@ -12,6 +12,7 @@ import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 包可见
@@ -54,6 +55,11 @@ class SMSSDKApi implements ApiInterface<Response<String>> {
             public void afterEvent(int eventCode, int resultCode, Object data) {
                 unregister();
                 Flowable.just(resultCode)
+                        .observeOn(Schedulers.io())
+                        .map(code->{
+                            Thread.sleep(400);// 延迟0.4秒在返回结果
+                            return code;
+                        })
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnNext(SMSSDKApi.this::parseResponse)
                         .subscribe();

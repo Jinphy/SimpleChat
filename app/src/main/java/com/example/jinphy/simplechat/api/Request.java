@@ -11,6 +11,7 @@ import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
+import com.example.jinphy.simplechat.utils.ThreadUtils;
 import com.google.gson.reflect.TypeToken;
 
 import org.java_websocket.WebSocketImpl;
@@ -107,20 +108,13 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
         }
         // 如果没有超时则返回网络请求结果
         if (emitter!=null && !emitter.isDisposed()) {
-            try {
-                // 解密
-                message = EncryptUtils.aesDecrypt(message);
-                // 解码
-                message = URLDecoder.decode(message, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+            // 解密和反编码
+            message = EncryptUtils.decryptThenDecode(message);
+
+            //为了能够在网络条件好的情况下显示对话框，延迟0.4毫秒再返回数据
+            ThreadUtils.sleep(400);
+
             Type jsonType = new TypeToken<Response<T>>() {}.getType();
-            try {
-                Thread.sleep(102);//为了能够在网络条件好的情况下显示对话框，延迟0.3毫秒再返回数据
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             emitter.onNext(GsonUtils.toBean(message, jsonType));
             emitter.onComplete();
             emitter = null;

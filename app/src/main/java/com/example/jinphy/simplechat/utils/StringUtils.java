@@ -1,7 +1,12 @@
 package com.example.jinphy.simplechat.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.example.jinphy.simplechat.constants.StringConst.UTF_8;
 
 /**
  * Created by jinphy on 2017/11/4.
