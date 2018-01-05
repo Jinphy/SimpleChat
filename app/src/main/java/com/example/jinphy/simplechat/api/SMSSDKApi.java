@@ -7,6 +7,7 @@ import com.example.jinphy.simplechat.utils.DialogUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
 
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
@@ -206,6 +207,11 @@ class SMSSDKApi implements ApiInterface<Response<String>> {
         if (this.dialog != null) {
             this.dialog.title(this.hint);
         }
+        return this;
+    }
+
+    @Override
+    public ApiInterface<Response<String>> dataType(Api.Data dataType, Class<?>[] dataClass) {
         return this;
     }
 

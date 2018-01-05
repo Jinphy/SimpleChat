@@ -15,9 +15,22 @@ import io.reactivex.annotations.NonNull;
 public class Friend {
 
     @Id protected long id;
+
     @NonNull
     protected String account;
 
+    protected String name;
+
+    protected String avatorUrl;
+
+    protected String remark;
+
+    protected String sex;
+
+    /**
+     * DESC: 一个好友只属于一个用户的，所以是一对一的关系，即一个Friend -> 一个User
+     * Created by jinphy, on 2018/1/3, at 13:32
+     */
     public ToOne<User> user;
 
     public long getId() {

@@ -19,7 +19,7 @@ class ZipApi<T> extends BaseApi<Response<T>[]> {
 
     private List<CommonApi<T>> apis;
 
-    public static<U> ApiInterface<Response<U>[]> create(Context context) {
+    public static <U> ApiInterface<Response<U>[]> create(Context context) {
         return new ZipApi<>(context);
     }
 

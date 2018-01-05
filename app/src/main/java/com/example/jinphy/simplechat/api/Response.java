@@ -32,7 +32,8 @@ public class Response<T> {
     //        返回数据
     private T data;
 
-    public Response() {
+    public Response(Class<T> tClass) {
+
     }
 
     public Response(String code, String msg, T data) {
@@ -63,5 +64,10 @@ public class Response<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+
+    public static <U> Class<Response<U>> responseClass(Class<U> uClass) {
+        return (Class<Response<U>>) new Response<>(uClass).getClass();
     }
 }

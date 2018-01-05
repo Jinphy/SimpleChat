@@ -30,7 +30,7 @@ public class DBApplication extends BaseApplication {
     }
 
 
-    public BoxStore getBoxStore(){
+    public BoxStore boxStore(){
         return boxStore;
     }
 

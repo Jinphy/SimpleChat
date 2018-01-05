@@ -38,7 +38,7 @@ public class LocalUserDataSource implements UserDataSource {
         if (boxStore != null) {
             return boxStore;
         }
-        boxStore =  ((DBApplication) DBApplication.app()).getBoxStore();
+        boxStore =  ((DBApplication) DBApplication.app()).boxStore();
         return boxStore;
     }
 

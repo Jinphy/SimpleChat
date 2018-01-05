@@ -10,6 +10,7 @@ import com.example.jinphy.simplechat.utils.DialogUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
+import com.google.gson.reflect.TypeToken;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
@@ -92,7 +93,7 @@ class CommonApi<T> extends BaseApi<Response<T>>{
      * Created by jinphy, on 2017/12/31, at 21:52
      */
     private Request<T> getRequest(){
-        request = Request.<T>newBuilder()
+        request = Request.<T>newBuilder(responseType, dataType)
                 .baseUrl(baseUrl)
                 .port(port)
                 .path(path)
@@ -109,6 +110,7 @@ class CommonApi<T> extends BaseApi<Response<T>>{
         if (TextUtils.isEmpty(path)) {
             throw new RuntimeException("请求路劲接口不能为空，必须调用CommonApi.requestId(String requestId) 设置请求接口");
         }
+
         return Observable.create(getRequest());
     }
 

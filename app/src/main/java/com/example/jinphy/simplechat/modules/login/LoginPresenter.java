@@ -3,9 +3,11 @@ package com.example.jinphy.simplechat.modules.login;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.api.Api;
 import com.example.jinphy.simplechat.api.NetworkManager;
 import com.example.jinphy.simplechat.base.BaseApplication;
+import com.example.jinphy.simplechat.model.user.User;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
@@ -16,11 +18,9 @@ import com.example.jinphy.simplechat.utils.Preconditions;
 public class LoginPresenter implements LoginContract.Presenter {
 
     private LoginContract.View view;
-    private NetworkManager networkManager;
 
     public LoginPresenter(@NonNull LoginContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-        networkManager = NetworkManager.getInstance();
 
     }
     @Override
@@ -77,14 +77,18 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void login(Context context, String account, String password, String deviceId) {
-        Api.<String>common(context)
+        Api.<User>common(context)
                 .param(Api.Key.account, account)
                 .param(Api.Key.password, password)
                 .param(Api.Key.deviceId, deviceId)
                 .hint("正在登录...")
                 .showProgress()
                 .path(Api.Path.login)
-                .onResponseYes(response -> view.loginOnNext(response,account,password))
+                .dataType(Api.Data.MODEL,User.class)
+                .onResponseYes(response -> {
+                    User data = response.getData();
+                    view.loginOnNext(response, account, password);
+                })
                 .request();
 
     }

@@ -6,28 +6,27 @@ import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.annotations.Get;
 import com.example.jinphy.simplechat.annotations.Post;
 import com.example.jinphy.simplechat.exceptions.ServerException;
+import com.example.jinphy.simplechat.model.user.User;
 import com.example.jinphy.simplechat.utils.DeviceUtils;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ThreadUtils;
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
-import org.java_websocket.WebSocketImpl;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
-import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ServerHandshake;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -54,16 +53,23 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
     private String url;
     private int readTimeout; // 读取数据超时，单位毫秒
 
+    private Type responseType;        // response的具体类型
+    private Api.Data dataType;        // response中data字段的类型枚举
+
     private Disposable disposable;    // 读取数据超时的计时器，当网络超时时，取消网络请求
 
     public Request(
             String url,
-            Map<String ,String> headers,
+            Map<String, String> headers,
             int connectTimeout,
-            int readTimeout)throws URISyntaxException {
-        super(new URI(url),new Draft_6455(),headers,connectTimeout);
+            int readTimeout,
+            Type responseType,
+            Api.Data dataType) throws URISyntaxException {
+        super(new URI(url), new Draft_6455(), headers, connectTimeout);
         this.url = url;
         this.readTimeout = readTimeout;
+        this.responseType = responseType;
+        this.dataType = dataType;
     }
 
     public String url(){
@@ -114,11 +120,28 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
             //为了能够在网络条件好的情况下显示对话框，延迟0.4毫秒再返回数据
             ThreadUtils.sleep(400);
 
-            Type jsonType = new TypeToken<Response<T>>() {}.getType();
-            emitter.onNext(GsonUtils.toBean(message, jsonType));
+            if (dataType == Api.Data.MAP_ARRAY) {
+                // data类型为Map<String,String>[]
+                Response<List<Map<String,String>>> tmp = GsonUtils.toBean(message, responseType);
+
+                Map<String,String>[] maps = tmp.getData().toArray(new LinkedTreeMap[tmp.getData().size()]);
+
+                Response<Map<String, String>[]> response = new Response<>(
+                        tmp.getCode(),
+                        tmp.getMsg(),
+                        maps
+                );
+                emitter.onNext((Response<T>) response);
+            } else {
+                // data 为其他类型
+                emitter.onNext(GsonUtils.toBean(message, this.responseType));
+            }
+
             emitter.onComplete();
             emitter = null;
+
         }
+
         this.close();
     }
 
@@ -158,8 +181,8 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
      * DESC: 创建一个Builder 对象
      * Created by jinphy, on 2017/12/31, at 21:50
      */
-    public static<U> Builder<U> newBuilder() {
-        return new Builder<>();
+    public static <U> Builder<U> newBuilder(Type responseType, Api.Data dataType) {
+        return new Builder<>(responseType,dataType);
     }
 
 
@@ -173,9 +196,14 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
         private Params params;
         private String requestId;
 
-        private Builder() {
-            requestId = path + DeviceUtils.devceId() + System.currentTimeMillis();
-            requestId = EncryptUtils.md5(requestId);
+        private Type responseType;
+        private Api.Data dataType;
+
+        private Builder(Type responseType, Api.Data dataType) {
+            this.requestId = path + DeviceUtils.devceId() + System.currentTimeMillis();
+            this.requestId = EncryptUtils.md5(requestId);
+            this.responseType = responseType;
+            this.dataType = dataType;
         }
 
         /**
@@ -255,12 +283,12 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
                 switch (method) {
                     case GET:
                         url = StringUtils.generateURI(baseUrl, port, path, params.toString());
-                        request = new Request<T>(url, headers, connectTimeout,readTimeout);
+                        request = new Request<T>(url, headers, connectTimeout,readTimeout,responseType,dataType);
                         request.method = method;
                         break;
                     case POST:
                         url = StringUtils.generateURI(baseUrl, port, path, "");
-                        request = new Request<T>(url, headers, connectTimeout,readTimeout);
+                        request = new Request<T>(url, headers, connectTimeout,readTimeout,responseType,dataType);
                         request.method = method;
                         request.body = Body.create(requestId, params);
                         break;

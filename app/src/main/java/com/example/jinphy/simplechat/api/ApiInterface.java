@@ -1,5 +1,9 @@
 package com.example.jinphy.simplechat.api;
 
+import com.example.jinphy.simplechat.api.Api.Data;
+
+import java.lang.reflect.Type;
+
 /**
  * Created by Jinphy on 2017/12/6.
  */
@@ -90,6 +94,19 @@ public interface ApiInterface<T> {
      * Created by jinphy, on 2017/12/4, at 21:58
      */
     ApiInterface<T> onResponse(ApiCallback.OnResponse<T> onResponse);
+
+
+    /**
+     * DESC: 设置网络请求返回结果中{@code data }字段的类型
+     *      注意，该方法在网络请求不需要使用{@code data} 字段时，可以不用设置
+     *      但是，如果要用到该字段时，则必须调用该方法显示设置{@code data} 的返回类型，
+     *      否则将会出错
+     *
+     *  @see Response#data
+     *  @see Data，该函数的详细用法请参考{@code Data} 枚举
+     * Created by jinphy, on 2018/1/5, at 13:52
+     */
+    ApiInterface<T> dataType(Data dataType, Class<?>...dataClass);
 
 
     /**

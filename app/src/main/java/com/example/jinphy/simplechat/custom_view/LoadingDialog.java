@@ -224,8 +224,6 @@ public class LoadingDialog extends AlertDialog {
         super.onStart();
         if (builder.contentView == null) {
             AnimUtils.just(findViewById(R.id.root_view))
-                    .setScaleX(3f,1)
-                    .setScaleY(3f,1)
                     .setAlpha(0,1f)
                     .setDuration(duration)
                     .onStart(a -> startAnimator = a)

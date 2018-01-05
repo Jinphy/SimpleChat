@@ -1028,10 +1028,10 @@ public class AnimUtils {
 
     /**
      * An implementation of {@link Property} to be used specifically create fields of
-     * type
-     * <code>float</code>. This type-specific subclass enables performance benefit by allowing
+     * dataType
+     * <code>float</code>. This dataType-specific subclass enables performance benefit by allowing
      * calls to a {@link #set(Object, Float) set()} function that takes the primitive
-     * <code>float</code> type and avoids autoboxing and other overhead associated create the
+     * <code>float</code> dataType and avoids autoboxing and other overhead associated create the
      * <code>Float</code> class.
      *
      * @param <T> The class on which the Property is declared.
@@ -1042,8 +1042,8 @@ public class AnimUtils {
         }
 
         /**
-         * A type-specific override of the {@link #set(Object, Float)} that is faster when dealing
-         * create fields of type <code>float</code>.
+         * A dataType-specific override of the {@link #set(Object, Float)} that is faster when dealing
+         * create fields of dataType <code>float</code>.
          */
         public abstract void setValue(T object, float value);
 
@@ -1056,10 +1056,10 @@ public class AnimUtils {
 
     /**
      * An implementation of {@link Property} to be used specifically create fields of
-     * type
-     * <code>int</code>. This type-specific subclass enables performance benefit by allowing
+     * dataType
+     * <code>int</code>. This dataType-specific subclass enables performance benefit by allowing
      * calls to a {@link #set(Object, Integer) set()} function that takes the primitive
-     * <code>int</code> type and avoids autoboxing and other overhead associated create the
+     * <code>int</code> dataType and avoids autoboxing and other overhead associated create the
      * <code>Integer</code> class.
      *
      * @param <T> The class on which the Property is declared.
@@ -1071,8 +1071,8 @@ public class AnimUtils {
         }
 
         /**
-         * A type-specific override of the {@link #set(Object, Integer)} that is faster when dealing
-         * create fields of type <code>int</code>.
+         * A dataType-specific override of the {@link #set(Object, Integer)} that is faster when dealing
+         * create fields of dataType <code>int</code>.
          */
         public abstract void setValue(T object, int value);
 

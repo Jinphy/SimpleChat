@@ -5,12 +5,16 @@ import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.text.TextUtils;
 
+import com.example.jinphy.simplechat.api.Api.Data;
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
+import com.example.jinphy.simplechat.utils.GsonUtils;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
+import com.google.gson.reflect.TypeToken;
 
-import org.java_websocket.WebSocket;
-
+import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,6 +24,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 /**
+ *  泛型类，
+ *  1、对于单条网络请求：CommonApi则 T：Response<U>
+ *
+ *  2、对于多条网络请求：ZipApi则 T：Response<U>[]
+ *
+ *
  * Created by jinphy on 2017/12/4.
  */
 
@@ -50,6 +60,8 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
     protected ApiCallback.OnCancel onCancel;          // 请求取消时回调
     protected ApiCallback.OnFinal onFinal;            // 请求结束时回调，该回调与OnStart对应，一定会回调
 
+    protected Type responseType;                      // Response 的具体类型
+    protected Data dataType;                           // 枚举，表示response中data字段的类型
     //====================方法===============================================
 
     /*
@@ -57,6 +69,7 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
      * Created by jinphy, on 2017/12/4, at 22:17
      */
     protected BaseApi(Context context) {
+        super();
         this.context = context;
         init();
     }
@@ -73,6 +86,16 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
         this.port = Api.COMMON_PORT;
         this.connectTimeout = 10_000;
         this.readtimeout = 10_000;
+
+        /**
+         * DESC: 这是返回数据类型的默认实现，使用该默认实现则不能访问{@link Response#getData()}方法
+         *
+         *      注：如果要访问{@code getData()} 方法，则需要在指定具体类型，
+         *      @see Data
+         *      @see BaseApi#dataType(Data, Class<U>)
+         * Created by jinphy, on 2018/1/5, at 14:30
+         */
+        this.responseType = new TypeToken<Response<T>>(){}.getType();
     }
 
     /**
@@ -191,6 +214,80 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
     @Override
     public ApiInterface<T> hint(CharSequence hint) {
         this.hint = hint;
+        return this;
+    }
+
+
+    /**
+     * DESC: 根据指定的dataType 设置网络请求结果类Response的泛型类型
+     * Created by jinphy, on 2018/1/5, at 15:12
+     */
+    @Override
+    public ApiInterface<T> dataType(Data dataType, Class<?>... dataClass) {
+        this.dataType = dataType;
+        switch (dataType) {
+            case MODEL:// 例如：返回类型为Response<GSUser>
+                if (dataClass.length == 0) {
+                    ObjectHelper.throwRuntime("You must pass in a class when specifying Data.MODEL");
+                }
+
+                responseType = GsonUtils.getType(Response.class, dataClass[0]);
+                break;
+            case MAP:// 例如：返回类型为Response<Map<String,String>>
+                responseType = GsonUtils.getType(
+                        Response.class,
+                        GsonUtils.getType(Map.class, String.class, String.class)
+                );
+                break;
+            case MODEL_ARRAY:// 例如：返回类型为Response<GSUser[]>
+                if (dataClass.length == 0) {
+                    ObjectHelper.throwRuntime("You must pass in a class when specifying Data.MODEL_ARRAY");
+                }
+                if (!dataClass[0].isArray()) {
+                    ObjectHelper.throwRuntime("The class must be array then specifying Data.MODEL_ARRAY");
+                }
+                responseType = GsonUtils.getType(Response.class, dataClass[0]);
+                break;
+            case MAP_ARRAY:// 例如：返回类型为Response<Map<String,String>[]>
+                /**
+                 * 先把结果转换成List<Map<String,String>>，然后再在Request类的onMessage方法中拦截转换
+                 * @see Request#onMessage(String)
+                 * */
+                responseType = GsonUtils.getType(
+                        Response.class,
+                        GsonUtils.getType(
+                                List.class,
+                                GsonUtils.getType(Map.class, String.class, String.class)
+                        )
+                );
+                // 使用这个方法不能解析成Map数组
+                //                responseType = GsonUtils.getType(
+                //                        Response.class,
+                //                        GsonUtils.getType(Map[].class, String.class, String.class)
+                //                );
+
+                break;
+            case MODEL_LIST:// 例如：返回类型为Response<List<GSUser>>
+                if (dataClass.length == 0) {
+                    ObjectHelper.throwRuntime("You must pass in a class when specifying Data.MODEL_LIST");
+                }
+                responseType = GsonUtils.getType(
+                        Response.class,
+                        GsonUtils.getType(List.class, dataClass[0])
+                );
+                break;
+            case MAP_LIST:// 例如：返回类型为Response<List<Map<String,String>>>
+                responseType = GsonUtils.getType(
+                        Response.class,
+                        GsonUtils.getType(
+                                List.class,
+                                GsonUtils.getType(Map.class, String.class, String.class)
+                        )
+                );
+                break;
+            default:
+                break;
+        }
         return this;
     }
 
