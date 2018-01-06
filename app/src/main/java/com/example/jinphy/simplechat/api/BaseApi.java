@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -44,10 +45,12 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
     protected Params params;                          // 请求参数
     protected boolean showProgress;                   // 是否显示请求请求对话框
     protected boolean cancellable;                    // 是否可以取消
+    // TODO: 2018/1/6 实现缓存
+    protected boolean useCache;                       // 设置是否缓存
     protected String baseUrl;                         // 基础url
     protected String port;                            // 网络请求端口
     protected int connectTimeout;                     // 单位：毫秒
-    protected int readtimeout;                        // 读取超时，单位：毫秒
+    protected int readTimeout;                        // 读取超时，单位：毫秒
     protected String path;                            // 网络请求接口
     protected CharSequence hint = "加载中...";         // 加载时对话框的提示信息
     protected boolean autoShowNo = true;              // 当返回码错误时，是否自动显示对话框，默认显示
@@ -85,7 +88,7 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
         this.baseUrl = Api.BASE_URL;
         this.port = Api.COMMON_PORT;
         this.connectTimeout = 10_000;
-        this.readtimeout = 10_000;
+        this.readTimeout = 10_000;
 
         /**
          * DESC: 这是返回数据类型的默认实现，使用该默认实现则不能访问{@link Response#getData()}方法
@@ -149,6 +152,17 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
         return this;
     }
 
+    @Override
+    public ApiInterface<T> params(Map<String, Object> params) {
+        if (params == null) {
+            return this;
+        }
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            this.params.put(param.getKey(), param.getValue());
+        }
+        return this;
+    }
+
     /**
      * DESC: 设置连接超时
      * Created by jinphy, on 2017/12/4, at 22:34
@@ -166,7 +180,7 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
      */
     @Override
     public ApiInterface<T> readTimeout(int timeout) {
-        this.readtimeout = timeout;
+        this.readTimeout = timeout;
         return this;
     }
 
@@ -212,11 +226,32 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
     }
 
     @Override
+    public ApiInterface<T> useCache(boolean... useCache) {
+        if (useCache.length == 0 || useCache[0]) {
+            this.useCache = true;
+        } else {
+            this.useCache = false;
+        }
+        return this;
+    }
+
+    @Override
     public ApiInterface<T> hint(CharSequence hint) {
         this.hint = hint;
         return this;
     }
 
+    /**
+     * DESC: 在回到时传入当前api设置对象进行额外的统一设置而不影响链式调用
+     * Created by jinphy, on 2018/1/6, at 14:06
+     */
+    @Override
+    public ApiInterface<T> setup(Setup<ApiInterface<T>> action) {
+        if (action != null) {
+            action.call(this);
+        }
+        return this;
+    }
 
     /**
      * DESC: 根据指定的dataType 设置网络请求结果类Response的泛型类型

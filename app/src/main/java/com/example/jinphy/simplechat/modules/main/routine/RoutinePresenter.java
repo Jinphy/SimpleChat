@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.model.menu.Routine;
+import com.example.jinphy.simplechat.models.menu.Routine;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**

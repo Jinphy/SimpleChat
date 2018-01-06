@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
-import com.example.jinphy.simplechat.model.user.User;
 
 /**
  * Created by jinphy on 2017/8/9.

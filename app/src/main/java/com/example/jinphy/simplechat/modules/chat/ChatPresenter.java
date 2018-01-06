@@ -2,7 +2,7 @@ package com.example.jinphy.simplechat.modules.chat;
 
 import android.support.annotation.NonNull;
 
-import com.example.jinphy.simplechat.model.message.Message;
+import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;

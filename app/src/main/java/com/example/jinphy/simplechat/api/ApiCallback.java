@@ -118,4 +118,15 @@ public interface ApiCallback<T> {
     interface OnFinal{
         void call();
     }
+
+    /**
+     * DESC: 该回调是用来进行特殊需求设置的，有了该回调可以通过方法传入的Api设置对象进行额外统一设置而不会使得
+     *      链式调用无法进行
+     *
+     *      T 的泛型一般是ApiInterface 类的对象
+     * Created by jinphy, on 2018/1/6, at 14:01
+     */
+    interface Setup<T>{
+        void call(T api);
+    }
 }

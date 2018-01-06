@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.base;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
@@ -14,6 +15,9 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -142,6 +146,33 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
     @Subscribe
     public void eventBus(String message) {
+
+    }
+
+    public ParamsBuilder newParams() {
+        return new ParamsBuilder();
+    }
+
+
+    /**
+     * DESC: 网络请求参数构造类，用来添加参数
+     * Created by jinphy, on 2018/1/6, at 15:01
+     */
+    protected static class ParamsBuilder{
+        private Map<String,Object> params;
+
+        public ParamsBuilder() {
+            this.params = new HashMap<>();
+        }
+
+        public ParamsBuilder add(String key, Object value) {
+            this.params.put(key, value);
+            return this;
+        }
+
+        public Map<String, Object> build() {
+            return params;
+        }
 
     }
 

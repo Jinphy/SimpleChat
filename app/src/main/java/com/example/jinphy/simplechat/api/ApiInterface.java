@@ -3,6 +3,8 @@ package com.example.jinphy.simplechat.api;
 import com.example.jinphy.simplechat.api.Api.Data;
 
 import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Created by Jinphy on 2017/12/6.
@@ -39,6 +41,8 @@ public interface ApiInterface<T> {
      * Created by jinphy, on 2017/12/4, at 21:43
      */
     ApiInterface<T> param(String key, Object value);
+
+    ApiInterface<T> params(Map<String, Object> params);
 
     /**
      * DESC: 添加网络请求
@@ -82,6 +86,12 @@ public interface ApiInterface<T> {
      */
     ApiInterface<T> cancellable(boolean... cancel);
 
+
+    /**
+     * DESC: 设置是否缓存，默认不缓存
+     * Created by jinphy, on 2018/1/6, at 13:14
+     */
+    ApiInterface<T> useCache(boolean... useCache);
 
     /**
      * DESC: 设置加载时对话框的提示信息
@@ -145,6 +155,8 @@ public interface ApiInterface<T> {
      * Created by jinphy, on 2018/1/1, at 8:50
      */
     ApiInterface<T> onCancel(ApiCallback.OnCancel onCancel);
+
+    ApiInterface<T> setup(ApiCallback.Setup<ApiInterface<T>> action);
 
     void request();
 }

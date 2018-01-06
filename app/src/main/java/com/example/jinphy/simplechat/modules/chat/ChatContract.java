@@ -2,7 +2,7 @@ package com.example.jinphy.simplechat.modules.chat;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
-import com.example.jinphy.simplechat.model.message.Message;
+import com.example.jinphy.simplechat.models.message.Message;
 
 import java.util.List;
 

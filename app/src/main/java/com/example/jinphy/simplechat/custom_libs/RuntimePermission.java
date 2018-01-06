@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.lang.ref.SoftReference;
@@ -114,10 +115,10 @@ public class RuntimePermission {
         if (permissions.size() == 0) {
             throw new RuntimeException("You must provide at lease one permission!");
         }
-        Activity activity = this.activity.get();
-        if (activity == null) {
-            Log.e(TAG, "execute: activity is null");
+        if (!ObjectHelper.reference(this.activity)) {
+            return;
         }
+        Activity activity = this.activity.get();
         String[] p = new String[permissions.size()];
         RxPermissions permission = new RxPermissions(activity);
         permission.requestEach(permissions.toArray(p))

@@ -1,13 +1,9 @@
 package com.example.jinphy.simplechat.modules.signup;
 
-import android.content.Context;
 import android.widget.TextView;
 
-import com.example.jinphy.simplechat.api.Api;
-import com.example.jinphy.simplechat.api.Response;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
-import com.example.jinphy.simplechat.model.user.User;
 
 /**
  * Created by jinphy on 2017/8/9.
@@ -17,41 +13,32 @@ public interface SignUpContract {
 
     interface View extends BaseView<Presenter>{
 
-        void setText(TextView view, String text);
+        void getCodeSucceed(String msg);
 
-        void getVerificationCodeOnNext(Response response);
+        void getCodeFailed();
 
-        void submitVerificationCodeOnNext(Response response);
+        void submitCodeSucceed(String msg);
 
-        void findUserOnNext(Response response);
+        void submitCodeFailed();
 
-        void createNewUserOnNext(Response response, long date);
+        void findUserOk();
 
-        void loginOnNext(Response response, User user);
-//
-//        void updateViewAfterSubmittingVerificationCode(Api.Response response);
-//
-//        void updateViewAfterGettingVerificationCode(Api.Response response);
-//
-//        void updateViewAfterCreateNewUser(Api.Response response, long date);
-//
-//        void updateViewAfterFindUser(Api.Response response);
+        void findUserNo(String reason);
+
+        void whenSignUpSucceed(String msg);
+
+        void whenLoginSucceed(String msg);
     }
     interface Presenter extends BasePresenter{
-        void registerSMSSDK(Context context);
 
-        void  unregisterSMSSDK();
+        void getVerificationCode(String phone);
 
-        void getVerificationCode(Context context, String phone);
+        void submitVerificationCode(String phone, String verificationCode);
 
-        void submitVerificationCode(Context context, String phone, String verificationCode);
+        void findUser(String account);
 
-        void findUser(Context context, String account);
+        void signUp(String account, String password, String date);
 
-        void createNewUser(Context context, String account, String password, String date);
-
-        User saveUser(String account, String password,long date);
-
-        void login(Context context, User user, String deviceId);
+        void login(String account,String password, String deviceId);
     }
 }

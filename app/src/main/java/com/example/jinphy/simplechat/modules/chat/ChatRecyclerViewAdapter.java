@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.model.message.Message;
+import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.List;

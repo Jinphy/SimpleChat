@@ -1,6 +1,6 @@
-package com.example.jinphy.simplechat.model.user;
+package com.example.jinphy.simplechat.models.user;
 
-import com.example.jinphy.simplechat.model.friend.Friend;
+import com.example.jinphy.simplechat.models.friend.Friend;
 
 import java.io.Serializable;
 
@@ -15,6 +15,18 @@ import io.reactivex.annotations.NonNull;
 
 @Entity
 public class User implements Serializable{
+
+    public static final String ID = "id";
+    public static final String ACCOUNT = "account";
+    public static final String NAME = "name";
+    public static final String PASSWORD = "password";
+    public static final String DATE = "date";
+    public static final String SEX = "sex";
+    public static final String AVATAR_URL = "avatarUrl";
+    public static final String STATUS = "status";
+    public static final String ACCESS_TOKEN = "accessToken";
+
+
     @Id
     protected long id;
 

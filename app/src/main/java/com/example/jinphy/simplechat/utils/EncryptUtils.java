@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.utils;
 import android.support.annotation.IntRange;
 
 import com.example.jinphy.simplechat.constants.StringConst;
+import com.example.jinphy.simplechat.secret.Secret;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -26,7 +27,7 @@ import static com.example.jinphy.simplechat.constants.StringConst.UTF_8;
 public class EncryptUtils {
 
     // AES 加密秘钥
-    public static final String AES_KEY = "OhgkU9HlPbmmXvFpZd2zStk8HfVNHMd4cAbtuNwrpeyUyCMyNFuDHXgiAYBKgcQZNJUatazKWp7eiE4mdmqccQ9ourHF6Hz0WrjrXnbdQxDQ3JCC0i7kgXH6wwWLdSv0";
+    public static final String AES_KEY = Secret.AES_KEY;
 
 
     private EncryptUtils() {

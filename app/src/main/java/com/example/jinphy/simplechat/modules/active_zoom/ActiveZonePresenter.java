@@ -1,6 +1,6 @@
 package com.example.jinphy.simplechat.modules.active_zoom;
 
-import com.example.jinphy.simplechat.model.blog.Blog;
+import com.example.jinphy.simplechat.models.blog.Blog;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;

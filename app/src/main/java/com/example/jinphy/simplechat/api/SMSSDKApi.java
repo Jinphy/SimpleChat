@@ -8,6 +8,7 @@ import com.example.jinphy.simplechat.utils.ObjectHelper;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
+import java.util.Map;
 
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
@@ -143,6 +144,16 @@ class SMSSDKApi implements ApiInterface<Response<String>> {
     }
 
     @Override
+    public  ApiInterface<Response<String>>params(Map<String, Object> params) {
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            param(param.getKey(), param.getValue());
+        }
+        return this;
+    }
+
+
+
+    @Override
     public <U> ApiInterface<Response<String>> api(ApiInterface<U> api) {
         ObjectHelper.throwRuntime("SMSSDKApi cannot invoke this method");
         return null;
@@ -198,6 +209,13 @@ class SMSSDKApi implements ApiInterface<Response<String>> {
 
     @Override
     public ApiInterface<Response<String>> cancellable(boolean... cancel) {
+        return this;
+    }
+
+
+    @Override
+    public ApiInterface<Response<String>> useCache(boolean... useCache) {
+        // no-op
         return this;
     }
 
@@ -282,6 +300,14 @@ class SMSSDKApi implements ApiInterface<Response<String>> {
         return this;
     }
 
+    @Override
+    public ApiInterface<Response<String>> setup(ApiCallback.Setup<ApiInterface<Response<String>>>
+                                                            action) {
+        if (action != null) {
+            action.call(this);
+        }
+        return this;
+    }
 
     /**
      * DESC: 请求网络

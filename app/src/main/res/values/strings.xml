@@ -35,9 +35,7 @@
     <string name="next_step">下一步</string>
     <string name="commit_data">提交信息</string>
     <string name="confirm">确 定</string>
-    
-    <string name="app_key">222286c4a82a4</string>
-    <string name="app_secret">fe79cb01da7800fc3439ea8d07b50a25</string>
+
     <string name="account">账号</string>
     <string name="verification_code">验证码</string>
     <string name="password">密码</string>

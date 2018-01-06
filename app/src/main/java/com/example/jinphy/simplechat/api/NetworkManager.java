@@ -102,14 +102,14 @@ public class NetworkManager {
      * 向服务器中创建新用户，如果创建成功则返回字符串"yes",如果不成功则返回 字符串"no"
      * 否则返回错误
      *//*
-    public void createNewUser(String account, String password, String date,Consumer callback) {
+    public void signUp(String account, String password, String date,Consumer callback) {
         try {
             HashMap<String, String> params = new HashMap<>();
             params.put("account", account);
             params.put("password", password);
             params.put("date", date);
             String createNewUserUri = StringUtils
-                    .generateURI(HOST, COMMON_PORT, "/user/createNewUser", params);
+                    .generateURI(HOST, COMMON_PORT, "/user/signUp", params);
 
             MyWebSocketClient client = MyWebSocketClient.newInstance(createNewUserUri);
             client.doOnMessage(title -> {

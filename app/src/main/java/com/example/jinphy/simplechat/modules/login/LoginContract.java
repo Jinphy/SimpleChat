@@ -14,11 +14,20 @@ public interface LoginContract {
 
     interface View extends BaseView<Presenter>{
 
+
         void showPasswordView();
 
         void showVerificationCodeView();
 
         void changeLoginType();
+
+        void enableCodeButton(boolean enable);
+
+        void countDownCodeButton();
+
+        void updateVerifiedAccount(String verifiedAccount);
+
+        void whenLoginSucceed();
 
         String getAccount();
 
@@ -26,30 +35,17 @@ public interface LoginContract {
 
         String getCode();
 
-        String getDeviceId();
-
         boolean isLoginByPassword();
 
-        void findUserOnNext(Response response, String tag);
-
-        void loginOnNext(Response response,String account,String password);
-
-        void getVerificationCodeOnNext(Response response,String account);
-
-        void submitVerificationCodeOnNext(Response response);
+        boolean remenberPassword();
     }
 
     interface Presenter extends BasePresenter{
-        void registerSMSSDK(Context context);
 
-        void  unregisterSMSSDK();
+        void getVerificationCode(String phone);
 
-        void findUser(Context context, String account, String tag);
+        void loginWithPassword(String account, String password, String deviceId);
 
-        void getVerificationCode(Context context, String account);
-
-        void submitVerificationCode(Context context, String phone, String verificationCode);
-
-        void login(Context context, String account, String password, String deviceId);
+        void loginWithCode(String account, String code, String deviceId);
     }
 }

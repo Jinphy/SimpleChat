@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.model.event_bus;
+package com.example.jinphy.simplechat.models.event_bus;
 
 import java.io.Serializable;
 

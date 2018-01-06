@@ -1,6 +1,6 @@
-package com.example.jinphy.simplechat.model.friend;
+package com.example.jinphy.simplechat.models.friend;
 
-import com.example.jinphy.simplechat.model.user.User;
+import com.example.jinphy.simplechat.models.user.User;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;

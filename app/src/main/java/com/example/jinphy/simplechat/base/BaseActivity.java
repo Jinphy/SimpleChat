@@ -15,8 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.jinphy.simplechat.model.event_bus.EBActivity;
-import com.example.jinphy.simplechat.model.event_bus.EBFinishActivityMsg;
+import com.example.jinphy.simplechat.models.event_bus.EBActivity;
+import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

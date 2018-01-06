@@ -87,7 +87,7 @@ public abstract class Api {
         @Get
         String findUser = "/user/findUser";
         @Post
-        String createNewUser = "/user/createNewUser";
+        String signUp = "/user/signUp";
         @Get
         String getVerificationCode = "sms/getVerificationCode";
         @Get

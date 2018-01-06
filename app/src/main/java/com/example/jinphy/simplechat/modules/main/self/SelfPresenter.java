@@ -2,7 +2,7 @@ package com.example.jinphy.simplechat.modules.main.self;
 
 import android.support.annotation.NonNull;
 
-import com.example.jinphy.simplechat.model.menu.Self;
+import com.example.jinphy.simplechat.models.menu.Self;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;

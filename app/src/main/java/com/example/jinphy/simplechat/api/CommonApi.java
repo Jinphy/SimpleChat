@@ -1,39 +1,12 @@
 package com.example.jinphy.simplechat.api;
 
 import android.content.Context;
-import android.support.annotation.CallSuper;
 import android.text.TextUtils;
-import android.util.Log;
 
-import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.utils.DialogUtils;
-import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
-import com.example.jinphy.simplechat.utils.StringUtils;
-import com.google.gson.reflect.TypeToken;
 
-import org.java_websocket.WebSocket;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.drafts.Draft_6455;
-import org.java_websocket.handshake.ServerHandshake;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * DESC: 一个泛型的通用Api请求类。
@@ -98,7 +71,7 @@ class CommonApi<T> extends BaseApi<Response<T>>{
                 .port(port)
                 .path(path)
                 .connectTimeout(connectTimeout)
-                .readTimeout(readtimeout)
+                .readTimeout(readTimeout)
                 .headers(headers)
                 .params(params)
                 .build();

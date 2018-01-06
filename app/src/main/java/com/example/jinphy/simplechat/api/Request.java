@@ -6,7 +6,6 @@ import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.annotations.Get;
 import com.example.jinphy.simplechat.annotations.Post;
 import com.example.jinphy.simplechat.exceptions.ServerException;
-import com.example.jinphy.simplechat.model.user.User;
 import com.example.jinphy.simplechat.utils.DeviceUtils;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
@@ -14,14 +13,12 @@ import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ThreadUtils;
 import com.google.gson.internal.LinkedTreeMap;
-import com.google.gson.reflect.TypeToken;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -200,7 +197,7 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
         private Api.Data dataType;
 
         private Builder(Type responseType, Api.Data dataType) {
-            this.requestId = path + DeviceUtils.devceId() + System.currentTimeMillis();
+            this.requestId = path + DeviceUtils.deviceId() + System.currentTimeMillis();
             this.requestId = EncryptUtils.md5(requestId);
             this.responseType = responseType;
             this.dataType = dataType;

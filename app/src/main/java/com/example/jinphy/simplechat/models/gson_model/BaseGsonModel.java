@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.model.gson_model;
+package com.example.jinphy.simplechat.models.gson_model;
 
 /**
  * DESC:

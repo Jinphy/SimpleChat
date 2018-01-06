@@ -1,15 +1,18 @@
-package com.example.jinphy.simplechat.model.menu;
+package com.example.jinphy.simplechat.models.menu;
 
 /**
- * Created by jinphy on 2017/8/15.
+ * Created by jinphy on 2017/8/17.
  */
 
-public class Routine {
+public class Self {
 
     private int iconId;
+
     private int tagId;
 
-    public Routine(int iconId, int tagId) {
+    public Self(){}
+
+    public Self(int iconId, int tagId) {
         this.iconId = iconId;
         this.tagId = tagId;
     }

@@ -1,13 +1,7 @@
 package com.example.jinphy.simplechat.application;
 
-import android.app.Activity;
-import android.os.Bundle;
-
-import com.example.jinphy.simplechat.api.NetworkManager;
 import com.example.jinphy.simplechat.base.BaseApplication;
-import com.example.jinphy.simplechat.model.friend.MyObjectBox;
-import com.example.jinphy.simplechat.utils.ObjectHelper;
-
+import com.example.jinphy.simplechat.models.friend.MyObjectBox;
 
 import io.objectbox.BoxStore;
 
@@ -17,24 +11,17 @@ import io.objectbox.BoxStore;
 
 public class DBApplication extends BaseApplication {
 
-    private BoxStore boxStore;
-
-    private NetworkManager networkManager;
-
+    private static BoxStore boxStore;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        boxStore = MyObjectBox.builder().androidContext(DBApplication.this).build();
-        networkManager = NetworkManager.getInstance();
+        boxStore = MyObjectBox.builder().androidContext(this).build();
     }
 
 
-    public BoxStore boxStore(){
+    public static BoxStore boxStore(){
         return boxStore;
     }
 
-    public NetworkManager getNetworkManager(){
-        return networkManager;
-    }
 }

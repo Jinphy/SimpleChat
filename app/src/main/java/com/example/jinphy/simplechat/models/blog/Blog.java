@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.model.blog;
+package com.example.jinphy.simplechat.models.blog;
 
 /**
  * Created by jinphy on 2017/8/15.

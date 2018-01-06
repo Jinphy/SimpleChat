@@ -33,7 +33,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     public LoginPresenter getPresenter(Fragment fragment) {
 
-        return new LoginPresenter((LoginContract.View) fragment);
+        return new LoginPresenter(this, (LoginContract.View) fragment);
 
     }
 

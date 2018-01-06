@@ -20,7 +20,7 @@ import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
-import com.example.jinphy.simplechat.model.event_bus.EBLoginInfo;
+import com.example.jinphy.simplechat.models.event_bus.EBLoginInfo;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsFragment;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsPresenter;

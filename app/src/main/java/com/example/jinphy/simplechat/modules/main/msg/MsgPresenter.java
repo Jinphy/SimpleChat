@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.model.message_record.MessageRecord;
+import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;

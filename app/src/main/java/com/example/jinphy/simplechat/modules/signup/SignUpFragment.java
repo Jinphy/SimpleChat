@@ -9,6 +9,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +17,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.api.Response;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
 import com.example.jinphy.simplechat.custom_view.CustomVerticalStepperFormLayout;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
-import com.example.jinphy.simplechat.model.event_bus.EBFinishActivityMsg;
-import com.example.jinphy.simplechat.model.user.User;
+import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
+import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.modules.login.LoginActivity;
 import com.example.jinphy.simplechat.modules.main.MainActivity;
 import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;
@@ -81,6 +85,8 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     private boolean hasVerified;
     private String verifiedPhone;
     private String password;
+    private long signUpTime;
+    private String deviceId;
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -111,7 +117,13 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 getString(R.string.password),
                 getString(R.string.confirm_password)
         };
-
+        RuntimePermission.getInstance(getActivity())
+                .permission(Manifest.permission.READ_PHONE_STATE)
+                .onGranted(() -> {
+                    deviceId = EncryptUtils.md5(DeviceUtils.deviceId());
+                })
+                .onReject(() -> App.showToast("您拒绝了访问手机状态的权限！", false))
+                .execute();
     }
 
     @Override
@@ -157,7 +169,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         if (presenter == null) {
             this.presenter = getPresenter();
         }
-        this.presenter.registerSMSSDK(getContext());
     }
 
     @Override
@@ -200,7 +211,6 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.presenter.unregisterSMSSDK();
     }
 
     @Override
@@ -310,7 +320,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
 
         AppCompatButton nextStepButton = verticalStepperForm.getNextStepButton(stepNumber);
         switch (stepNumber) {
-            case STEP_ACCOUNT:
+            case STEP_ACCOUNT:// 输入账号步骤的下一步按钮
                 nextStepButton.setOnClickListener(v -> {
                     // 如果此时该账号已经获取过验证码，说明该账号是可以注册的，则直接进行下一步
                     if (hasGetVerificationCode) {
@@ -319,10 +329,10 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                     }
                     // 当前输入账号还未获取过验证码，需要检测账号是否合法，合法则进行下一步
                     // 返回 yes 说明该账号已经注册过，所以不合法
-                    presenter.findUser(getContext(), getText(accountView));
+                    presenter.findUser(getText(accountView));
                 });
                 break;
-            case STEP_VERIFICATION_CODE:
+            case STEP_VERIFICATION_CODE: // 输入验证码步骤的下一步按钮
                 nextStepButton.setOnClickListener(v -> {
                     // 判断当前账号是否验证过
                     if (hasVerified) {
@@ -334,8 +344,8 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                                 .input_text);
                         String verificationCode = editText.getText().toString();
 
-                        presenter.submitVerificationCode(getContext(), verifiedPhone,
-                                verificationCode);
+                        // 提交验证码
+                        presenter.submitVerificationCode(verifiedPhone,verificationCode);
                     }
 
                 });
@@ -344,10 +354,11 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 break;
             case STEP_CONFIRM_PASSWORD:
                 break;
-            default:
+            default: // 最后一步，执行注册
                 nextStepButton.setOnClickListener(v -> {
-                    String date = System.currentTimeMillis() + "";
-                    presenter.createNewUser(getContext(), verifiedPhone, EncryptUtils.md5(password),date);
+                    signUpTime = System.currentTimeMillis();
+                    // 注册
+                    presenter.signUp(verifiedPhone, password,signUpTime+"");
                 });
                 break;
         }
@@ -507,108 +518,116 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
         view.setEnabled(false);
         TextInputEditText editText = accountView.findViewById(R.id.input_text);
         String phone = editText.getText().toString();
-        presenter.getVerificationCode(getContext(), phone);
+
+        presenter.getVerificationCode(phone);
     }
 
     //------------mvp中View的函数----------------------------------------
 
-
     @Override
-    public void getVerificationCodeOnNext(Response response) {
-        BaseApplication.showToast(response.getMsg(), false);
-        if (Response.YES.equals(response.getCode())) {
-            TextInputEditText editText = accountView.findViewById(R.id.input_text);
-            verifiedPhone = editText.getText().toString();
-            hasVerified = false;
-            hasGetVerificationCode = true;
-            TextView view = verificationCodeView.findViewById(R.id.verification_code_button);
+    public void getCodeSucceed(String msg) {
+        App.showToast(msg, false);
+        TextInputEditText editText = accountView.findViewById(R.id.input_text);
+        verifiedPhone = editText.getText().toString();
+        hasVerified = false;
+        hasGetVerificationCode = true;
+        TextView view = verificationCodeView.findViewById(R.id.verification_code_button);
 
-            String origin = view.getText().toString();
-            String text = BaseApplication.app().getString(R.string.re_get);
+        String origin = view.getText().toString();
+        String text = BaseApplication.app().getString(R.string.re_get);
 
-            Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
-                    .map(value -> text.replace(" ", (60 - value) + ""))
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(view::setText)
-                    .doOnComplete(() -> {
-                        view.setEnabled(true);
-                        view.setText(origin);
-                    }).subscribe();
-        } else {
-            verifiedPhone = null;
-            hasGetVerificationCode = false;
-            hasVerified = false;
-            verificationCodeView.findViewById(R.id.verification_code_button).setEnabled(true);
-        }
-
+        Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
+                .map(value -> text.replace(" ", (60 - value) + ""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(view::setText)
+                .doOnComplete(() -> {
+                    view.setEnabled(true);
+                    view.setText(origin);
+                }).subscribe();
     }
 
     @Override
-    public void submitVerificationCodeOnNext(Response response) {
-        BaseApplication.showToast(response.getMsg(), false);
-        if (Response.YES.equals(response.getCode())) {
-            hasVerified = true;
-            //        verticalStepperForm.next(STEP_VERIFICATION_CODE);
-            verticalStepperForm.goToNextStep();
-            return;
-        }
+    public void getCodeFailed() {
+        verifiedPhone = null;
+        hasGetVerificationCode = false;
+        hasVerified = false;
+        verificationCodeView.findViewById(R.id.verification_code_button).setEnabled(true);
+    }
+
+    @Override
+    public void submitCodeSucceed(String msg) {
+        BaseApplication.showToast(msg, false);
+        hasVerified = true;
+        //        verticalStepperForm.next(STEP_VERIFICATION_CODE);
+        verticalStepperForm.goToNextStep();
+        return;
+    }
+
+    @Override
+    public void submitCodeFailed() {
         hasVerified = false;
     }
 
     @Override
-    public void findUserOnNext(Response response) {
-        if (Response.YES.equals(response.getCode())) {
-            BaseApplication.showToast("该账号已被注册过，可直接登录！", false);
-            return;
-        }
-        verticalStepperForm.next(STEP_ACCOUNT);
+    public void findUserOk() {
+        BaseApplication.showToast("该账号已被注册过，可直接登录！", false);
     }
 
+    /**
+     * DESC: 查找用户失败，并且原因为用户不存在时，可以执行下一步
+     * Created by jinphy, on 2018/1/6, at 18:02
+     */
     @Override
-    public void createNewUserOnNext(Response response, long date) {
-        if (Response.YES.equals(response.getCode())) {
-            User user = presenter.saveUser(verifiedPhone, password, date);
-            new MaterialDialog.Builder(getContext())
-                    .title("注册成功")
-                    .iconRes(R.drawable.ic_smile_red_24dp)
-                    .content("恭喜你成功注册账号，是否立即登录？")
-                    .positiveText("马上登录")
-                    .negativeText("不了不了")
-                    .titleColorRes(R.color.color_red_D50000)
-                    .negativeColorRes(R.color.half_alpha_gray)
-                    .positiveColorRes(R.color.color_red_D50000)
-                    .cancelable(false)
-                    .onPositive((dialog, which) -> {
-                        RuntimePermission.getInstance(getActivity())
-                                .permission(Manifest.permission.READ_PHONE_STATE)
-                                .onGranted(()->{
-                                    presenter.login(
-                                            getContext(),
-                                            user,
-                                            EncryptUtils.md5(DeviceUtils.devceId()));
-                                })
-                                .execute();
-                    })
-                    .onNegative((dialog, which) -> finishActivity())
-                    .show();
-
+    public void findUserNo(String reason) {
+        if (BaseRepository.TYPE_CODE.equals(reason)) {
+            verticalStepperForm.next(STEP_ACCOUNT);
         }
     }
 
     @Override
-    public void loginOnNext(Response response, User user) {
-        BaseApplication.showToast(response.getMsg(), false);
-        if (Response.YES.equals(response.getCode())) {
-            MainActivity.start(getActivity(), user, true);
-            EventBus.getDefault().post(new EBFinishActivityMsg(WelcomeActivity.class));
-            EventBus.getDefault().post(new EBFinishActivityMsg(LoginActivity.class));
+    public void whenSignUpSucceed(String msg) {
+        App.showToast(msg, false);
+        new MaterialDialog.Builder(getContext())
+                .title("注册成功")
+                .iconRes(R.drawable.ic_smile_red_24dp)
+                .content("恭喜你成功注册账号，是否立即登录？")
+                .positiveText("马上登录")
+                .negativeText("不了不了")
+                .titleColorRes(R.color.color_red_D50000)
+                .negativeColorRes(R.color.half_alpha_gray)
+                .positiveColorRes(R.color.color_red_D50000)
+                .cancelable(false)
+                .onPositive((dialog, which) -> {
+                    if (!checkDeviceId()) {
+                        return;
+                    }
+                    presenter.login(verifiedPhone, password, deviceId);
+                })
+                .onNegative((dialog, which) -> finishActivity())
+                .show();
+
+    }
+
+    /**
+     * DESC: 检测是否优化去设备Id
+     * Created by jinphy, on 2018/1/6, at 19:48
+     */
+    private boolean checkDeviceId() {
+        if (deviceId == null) {
+            App.showToast("您拒绝了访问手机状态的权限，请到系统设置手动开启以继续当前操作！", false);
+            return false;
         }
+        return true;
+    }
+
+
+    @Override
+    public void whenLoginSucceed(String msg) {
+        BaseApplication.showToast(msg, false);
+        MainActivity.start(getActivity());
+        EventBus.getDefault().post(new EBFinishActivityMsg(WelcomeActivity.class));
+        EventBus.getDefault().post(new EBFinishActivityMsg(LoginActivity.class));
         finishActivity();
-    }
-
-    @Override
-    public synchronized void setText(TextView view, String text) {
-        view.setText(text);
     }
 }

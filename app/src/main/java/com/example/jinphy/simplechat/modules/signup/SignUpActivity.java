@@ -26,7 +26,7 @@ public class SignUpActivity extends BaseActivity {
 
     @Override
     public SignUpPresenter getPresenter(Fragment fragment) {
-        return new SignUpPresenter((SignUpContract.View) fragment);
+        return new SignUpPresenter(this, (SignUpContract.View) fragment);
     }
 
     @Override

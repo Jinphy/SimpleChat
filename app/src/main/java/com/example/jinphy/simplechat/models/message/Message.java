@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.model.message;
+package com.example.jinphy.simplechat.models.message;
 
 import android.support.annotation.IntRange;
 

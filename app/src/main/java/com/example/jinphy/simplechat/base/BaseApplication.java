@@ -10,7 +10,10 @@ import android.widget.Toast;
 
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.listener_adapters.ActivityLiftcycle;
+import com.example.jinphy.simplechat.secret.Secret;
 import com.example.jinphy.simplechat.utils.AppUtils;
+import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.mob.MobSDK;
 
@@ -24,13 +27,13 @@ import io.reactivex.annotations.NonNull;
  */
 
 @SuppressLint("Registered")
-public class BaseApplication extends Application implements Application.ActivityLifecycleCallbacks {
+public class BaseApplication extends Application implements ActivityLiftcycle {
 
     private static final String TAG = "BaseApplication";
 
     private static BaseApplication INSTANCE;
     private static Toast toast;
-    private static boolean DEBUG = true;
+    private static boolean DEBUG;
     private static WeakReference<Activity> currentActivity=null;
 
 
@@ -53,11 +56,12 @@ public class BaseApplication extends Application implements Application.Activity
     public void onCreate() {
         super.onCreate();
         INSTANCE = this;
+        DEBUG = AppUtils.debug();
         initToast();
         registerActivityLifecycleCallbacks(this);
 //        EventBus.getDefault().register(this);
-        String appKey = getString(R.string.app_key);
-        String appSecret = getString(R.string.app_secret);
+        String appKey = EncryptUtils.aesDecrypt(Secret.APP_KEY);
+        String appSecret = EncryptUtils.aesDecrypt(Secret.APP_SECRET);
         MobSDK.init(this, appKey, appSecret);
         LogUtils.getLogConfig()
                 .configAllowLog(AppUtils.debug())
@@ -161,36 +165,7 @@ public class BaseApplication extends Application implements Application.Activity
     }
 
     @Override
-    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-
-    }
-
-    @Override
-    public void onActivityStarted(Activity activity) {
-
-    }
-
-    @Override
     public void onActivityResumed(Activity activity) {
         currentActivity = new WeakReference<>(activity);
-    }
-
-    @Override
-    public void onActivityPaused(Activity activity) {
-    }
-
-    @Override
-    public void onActivityStopped(Activity activity) {
-
-    }
-
-    @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
-    }
-
-    @Override
-    public void onActivityDestroyed(Activity activity) {
-
     }
 }

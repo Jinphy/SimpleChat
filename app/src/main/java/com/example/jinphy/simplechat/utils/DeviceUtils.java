@@ -21,7 +21,7 @@ public class DeviceUtils {
      * Created by jinphy, on 2017/12/31, at 13:28
      */
     @SuppressLint("MissingPermission")
-    public static String devceId(){
+    public static String deviceId(){
         String IMEI = null;
         Activity activity = BaseApplication.activity();
         if (activity != null) {
@@ -41,7 +41,7 @@ public class DeviceUtils {
      */
     @SuppressLint("MissingPermission")
     public static String devceIdMD5(){
-        return EncryptUtils.md5(devceId());
+        return EncryptUtils.md5(deviceId());
     }
 
     /**
