@@ -15,7 +15,9 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.models.event_bus.EBUser;
@@ -62,6 +64,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     private ImageView sexView;
 
     private float density;
+    private User user;
 
     public SelfFragment() {
         // Required empty public constructor
@@ -118,11 +121,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         avatarViewTransYDistance = dp2px(IntConst.POSITIVE_120, density);
         nameTextTransXDistance = dp2px(IntConst.POSITIVE_50, density);
         sexViewTransXDistance = nameTextTransXDistance;
-//        distanceVertical = (IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT)*density;
-//        baseTransY = -distanceVertical;
-//        avatarViewTransXDistance = IntConst.NEGATIVE_150 * density;
-//        avatarViewTransYDistance = IntConst.POSITIVE_120 * density;
-//        nameTextTransXDistance = IntConst.POSITIVE_50 * density;
+        user = presenter.getUser();
     }
 
     @Override
@@ -140,11 +139,11 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         recyclerView.setAdapter(presenter.getAdapter());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        setupUser(presenter.getUser());
+        setupUser();
     }
 
     @Override
-    public void setupUser(User user) {
+    public void setupUser() {
         nameText.setText(user.getName()==null?"没有昵称":user.getName());
         sexView.setVisibility(user.getSex() == null ? View.GONE : View.VISIBLE);
         sexView.setImageResource(getString(R.string.male).equals(user.getSex())
@@ -373,7 +372,8 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void whenModifyUserInfo(EBUser msg) {
         if (msg.ok) {
-            setupUser(msg.data);
+            user = msg.data;
+            setupUser();
         }
     }
 

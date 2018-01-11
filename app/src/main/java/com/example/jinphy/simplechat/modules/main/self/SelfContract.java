@@ -28,7 +28,7 @@ public interface SelfContract {
 
         boolean canMoveDown();
 
-        void setupUser(User user);
+        void setupUser();
     }
 
     interface Presenter extends BasePresenter {

@@ -150,7 +150,7 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
         itemBackgroundColor = a.getColor(R.styleable.MenuItemView_item_backgroundColor,
                 ContextCompat.getColor(getContext(), R.color.white));
         itemNormalElevation = a.getDimensionPixelSize(R.styleable.MenuItemView_item_normal_elevation,
-                ScreenUtils.dp2px(getContext(), 2));
+                ScreenUtils.dp2px(getContext(), 1));
         itemInputElevation = a.getDimensionPixelSize(R.styleable.MenuItemView_item_input_elevation,
                 itemNormalElevation+ScreenUtils.dp2px(getContext(), 8));
         itemCornerRadius = a.getDimensionPixelSize(R.styleable.MenuItemView_item_corner_radius,
