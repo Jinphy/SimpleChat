@@ -187,7 +187,7 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
         private String baseUrl = Api.BASE_URL;
         private String port = Api.COMMON_PORT;
         private String path;
-        private int connectTimeout = 10_000;// 单位是毫秒，默认为10秒
+        private int connectTimeout = 15_000;// 单位是毫秒，默认为10秒
         private int readTimeout = 10_000;   // 单位是毫秒，默认为10秒
         private Map<String, String> headers = new HashMap<>();
         private Params params;

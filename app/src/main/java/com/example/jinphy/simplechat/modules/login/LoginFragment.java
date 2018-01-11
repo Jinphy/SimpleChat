@@ -24,6 +24,7 @@ import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
 import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
+import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.modules.main.MainActivity;
 import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;
@@ -64,6 +65,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
 
     protected String verifiedAccount = null;
     private String deviceId;
+    private User user;
 
     //------------fragment 的函数--------------------------------------------------------------------
 
@@ -82,10 +84,6 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         return fragment;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -109,6 +107,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
                 })
                 .onReject(() -> App.showToast("您拒绝了访问手机状态的权限！", false))
                 .execute();
+        user = presenter.getUser();
     }
 
     @Override
@@ -127,6 +126,11 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
 
     @Override
     protected void setupViews() {
+        if (user != null) {
+            accountLayout.getEditText().setText(user.getAccount());
+            accountLayout.getEditText().setSelection(user.getAccount().length());
+            getVerificationCodeButton.setEnabled(true);
+        }
     }
 
     @Override
@@ -142,7 +146,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         TextInputEditText editText = accountLayout.findViewById(R.id.account_text);
         editText.addTextChangedListener((TextListener.After) editable -> {
             String text = editable.toString();
-            LoginFragment.this.checkAccount(text, text.length());
+            this.checkAccount(text, text.length());
         });
     }
 

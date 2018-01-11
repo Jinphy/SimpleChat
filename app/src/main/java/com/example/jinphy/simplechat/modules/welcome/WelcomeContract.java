@@ -6,6 +6,7 @@ import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 
 /**
+ * DESC:
  * Created by jinphy on 2017/8/9.
  */
 
@@ -16,7 +17,7 @@ public interface WelcomeContract {
 
         void showSignUpView(android.view.View view);
 
-        void showMainActivity(String account,String password);
+        void showMainActivity();
 
         void showAnimator();
 

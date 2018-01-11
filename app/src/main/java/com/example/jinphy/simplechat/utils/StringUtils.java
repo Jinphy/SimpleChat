@@ -1,8 +1,22 @@
 package com.example.jinphy.simplechat.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.icu.text.RelativeDateTimeFormatter;
+import android.support.annotation.IntRange;
+import android.text.TextUtils;
+import android.util.Base64;
+
+import com.example.jinphy.simplechat.custom_libs.SChain;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,8 +56,23 @@ public class StringUtils {
         return one.equals(two);
     }
 
+    /**
+     * DESC: 判断两个字符串是否不相等，如果两个任意一个为空则不相等
+     * Created by jinphy, on 2018/1/10, at 20:30
+     */
     public static boolean notEqual(String one, String two) {
         return !equal(one, two);
+    }
+
+    /**
+     * DESC: 判断两个字符串是否不相等，如果两个字符串都为空则认为相等
+     * Created by jinphy, on 2018/1/10, at 20:29
+     */
+    public static boolean notEqualNullable(String one, String two) {
+        if (TextUtils.isEmpty(one) && TextUtils.isEmpty(two)) {
+            return false;
+        }
+        return notEqual(one, two);
     }
 
     public static String generateURI(String baseUrl, String port, String path, String params) {
@@ -55,6 +84,37 @@ public class StringUtils {
                 .append("/?content=")
                 .append(params);
         return build.toString();
+    }
+
+    /**
+     * DESC: 格式化日期
+     *
+     *
+     *
+     * @param time 毫秒
+     * Created by jinphy, on 2018/1/7, at 15:12
+     */
+    public static String formatDate(long time) {
+        return SimpleDateFormat.getDateInstance().format(new Date(time));
+    }
+
+    /**
+     * DESC:格式化时间
+     * @param time 毫秒
+     * Created by jinphy, on 2018/1/7, at 15:25
+     */
+    public static String formatTime(long time) {
+        return SimpleDateFormat.getTimeInstance().format(new Date(time));
+    }
+
+    /**
+     * DESC: 格式化日期和时间
+     *
+     * @param time 毫秒
+     * Created by jinphy, on 2018/1/7, at 15:26
+     */
+    public static String formatDateTime(long time) {
+        return SimpleDateFormat.getDateTimeInstance().format(new Date(time));
     }
 
 
@@ -88,4 +148,63 @@ public class StringUtils {
         return ret;
     }
 
+    /**
+     * DESC: 格式化角度字符串
+     * Created by jinphy, on 2018/1/10, at 20:49
+     */
+    public static CharSequence formatDegree(Object value) {
+        return SChain.with(value).append("o").superscript(0.5f).make();
+    }
+
+    /**
+     * bitmap转为base64
+     * @param bitmap
+     * @return
+     */
+    public static String bitmapToBase64(Bitmap bitmap, @IntRange(from = 0,to = 100) int... quality) {
+        if (bitmap == null) {
+            return "";
+        }
+        int q = 100;
+        if (quality.length > 0) {
+            q = quality[0];
+        }
+        String result = null;
+        ByteArrayOutputStream out = null;
+        try {
+            if (bitmap != null) {
+                out = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, q, out);
+                out.flush();
+
+                byte[] bitmapBytes = out.toByteArray();
+                result = Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.flush();
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * base64转为bitmap
+     * @param base64
+     * @return
+     */
+    public static Bitmap base64ToBitmap(String base64) {
+        if (TextUtils.isEmpty(base64)) {
+            return null;
+        }
+        byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
 }

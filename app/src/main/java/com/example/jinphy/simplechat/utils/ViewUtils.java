@@ -45,4 +45,5 @@ public class ViewUtils {
         editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 //        editText.setTransformationMethod(PasswordTransformationMethod.getInstance())
     }
+
 }

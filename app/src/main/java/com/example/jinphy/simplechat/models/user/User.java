@@ -16,15 +16,8 @@ import io.reactivex.annotations.NonNull;
 @Entity
 public class User implements Serializable{
 
-    public static final String ID = "id";
-    public static final String ACCOUNT = "account";
-    public static final String NAME = "name";
-    public static final String PASSWORD = "password";
-    public static final String DATE = "date";
-    public static final String SEX = "sex";
-    public static final String AVATAR_URL = "avatarUrl";
-    public static final String STATUS = "status";
-    public static final String ACCESS_TOKEN = "accessToken";
+    public static final String STATUS_LOGIN = "LOGIN";
+    public static final String STATUS_LOGOUT = "LOGOUT";
 
 
     @Id
@@ -64,10 +57,10 @@ public class User implements Serializable{
     protected String sex;
 
     /**
-     * DESC: 头像地址
+     * DESC: 头像，base64编码
      * Created by jinphy, on 2018/1/3, at 14:24
      */
-    protected String avatarUrl;
+    protected String avatar;
 
     /**
      * DESC: 登录状态
@@ -89,6 +82,17 @@ public class User implements Serializable{
      */
     protected String accessToken;
 
+    private boolean current;
+
+    private boolean rememberPassword;
+
+    /**
+     * DESC: 个性签名
+     * Created by jinphy, on 2018/1/9, at 14:29
+     */
+    private String signature;
+
+    private String address;
 
     /**
      * DESC: 一个用户可以有多个好友，所以是一对多关系，即一个User -> 多个Friend
@@ -98,12 +102,12 @@ public class User implements Serializable{
 
     public User(){}
 
-    public User(int id, String account, String password, long date, String avatarUrl) {
+    public User(int id, String account, String password, long date, String avatar) {
         this.id = id;
         this.account = account;
         this.password = password;
         this.date = date;
-        this.avatarUrl = avatarUrl;
+        this.avatar = avatar;
     }
 
     public void setId(long id) {
@@ -126,8 +130,8 @@ public class User implements Serializable{
         this.date = date;
     }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public long getId() {
@@ -150,8 +154,8 @@ public class User implements Serializable{
         return date;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public String getAvatar() {
+        return avatar;
     }
 
     public ToMany<Friend> getFriends() {
@@ -184,5 +188,37 @@ public class User implements Serializable{
 
     public void setSex(String sex) {
         this.sex = sex;
+    }
+
+    public boolean isCurrent() {
+        return current;
+    }
+
+    public void setCurrent(boolean current) {
+        this.current = current;
+    }
+
+    public boolean isRememberPassword() {
+        return rememberPassword;
+    }
+
+    public void setRememberPassword(boolean rememberPassword) {
+        this.rememberPassword = rememberPassword;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

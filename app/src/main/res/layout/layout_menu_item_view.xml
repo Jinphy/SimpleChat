@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    android:id="@+id/root_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/icon_view"
+        android:layout_width="@dimen/dimen_24dp"
+        android:layout_height="@dimen/dimen_24dp"
+        android:layout_marginLeft="@dimen/dimen_10dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_smile_24dp"/>
+
+    <TextView
+        android:id="@+id/title_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dimen_5dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:maxWidth="140dp"
+        android:textSize="18sp"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/icon_view"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="菜单标题"/>
+
+    <RelativeLayout
+        android:id="@+id/right_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:alpha="0.5"
+        android:layout_marginRight="@dimen/dimen_5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/content_layout"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="@dimen/dimen_24dp"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical">
+
+            <HorizontalScrollView
+                android:scrollbars="none"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/content_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    tools:text="菜单内容"
+                    tools:textSize="15sp"
+                    android:textColor="@color/colorAccent"
+                    android:layout_gravity="end"
+                    android:gravity="end"
+                    android:maxLines="1"/>
+            </HorizontalScrollView>
+
+            <HorizontalScrollView
+                android:scrollbars="none"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:id="@+id/content_edit_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
+                    android:layout_gravity="end"
+                    android:background="@color/transparent"
+                    android:textColor="@color/colorAccent"
+                    android:maxLines="1"
+                    android:visibility="gone"/>
+            </HorizontalScrollView>
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/arrow_view"
+            android:layout_width="24dp"
+            android:layout_height="48dp"
+            android:alpha="0.6"
+            android:layout_alignParentRight="true"
+            app:srcCompat="@drawable/ic_arrow_right"/>
+
+    </RelativeLayout>
+
+
+</android.support.constraint.ConstraintLayout>
+
+
+
+

@@ -47,8 +47,7 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
      * @return A new app of fragment WelcomeFragment.
      */
     public static WelcomeFragment newInstance() {
-        WelcomeFragment fragment = new WelcomeFragment();
-        return fragment;
+        return new WelcomeFragment();
     }
 
     @Override
@@ -108,10 +107,7 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
     }
 
     @Override
-    public void showMainActivity(String account,String password) {
-        User user = new User();
-        user.setAccount(account);
-        user.setPassword(password);
+    public void showMainActivity() {
         MainActivity.start(getActivity());
         finishActivity();
     }

@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.GET_TASKS"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:name=".application.App"
@@ -41,8 +42,8 @@
         </activity>
         <activity
             android:name=".modules.login.LoginActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"
-            android:theme="@style/LoginActivityTheme">
+            android:theme="@style/LoginActivityTheme"
+            android:windowSoftInputMode="stateHidden|adjustResize">
         </activity>
         <activity android:name=".modules.main.MainActivity">
         </activity>
@@ -60,6 +61,28 @@
             android:enabled="true"
             android:exported="true">
         </service>
+
+        <activity
+            android:name=".modules.modify_user_info.ModifyUserActivity"
+            android:theme="@style/ModifyUserActivityTheme">
+        </activity>
+        <activity android:name=".modules.pick_photo.PickPhotoActivity"
+            android:theme="@style/PickPhotoActivityTheme">
+        </activity>
+
+
+
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.jinphy.simplechat.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths">
+            </meta-data>
+        </provider>
     </application>
 
 </manifest>

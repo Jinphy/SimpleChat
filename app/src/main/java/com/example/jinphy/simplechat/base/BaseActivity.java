@@ -1,7 +1,9 @@
 package com.example.jinphy.simplechat.base;
 
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -11,10 +13,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.models.event_bus.EBActivity;
 import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
 
@@ -34,11 +38,31 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected static Snackbar snackbar;
     protected static String TAG;
 
+    public int colorAccent;
+    public int colorPrimary;
+    public int colorPrimaryDark;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         TAG = this.getClass().getSimpleName();
         EventBus.getDefault().register(this);
+
+        initColor();
+    }
+
+
+    private void initColor() {
+        TypedArray a = getTheme().obtainStyledAttributes(new int[]{
+                R.attr.colorPrimary,
+                R.attr.colorPrimaryDark,
+                R.attr.colorAccent
+        });
+        colorPrimary = a.getColor(0, ContextCompat.getColor(this, R.color.colorPrimary));
+        colorPrimaryDark = a.getColor(1, ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        colorAccent = a.getColor(2, ContextCompat.getColor(this, R.color.colorAccent));
     }
 
     @Override

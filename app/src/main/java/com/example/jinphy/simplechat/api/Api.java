@@ -18,7 +18,7 @@ import java.lang.reflect.Type;
 public abstract class Api {
 
     // 宿舍WiFi
-    //        public static String BASE_URL = "ws://192.168.0.3";
+//            public static String BASE_URL = "ws://192.168.0.3";
     //    成和WiFi
     //    public static String BASE_URL = "ws://192.168.3.21";
     //    我的手机WiFi
@@ -84,6 +84,8 @@ public abstract class Api {
 
         @Post
         String login = "/user/login";
+        @Post
+        String logout = "/user/logout";
         @Get
         String findUser = "/user/findUser";
         @Post
@@ -92,6 +94,8 @@ public abstract class Api {
         String getVerificationCode = "sms/getVerificationCode";
         @Get
         String submitVerificationCode = "sms/submitVerificationCode";
+        @Post
+        String modifyUserInfo = "/user/modifyUserInfo";
     }
 
     //===================参数key==========================================================
@@ -107,6 +111,13 @@ public abstract class Api {
         String password = "password";
         String deviceId = "deviceId";
         String date = "date";
+        String avatar = "avatar";
+        String name = "name";
+        String accessToken = "accessToken";
+        String signature = "signature";
+        String sex = "sex";
+        String address = "address";
+
     }
 
 
@@ -123,7 +134,7 @@ public abstract class Api {
      *                    .dataType(Api.Data.MODEL_LIST,GSUser.class)
      *                    .path(Api.Path.login)
      *                    .onResponseYes(response -> {
-     *                          List<GSUser> data = response.getData();
+     *                          List<GSUser> data = response.getBitmapFromActivity();
      *                    })
      *                    .request();
      *      注意：

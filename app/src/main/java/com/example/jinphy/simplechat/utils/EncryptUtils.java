@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.utils;
 
 import android.support.annotation.IntRange;
+import android.text.TextUtils;
 
 import com.example.jinphy.simplechat.constants.StringConst;
 import com.example.jinphy.simplechat.secret.Secret;
@@ -41,6 +42,9 @@ public class EncryptUtils {
      * @param times 加密次数
      */
     public static String md5(String msg, @IntRange(from = 1) int times) {
+        if (TextUtils.isEmpty(msg)) {
+            return "";
+        }
         if (times < 1) {
             times = 1;
         }
@@ -56,6 +60,9 @@ public class EncryptUtils {
      * @param msg 待加密的文本信息
      */
     public static String md5(String msg) {
+        if (TextUtils.isEmpty(msg)) {
+            return "";
+        }
         try {
             MessageDigest digest = MessageDigest.getInstance(MD5);
             byte[] encryptedMsg = digest.digest(msg.getBytes(UTF_8));
@@ -76,6 +83,9 @@ public class EncryptUtils {
      * Created by jinphy, on 2017/12/31, at 20:27
      */
     public static String aesEncrypt(String value, String... aesKey) {
+        if (TextUtils.isEmpty(value)) {
+            return "";
+        }
         String key = AES_KEY;
         if (aesKey.length > 0) {
             key = aesKey[0];
@@ -95,6 +105,9 @@ public class EncryptUtils {
      * Created by jinphy, on 2017/12/31, at 20:29
      */
     public static String aesDecrypt(String value, String... aesKey) {
+        if (TextUtils.isEmpty(value)) {
+            return "";
+        }
         try {
             String s = new String(StringUtils.hexString2Bytes(value), UTF_8);
 
@@ -114,6 +127,9 @@ public class EncryptUtils {
      * Created by jinphy, on 2017/12/31, at 20:12
      */
     public static String aesTransform(String value, String aesKey) {
+        if (TextUtils.isEmpty(value)) {
+            return "";
+        }
         int[] iS = new int[256];
         byte[] iK = new byte[256];
 
@@ -160,6 +176,9 @@ public class EncryptUtils {
      * Created by jinphy, on 2018/1/3, at 10:48
      */
     public static String encodeThenEncrypt(String value) {
+        if (TextUtils.isEmpty(value)) {
+            return "";
+        }
         String out = value;
         try {
             // 编码
@@ -178,6 +197,9 @@ public class EncryptUtils {
      * Created by jinphy, on 2018/1/3, at 10:48
      */
     public static String decryptThenDecode(String value) {
+        if (TextUtils.isEmpty(value)) {
+            return "";
+        }
         String out = value;
         try {
             // 解密
@@ -190,13 +212,6 @@ public class EncryptUtils {
         }
         return out;
     }
-
-
-
-
-
-
-
 
     //    将用md5加密后的字节数组进行解析
     private static String parseBytes(byte[] bytes) {

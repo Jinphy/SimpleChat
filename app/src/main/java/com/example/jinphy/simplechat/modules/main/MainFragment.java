@@ -328,6 +328,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     // 获取一个fragment时，判断fragment是否存在于FragmentManager中，
     // 如果存在，在从FragmentManager中获取，否则生成一个新的fragment对象实例
+    @SuppressWarnings("unchecked")
     private <T extends Fragment> T getFragment(int position) {
         String tag = MainViewPagerAdapter.getItemTag(viewPager, position);
         Fragment fragment = this.getChildFragmentManager().findFragmentByTag(tag);
@@ -451,7 +452,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     @Override
     public SelfPresenter getSelfPresenter(Fragment fragment) {
 
-        return new SelfPresenter((SelfContract.View) fragment);
+        return new SelfPresenter(getContext(), (SelfContract.View) fragment);
     }
 
     /**

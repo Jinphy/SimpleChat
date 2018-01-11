@@ -5,6 +5,7 @@ import android.content.Context;
 import com.example.jinphy.simplechat.api.Response;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.user.User;
 
 /**
  * Created by jinphy on 2017/8/9.
@@ -47,5 +48,7 @@ public interface LoginContract {
         void loginWithPassword(String account, String password, String deviceId);
 
         void loginWithCode(String account, String code, String deviceId);
+
+        User getUser();
     }
 }

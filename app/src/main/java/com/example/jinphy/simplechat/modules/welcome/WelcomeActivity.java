@@ -24,10 +24,7 @@ public class WelcomeActivity extends BaseActivity {
         ScreenUtils.setFullScreen(this);
         setContentView(R.layout.activity_welcome);
 
-        WelcomeFragment fragment = WelcomeFragment.newInstance();
-
-        WelcomeFragment returnFragment = (WelcomeFragment) addFragment(fragment, R.id.fragment);
-        getPresenter(returnFragment);
+        getPresenter(addFragment(WelcomeFragment.newInstance(), R.id.fragment));
     }
 
     @Override

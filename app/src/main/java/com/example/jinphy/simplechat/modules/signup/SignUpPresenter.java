@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.example.jinphy.simplechat.api.Api;
+import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.models.verification_code.CodeRepository;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
@@ -47,14 +48,14 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     public void getVerificationCode(String phone) {
         if (ObjectHelper.reference(context)) {
             Context context = this.context.get();
-            codeRepository.newTask()
+            codeRepository.<String>newTask()
                     .param(Api.Key.phone, phone)
-                    // 找到账号是回调
-                    .doOnDataOk(view::getCodeSucceed)
+                    // 找到账号时回调
+                    .doOnDataOk(response->view.getCodeSucceed(response.getMsg()))
                     // 没有找到或者网络异常时回调，网络请求底层已做好了对应提示，我已这里无需再提示
                     .doOnDataNo(reason -> view.getCodeFailed())
                     // 提交设置并执行用户查找
-                    .submit(builder -> codeRepository.getCode(context, builder));
+                    .submit(task -> codeRepository.getCode(context, task));
         }
     }
 
@@ -66,14 +67,14 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     public void submitVerificationCode(String phone, String verificationCode) {
             if (ObjectHelper.reference(context)) {
                 Context context = this.context.get();
-                codeRepository.newTask()
+                codeRepository.<String>newTask()
                         .param(Api.Key.phone, phone)
                         .param(Api.Key.verificationCode, verificationCode)
                         // 验证码验证成功时回调
-                        .doOnDataOk(view::submitCodeSucceed)
+                        .doOnDataOk(response->view.submitCodeSucceed(response.getMsg()))
                         .doOnDataNo(reason -> view.submitCodeFailed())
                         // 提交设置并执行验证
-                        .submit(builder -> codeRepository.verify(context, builder));
+                        .submit(task -> codeRepository.verify(context, task));
             }
     }
 
@@ -81,15 +82,15 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     public void findUser(String account) {
         if (ObjectHelper.reference(context)) {
             Context context = this.context.get();
-            userRepository.newTask()
+            userRepository.<User>newTask()
                     .param(Api.Key.account, account)
                     .autoShowNo(false)
-                    // 找到账号是回调
-                    .doOnDataOk(user -> view.findUserOk())
+                    // 找到账号时回调
+                    .doOnDataOk(response -> view.findUserOk())
                     // 没有找到或者网络异常时回调，网络请求底层已做好了对应提示，我已这里无需再提示
                     .doOnDataNo(view::findUserNo)
                     // 提交设置并执行用户查找
-                    .submit(builder -> userRepository.findUser(context, builder));
+                    .submit(task -> userRepository.findUser(context, task));
         }
     }
 
@@ -97,16 +98,16 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     public void signUp(String account, String password, String date) {
         if (ObjectHelper.reference(context)) {
             Context context = this.context.get();
-            userRepository.newTask()
+            userRepository.<User>newTask()
                     .param(Api.Key.account, account)
                     .param(Api.Key.password, EncryptUtils.md5(password))
                     .param(Api.Key.date, date)
                     // 注册成功时回调
-                    .doOnDataOk(user -> view.whenSignUpSucceed("账号注册成功！"))
+                    .doOnDataOk(response -> view.whenSignUpSucceed("账号注册成功！"))
                     // 没有找到或者网络异常时回调，网络请求底层已做好了对应提示，我已这里无需再提示
                     .doOnDataNo(view::findUserNo)
                     // 提交设置并执行用户查找
-                    .submit(builder -> userRepository.signUp(context, builder));
+                    .submit(task -> userRepository.signUp(context, task));
 
         }
     }
@@ -117,17 +118,20 @@ public class SignUpPresenter implements SignUpContract.Presenter {
         if (ObjectHelper.reference(context)) {
             Context context = this.context.get();
 
-            userRepository.newTask()
+            userRepository.<User>newTask()
                     .param(Api.Key.account, account)
                     .param(Api.Key.password, EncryptUtils.md5(password))
                     .param(Api.Key.deviceId, deviceId)
                     // 登录成功时回调
-                    .doOnDataOk(user -> {
+                    .doOnDataOk(response -> {
+                        User user = response.getData();
                         view.whenLoginSucceed("登录成功！");
-                        // TODO: 2018/1/6 保存账号
+                        user.setPassword(EncryptUtils.aesEncrypt(password));
+                        user.setRememberPassword(true);
+                        userRepository.saveUser(user);
                     })
                     // 提交设置并执行登录操作
-                    .submit(builder -> userRepository.login(context, builder));
+                    .submit(task -> userRepository.login(context, task));
         }
 
     }

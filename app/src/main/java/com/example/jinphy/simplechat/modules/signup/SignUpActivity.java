@@ -18,10 +18,8 @@ public class SignUpActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        SignUpFragment fragment = SignUpFragment.newInstance();
+        getPresenter(addFragment(SignUpFragment.newInstance(),R.id.fragment));
 
-        SignUpFragment returnFragment = (SignUpFragment) addFragment(fragment, R.id.fragment);
-        getPresenter(returnFragment);
     }
 
     @Override

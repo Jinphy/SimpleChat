@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.user.User;
 
 /**
  * Created by jinphy on 2017/8/10.
@@ -26,6 +27,8 @@ public interface SelfContract {
         boolean canMoveUp();
 
         boolean canMoveDown();
+
+        void setupUser(User user);
     }
 
     interface Presenter extends BasePresenter {
@@ -33,6 +36,8 @@ public interface SelfContract {
         SelfRecyclerViewAdapter getAdapter();
 
         int getItemCount();
+
+        User getUser();
     }
 }
 

@@ -397,11 +397,17 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
     //----------------------------------------------
+
+    /**
+     * DESC: 创建菜单
+     * Created by jinphy, on 2018/1/8, at 20:52
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_chat_fragment,menu);
     }
 
+    // 菜单点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

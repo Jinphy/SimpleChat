@@ -1,6 +1,6 @@
 package com.example.jinphy.simplechat.base;
 
-import android.databinding.DataBindingUtil;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
@@ -13,14 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.jinphy.simplechat.utils.ScreenUtils;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by jinphy on 2017/8/15.
@@ -31,6 +30,16 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     public BaseFragment() {
     }
 
+    /**
+     * DESC: activity 布局所在的父布局（id为content的系统布局，是一个frameLayout）
+     * Created by jinphy, on 2018/1/9, at 8:53
+     */
+    protected View activityContentView;
+
+    /**
+     * DESC: 当前fragment的跟布局
+     * Created by jinphy, on 2018/1/9, at 8:54
+     */
     protected View rootView;
 
     protected T presenter;
@@ -38,6 +47,10 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     private static final String TAG = "BaseFragment";
 
     private Toast toast;
+
+    protected int colorAccent;
+    protected int colorPrimary;
+    protected int colorPrimaryDark;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,17 +70,26 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         initView(root);
 
 
-        // Must set to true,if you want to use options menu in the fragment
+        /**
+         * DESC: Must set to true,if you want to use options menu in the fragment
+         *
+         *
+         * Created by jinphy, on 2018/1/9, at 8:44
+         */
         setHasOptionsMenu(true);
 
 
         return root;
     }
 
+    @SuppressWarnings("all")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+        activityContentViewBottom = ScreenUtils.getScreenHeight(getContext());
+        keyboardHeight = ScreenUtils.dp2px(getContext(), 230);// 实际的键盘高度不一定是这个，取个大概
+
     }
 
     @Override
@@ -96,6 +118,36 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
         // 为需要的View注册各种点击事件
         registerEvent();
+
+        // 额外设置
+        doExtra();
+
+    }
+
+    private void doExtra(){
+
+        /**
+         * DESC: 注册该监听器主要是用来监听键盘是否关闭
+         * Created by jinphy, on 2018/1/8, at 21:30
+         */
+        activityContentView = getActivity().findViewById(android.R.id.content);
+        activityContentView
+                .getViewTreeObserver()
+                .addOnGlobalLayoutListener(
+                        () -> { //当界面大小变化时，系统就会调用该方法
+                            //将当前界面的尺寸传给Rect矩形
+                            activityContentView.getWindowVisibleDisplayFrame(rect);
+                            //弹起键盘时的变化高度，在该场景下其实就是键盘高度。
+                            int deltaHeight = activityContentViewBottom - rect.bottom;
+                            if (deltaHeight > keyboardHeight) {
+                                // 键盘打开
+                                onKeyboardEvent(true);
+                            } else if (-deltaHeight > keyboardHeight) {
+                                // 键盘关闭
+                                onKeyboardEvent(false);
+                            }
+                            activityContentViewBottom = rect.bottom;
+                        });
     }
 
     protected abstract @LayoutRes int getResourceId();
@@ -109,17 +161,18 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     protected abstract void registerEvent();
 
     protected T getPresenter() {
-        BaseActivity activity = (BaseActivity) getActivity();
-        return activity.getPresenter(this);
-
-        //        if (presenterCallback == null) {
-        //            throw new NullPointerException(
-        //                    "in " + this.getClass().getSimpleName() +
-        //                            " the presenterCallback cannot be null,you must invoke the fragment" +
-        //                            ".setPresenterCallback() method");
-        //        }
-//        return (T) presenterCallback.getPresenter(this);
+        return activity().getPresenter(this);
     }
+
+
+    /**
+     * DESC: 获取当前fragment所在的activity
+     * Created by jinphy, on 2018/1/9, at 23:33
+     */
+    public BaseActivity activity() {
+        return (BaseActivity) getActivity();
+    }
+
 
     public boolean handleHorizontalTouchEvent(MotionEvent event) {
         return false;
@@ -136,11 +189,52 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         }
     }
 
-//    这个方法在activity的onBackPressed中调用
+    /**
+     * DESC: 这个方法在activity的onBackPressed中调用
+     *
+     *  注：返回true则会执行activity的onBackPressed()
+     *
+     * Created by jinphy, on 2018/1/8, at 21:03
+     */
     public boolean onBackPressed(){
-//        返回true则会执行activity的onBackPressed()
         return true;
     }
+
+    /**
+     * DESC: 初始化当前activity的主题颜色
+     * Created by jinphy, on 2018/1/9, at 23:35
+     */
+    protected void initColor() {
+        BaseActivity activity = (BaseActivity) getActivity();
+        if (activity == null) {
+            return;
+        }
+        colorAccent = activity.colorAccent;
+        colorPrimary = activity.colorPrimary;
+        colorPrimaryDark = activity.colorPrimaryDark;
+    }
+
+    public int colorAccent() {
+        if (colorAccent == 0) {
+            initColor();
+        }
+        return colorAccent;
+    }
+
+    public int colorPrimary() {
+        if (colorPrimary == 0) {
+            initColor();
+        }
+        return colorPrimary;
+    }
+
+    public int colorPrimaryDark() {
+        if (colorPrimaryDark == 0) {
+            initColor();
+        }
+        return colorPrimaryDark;
+    }
+
 
     //========================================================\\
 
@@ -175,6 +269,28 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         }
 
     }
+
+
+
+    // activity布局所在的系统的 id 为content 的布局的底部位置
+    private int activityContentViewBottom;
+
+    // 键盘高度
+    private int keyboardHeight;
+
+    private Rect rect = new Rect();
+
+
+    /**
+     * DESC: 键盘状态发生变化是回调
+     *
+     * @param open true 表示键盘打开，false表示键盘关闭
+     * Created by jinphy, on 2018/1/9, at 8:38
+     */
+    protected void onKeyboardEvent(boolean open) {
+        // no-op
+    }
+
 
 }
 

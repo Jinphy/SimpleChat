@@ -1,6 +1,8 @@
 package com.example.jinphy.simplechat.modules.main.self;
 
 import android.app.Activity;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -16,15 +18,28 @@ import android.widget.TextView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.models.event_bus.EBUser;
+import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
+import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
+import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.example.jinphy.simplechat.utils.ScreenUtils.dp2px;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,6 +51,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     private static final int HORIZONTAL = 0;
     private static final int VERTICAL = 1;
 
+
     private FloatingActionButton fab;
 
     private RecyclerView recyclerView;
@@ -43,6 +59,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     private ImageView avatarView;
     private TextView nameText;
     private TextView dateText;
+    private ImageView sexView;
 
     private float density;
 
@@ -61,6 +78,13 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (presenter == null) {
+            presenter = getPresenter();
+        }
+    }
 
     @Override
     public void initFab(Activity activity) {
@@ -75,7 +99,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
     @Override
     public void fabAction(View view) {
-
+        ModifyUserActivity.start(getActivity());
     }
 
 
@@ -88,11 +112,12 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     public void initData() {
         density = ScreenUtils.getDensity(getContext());
 
-        distanceVertical = ScreenUtils.dp2px(IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT,density);
+        distanceVertical = dp2px(IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT,density);
         baseTransY = -distanceVertical;
-        avatarViewTransXDistance = ScreenUtils.dp2px(IntConst.NEGATIVE_150, density);
-        avatarViewTransYDistance = ScreenUtils.dp2px(IntConst.POSITIVE_120, density);
-        nameTextTransXDistance = ScreenUtils.dp2px(IntConst.POSITIVE_50, density);
+        avatarViewTransXDistance = dp2px(IntConst.NEGATIVE_150, density);
+        avatarViewTransYDistance = dp2px(IntConst.POSITIVE_120, density);
+        nameTextTransXDistance = dp2px(IntConst.POSITIVE_50, density);
+        sexViewTransXDistance = nameTextTransXDistance;
 //        distanceVertical = (IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT)*density;
 //        baseTransY = -distanceVertical;
 //        avatarViewTransXDistance = IntConst.NEGATIVE_150 * density;
@@ -107,12 +132,27 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         avatarView = headView.findViewById(R.id.avatar);
         nameText = headView.findViewById(R.id.name);
         dateText = headView.findViewById(R.id.date);
+        sexView = headView.findViewById(R.id.sex);
     }
 
     @Override
     protected void setupViews() {
         recyclerView.setAdapter(presenter.getAdapter());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        setupUser(presenter.getUser());
+    }
+
+    @Override
+    public void setupUser(User user) {
+        nameText.setText(user.getName()==null?"没有昵称":user.getName());
+        sexView.setVisibility(user.getSex() == null ? View.GONE : View.VISIBLE);
+        sexView.setImageResource(getString(R.string.male).equals(user.getSex())
+                ? R.drawable.ic_male : R.drawable.ic_female);
+        dateText.setText(StringUtils.formatDate(user.getDate()));
+        if (user.getAvatar() != null) {
+            avatarView.setImageBitmap(StringUtils.base64ToBitmap(user.getAvatar()));
+        }
     }
 
     @Override
@@ -133,6 +173,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     float avatarViewTransXDistance;
     float avatarViewTransYDistance;
     float nameTextTransXDistance;
+    float sexViewTransXDistance;
     int baseTransY;
     float oldY;
 
@@ -263,6 +304,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
             avatarView.setTranslationX(faction*avatarViewTransXDistance);
             avatarView.setTranslationY(faction*avatarViewTransYDistance);
             nameText.setTranslationX(faction*nameTextTransXDistance);
+            sexView.setTranslationX(faction * sexViewTransXDistance);
             dateText.setAlpha(1-faction);
         }
     }
@@ -323,4 +365,16 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
         }
     }
+
+    /**
+     * DESC: 当修改用户信息是该函数将会接收到修改结果
+     * Created by jinphy, on 2018/1/11, at 13:17
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void whenModifyUserInfo(EBUser msg) {
+        if (msg.ok) {
+            setupUser(msg.data);
+        }
+    }
+
 }

@@ -27,6 +27,9 @@ public class MainActivity extends BaseActivity {
 
 
     public static void start(Activity activity) {
+        if (activity == null) {
+            return;
+        }
         Intent intent = new Intent(activity, MainActivity.class);
         activity.startActivity(intent);
         activity.overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);

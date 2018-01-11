@@ -12,7 +12,7 @@ import com.example.jinphy.simplechat.base.BaseRepository;
  * Created by jinphy on 2018/1/6.
  */
 
-public class CodeRepository extends BaseRepository<String,String> implements CodeDataSource<String>{
+public class CodeRepository extends BaseRepository implements CodeDataSource{
 
 
     public static CodeRepository getInstance() {
@@ -52,14 +52,15 @@ public class CodeRepository extends BaseRepository<String,String> implements Cod
                 .request();
     }
 
+
     @Override
-    protected void handleBuilder(ApiInterface<Response<String>> api, Task<String> task) {
+    protected<T> void handleBuilder(ApiInterface<Response<T>> api, Task<T> task) {
         api.showProgress(task.isShowProgress())
                 .autoShowNo(task.isAutoShowNo())
                 .params(task.getParams())
                 .onResponseYes(task.getOnDataOk()==null
                         ?null
-                        :response -> task.getOnDataOk().call(response.getMsg())
+                        :response -> task.getOnDataOk().call(response)
                 )
                 .onResponseNo(task.getOnDataNo()==null
                         ?null

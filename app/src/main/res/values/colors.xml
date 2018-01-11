@@ -17,4 +17,10 @@
     <color name="colorAccentLighter">#9f4E342E</color>
     <color name="color_red_D50000">#D50000</color>
     <color name="color_red_light_B71C1C">#B71C1C</color>
+    <color name="green_primary">#ff558B2F</color>
+    <color name="green_primary_dark">#ff33691E</color>
+    <color name="yellow_primary">#FF8F00</color>
+    <color name="yellow_primary_dark">#FF6F00</color>
+    <color name="black_primary">#ff212121</color>
+    <color name="black_primary_dark">#ff111111</color>
 </resources>

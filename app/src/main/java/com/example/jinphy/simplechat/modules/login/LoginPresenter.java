@@ -5,8 +5,6 @@ import android.support.annotation.NonNull;
 
 import com.example.jinphy.simplechat.api.Api;
 import com.example.jinphy.simplechat.application.App;
-import com.example.jinphy.simplechat.base.BaseApplication;
-import com.example.jinphy.simplechat.base.BaseRepository.Task;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.models.verification_code.CodeRepository;
@@ -15,8 +13,6 @@ import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -57,27 +53,27 @@ public class LoginPresenter implements LoginContract.Presenter {
     public void getVerificationCode(String phone) {
         if (ObjectHelper.reference(context)) {
             Context context = this.context.get();
-            userRepository.newTask()
+            userRepository.<User>newTask()
                     .param(Api.Key.account, phone)
                     // 开始时回调
                     .doOnStart(() -> view.enableCodeButton(false))
                     // 找到账号是回调
                     .doOnDataOk(user -> {
                         // 找到账号，获取验证码
-                        codeRepository.newTask()
+                        codeRepository.<String>newTask()
                                 .param(Api.Key.phone, phone)
                                 .doOnDataOk(msg -> {
-                                    App.showToast(msg, false);
+                                    App.showToast(msg.getMsg(), false);
                                     view.updateVerifiedAccount(phone);
                                     view.countDownCodeButton();
                                 })
                                 .doOnDataNo(reason -> view.enableCodeButton(true))
-                                .submit(builder -> codeRepository.getCode(context, builder));
+                                .submit(task -> codeRepository.getCode(context, task));
                     })
                     // 没有找到或者网络异常时回调，网络请求底层已做好了对应提示，我已这里无需再提示
                     .doOnDataNo(reason -> view.enableCodeButton(true))
                     // 提交设置并执行用户查找
-                    .submit(builder -> userRepository.findUser(context, builder));
+                    .submit(task -> userRepository.findUser(context, task));
         }
     }
 
@@ -85,22 +81,29 @@ public class LoginPresenter implements LoginContract.Presenter {
     public void loginWithPassword(String account, String password, String deviceId) {
         if (ObjectHelper.reference(context)) {
             Context context = this.context.get();
-            userRepository.newTask()
+            userRepository.<User>newTask()
                     .param(Api.Key.account,account)
                     .param(Api.Key.password,"null".equals(password)?password: EncryptUtils.md5(password))
                     .param(Api.Key.deviceId,deviceId)
                     // 登录成功时是回调
-                    .doOnDataOk(user -> {
+                    .doOnDataOk(response -> {
+                        User user = response.getData();
                         // 登录成功
                         view.whenLoginSucceed();
                         if (view.remenberPassword()) {
-                            // TODO: 2018/1/6 保存账号
+                            if (!"null".equals(password)) {
+                                user.setPassword(EncryptUtils.aesEncrypt(password));
+                            } else {
+                                user.setPassword(null);
+                            }
+                            user.setRememberPassword(true);
+                        } else {
+                            user.setRememberPassword(false);
                         }
                         userRepository.saveUser(user);
-
                     })
                     // 提交设置并执行登录操作
-                    .submit(builder -> userRepository.login(context, builder));
+                    .submit(task -> userRepository.login(context, task));
         }
     }
 
@@ -109,7 +112,7 @@ public class LoginPresenter implements LoginContract.Presenter {
         if (ObjectHelper.reference(context)) {
             Context context = this.context.get();
 
-            codeRepository.newTask()
+            codeRepository.<String>newTask()
                     .param(Api.Key.phone, account)
                     .param(Api.Key.verificationCode, code)
                     // 验证码验证成功时回调
@@ -118,7 +121,12 @@ public class LoginPresenter implements LoginContract.Presenter {
                         loginWithPassword(account, "null", deviceId);
                     })
                     // 提交设置并执行验证
-                    .submit(builder -> codeRepository.verify(context, builder));
+                    .submit(task -> codeRepository.verify(context, task));
         }
+    }
+
+    @Override
+    public User getUser() {
+        return userRepository.currentUser();
     }
 }

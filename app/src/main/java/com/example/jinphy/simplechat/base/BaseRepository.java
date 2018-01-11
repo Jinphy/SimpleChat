@@ -9,14 +9,14 @@ import java.util.Map;
 /**
  * DESC:
  *  泛型解释：
- *      1、T，使用该类是调用者需要的数据类型，一般情况下是Presenter类需要的类型，因为该类一般由Presenter使用
+ *      1、T，使用该类时调用者需要的数据类型，一般情况下是Presenter类需要的类型，因为该类一般由Presenter使用
  *
  *      2、U,是网络请求中返回的具体数据类型，即Response<U>，所以是Response类中data字段的类型
  *
  *      @see Response#data
  * Created by jinphy on 2018/1/6.
  */
-abstract public  class BaseRepository<T,U> {
+abstract public  class BaseRepository {
 
     /**
      * DESC: 数据仓库返回数据错误的类型是网络请求返回码不正确
@@ -35,13 +35,17 @@ abstract public  class BaseRepository<T,U> {
      * DESC: 新建一个任务
      * Created by jinphy, on 2018/1/6, at 12:43
      */
-    public Task<T> newTask(Map<String, Object> params) {
+    public<T> Task<T> newTask(Map<String, Object> params) {
         return new Task<>(params);
     }
 
-    public Task<T> newTask() {
+    public<T> Task<T> newTask() {
         return new Task<>(new HashMap<>());
     }
+
+
+    abstract protected<T> void handleBuilder(ApiInterface<Response<T>> api, Task<T> task) ;
+
 
     /**
      * DESC: 获取数据的任务
@@ -49,7 +53,7 @@ abstract public  class BaseRepository<T,U> {
      */
     public static class Task<T>{
 
-        private OnDataOk<T> onDataOk;
+        private OnDataOk<Response<T>> onDataOk;
 
         private OnDataNo onDataNo;
 
@@ -93,7 +97,7 @@ abstract public  class BaseRepository<T,U> {
             return this;
         }
 
-        public Task<T> doOnDataOk(OnDataOk<T> onDataOk) {
+        public Task<T> doOnDataOk(OnDataOk<Response<T>> onDataOk) {
             this.onDataOk = onDataOk;
             return this;
         }
@@ -115,7 +119,7 @@ abstract public  class BaseRepository<T,U> {
         }
 
 
-        public OnDataOk<T> getOnDataOk() {
+        public OnDataOk<Response<T>> getOnDataOk() {
             return onDataOk;
         }
 
@@ -150,16 +154,18 @@ abstract public  class BaseRepository<T,U> {
 
         /**
          * DESC: 提交该对象，可以通过该回调链式最终的设置结果
+         *
+         *
          * Created by jinphy, on 2018/1/6, at 15:44
          */
-        public void submit(OnDataOk<Task<T>> commit) {
+        public void submit(TaskCallback<T> commit) {
             if (commit != null) {
-                commit.call(this);
+                commit.accept(this);
             }
         }
     }
 
-    abstract protected void handleBuilder(ApiInterface<Response<U>> api, Task<T> task) ;
+
 
     /**
      * DESC: 获取数据成功时回调
@@ -191,5 +197,9 @@ abstract public  class BaseRepository<T,U> {
      */
     public interface OnFinal{
         void call();
+    }
+
+    public interface TaskCallback<T>{
+        void accept(Task<T> task);
     }
 }

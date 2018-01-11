@@ -50,9 +50,19 @@
                 android:layout_marginBottom="@dimen/dimen_12dp"
                 android:layout_marginLeft="@dimen/dimen_12dp"
                 android:gravity="center"
-                android:text="Jinphy"
+                android:text="未登录"
                 android:textColor="#9fffffff"
                 android:textSize="@dimen/size_18sp"/>
+
+            <ImageView
+                android:id="@+id/sex"
+                android:layout_toRightOf="@id/name"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="@dimen/dimen_5dp"
+                android:layout_marginBottom="19dp"
+                android:src="@drawable/ic_female"
+                android:layout_width="18dp"
+                android:layout_height="18dp"/>
 
             <TextView
                 android:id="@+id/date"

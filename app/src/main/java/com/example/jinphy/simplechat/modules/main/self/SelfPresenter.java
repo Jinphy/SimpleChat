@@ -1,10 +1,14 @@
 package com.example.jinphy.simplechat.modules.main.self;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.example.jinphy.simplechat.models.menu.Self;
+import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +21,14 @@ public class SelfPresenter implements SelfContract.Presenter {
 
     private List<Self> selfs;
 
+    private WeakReference<Context> context;
+    private UserRepository userRepository;
 
-    public SelfPresenter(@NonNull SelfContract.View view) {
+
+    public SelfPresenter(Context context, @NonNull SelfContract.View view) {
         this.view = Preconditions.checkNotNull(view);
+        this.userRepository = UserRepository.getInstance();
+        this.context = new WeakReference<>(context);
     }
 
     @Override
@@ -39,5 +48,10 @@ public class SelfPresenter implements SelfContract.Presenter {
     @Override
     public int getItemCount() {
         return selfs.size();
+    }
+
+    @Override
+    public User getUser() {
+        return userRepository.currentUser();
     }
 }

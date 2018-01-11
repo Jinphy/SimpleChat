@@ -3,8 +3,10 @@ package com.example.jinphy.simplechat.base;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -67,32 +69,6 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
                 .configAllowLog(AppUtils.debug())
                 .configTagPrefix("Jinphy");
     }
-
-//    @Subscribe(priority = 100, threadMode = ThreadMode.BACKGROUND)
-//    public synchronized void onActivityResumed(EBActivity event) {
-//        if (!event.resume) {
-//            return;
-//        }
-//        if (currentActivity == null || currentActivity.get() != event.activity) {
-//            currentActivity = new WeakReference<Activity>(event.activity);
-//        }
-//        BaseApplication.e(TAG, "onActivityResumed: resumed activity = "+
-//                event.activity.getClass().getSimpleName());
-//    }
-
-//    @Subscribe(priority = 100, threadMode = ThreadMode.BACKGROUND)
-//    public synchronized void onActivityPaused(EBActivity event) {
-//        if (event.resume) {
-//            return;
-//        }
-//        if (currentActivity != null && currentActivity.get() == event.activity) {
-//            currentActivity = null;
-//        }
-//        BaseApplication.e(TAG, "onActivityResumed: paused activity = "+
-//                event.activity.getClass().getSimpleName());
-//    }
-
-
 
     public static void showToast(@NonNull  Object msg, boolean isLong){
         if (toast == null) {
@@ -167,5 +143,10 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
     @Override
     public void onActivityResumed(Activity activity) {
         currentActivity = new WeakReference<>(activity);
+    }
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

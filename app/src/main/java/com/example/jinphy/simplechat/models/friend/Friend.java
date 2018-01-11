@@ -21,7 +21,7 @@ public class Friend {
 
     protected String name;
 
-    protected String avatorUrl;
+    protected String avatar;
 
     protected String remark;
 

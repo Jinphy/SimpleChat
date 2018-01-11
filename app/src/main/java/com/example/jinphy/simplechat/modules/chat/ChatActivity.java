@@ -20,17 +20,14 @@ public class ChatActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left_24dp);
 
-        ChatFragment fragment = ChatFragment.newInstance();
-
-        ChatFragment returnFragment = (ChatFragment) addFragment(fragment, R.id.fragment);
-        presenter = getPresenter(returnFragment);
+        presenter = getPresenter(addFragment(ChatFragment.newInstance(), R.id.fragment));
     }
 
     @Override
