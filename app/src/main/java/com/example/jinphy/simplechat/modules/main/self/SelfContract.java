@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.main.self;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
@@ -29,15 +30,15 @@ public interface SelfContract {
         boolean canMoveDown();
 
         void setupUser();
+
+        void whenLogout();
     }
 
     interface Presenter extends BasePresenter {
 
-        SelfRecyclerViewAdapter getAdapter();
-
-        int getItemCount();
-
         User getUser();
+
+        void logout(Context context, String account, String accessToken);
     }
 }
 

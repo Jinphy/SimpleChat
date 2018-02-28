@@ -275,7 +275,9 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
         if (showRightLayout&& showContent&&showInput) {
             contentTextView.setVisibility(GONE);
             contentEditText.setVisibility(VISIBLE);
-            contentEditText.setSelection(content.length());
+            if (content != null) {
+                contentEditText.setSelection(content.length());
+            }
             Keyboard.open(getContext(), contentEditText);
         }
     }
@@ -517,6 +519,9 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
      * Created by jinphy, on 2018/1/8, at 9:06
      */
     public MenuItemView iconDrawable(Drawable iconDrawable) {
+        if (iconDrawable == null) {
+            return this;
+        }
         this.iconDrawable = iconDrawable;
         if (iconColor != 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             this.iconDrawable.setTint(iconColor);

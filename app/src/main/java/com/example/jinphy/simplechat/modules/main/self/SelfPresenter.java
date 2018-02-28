@@ -3,14 +3,14 @@ package com.example.jinphy.simplechat.modules.main.self;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.example.jinphy.simplechat.models.menu.Self;
+import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.services.push.PushService;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jinphy on 2017/8/10.
@@ -19,7 +19,6 @@ import java.util.List;
 public class SelfPresenter implements SelfContract.Presenter {
     private SelfContract.View view;
 
-    private List<Self> selfs;
 
     private WeakReference<Context> context;
     private UserRepository userRepository;
@@ -37,21 +36,21 @@ public class SelfPresenter implements SelfContract.Presenter {
     }
 
     @Override
-    public SelfRecyclerViewAdapter getAdapter() {
-        selfs = new ArrayList<>(10);
-        for (int i = 0; i < 10; i++) {
-            selfs.add(new Self());
-        }
-        return new SelfRecyclerViewAdapter(selfs);
-    }
-
-    @Override
-    public int getItemCount() {
-        return selfs.size();
-    }
-
-    @Override
     public User getUser() {
         return userRepository.currentUser();
+    }
+
+    @Override
+    public void logout(Context context, String account, String accessToken) {
+        userRepository.<Map<String, String>>newTask()
+                .param(Api.Key.account, account)
+                .param(Api.Key.accessToken, accessToken)
+                .doOnDataOk(response -> {
+                    userRepository.updateUser(response.getData());
+                    view.whenLogout();
+                    // 关闭推送服务
+                    PushService.start(context,PushService.FLAG_CLOSE);
+                })
+                .submit(task -> userRepository.logout(context, task));
     }
 }

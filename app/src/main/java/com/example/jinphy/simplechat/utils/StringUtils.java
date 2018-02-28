@@ -81,7 +81,7 @@ public class StringUtils {
                 .append(":")
                 .append(port)
                 .append(path)
-                .append("/?content=")
+                .append(TextUtils.isEmpty(params) ? "" : "/?content=")
                 .append(params);
         return build.toString();
     }

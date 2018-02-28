@@ -13,6 +13,7 @@ public class DBApplication extends BaseApplication {
 
     private static BoxStore boxStore;
 
+
     @Override
     public void onCreate() {
         super.onCreate();

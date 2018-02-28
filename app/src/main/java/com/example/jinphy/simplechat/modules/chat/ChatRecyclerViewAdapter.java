@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.List;
@@ -33,17 +34,15 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int resourceId = 0;
-        switch (Message.parseSourceType(viewType)) {
-            case Message.TYPE_RECEIVE:
+        switch (viewType) {
+            case Message.RECEIVE:
                 resourceId = R.layout.chat_receive_msg_item;
                 break;
-            case Message.TYPE_SEND:
+            case Message.SEND:
                 resourceId = R.layout.chat_send_msg_item;
                 break;
             default:
-                throw new IllegalArgumentException(
-                        "the resourceType of title item is illegal,sourceType="+
-                Message.parseSourceType(viewType));
+                ObjectHelper.throwRuntime("you must specify the message type!");
         }
 
         View itemView = LayoutInflater.from(parent.getContext()).inflate(resourceId, parent, false);
@@ -59,26 +58,24 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
 
         bindCommonView(holder,message,position);
 
-        switch (Message.parseContentType(holder.type)) {
-            case Message.TYPE_TEXT:
+        switch (message.getContentType()) {
+            case Message.TYPE_CHAT_TEXT:
                 bindTextMsgView(holder,message);
                 break;
-            case Message.TYPE_PHOTO:
+            case Message.TYPE_CHAT_IMAGE:
                 bindPhotoMsgView(holder,message);
                 break;
-            case Message.TYPE_VOICE:
+            case Message.TYPE_CHAT_VOICE:
                 bindVoiceMsgView(holder,message);
                 break;
-            case Message.TYPE_VIDEO:
+            case Message.TYPE_CHAT_VIDEO:
                 bindVideoMsgView(holder,message);
                 break;
-            case Message.TYPE_FILE:
+            case Message.TYPE_CHAT_FILE:
                 bindFileMsgView(holder,message);
                 break;
             default:
-                throw new IllegalArgumentException(
-                        "the contentType of title item is illegal,contentType="+
-                                Message.parseContentType(holder.type));
+                ObjectHelper.throwRuntime("unknown message type!");
         }
     }
 
@@ -87,7 +84,7 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
         // TODO: 2017/8/13 设置头像 ，时间，
         if (click != null) {
             holder.avatar.setOnClickListener(view ->
-                    click.onClick(view,message,holder.type,position));
+                    click.onClick(view,message,holder.type, position));
             holder.content.setOnClickListener(view ->
                     click.onClick(view, message, holder.type, position));
         }
@@ -136,7 +133,7 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
 
     @Override
     public int getItemViewType(int position) {
-        return messages.get(position).combineType();
+        return messages.get(position).getSourceType();
     }
 
 

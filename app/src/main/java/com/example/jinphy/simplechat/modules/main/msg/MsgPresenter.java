@@ -5,6 +5,8 @@ import android.view.View;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
+import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
+import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;
@@ -16,12 +18,14 @@ import java.util.List;
 
 public class MsgPresenter implements MsgContract.Presenter {
     MsgContract.View view;
-
+    MessageRecordRepository recordRepository;
+    UserRepository userRepository;
     private List<MessageRecord> messageRecords;
 
     public MsgPresenter(@NonNull MsgContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-
+        this.recordRepository = MessageRecordRepository.getInstance();
+        this.userRepository = UserRepository.getInstance();
     }
 
     @Override
@@ -41,10 +45,7 @@ public class MsgPresenter implements MsgContract.Presenter {
 
     @Override
     public List<MessageRecord> loadMsgRecord() {
-        messageRecords = new ArrayList<>(30);
-        for (int i = 0; i < 30; i++) {
-            messageRecords.add(new MessageRecord());
-        }
+        messageRecords = recordRepository.load(userRepository.currentUser().getAccount());
         return messageRecords;
     }
 

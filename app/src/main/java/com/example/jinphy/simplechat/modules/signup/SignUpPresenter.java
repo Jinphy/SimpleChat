@@ -3,10 +3,11 @@ package com.example.jinphy.simplechat.modules.signup;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.example.jinphy.simplechat.api.Api;
+import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.models.verification_code.CodeRepository;
+import com.example.jinphy.simplechat.services.push.PushService;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.Preconditions;
@@ -129,6 +130,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                         user.setPassword(EncryptUtils.aesEncrypt(password));
                         user.setRememberPassword(true);
                         userRepository.saveUser(user);
+                        PushService.start(context, PushService.FLAG_INIT);
                     })
                     // 提交设置并执行登录操作
                     .submit(task -> userRepository.login(context, task));

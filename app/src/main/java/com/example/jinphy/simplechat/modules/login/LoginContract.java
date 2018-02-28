@@ -1,8 +1,5 @@
 package com.example.jinphy.simplechat.modules.login;
 
-import android.content.Context;
-
-import com.example.jinphy.simplechat.api.Response;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.models.user.User;

@@ -1,0 +1,72 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context="com.example.jinphy.simplechat.modules.add_friend.AddFriendFragment">
+
+    <com.example.jinphy.simplechat.custom_view.MenuItemView
+        android:id="@+id/item_friend"
+        app:show_arrow="false"
+        app:show_input="false"
+        app:auto_animate="false"
+        app:icon_drawable="@drawable/pic_1"
+        tools:content="昵称"
+        app:icon_color="#00000000"
+        app:icon_size="90dp"
+        android:layout_marginLeft="@dimen/dimen_10dp"
+        android:layout_marginRight="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_100dp"/>
+
+    <com.example.jinphy.simplechat.custom_view.MenuItemView
+        android:id="@+id/item_remark"
+        app:icon_drawable="@drawable/ic_remark_24dp"
+        app:icon_color="@color/green_primary"
+        app:title="修改备注"
+        app:content_hint="输入备注信息"
+        android:layout_marginLeft="@dimen/dimen_10dp"
+        android:layout_marginRight="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_60dp"/>
+
+    <com.example.jinphy.simplechat.custom_view.MenuItemView
+        android:id="@+id/item_verify_msg"
+        app:icon_drawable="@drawable/ic_certificates_24dp"
+        app:icon_color="@color/green_primary"
+        app:title="验证信息"
+        android:layout_marginLeft="@dimen/dimen_10dp"
+        android:layout_marginRight="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        app:content_hint="输入验证信息"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_60dp"/>
+
+    <android.support.v7.widget.CardView
+        android:layout_marginTop="@dimen/dimen_40dp"
+        android:layout_marginBottom="@dimen/dimen_20dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardElevation="@dimen/dimen_1dp"
+        app:cardCornerRadius="@dimen/dimen_5dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="150dp"
+        android:layout_height="@dimen/dimen_50dp">
+
+        <TextView
+            android:id="@+id/btn_add_friend"
+            android:gravity="center"
+            android:textColor="@color/green_primary"
+            android:textSize="@dimen/size_15sp"
+            android:clickable="true"
+            android:text="马上添加"
+            android:background="@drawable/btn_alpha"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

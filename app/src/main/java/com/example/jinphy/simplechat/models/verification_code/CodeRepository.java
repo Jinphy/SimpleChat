@@ -2,9 +2,9 @@ package com.example.jinphy.simplechat.models.verification_code;
 
 import android.content.Context;
 
-import com.example.jinphy.simplechat.api.Api;
-import com.example.jinphy.simplechat.api.ApiInterface;
-import com.example.jinphy.simplechat.api.Response;
+import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.api.common.ApiInterface;
+import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.base.BaseRepository;
 
 /**

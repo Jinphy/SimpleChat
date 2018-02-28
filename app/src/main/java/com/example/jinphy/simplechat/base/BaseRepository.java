@@ -1,7 +1,7 @@
 package com.example.jinphy.simplechat.base;
 
-import com.example.jinphy.simplechat.api.ApiInterface;
-import com.example.jinphy.simplechat.api.Response;
+import com.example.jinphy.simplechat.models.api.common.ApiInterface;
+import com.example.jinphy.simplechat.models.api.common.Response;
 
 import java.util.HashMap;
 import java.util.Map;

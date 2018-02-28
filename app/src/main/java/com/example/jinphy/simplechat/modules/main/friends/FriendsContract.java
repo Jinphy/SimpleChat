@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.main.friends;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
@@ -22,13 +23,15 @@ public interface FriendsContract {
         void fabAction(android.view.View view);
 
         RecyclerView getRecyclerView();
+
+        void updateFriends(List<Friend> friends);
     }
 
     interface Presenter extends BasePresenter {
 
-        List<Friend> loadFriends();
+        void loadFriends(Context context);
 
-        FriendsRecyclerViewAdapter getAdapter();
+
     }
 }
 

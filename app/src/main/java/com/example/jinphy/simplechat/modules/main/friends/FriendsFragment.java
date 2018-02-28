@@ -9,7 +9,10 @@ import android.view.View;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +24,7 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     RecyclerView recyclerView;
 
     FloatingActionButton fab;
+    private FriendsRecyclerViewAdapter adapter;
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -81,7 +85,6 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
 
     @Override
     public void initData() {
-
     }
 
     @Override
@@ -93,7 +96,9 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     protected void setupViews() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(presenter.getAdapter());
+        adapter = new FriendsRecyclerViewAdapter();
+        recyclerView.setAdapter(adapter);
+        presenter.loadFriends(activity());
     }
 
     @Override
@@ -112,5 +117,10 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     @Override
     public RecyclerView getRecyclerView() {
         return recyclerView;
+    }
+
+    @Override
+    public void updateFriends(List<Friend> friends) {
+        adapter.update(friends);
     }
 }

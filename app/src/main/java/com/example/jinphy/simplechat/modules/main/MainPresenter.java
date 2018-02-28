@@ -1,8 +1,16 @@
 package com.example.jinphy.simplechat.modules.main;
 
-import android.view.MotionEvent;
+import android.content.Context;
 
+import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.api.common.Response;
+import com.example.jinphy.simplechat.base.BaseRepository;
+import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.Preconditions;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Created by jinphy on 2017/8/10.
@@ -10,16 +18,34 @@ import com.example.jinphy.simplechat.utils.Preconditions;
 
 public class MainPresenter implements MainContract.Presenter {
 
+    private final WeakReference<Context> context;
     private MainContract.View view;
 
+    private UserRepository userRepository;
 
-    public MainPresenter(MainContract.View view) {
+
+    public MainPresenter(Context context, MainContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-
+        this.context = new WeakReference<>(context);
+        userRepository = UserRepository.getInstance();
     }
 
     @Override
     public void start() {
 
+    }
+
+    @Override
+    public void findUser(String account, BaseRepository.OnDataOk<Response<User>> callback) {
+        if (ObjectHelper.reference(context)) {
+            Context context = this.context.get();
+            userRepository.<User>newTask()
+                    .param(Api.Key.account, account)
+                    .doOnDataOk(callback::call)
+                    .doOnDataNo(msg -> {
+                        callback.call(new Response<>(Response.NO, msg, null));
+                    })
+                    .submit(task -> userRepository.findUser(context, task));
+        }
     }
 }

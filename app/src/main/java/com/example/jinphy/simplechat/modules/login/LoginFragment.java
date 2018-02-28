@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -130,6 +131,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
             accountLayout.getEditText().setText(user.getAccount());
             accountLayout.getEditText().setSelection(user.getAccount().length());
             getVerificationCodeButton.setEnabled(true);
+            passwordLayout.getEditText().setText(EncryptUtils.aesDecrypt(user.getPassword()));
         }
     }
 

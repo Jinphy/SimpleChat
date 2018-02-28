@@ -94,16 +94,12 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
 
     @Override
     public void showLoginView(View view) {
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
+        LoginActivity.start(activity());
     }
 
     @Override
     public void showSignUpView(View view) {
-        Intent intent = new Intent(getActivity(), SignUpActivity.class);
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
+        SignUpActivity.start(activity());
     }
 
     @Override

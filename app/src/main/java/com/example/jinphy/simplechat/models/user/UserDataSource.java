@@ -17,11 +17,13 @@ public interface UserDataSource {
 
     void login(Context context, BaseRepository.Task<User> task);
 
-    void logout(Context context, BaseRepository.Task<User> task);
-
     void signUp(Context context, BaseRepository.Task<User> task);
 
     void modifyUserInfo(Context context, BaseRepository.Task<Map<String,String>> task);
+
+    void logout(Context context, BaseRepository.Task<Map<String, String>> task);
+
+    void logoutLocal();
 
     void saveUser(User user);
 

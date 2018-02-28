@@ -4,20 +4,20 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
 import android.support.multidex.MultiDex;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.apkfuns.logutils.LogUtils;
-import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.listener_adapters.ActivityLiftcycle;
 import com.example.jinphy.simplechat.secret.Secret;
+import com.example.jinphy.simplechat.services.push.PushService;
 import com.example.jinphy.simplechat.utils.AppUtils;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.mob.MobSDK;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
 
@@ -68,6 +68,15 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
         LogUtils.getLogConfig()
                 .configAllowLog(AppUtils.debug())
                 .configTagPrefix("Jinphy");
+
+        PushService.start(this, PushService.FLAG_INIT);
+//        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onTerminate() {
+//        EventBus.getDefault().unregister(this);
+        super.onTerminate();
     }
 
     public static void showToast(@NonNull  Object msg, boolean isLong){
@@ -136,7 +145,6 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
 
     @SuppressLint("ShowToast")
     private static void initToast() {
-
         toast = Toast.makeText(INSTANCE, "", Toast.LENGTH_SHORT);
     }
 

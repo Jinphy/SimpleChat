@@ -12,6 +12,7 @@ import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -25,7 +26,11 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
     private List<MessageRecord> messageRecords;
 
     public MsgRecyclerViewAdapter(@NonNull List<MessageRecord> messageRecords) {
-        this.messageRecords = Preconditions.checkNotNull(messageRecords);
+        if (messageRecords == null) {
+            this.messageRecords = new ArrayList<>();
+        } else {
+            this.messageRecords = Preconditions.checkNotNull(messageRecords);
+        }
 
     }
 

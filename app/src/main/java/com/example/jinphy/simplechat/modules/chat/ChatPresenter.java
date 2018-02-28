@@ -41,11 +41,29 @@ public class ChatPresenter implements ChatContract.Presenter {
         for (int i = 0; i < 40; i++) {
             Message message = new Message();
             if (i % 2 == 0) {
-                message.setSourceType(Message.TYPE_SEND);
+                message.setSourceType(Message.SEND);
             } else {
-                message.setSourceType(Message.TYPE_RECEIVE);
+                message.setSourceType(Message.RECEIVE);
             }
-            int contentType  = random.nextInt(5)+3;
+            int x  = random.nextInt(5);
+            String contentType;
+            switch (x) {
+                case 0:
+                    contentType = Message.TYPE_CHAT_FILE;
+                    break;
+                case 1:
+                    contentType = Message.TYPE_CHAT_IMAGE;
+                    break;
+                case 2:
+                    contentType = Message.TYPE_CHAT_TEXT;
+                    break;
+                case 3:
+                    contentType = Message.TYPE_CHAT_VIDEO;
+                    break;
+                default:
+                    contentType = Message.TYPE_CHAT_VOICE;
+                    break;
+            }
             message.setContentType(contentType);
             messages.add(message);
         }

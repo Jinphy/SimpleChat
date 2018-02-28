@@ -65,6 +65,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         colorAccent = a.getColor(2, ContextCompat.getColor(this, R.color.colorAccent));
     }
 
+    public int colorAccent() {
+        return colorAccent;
+    }
+
+    public int colorPrimary() {
+        return colorPrimary;
+    }
+    public int colorPrimaryDark() {
+        return colorPrimaryDark;
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -88,9 +100,20 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void finishMe(EBFinishActivityMsg message) {
-        if (message.which == EBFinishActivityMsg.ALL || message.which == this.getClass()) {
+        if (message.which == EBFinishActivityMsg.ALL) {
             finish();
+            return;
         }
+        if (message.kill) {
+            if (message.which == this.getClass()) {
+                finish();
+            }
+        } else {
+            if (message.which != this.getClass()) {
+                finish();
+            }
+        }
+
     }
 
     /**

@@ -56,22 +56,18 @@
             android:theme="@style/TranslucentTheme">
         </activity>
 
-        <service
-            android:name=".services.PushService"
-            android:enabled="true"
-            android:exported="true">
-        </service>
-
         <activity
             android:name=".modules.modify_user_info.ModifyUserActivity"
             android:theme="@style/ModifyUserActivityTheme">
         </activity>
-        <activity android:name=".modules.pick_photo.PickPhotoActivity"
+        <activity
+            android:name=".modules.pick_photo.PickPhotoActivity"
             android:theme="@style/PickPhotoActivityTheme">
         </activity>
 
-
-
+        <activity android:name=".modules.add_friend.AddFriendActivity"
+                  android:theme="@style/AddFriendActivityTheme">
+        </activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -83,6 +79,22 @@
                 android:resource="@xml/file_paths">
             </meta-data>
         </provider>
+
+        <service
+            android:name=".services.push.PushService"
+            android:enabled="true"
+            android:process=":push"
+            android:exported="true">
+        </service>
+
+        <receiver android:name=".broadcasts.AppBroadcastReceiver"
+                  android:exported="true"
+                  android:enabled="true">
+            <intent-filter>
+                <action android:name="com.example.jinphy.simplechat.AppReceiver"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

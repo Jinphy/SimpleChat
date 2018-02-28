@@ -19,6 +19,7 @@ public class ModifyUserActivity extends BaseActivity {
     public static void start(Activity activity) {
         Intent intent = new Intent(activity, ModifyUserActivity.class);
         activity.startActivity(intent);
+        activity.overridePendingTransition(R.anim.alpha_in,R.anim.anim_no);
     }
 
     @Override

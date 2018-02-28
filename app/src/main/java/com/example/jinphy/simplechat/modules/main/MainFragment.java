@@ -1,12 +1,18 @@
 package com.example.jinphy.simplechat.modules.main;
 
 import android.animation.AnimatorSet;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +20,20 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.models.api.common.Response;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.models.event_bus.EBLoginInfo;
+import com.example.jinphy.simplechat.modules.add_friend.AddFriendActivity;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsFragment;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsPresenter;
@@ -35,7 +48,9 @@ import com.example.jinphy.simplechat.modules.main.self.SelfFragment;
 import com.example.jinphy.simplechat.modules.main.self.SelfPresenter;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
+import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -69,6 +84,13 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     private View bottomBar;
     private FloatingActionButton fab;
+
+    private View menuView;
+    private PopupWindow mainMenu;
+    private MenuItemView addFriendItem;
+    private MenuItemView groupChatItem;
+    private MenuItemView scanItem;
+
 
     private LinearLayout btnMsg;
     private LinearLayout btnFriends;
@@ -144,6 +166,10 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         btnRoutine = view.findViewById(R.id.btn_routine);
         btnSelf = view.findViewById(R.id.btn_self);
 
+        menuView = LayoutInflater.from(activity).inflate(R.layout.menu_main_fragment, null);
+        addFriendItem = menuView.findViewById(R.id.item_add_friend);
+        groupChatItem = menuView.findViewById(R.id.item_group_chat);
+        scanItem = menuView.findViewById(R.id.item_scan);
     }
 
     @Override
@@ -170,6 +196,49 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         btnSelf.setOnClickListener(this::selectFragment);
 
         viewPager.addOnPageChangeListener(getPageChangeListener());
+
+        addFriendItem.onClick((menuItemView, hasFocus) -> {
+            new MaterialDialog.Builder(activity())
+                    .title("添加好友")
+                    .titleColor(colorPrimary())
+                    .icon(ImageUtil.getDrawable(activity(),R.drawable.ic_friends_open_24dp,colorPrimary()))
+                    .content("输入简聊号")
+                    .input("请输入需要添加的好友简聊号", null, (dialog, input) -> {
+                        if (!StringUtils.isPhoneNumber(input.toString())) {
+                            App.showToast("请输入正确的账号！", false);
+                            return;
+                        }
+                        presenter.findUser(input.toString(),response->{
+                            if (Response.YES.equals(response.getCode())) {
+                                AddFriendActivity.start(activity(), response.getData());
+                                dialog.dismiss();
+                            }
+                        });
+                    })
+                    .cancelable(false)
+                    .autoDismiss(false)
+                    .positiveText("查找")
+                    .negativeText("取消")
+                    .positiveColor(colorPrimary())
+                    .negativeColorRes(R.color.color_red_D50000)
+                    .onNegative((dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .show();
+            mainMenu.dismiss();
+        });
+
+        groupChatItem.onClick((menuItemView, hasFocus) -> {
+            // TODO: 2018/1/15 增加群聊功能
+            mainMenu.dismiss();
+        });
+
+        scanItem.onClick((menuItemView, hasFocus) -> {
+            // TODO: 2018/1/15 增加扫一扫功能
+            mainMenu.dismiss();
+        });
+
+
     }
 
     //---------------私有函数---------------------------------------------
@@ -359,6 +428,28 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     }
 
 
+    /**
+     * DESC: 创建菜单
+     * Created by jinphy, on 2018/1/8, at 20:52
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main_fragment,menu);
+    }
+
+    // 菜单点击事件
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_more:
+                showMenu();
+                break;
+            default:
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 
 
@@ -614,5 +705,28 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     @Override
     public int currentItemPosition() {
         return selectedTab;
+    }
+
+    @Override
+    public void showMenu() {
+        LogUtils.e("ahu");
+        if (mainMenu != null) {
+            mainMenu.dismiss();
+            return;
+        }
+        mainMenu = new PopupWindow(menuView,
+                ScreenUtils.dp2px(activity(), 150),
+                ScreenUtils.dp2px(activity(), 152));
+        mainMenu.setAnimationStyle(R.style.main_menu_animate);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mainMenu.setElevation(ScreenUtils.dp2px(activity(),6));
+            mainMenu.showAsDropDown(
+                    toolbar,
+                    ScreenUtils.dp2px(activity(),-5),
+                    0,
+                    Gravity.END);
+        }
+        mainMenu.setOutsideTouchable(false);
+        mainMenu.setOnDismissListener(() -> mainMenu = null);
     }
 }

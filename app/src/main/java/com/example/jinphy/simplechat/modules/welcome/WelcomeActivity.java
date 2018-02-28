@@ -2,19 +2,10 @@ package com.example.jinphy.simplechat.modules.welcome;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.api.Api;
 import com.example.jinphy.simplechat.base.BaseActivity;
-import com.example.jinphy.simplechat.custom_view.LoadingDialog;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
-
-import java.lang.reflect.Field;
-
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 
 public class WelcomeActivity extends BaseActivity {
 
@@ -25,6 +16,7 @@ public class WelcomeActivity extends BaseActivity {
         setContentView(R.layout.activity_welcome);
 
         getPresenter(addFragment(WelcomeFragment.newInstance(), R.id.fragment));
+
     }
 
     @Override

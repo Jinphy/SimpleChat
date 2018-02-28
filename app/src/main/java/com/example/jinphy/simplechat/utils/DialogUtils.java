@@ -1,23 +1,13 @@
 package com.example.jinphy.simplechat.utils;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.text.InputType;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.api.Api;
-import com.example.jinphy.simplechat.api.Response;
-import com.example.jinphy.simplechat.application.App;
-import com.example.jinphy.simplechat.base.BaseActivity;
+import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.custom_libs.SChain;
-import com.example.jinphy.simplechat.models.user.User;
-import com.example.jinphy.simplechat.models.verification_code.CodeRepository;
 
 /**
  * DESC:

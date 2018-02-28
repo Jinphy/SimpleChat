@@ -2,9 +2,9 @@ package com.example.jinphy.simplechat.models.user;
 
 import android.content.Context;
 
-import com.example.jinphy.simplechat.api.Api;
-import com.example.jinphy.simplechat.api.ApiInterface;
-import com.example.jinphy.simplechat.api.Response;
+import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.api.common.ApiInterface;
+import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseRepository;
 
@@ -58,13 +58,12 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
 
 
     @Override
-    public void logout(Context context, Task<User> task) {
-        Api.<User>common(context)
+    public void logout(Context context, Task<Map<String, String>> task) {
+        Api.<Map<String, String>>common(context)
                 .hint("正在注销...")
                 .path(Api.Path.logout)
                 .setup(api -> this.handleBuilder(api, task))
                 .request();
-
     }
 
     @Override
@@ -208,6 +207,13 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
     @Override
     public boolean needToLogin() {
         return !rememberPassword() || !hasLogin();
+    }
+
+    @Override
+    public void logoutLocal() {
+        User user = currentUser();
+        user.setStatus(User.STATUS_LOGOUT);
+        userBox.put(user);
     }
 
     @Override

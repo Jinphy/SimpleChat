@@ -11,7 +11,9 @@ import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.utils.Preconditions;
+import com.example.jinphy.simplechat.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -24,9 +26,8 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
 
     private List<Friend> friends;
 
-    public FriendsRecyclerViewAdapter(@NonNull List<Friend> friends) {
-
-        this.friends = Preconditions.checkNotNull(friends);
+    public FriendsRecyclerViewAdapter() {
+        this.friends = new ArrayList<>();
     }
 
     @Override
@@ -41,7 +42,11 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
     public void onBindViewHolder(ViewHolder holder, int position) {
         Friend friend = friends.get(position);
         // TODO: 2017/8/10 设置avatar等信息
-
+        holder.remark.setText(friend.getRemark());
+        holder.account.setText(friend.getAccount());
+        holder.address.setText(friend.getAddress());
+        holder.date.setText(friend.getDate());
+        holder.avatar.setImageBitmap(StringUtils.base64ToBitmap(friend.getAvatar()));
         if (click != null) {
             holder.avatar.setOnClickListener(view -> click.onClick(view,friend,0,position));
             holder.itemView.setOnClickListener(view -> click.onClick(view,friend,0,position));
@@ -55,6 +60,15 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
     @Override
     public int getItemCount() {
         return friends.size();
+    }
+
+
+    public void update(List<Friend> friends) {
+        if (friends == null) {
+            return;
+        }
+        this.friends.addAll(friends);
+        notifyDataSetChanged();
     }
 
 

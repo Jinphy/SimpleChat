@@ -29,7 +29,7 @@
                 android:layout_marginRight="@dimen/dimen_10dp"
                 android:layout_marginTop="@dimen/dimen_20dp"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"/>
+                android:layout_height="@dimen/dimen_100dp"/>
 
             <!--account-->
             <com.example.jinphy.simplechat.custom_view.MenuItemView

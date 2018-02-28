@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/background"
+    app:cardElevation="@dimen/dimen_10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.example.jinphy.simplechat.custom_view.MenuItemView
+            android:id="@+id/item_add_friend"
+            app:icon_drawable="@drawable/ic_add_person_24dp"
+            app:icon_color="@color/colorAccent"
+            app:auto_animate="false"
+            app:title="添加好友"
+            app:title_text_color="@color/colorAccent"
+            app:show_input="false"
+            app:show_right_layout="false"
+            app:show_arrow="false"
+            app:item_corner_radius="@dimen/dimen_0dp"
+            android:layout_marginBottom="@dimen/dimen_1dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_50dp"/>
+        <com.example.jinphy.simplechat.custom_view.MenuItemView
+            android:id="@+id/item_group_chat"
+            app:icon_drawable="@drawable/ic_group_work24dp"
+            app:icon_color="@color/colorAccent"
+            app:auto_animate="false"
+            app:title="发起群聊"
+            app:title_text_color="@color/colorAccent"
+            app:show_input="false"
+            app:show_right_layout="false"
+            app:show_arrow="false"
+            app:item_corner_radius="@dimen/dimen_0dp"
+            android:layout_marginBottom="@dimen/dimen_1dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_50dp"/>
+        <com.example.jinphy.simplechat.custom_view.MenuItemView
+            android:id="@+id/item_scan"
+            app:icon_drawable="@drawable/ic_scan_24dp"
+            app:icon_color="@color/colorAccent"
+            app:auto_animate="false"
+            app:title="扫一扫"
+            app:title_text_color="@color/colorAccent"
+            app:show_input="false"
+            app:show_right_layout="false"
+            app:show_arrow="false"
+            app:item_corner_radius="@dimen/dimen_0dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_50dp"/>
+
+    </LinearLayout>
+
+
+
+
+
+</android.support.v7.widget.CardView>

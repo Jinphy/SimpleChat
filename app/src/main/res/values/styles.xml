@@ -44,6 +44,14 @@
     </style>
 
 
+    <style name="AddFriendActivityTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryDark">@color/green_primary_dark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
+
+
     <style name="AppTheme" parent="Base.AppTheme" >
         <item name="md_dark_theme">false</item>
         <item name="md_title_color">@color/colorPrimary</item>
@@ -106,14 +114,18 @@
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    <!--popupWindow 的动画-->
+    <style name="main_menu_animate" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/main_menu_enter</item>
+        <item name="android:windowExitAnimation">@anim/main_menu_exit</item>
+    </style>
+
+
+
+
+
+
+
+
+
 </resources>

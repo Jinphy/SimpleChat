@@ -2,40 +2,40 @@ package com.example.jinphy.simplechat.modules.main.self;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.apkfuns.logutils.LogUtils;
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseActivity;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.models.event_bus.EBUser;
 import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.modules.login.LoginActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -56,12 +56,13 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
     private FloatingActionButton fab;
 
-    private RecyclerView recyclerView;
+    private ScrollView scrollView;
     private CardView headView;
     private ImageView avatarView;
     private TextView nameText;
     private TextView dateText;
     private ImageView sexView;
+    private TextView btnLogout;
 
     private float density;
     private User user;
@@ -103,6 +104,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     @Override
     public void fabAction(View view) {
         ModifyUserActivity.start(getActivity());
+
     }
 
 
@@ -126,19 +128,17 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
     @Override
     protected void findViewsById(View view) {
-        recyclerView = view.findViewById(R.id.recycler_view);
+        scrollView = view.findViewById(R.id.scroll_view);
         headView = view.findViewById(R.id.head_view);
         avatarView = headView.findViewById(R.id.avatar);
         nameText = headView.findViewById(R.id.name);
         dateText = headView.findViewById(R.id.date);
         sexView = headView.findViewById(R.id.sex);
+        btnLogout = view.findViewById(R.id.btn_logout);
     }
 
     @Override
     protected void setupViews() {
-        recyclerView.setAdapter(presenter.getAdapter());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         setupUser();
     }
 
@@ -156,7 +156,26 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
     @Override
     protected void registerEvent() {
+        btnLogout.setOnClickListener(view->{
+            if (activity() == null) {
+                return;
+            }
+            new MaterialDialog.Builder(activity())
+                    .title("退出登录")
+                    .titleColor(colorPrimary())
+                    .icon(ImageUtil.getDrawable(activity(),R.drawable.ic_account_24dp,colorPrimary()))
+                    .content("退出后将无法再接收到消息\n是否继续？")
+                    .contentGravity(GravityEnum.CENTER)
+                    .positiveText("是的")
+                    .negativeText("不了")
+                    .positiveColor(colorPrimary())
+                    .negativeColorRes(R.color.half_alpha_gray)
+                    .onPositive((dialog, which) -> {
+                        presenter.logout(activity(), user.getAccount(),user.getAccessToken());
+                    })
+                    .show();
 
+        });
     }
 
 
@@ -239,6 +258,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     }
 
 
+    /**
+     * DESC: 判断是否可以向上移动
+     * Created by jinphy, on 2018/1/11, at 14:12
+     */
     @Override
     public boolean canMoveUp() {
         float transY = -headView.getTranslationY();
@@ -246,16 +269,17 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         return can;
     }
 
+    /**
+     * DESC: 判断是否可以向下移动
+     * Created by jinphy, on 2018/1/11, at 14:12
+     */
     @Override
     public boolean canMoveDown() {
         float transY = headView.getTranslationY();
         boolean can = transY < 0;
 
-        LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
-        int firstPosition = manager.findFirstCompletelyVisibleItemPosition();
-
-        can = can && (firstPosition == 0);
-        return can;
+        int scrollY = scrollView.getScrollY();
+        return can && scrollY == 0;
     }
 
 
@@ -293,12 +317,12 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
             // TODO: 2017/8/13 headView和statusBar背景颜色初始值设置为相应头像的Palette颜色，
             // TODO: 2017/8/13 headView的结束颜色设置为R.color.colorPrimary
             // TODO: 2017/8/13 statusBar的结束颜色设置为 R.color.colorPrimaryDark
-            headView.setBackgroundColor(ColorUtils.rgbColorByFactor(
-                    ContextCompat.getColor(getContext(),R.color.colorPrimaryDark),
-                    ContextCompat.getColor(getContext(),R.color.colorPrimary),
+            headView.setCardBackgroundColor(ColorUtils.rgbColorByFactor(
+                    colorPrimaryDark(),
+                    colorPrimary(),
                     faction
             ));
-            recyclerView.setTranslationY(distanceVertical *(1-faction));
+            scrollView.setTranslationY(distanceVertical *(1-faction));
             ViewUtils.setScaleXY(avatarView,1-faction*avatarViewScaleDistance);
             avatarView.setTranslationX(faction*avatarViewTransXDistance);
             avatarView.setTranslationY(faction*avatarViewTransYDistance);
@@ -308,7 +332,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         }
     }
 
-    // 手指松开后的动画
+    /**
+     * DESC: 手指松开后的动画
+     * Created by jinphy, on 2018/1/11, at 14:15
+     */
     @Override
     public void animateVertical(float fromFactor,float toFactor) {
         float deltaFactor = Math.abs(toFactor - fromFactor);
@@ -324,7 +351,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     }
 
 
-    //获取当前headView应该滑动的百分比
+    /**
+     * DESC: 获取当前headView竖直方向上滑动的百分比
+     * Created by jinphy, on 2018/1/11, at 14:14
+     */
     private float getVerticalMoveFactor(float deltaY) {
         float transY = headView.getTranslationY();
         transY += deltaY;
@@ -377,4 +407,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         }
     }
 
+    @Override
+    public void whenLogout() {
+        App.showToast("账号已退出！", false);
+        LoginActivity.start(activity());
+        finishActivity();
+    }
 }

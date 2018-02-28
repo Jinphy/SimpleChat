@@ -5,8 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.text.InputType;
@@ -19,7 +17,7 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.api.Api;
+import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.base.BaseFragment;
@@ -601,5 +599,11 @@ public class ModifyUserFragment extends BaseFragment<ModifyUserPresenter> implem
             return EncryptUtils.aesEncrypt(passwordItem.content().toString());
         }
         return null;
+    }
+
+    @Override
+    protected void finishActivity() {
+        super.finishActivity();
+        activity().overridePendingTransition(R.anim.anim_no, R.anim.alpha_out);
     }
 }

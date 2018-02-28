@@ -11,8 +11,10 @@ public class EBFinishActivityMsg {
     // 销毁所有的activity
     public static final Class<?extends Activity> ALL = Activity.class;
 
-    // 要销毁的activity
+    // 指定的activity
     public Class<? extends Activity> which;
+
+    public boolean kill = true;
 
     public EBFinishActivityMsg(){
         this.which = ALL;
@@ -22,4 +24,9 @@ public class EBFinishActivityMsg {
         this.which = which;
     }
 
+
+    public EBFinishActivityMsg(Class<? extends Activity> which, boolean kill) {
+        this.which = which;
+        this.kill = kill;
+    }
 }

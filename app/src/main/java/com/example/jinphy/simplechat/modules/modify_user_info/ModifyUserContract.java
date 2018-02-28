@@ -2,7 +2,7 @@ package com.example.jinphy.simplechat.modules.modify_user_info;
 
 import android.content.Context;
 
-import com.example.jinphy.simplechat.api.Response;
+import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.base.BaseView;
