@@ -101,13 +101,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
 
     @Override
     public void initData() {
-        RuntimePermission.getInstance(getActivity())
-                .permission(Manifest.permission.READ_PHONE_STATE)
-                .onGranted(() -> {
-                    deviceId = EncryptUtils.md5(DeviceUtils.deviceId());
-                })
-                .onReject(() -> App.showToast("您拒绝了访问手机状态的权限！", false))
-                .execute();
+        deviceId = EncryptUtils.md5(DeviceUtils.deviceId());
         user = presenter.getUser();
     }
 

@@ -2,6 +2,10 @@ package com.example.jinphy.simplechat.models.friend;
 
 import com.example.jinphy.simplechat.models.user.User;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
 import io.objectbox.relation.ToOne;
@@ -18,6 +22,11 @@ public class Friend {
     public static final String system = "0";
 
     public static final String status_ok = "ok";
+    public static final String status_waiting = "waiting";
+    public static final String status_refuse = "refuse";
+    public static final String status_black_listed = "blackListed";
+    public static final String status_black_listing = "blackListing";
+    public static final String status_deleted = "deleted";
 
     @Id protected long id;
 
@@ -81,6 +90,8 @@ public class Friend {
      * Created by jinphy, on 2018/1/18, at 12:11
      */
     protected String status;
+
+    protected String signature;
 
     /**
      * DESC: 一个好友只属于一个用户的，所以是一对一的关系，即一个Friend -> 一个User
@@ -178,5 +189,42 @@ public class Friend {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public static Friend parse(Map<String, String> map) {
+        if (map == null) {
+            return null;
+        }
+        Friend friend = new Friend();
+        friend.account = map.get(Friend_.account.name);
+        friend.name = map.get(Friend_.name.name);
+        friend.avatar = map.get(Friend_.avatar.name);
+        friend.remark = map.get(Friend_.remark.name);
+        friend.sex = map.get(Friend_.sex.name);
+        friend.address = map.get(Friend_.address.name);
+        friend.date = map.get(Friend_.date.name);
+        friend.owner = map.get(Friend_.owner.name);
+        friend.status = map.get(Friend_.status.name);
+        friend.signature = map.get(Friend_.signature.name);
+        return friend;
+    }
+
+    public static List<Friend> parse(List<Map<String, String>> maps) {
+        if (maps == null || maps.size() == 0) {
+            return null;
+        }
+        List<Friend> friends = new ArrayList<>(maps.size());
+        for (Map<String, String> map : maps) {
+            friends.add(Friend.parse(map));
+        }
+        return friends;
     }
 }

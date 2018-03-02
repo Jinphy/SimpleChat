@@ -106,6 +106,9 @@ public class AddFriendFragment extends BaseFragment<AddFriendPresenter> implemen
 
     @Override
     public void finish() {
+        friend.setStatus(Friend.status_waiting);
+        friend.setRemark(remarkItem.content().toString());
+        presenter.saveFriend(friend);
         activity().finish();
     }
 }

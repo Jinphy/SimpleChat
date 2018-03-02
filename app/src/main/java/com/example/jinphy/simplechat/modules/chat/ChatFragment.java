@@ -39,6 +39,8 @@ import com.example.jinphy.simplechat.utils.ViewUtils;
  */
 public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatContract.View {
 
+    public static final String WITH_ACCOUNT = "with";
+
     private static final int HORIZONTAL = 0;
     private static final int VERTICAL = 1;
 

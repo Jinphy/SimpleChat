@@ -1,6 +1,9 @@
 package com.example.jinphy.simplechat.models.message;
 
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
+
+import com.example.jinphy.simplechat.models.friend.Friend;
 
 import java.util.List;
 import java.util.Map;
@@ -61,8 +64,41 @@ public class Message {
 
     public static final String TYPE_CHAT_VIDEO = "video";
 
-
+    /**
+     * DESC: 系统消息，账号过期
+     * Created by jinphy, on 2018/3/2, at 8:56
+     */
     public static final String TYPE_SYSTEM_ACCOUNT_INVALIDATE = "system_account_invalidate";
+
+    /**
+     * DESC: 系统消息，添加新好友
+     * Created by jinphy, on 2018/3/2, at 8:57
+     */
+    public static final String TYPE_SYSTEM_ADD_FRIEND = "system_add_friend";
+
+    /**
+     * DESC: 系统消息，同意添加好友
+     * Created by jinphy, on 2018/3/2, at 15:52
+     */
+    public static final String TYPE_SYSTEM_ADD_FRIEND_AGREE = "system_add_friend_agree";
+
+    /**
+     * DESC: 系统消息，重新加载指定的好友
+     * Created by jinphy, on 2018/3/2, at 19:58
+     */
+    public static final String TYPE_SYSTEM_RELOAD_FRIEND = "system_reload_friend";
+
+    /**
+     * DESC: 系统消息，删除好友
+     * Created by jinphy, on 2018/3/2, at 20:49
+     */
+    public static final String TYPE_SYSTEM_DELETE_FRIEND = "system_delete_friend";
+
+    /**
+     * DESC: 系统消息，公告
+     * Created by jinphy, on 2018/3/2, at 12:54
+     */
+    public static final String TYPE_SYSTEM_NOTICE = "system_notice";
 
     /**
      * DESC: 聊天的文件消息
@@ -107,8 +143,10 @@ public class Message {
     @NonNull
     private String with; // 消息的参与者，即该消息的参与者，
 
+    private String extra;
+
     public static Message[] parse(List<Map<String, String>> messageList) {
-        if (messageList.size() == 0) {
+        if (messageList==null || messageList.size() == 0) {
             return null;
         }
         Message[] result = new Message[messageList.size()];
@@ -127,6 +165,7 @@ public class Message {
         message.setSourceType(Message.RECEIVE);
         message.setOwner(msg.get(Message.TO_ACCOUNT));
         message.setWith(msg.get(Message.FROM_ACCOUNT));
+        message.setExtra(msg.get(Message_.extra.name));
         return message;
     }
 
@@ -215,6 +254,13 @@ public class Message {
         return this.hasSent;
     }
 
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
+    }
 
     /**
      * DESC: 过滤消息是否需要保存到数据库
@@ -223,10 +269,12 @@ public class Message {
      */
     public boolean needSave() {
         // "0" 表示系统消息
-        if ("0".equals(getWith()) &&
-                Message.TYPE_SYSTEM_ACCOUNT_INVALIDATE.equals(getContentType())) {
-            return true;
+        if (Friend.system.equals(getWith())) {
+            if (Message.TYPE_SYSTEM_ACCOUNT_INVALIDATE.equals(getContentType())
+                    || Message.TYPE_SYSTEM_ADD_FRIEND_AGREE.equals(getContentType())) {
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 }

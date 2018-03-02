@@ -1,15 +1,19 @@
 package com.example.jinphy.simplechat.modules.main.msg;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.modules.system_msg.SystemMsgActivity;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,24 +39,11 @@ public class MsgPresenter implements MsgContract.Presenter {
 
 
     @Override
-    public <T>void handleItemEvent(View view, T item,int type,int position) {
-        switch (view.getId()) {
-            case R.id.item_view:
-                MsgPresenter.this.view.showChatWindow((MessageRecord) item);
-                break;
-        }
-    }
-
-    @Override
-    public List<MessageRecord> loadMsgRecord() {
+    public List<MessageRecord> loadMsgRecords() {
         messageRecords = recordRepository.load(userRepository.currentUser().getAccount());
-        return messageRecords;
-    }
 
-    @Override
-    public MsgRecyclerViewAdapter getAdapter() {
-        MsgRecyclerViewAdapter adapter = new MsgRecyclerViewAdapter(loadMsgRecord());
-        adapter.onClick(this::handleItemEvent);
-        return adapter;
+        MessageRecord.sort(messageRecords);
+
+        return messageRecords;
     }
 }

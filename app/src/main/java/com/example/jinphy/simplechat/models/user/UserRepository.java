@@ -124,7 +124,6 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
         }
         String column;
         for (Map.Entry<String, String> update : values.entrySet()) {
-
             column = update.getKey();
             if (User_.accessToken.name.equals(column)) {
                 current.setAccessToken(update.getValue());
@@ -140,6 +139,8 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
                 current.setPassword(update.getValue());
             } else if (User_.address.name.equals(column)) {
                 current.setAddress(update.getValue());
+            } else if (User_.status.name.equals(column)) {
+                current.setStatus(update.getValue());
             }
         }
         userBox.put(current);
@@ -217,6 +218,16 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
     }
 
     @Override
+    public void loadAvatar(Context context, Task<Map<String, String>> task) {
+        Api.<Map<String,String>>common(context)
+                .path(Api.Path.getAvatar)
+                .dataType(Api.Data.MAP)
+                .setup(api -> this.handleBuilder(api, task))
+                .request();
+
+    }
+
+    @Override
     protected<T> void handleBuilder(ApiInterface<Response<T>> api, Task<T> task) {
         api.showProgress(task.isShowProgress())
                 .useCache(task.isUseCache())
@@ -227,5 +238,6 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
                 .onError(task.getOnDataNo()==null?null: e-> task.getOnDataNo().call(TYPE_ERROR))
                 .onFinal(task.getOnFinal()==null?null: task.getOnFinal()::call);
     }
+
 
 }

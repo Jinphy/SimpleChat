@@ -1,17 +1,22 @@
 package com.example.jinphy.simplechat.modules.main.friends;
 
-import android.support.annotation.NonNull;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.models.event_bus.EBFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
-import com.example.jinphy.simplechat.utils.Preconditions;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,18 +46,32 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Friend friend = friends.get(position);
-        // TODO: 2017/8/10 设置avatar等信息
         holder.remark.setText(friend.getRemark());
         holder.account.setText(friend.getAccount());
         holder.address.setText(friend.getAddress());
-        holder.date.setText(friend.getDate());
-        holder.avatar.setImageBitmap(StringUtils.base64ToBitmap(friend.getAvatar()));
+        if (!TextUtils.isEmpty(friend.getDate())) {
+            holder.date.setText(StringUtils.formatDate(Long.valueOf(friend.getDate())));
+        }
+
+        if (!"无".equals(friend.getAvatar())){
+            int w = holder.avatar.getMeasuredWidth();
+            int h = holder.avatar.getMeasuredHeight();
+            Bitmap bitmap = ImageUtil.loadAvatar(friend.getAccount(), w, h);
+            if (bitmap != null) {
+                holder.avatar.setImageBitmap(bitmap);
+            } else {
+                if (!"loading".equals(friend.getAvatar())) {
+                    friend.setAvatar("loading");
+                    EventBus.getDefault().post(new EBFriend(friend));
+                }
+
+            }
+        }
+
         if (click != null) {
-            holder.avatar.setOnClickListener(view -> click.onClick(view,friend,0,position));
             holder.itemView.setOnClickListener(view -> click.onClick(view,friend,0,position));
         }
         if (longClick != null) {
-            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view,friend,0,position));
             holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,friend,0,position));
         }
     }
@@ -70,7 +89,6 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
         this.friends.addAll(friends);
         notifyDataSetChanged();
     }
-
 
     //===============================================================\\
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -90,7 +108,6 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
             this.account = itemView.findViewById(R.id.account);
             this.address = itemView.findViewById(R.id.address);
             this.date = itemView.findViewById(R.id.date);
-
         }
     }
 

@@ -31,6 +31,19 @@ android {
 
     }
 
+    // 在这里统一设置某些依赖（例如support依赖）的编译版本，以防止某些第三方类库中也有使用相同依赖的不同版本
+    // 或者某些三方类库使用了相同依赖但是在版本号中使用+来获取最新版本
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            def requested = details.requested
+            if (requested.group == 'com.android.support') {
+                if (!requested.name.startsWith("multidex")) {
+                    //这里指定需要统一的依赖版本,这里统一为27.1.0
+                    details.useVersion '27.1.0'
+                }
+            }
+        }
+    }
 
 }
 
@@ -39,6 +52,7 @@ repositories {
         dirs 'libs' //就是你放aar的目录地址
     }
 }
+
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -68,6 +82,9 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.1.1'
     compile 'com.squareup.okio:okio:1.13.0'
     compile 'com.apkfuns.logutils:library:1.5.1.1'
+
+    // 这个'com.theartofdev.edmodo:android-image-cropper:2.6.0'内部有一个
+    // com.android.support:{module}:27.+
     compile 'com.theartofdev.edmodo:android-image-cropper:2.6.0'
     compile 'com.android.support:multidex:1.0.3'
     testCompile 'junit:junit:4.12'

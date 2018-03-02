@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.services.push;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
@@ -55,6 +56,7 @@ public class PushManager {
     }
 
     public void handleMessage(List<Map<String, String>> messagesList) {
+        LogUtils.e(messagesList);
         // 解析消息
         Message[] messages = Message.parse(messagesList);
 
@@ -109,4 +111,5 @@ public class PushManager {
                     logoutMessage.getContent());
         }
     }
+
 }

@@ -56,6 +56,7 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
         switch (tag) {
             case MESSAGE:
                 // 新消息
+                // TODO: 2018/3/1 各个界面接收新消息
                 EventBus.getDefault().post(new EBNewMsg());
                 break;
             case LOGOUT:

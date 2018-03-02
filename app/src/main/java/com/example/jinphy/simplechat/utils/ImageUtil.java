@@ -22,10 +22,13 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseActivity;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import static com.example.jinphy.simplechat.utils.Preconditions.checkNotNull;
 /**
@@ -33,6 +36,11 @@ import static com.example.jinphy.simplechat.utils.Preconditions.checkNotNull;
  */
 
 public class ImageUtil {
+    public static final String AVATAR_PATH = Environment.getExternalStorageDirectory()
+            .getAbsolutePath() + "/simple_chat/avatar" ;
+    public static final String PHOTO_PATH = Environment.getExternalStorageDirectory()
+            .getAbsolutePath() + "/simple_chat/photo" ;
+
 
     public static Builder from(@NonNull Context context) {
         checkNotNull(context);
@@ -163,9 +171,6 @@ public class ImageUtil {
             return null;
         }
     }
-
-
-
 
     public static int calculateInSampleSize(
             int reqWidth,
@@ -325,5 +330,46 @@ public class ImageUtil {
         return (Bitmap) data.getExtras().get("data");
     }
 
+    /**
+     * DESC: 保存头像到文件
+     * Created by jinphy, on 2018/3/1, at 10:01
+     */
+    public static void storeAvatar(String account, Bitmap bitmap) {
+        File file = new File(AVATAR_PATH,account);
+        file.getParentFile().mkdirs();
+        if (file.exists()) {
+            file.delete();
+        }
+        try {
+            file.createNewFile();
+            FileOutputStream out = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * DESC: 从文件中获取图片
+     *
+     *
+     * @return 返回对应账号的头像，如果不存在则返回 null
+     * Created by jinphy, on 2018/3/1, at 10:01
+     */
+    public static Bitmap loadAvatar(String account, int w, int h) {
+        File file = new File(AVATAR_PATH, account);
+        if (!file.exists()) {
+            return null;
+        }
+        if (w <= 0) {
+            w = 50;
+        }
+        if (h <= 0) {
+            h = 50;
+        }
+        return getBitmap(file.getAbsolutePath(), w, h);
+    }
 
 }

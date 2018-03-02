@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.models.friend;
 
 import android.content.Context;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.models.api.common.Api;
@@ -10,11 +11,14 @@ import com.example.jinphy.simplechat.models.api.common.ApiInterface;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
+import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 
 import io.objectbox.Box;
+import io.objectbox.query.QueryFilter;
 
 /**
  * DESC:
@@ -44,12 +48,27 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
      * Created by jinphy, on 2018/2/28, at 18:28
      */
     @Override
-    public List<Friend> loadLocal(String owner) {
-        return friendBox.query()
-                .equal(Friend_.owner, owner)
-                .and()
-                .equal(Friend_.status, Friend.status_ok)
-                .build().find();
+    public List<Friend> loadLocal(String owner, String... account) {
+        if (account.length == 0) {
+            return friendBox.query()
+                    .equal(Friend_.owner, owner)
+                    .and()
+                    .equal(Friend_.status, Friend.status_ok)
+                    .build().find();
+        } else {
+            return friendBox.query()
+                    .filter(friend -> {
+                        if (StringUtils.equal(owner, friend.owner)) {
+                            for (String a : account) {
+                                if (StringUtils.equal(a, friend.account)) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    })
+                    .build().find();
+        }
     }
 
     /**
@@ -57,13 +76,26 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
      * Created by jinphy, on 2018/2/28, at 18:29
      */
     @Override
-    public void loadOnline(Context context, Task<List<Friend>> task) {
-        Api.<List<Friend>>common(context)
-                .hint("正在加载...")
+    public void loadOnline(Context context, Task<List<Map<String,String>>> task) {
+        Api.<List<Map<String,String>>>common(context)
                 .path(Api.Path.loadFriends)
                 .cancellable(false)
-                .dataType(Api.Data.MODEL_LIST,Friend.class)
+                .showProgress(false)
+                .dataType(Api.Data.MAP_LIST)
                 .setup(api -> this.handleBuilder(api, task))
+                .request();
+    }
+
+    @Override
+    public void getOnline(Context context, String owner, String account) {
+        Api.<Map<String, String>>common(context)
+                .path(Api.Path.getFriend)
+                .param(Api.Key.owner, owner)
+                .param(Api.Key.account, account)
+                .cancellable(false)
+                .showProgress(false)
+                .dataType(Api.Data.MAP)
+                .onResponseYes(response -> save(Friend.parse(response.getData())))
                 .request();
     }
 
@@ -81,9 +113,10 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
 
     @Override
     public Friend get(String owner, String account) {
-        // TODO: 2018/1/18
-
-        return null;
+        return friendBox.query()
+                .equal(Friend_.owner, owner)
+                .equal(Friend_.account, account)
+                .build().findFirst();
     }
 
     @Override
@@ -97,17 +130,87 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
     }
 
     @Override
+    public void modifyRemark(Context context, Task<Map<String, String>> task) {
+        Api.<Map<String, String>>common(context)
+                .hint("正在修改...")
+                .path(Api.Path.modifyRemark)
+                .dataType(Api.Data.MAP)
+                .setup(api -> this.handleBuilder(api, task))
+                .request();
+    }
+
+
+    @Override
+    public void modifyStatus(Context context, Task<Map<String, String>> task) {
+        Api.<Map<String, String>>common(context)
+                .hint("正在修改...")
+                .path(Api.Path.modifyStatus)
+                .dataType(Api.Data.MAP)
+                .setup(api -> this.handleBuilder(api, task))
+                .request();
+    }
+
+    @Override
+    public void deleteFriend(Context context, Task<Map<String, String>> task) {
+        Api.<Map<String, String>>common(context)
+                .hint("正在删除...")
+                .path(Api.Path.deleteFriend)
+                .dataType(Api.Data.MAP)
+                .setup(api -> this.handleBuilder(api, task))
+                .request();
+
+    }
+
+    @Override
     public void save(List<Friend> friends) {
         if (friends == null) {
             return;
         }
         User user = UserRepository.getInstance().currentUser();
         for (Friend friend : friends) {
-            friend.setUser(user);
-            friend.setId(0);
+            Friend old = get(friend.owner, friend.account);
+            if (old != null) {
+                friend.setId(old.getId());
+            } else {
+                friend.setId(0);
+                friend.setUser(user);
+            }
         }
-        friendBox.removeAll();
         friendBox.put(friends);
+    }
+
+    @Override
+    public void save(Friend... friends) {
+        if (friends.length == 0) {
+            return;
+        }
+        User user = UserRepository.getInstance().currentUser();
+        for (Friend friend : friends) {
+            Friend old = get(friend.owner, friend.account);
+            if (old != null) {
+                friend.setId(old.getId());
+            } else {
+                friend.setId(0);
+                friend.setUser(user);
+            }
+        }
+        friendBox.put(friends);
+    }
+
+    @Override
+    public void update(Friend friend) {
+        if (friend == null) {
+            return;
+        }
+        friendBox.put(friend);
+    }
+
+    @Override
+    public void delete(Friend friend) {
+        if (friend == null) {
+            return;
+        }
+        friendBox.remove(friend);
     }
 
     @Override

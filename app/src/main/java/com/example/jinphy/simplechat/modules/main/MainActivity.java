@@ -66,12 +66,6 @@ public class MainActivity extends BaseActivity {
         MainFragment returnFragment = (MainFragment) addFragment(fragment, R.id.fragment);
         presenter = getPresenter(returnFragment);
 
-
-        RuntimePermission.getInstance(this)
-                .permission(Manifest.permission.READ_PHONE_STATE)
-                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .permission(Manifest.permission.CAMERA)
-                .onReject(this::finish);
     }
 
 

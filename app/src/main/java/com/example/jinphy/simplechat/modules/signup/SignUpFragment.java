@@ -113,7 +113,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
                 getString(R.string.password),
                 getString(R.string.confirm_password)
         };
-        RuntimePermission.getInstance(getActivity())
+        RuntimePermission.newInstance(getActivity())
                 .permission(Manifest.permission.READ_PHONE_STATE)
                 .onGranted(() -> {
                     deviceId = EncryptUtils.md5(DeviceUtils.deviceId());

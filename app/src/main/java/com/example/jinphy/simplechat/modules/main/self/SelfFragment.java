@@ -22,6 +22,7 @@ import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
+import com.example.jinphy.simplechat.models.event_bus.EBNewMsg;
 import com.example.jinphy.simplechat.models.event_bus.EBUser;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.modules.login.LoginActivity;
@@ -413,4 +414,6 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         LoginActivity.start(activity());
         finishActivity();
     }
+
+
 }

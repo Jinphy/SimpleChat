@@ -80,7 +80,6 @@ public class PushClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        LogUtils.e("onMessage");
         if (ObjectHelper.reference(service)) {
             service.get().handleMsg(EncryptUtils.decryptThenDecode(message));
         }

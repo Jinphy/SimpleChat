@@ -1,7 +1,14 @@
 package com.example.jinphy.simplechat.models.message_record;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message.Message;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
@@ -13,7 +20,7 @@ import io.objectbox.relation.ToOne;
  */
 
 @Entity
-public class MessageRecord {
+public class MessageRecord implements Comparable<MessageRecord>{
 
     @Id
     private long id;
@@ -105,5 +112,36 @@ public class MessageRecord {
             toTop = 0;
         }
         this.toTop = toTop;
+    }
+
+    /**
+     * DESC: 倒序排列
+     * Created by jinphy, on 2018/3/1, at 19:36
+     */
+    @Override
+    public int compareTo(@NonNull MessageRecord other) {
+        if (toTop > other.toTop) {
+            return -1;
+        } else if (toTop < other.toTop) {
+            return 1;
+        }
+        Long t1 = Long.valueOf(getMessage().getCreateTime());
+        Long t2 = Long.valueOf(other.getMessage().getCreateTime());
+        if (t1 > t2) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+
+    public static void sort(List<MessageRecord> records) {
+        if (records == null || records.size() == 0) {
+            return;
+        }
+        MessageRecord[] temp = new MessageRecord[records.size()];
+        records.toArray(temp);
+        Arrays.sort(temp);
+        records.clear();
+        records.addAll(Arrays.asList(temp));
     }
 }

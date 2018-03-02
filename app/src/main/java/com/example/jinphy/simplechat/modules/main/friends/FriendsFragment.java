@@ -7,10 +7,18 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.event_bus.EBFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
+import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
+import com.example.jinphy.simplechat.modules.system_msg.SystemMsgActivity;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -25,6 +33,7 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
 
     FloatingActionButton fab;
     private FriendsRecyclerViewAdapter adapter;
+    private LinearLayoutManager linearLayoutManager;
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -94,7 +103,7 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
 
     @Override
     protected void setupViews() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
         adapter = new FriendsRecyclerViewAdapter();
         recyclerView.setAdapter(adapter);
@@ -104,7 +113,16 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     @Override
     protected void registerEvent() {
         recyclerView.addOnScrollListener(getOnScrollListener());
+        adapter.onClick(this::handleItemEvent);
+    }
 
+    public <T>void handleItemEvent(View view, T item,int type,int position) {
+        Friend friend = (Friend) item;
+        switch (view.getId()) {
+            case R.id.item_view:
+                ModifyFriendInfoActivity.start(activity(), friend.getAccount());
+                break;
+        }
     }
 
 
@@ -123,4 +141,17 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     public void updateFriends(List<Friend> friends) {
         adapter.update(friends);
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void loadAvatar(EBFriend msg) {
+        presenter.loadAvatar(activity(), msg.data);
+    }
+
+    @Override
+    public void updateView() {
+        int i = linearLayoutManager.findFirstVisibleItemPosition();
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(i);
+    }
+
 }

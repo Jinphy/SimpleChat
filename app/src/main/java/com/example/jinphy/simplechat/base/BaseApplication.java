@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.apkfuns.logutils.LogUtils;
+import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
 import com.example.jinphy.simplechat.listener_adapters.ActivityLiftcycle;
 import com.example.jinphy.simplechat.secret.Secret;
 import com.example.jinphy.simplechat.services.push.PushService;
@@ -71,6 +72,7 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
 
         PushService.start(this, PushService.FLAG_INIT);
 //        EventBus.getDefault().register(this);
+
     }
 
     @Override

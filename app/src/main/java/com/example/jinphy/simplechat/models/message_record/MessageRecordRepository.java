@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.models.message_record;
 
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.List;
 
@@ -49,12 +50,10 @@ public class MessageRecordRepository implements MessageRecordDataSource {
 
     @Override
     public List<MessageRecord> load(String owner) {
-        messageRecordBox.query()
-                .equal(MessageRecord_.owner, owner)
-//                .orderDesc(MessageRecord_.toTop)
-//                .orderDesc(MessageRecord_.lastMsgId)
+        return messageRecordBox.query()
+                .filter(record-> StringUtils.equal(owner, record.getOwner())
+                        && record.getFriend() != null)
                 .build().find();
-        return null;
     }
 
     @Override

@@ -98,7 +98,7 @@ public class ModifyUserFragment extends BaseFragment<ModifyUserPresenter> implem
 
     @Override
     protected void initData() {
-        RuntimePermission.getInstance(activity())
+        RuntimePermission.newInstance(activity())
                 .permission(Manifest.permission.READ_PHONE_STATE)
                 .onGranted(() -> {
                     deviceId = EncryptUtils.md5(DeviceUtils.deviceId());
@@ -448,7 +448,7 @@ public class ModifyUserFragment extends BaseFragment<ModifyUserPresenter> implem
 
     @Override
     public void pickPhoto() {
-        RuntimePermission.getInstance(activity())
+        RuntimePermission.newInstance(activity())
                 .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .permission(Manifest.permission.CAMERA)
                 .onGranted(()->{

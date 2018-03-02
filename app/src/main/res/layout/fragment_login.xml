@@ -128,13 +128,13 @@
 
                 </RelativeLayout>
 
-                <!--goto sign up view and checkbox layout-->
+                <!--gsignaturesign up view and checkbox layout-->
                 <RelativeLayout
                     android:layout_marginBottom="@dimen/dimen_10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <!--go to sign up view -->
+                    <!--gosignaturesign up view -->
                     <TextView
                         android:id="@+id/goto_sign_up_text"
                         android:layout_width="wrap_content"

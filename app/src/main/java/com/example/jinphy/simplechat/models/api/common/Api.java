@@ -102,6 +102,16 @@ public abstract class Api {
         String addFriend = "/friend/addFriend";
         @Post
         String loadFriends = "/friend/loadFriends";
+        @Post
+        String getAvatar = "/user/getAvatar";
+        @Post
+        String getFriend = "/friend/getFriend";
+        @Post
+        String modifyRemark = "/friend/modifyRemark";
+        @Post
+        String modifyStatus = "/friend/modifyStatus";
+        @Post
+        String deleteFriend = "/friend/deleteFriend";
     }
 
     //===================参数key==========================================================
@@ -128,6 +138,8 @@ public abstract class Api {
         String remark = "remark";
         String verifyMsg = "verifyMsg";
         String owner = "owner";
+        String confirm = "confirm";
+        String status = "status";
     }
 
 

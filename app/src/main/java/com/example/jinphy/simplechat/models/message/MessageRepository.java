@@ -1,6 +1,9 @@
 package com.example.jinphy.simplechat.models.message;
 
 import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.custom_view.MenuItemView;
+import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.friend.FriendRepository;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -41,6 +44,20 @@ public class MessageRepository implements MessageDataSource {
             if (message.needSave()) {
                 message.setId(0);
                 list.add(message);
+            }
+            // 如果是添加新好友的消息，则先预加载该好友的信息
+            if (Message.TYPE_SYSTEM_ADD_FRIEND.equals(message.getContentType())
+                    || Message.TYPE_SYSTEM_ADD_FRIEND_AGREE.equals(message.getContentType())
+                    || Message.TYPE_SYSTEM_RELOAD_FRIEND.equals(message.getContentType())) {
+                String owner = message.getOwner();
+                String account = message.getExtra();//好友的账号保存在该字段中
+                FriendRepository.getInstance().getOnline(null, owner, account);
+            } else if (Message.TYPE_SYSTEM_DELETE_FRIEND.equals(message.getContentType())) {
+                String owner = message.getOwner();
+                String account = message.getExtra();//好友的账号保存在该字段中
+                Friend friend = FriendRepository.getInstance().get(owner, account);
+                friend.setStatus(Friend.status_deleted);
+                FriendRepository.getInstance().update(friend);
             }
         }
         if (messages.length > 0) {
@@ -126,4 +143,12 @@ public class MessageRepository implements MessageDataSource {
                 .find();
     }
 
+    @Override
+    public List<Message> loadSystemMsg(String owner, String contentType) {
+        return messageBox.query()
+                .equal(Message_.owner, owner)
+                .equal(Message_.contentType, contentType)
+                .build()
+                .find();
+    }
 }

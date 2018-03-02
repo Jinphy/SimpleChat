@@ -64,4 +64,6 @@ public interface MessageDataSource {
      */
     List<Message> load(String owner, String with);
 
+
+    List<Message> loadSystemMsg(String owner, String contentType);
 }

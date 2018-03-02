@@ -145,7 +145,6 @@ class Request<T> extends WebSocketClient implements ObservableOnSubscribe<Respon
      */
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        LogUtils.e("onClose code = " + code+", msg = "+reason);
         if (emitter != null && !emitter.isDisposed()) {
             emitter.onError(new ServerException("网络连接超时！"));
             emitter = null;

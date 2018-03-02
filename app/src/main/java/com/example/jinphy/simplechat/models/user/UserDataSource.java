@@ -61,4 +61,6 @@ public interface UserDataSource {
 
     boolean needToLogin();
 
+    void loadAvatar(Context context, BaseRepository.Task<Map<String, String>> task);
+
 }

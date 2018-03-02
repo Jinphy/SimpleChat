@@ -4,13 +4,19 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 
 /**
  * 6.0 及以上版本运行时权限申请类
@@ -18,7 +24,7 @@ import java.util.List;
  * <h1>使用说明：</h1>
  *  <h2>1、实例代码：</h2>
  *     <p>{@code
- *     RuntimePermission.getInstance(activity)
+ *     RuntimePermission.newInstance(activity)
  *                         .permission(Manifest.permission.READ_PHONE_STATE)
  *                         .onGranted(() -> {
  *                              // 用户同意了所申请的权限，接下来可以执行具体的逻辑
@@ -53,15 +59,15 @@ public class RuntimePermission {
     private Runnable onReject;
     private Runnable onDialog;
     private List<String> permissions;
-    private SoftReference<Activity> activity;
-    private int grantedCount = 0;
+    private WeakReference<Activity> activity;
+    private Disposable disposable;
 
-    public static RuntimePermission getInstance(@NonNull Activity activity) {
+    public static RuntimePermission newInstance(@NonNull Activity activity) {
         return new RuntimePermission(activity);
     }
 
     private RuntimePermission(@NonNull Activity activity) {
-        this.activity = new SoftReference<>(activity);
+        this.activity = new WeakReference<>(activity);
         permissions = new LinkedList<>();
     }
 
@@ -122,22 +128,27 @@ public class RuntimePermission {
         String[] p = new String[permissions.size()];
         RxPermissions permission = new RxPermissions(activity);
         permission.requestEach(permissions.toArray(p))
-                .subscribe(result -> { // will emit 2 RuntimePermission objects
-                    if (result.granted && onGranted != null) {
-                        // `permission.name` is granted !
-                        if ((++grantedCount) == permissions.size()) {
-                            onGranted.run();
+                .doOnSubscribe(disposable -> this.disposable = disposable)
+                .doOnComplete(() -> {
+                    // 当所有的权限申请都被授权后才会执行该回调
+                    if (this.onGranted != null) {
+                        this.onGranted.run();
+                    }
+                })
+                .subscribe(result -> {
+                    // 判断申请的所有权限中只要有一条被拒绝则申请失败，并终止申请
+                    if (!result.granted) {
+                        if (result.shouldShowRequestPermissionRationale) {
+                            if (this.onDialog != null) {
+                                this.onDialog.run();
+                            }
+                        } else {
+                            if (this.onReject != null) {
+                                this.onReject.run();
+                            }
                         }
-                    } else if (result.shouldShowRequestPermissionRationale && onDialog !=
-                            null) {
-                        // Denied permission without ask never again
-                        onDialog.run();
-                    } else {
-                        // Denied permission with ask never again
-                        // Need to go to the settings
-                        onReject.run();
+                        this.disposable.dispose();
                     }
                 });
     }
-
 }

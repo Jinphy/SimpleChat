@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -429,7 +428,7 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
      */
     @Override
     public void request() {
-        RuntimePermission.getInstance(BaseApplication.activity())
+        RuntimePermission.newInstance(BaseApplication.activity())
                 .permission(Manifest.permission.READ_PHONE_STATE)
                 .onGranted(()->{
                     threadPool.execute(()->{

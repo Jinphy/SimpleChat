@@ -45,8 +45,14 @@ public class AddFriendPresenter implements AddFriendContract.Presenter {
                 .doOnDataOk(okData -> {
                     App.showToast(okData.getMsg(), false);
                     view.finish();
+
                 })
                 .submit(task -> friendRepository.addFriend(context, task));
+    }
+
+    @Override
+    public void saveFriend(Friend friend) {
+        friendRepository.save(friend);
     }
 
     @Override

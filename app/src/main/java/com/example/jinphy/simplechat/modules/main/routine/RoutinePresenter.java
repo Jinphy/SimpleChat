@@ -30,7 +30,7 @@ public class RoutinePresenter implements RoutineContract.Presenter {
 
     @Override
     public RoutineRecyclerViewAdapter getAdapter() {
-        Log.e("Main", "getAdapter");
+        Log.e("Main", "loadMessageRecords");
         return new RoutineRecyclerViewAdapter();
     }
 

@@ -24,6 +24,9 @@ public interface AddFriendContract {
 
         void addFriend(Context context, Map<String, Object> params);
 
+        void saveFriend(Friend friend);
+
+
         String getCurrentAccount();
     }
 }

@@ -14,16 +14,31 @@ import java.util.Map;
 
 public interface FriendDataSource {
 
-    List<Friend> loadLocal(String owner);
+    List<Friend> loadLocal(String owner, String... account);
 
-    void loadOnline(Context context, BaseRepository.Task<List<Friend>> task);
+
+    void loadOnline(Context context, BaseRepository.Task<List<Map<String,String>>> task);
+
+    void getOnline(Context context, String owner, String account);
 
     Friend get(String owner, String account);
 
     void addFriend(Context context, BaseRepository.Task<Map<String, String>> task);
 
+    void modifyRemark(Context context, BaseRepository.Task<Map<String, String>> task);
+
+    void modifyStatus(Context context, BaseRepository.Task<Map<String, String>> task);
+
+    void deleteFriend(Context context, BaseRepository.Task<Map<String, String>> task);
+
     long count(String owner);
 
     void save(List<Friend> friends);
+
+    void save(Friend... friends);
+
+    void update(Friend friend);
+
+    void delete(Friend friend);
 
 }

@@ -571,6 +571,9 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
     }
 
     public MenuItemView contentHint(CharSequence contentHint) {
+        if (contentHint == null || contentHint.length() == 0) {
+            return this;
+        }
         this.contentHint = contentHint;
         this.contentTextView.setHint(contentHint);
         this.contentEditText.setHint(contentHint);

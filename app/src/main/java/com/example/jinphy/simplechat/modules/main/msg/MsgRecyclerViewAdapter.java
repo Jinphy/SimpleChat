@@ -2,17 +2,27 @@ package com.example.jinphy.simplechat.modules.main.msg;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
+import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.Preconditions;
+import com.example.jinphy.simplechat.utils.StringUtils;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -25,13 +35,8 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
 
     private List<MessageRecord> messageRecords;
 
-    public MsgRecyclerViewAdapter(@NonNull List<MessageRecord> messageRecords) {
-        if (messageRecords == null) {
-            this.messageRecords = new ArrayList<>();
-        } else {
-            this.messageRecords = Preconditions.checkNotNull(messageRecords);
-        }
-
+    public MsgRecyclerViewAdapter() {
+        this.messageRecords = new LinkedList<>();
     }
 
     @Override
@@ -45,14 +50,50 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         MessageRecord messageRecord = messageRecords.get(position);
-        // TODO: 2017/8/10 设置avatar等信息
+        Friend friend = messageRecord.getFriend();
+        Message message = messageRecord.getMessage();
+        String name = "暂无昵称";
+        if (!TextUtils.isEmpty(friend.getRemark())) {
+            name = friend.getRemark();
+        } else if (!TextUtils.isEmpty(friend.getName())) {
+            name = friend.getName();
+        }
+        holder.name.setText(name);
+        holder.lastMsg.setText(message.getContent());
+        holder.time.setText(StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
+
+        if (!"无".equals(friend.getAvatar())) {
+            holder.avatar.setImageBitmap(
+                    ImageUtil.loadAvatar(
+                            friend.getAccount(),
+                            holder.avatar.getMeasuredWidth(),
+                            holder.avatar.getMeasuredHeight()));
+        }
+        if (Friend.system.equals(friend.getAccount())) {
+            holder.avatar.setImageResource(R.drawable.ic_system_24dp);
+        }
+
+        // 设置未读消息数
+        int count = messageRecord.getNewMsgCount();
+        if (count == 0) {
+            holder.count.setVisibility(View.GONE);
+        } else {
+            holder.count.setVisibility(View.VISIBLE);
+            if (count < 100) {
+                holder.count.setText(count+"");
+            } else {
+                holder.count.setText("99+");
+            }
+        }
+        // 设置是否有置顶
+        holder.top.setVisibility(messageRecord.getToTop() == 1 ? View.VISIBLE : View.GONE);
 
         if (click != null) {
-            holder.avatar.setOnClickListener(view -> click.onClick(view, messageRecord,0,position));
+//            holder.avatar.setOnClickListener(view -> click.onClick(view, messageRecord,0,position));
             holder.itemView.setOnClickListener(view -> click.onClick(view, messageRecord,0,position));
         }
         if (longClick != null) {
-            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view, messageRecord,0,position));
+//            holder.avatar.setOnLongClickListener(view -> longClick.onLongClick(view, messageRecord,0,position));
             holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view, messageRecord,0,position));
         }
 
@@ -64,6 +105,11 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
         return messageRecords.size();
     }
 
+    public void update(List<MessageRecord> records) {
+        messageRecords.clear();
+        messageRecords.addAll(records);
+        notifyDataSetChanged();
+    }
 
     //===================================================================\\
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -73,6 +119,8 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
         private TextView lastMsg;
         private TextView time;
         private View itemView;
+        private TextView count;
+        private View top;
 
 
         public ViewHolder(View itemView) {
@@ -82,6 +130,8 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
             this.lastMsg = itemView.findViewById(R.id.last_msg);
             this.time = itemView.findViewById(R.id.time);
             this.itemView = itemView;
+            this.count = itemView.findViewById(R.id.new_count);
+            this.top = itemView.findViewById(R.id.top);
         }
     }
 

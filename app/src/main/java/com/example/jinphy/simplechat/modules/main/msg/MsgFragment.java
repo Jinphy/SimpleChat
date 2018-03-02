@@ -10,9 +10,15 @@ import android.view.View;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.event_bus.EBNewMsg;
+import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
+import com.example.jinphy.simplechat.modules.system_msg.SystemMsgActivity;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +30,7 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     private RecyclerView recyclerView;
 
     private FloatingActionButton fab;
+    private MsgRecyclerViewAdapter adapter;
 
     public MsgFragment() {
         // Required empty public constructor
@@ -99,13 +106,16 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     protected void setupViews() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(presenter.getAdapter());
 
+        adapter = new MsgRecyclerViewAdapter();
+        recyclerView.setAdapter(adapter);
+        adapter.update(presenter.loadMsgRecords());
     }
 
     @Override
     protected void registerEvent() {
         recyclerView.addOnScrollListener(getOnScrollListener());
+        adapter.onClick(this::handleItemEvent);
     }
 
     @Override
@@ -117,5 +127,26 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     public void showChatWindow(MessageRecord item) {
         Intent intent = new Intent(getActivity(), ChatActivity.class);
         startActivity(intent);
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateView(EBNewMsg msg) {
+        adapter.update(presenter.loadMsgRecords());
+    }
+
+
+    public <T>void handleItemEvent(View view, T item,int type,int position) {
+        MessageRecord record = (MessageRecord) item;
+        switch (view.getId()) {
+            case R.id.item_view:
+                String with = record.getFriend().getAccount();
+                if (Friend.system.equals(with)) {
+                    SystemMsgActivity.start(activity());
+                } else {
+                    showChatWindow(record);
+                }
+                break;
+        }
     }
 }
