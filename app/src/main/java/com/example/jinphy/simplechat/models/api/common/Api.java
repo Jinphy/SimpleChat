@@ -112,6 +112,8 @@ public abstract class Api {
         String modifyStatus = "/friend/modifyStatus";
         @Post
         String deleteFriend = "/friend/deleteFriend";
+        @Post
+        String checkAccount = "/user/checkAccount";
     }
 
     //===================参数key==========================================================

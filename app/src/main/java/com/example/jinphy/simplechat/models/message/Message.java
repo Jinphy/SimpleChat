@@ -17,7 +17,7 @@ import io.objectbox.annotation.Id;
  */
 
 @Entity
-public class Message {
+public class Message implements Comparable<Message>{
 
     /**
      * DESC: 消息的来源类型：发送的消息
@@ -270,11 +270,25 @@ public class Message {
     public boolean needSave() {
         // "0" 表示系统消息
         if (Friend.system.equals(getWith())) {
-            if (Message.TYPE_SYSTEM_ACCOUNT_INVALIDATE.equals(getContentType())
-                    || Message.TYPE_SYSTEM_ADD_FRIEND_AGREE.equals(getContentType())) {
-                return false;
+            switch (getContentType()) {
+                case Message.TYPE_SYSTEM_ACCOUNT_INVALIDATE:
+                case Message.TYPE_SYSTEM_ADD_FRIEND_AGREE:
+                case Message.TYPE_SYSTEM_RELOAD_FRIEND:
+                case Message.TYPE_SYSTEM_DELETE_FRIEND:
+                    return false;
             }
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(@NonNull Message other) {
+        Long t1 = Long.valueOf(this.createTime);
+        Long t2 = Long.valueOf(other.createTime);
+        if (t1 > t2) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 }

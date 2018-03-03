@@ -7,6 +7,8 @@ import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
+import com.example.jinphy.simplechat.models.message.MessageRepository;
+import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
@@ -25,12 +27,16 @@ public class AddFriendPresenter implements AddFriendContract.Presenter {
     private final AddFriendContract.View view;
     private UserRepository userRepository;
     private FriendRepository friendRepository;
+    private MessageRepository messageRepository;
+    private MessageRecordRepository recordRepository;
 
     public AddFriendPresenter(Context context, AddFriendContract.View view) {
         this.context = new WeakReference<>(context);
         this.view = view;
         userRepository = UserRepository.getInstance();
         friendRepository = FriendRepository.getInstance();
+        messageRepository = MessageRepository.getInstance();
+        recordRepository = MessageRecordRepository.getInstance();
     }
 
 
@@ -45,14 +51,19 @@ public class AddFriendPresenter implements AddFriendContract.Presenter {
                 .doOnDataOk(okData -> {
                     App.showToast(okData.getMsg(), false);
                     view.finish();
-
                 })
                 .submit(task -> friendRepository.addFriend(context, task));
     }
 
     @Override
     public void saveFriend(Friend friend) {
-        friendRepository.save(friend);
+        User user = userRepository.currentUser();
+        Friend old = friendRepository.get(user.getAccount(), friend.getAccount());
+        if (old != null) {
+            friend.setId(old.getId());
+            friend.setStatus(Friend.status_readd);
+        }
+        friendRepository.update(friend);
     }
 
     @Override

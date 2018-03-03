@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.models.verification_code.CodeRepository;
@@ -28,6 +30,8 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     private UserRepository userRepository;
 
+    private FriendRepository friendRepository;
+
     private LoginContract.View view;
 
     public LoginPresenter(Context context, @NonNull LoginContract.View view) {
@@ -35,6 +39,7 @@ public class LoginPresenter implements LoginContract.Presenter {
         this.context = new WeakReference<>(context);
         this.codeRepository = CodeRepository.getInstance();
         this.userRepository = UserRepository.getInstance();
+        this.friendRepository = FriendRepository.getInstance();
     }
     @Override
     public void start() {
@@ -86,7 +91,7 @@ public class LoginPresenter implements LoginContract.Presenter {
                     .param(Api.Key.account,account)
                     .param(Api.Key.password,"null".equals(password)?password: EncryptUtils.md5(password))
                     .param(Api.Key.deviceId,deviceId)
-                    // 登录成功时是回调
+                    // 登录成功时回调
                     .doOnDataOk(response -> {
                         User user = response.getData();
                         // 登录成功
@@ -102,6 +107,9 @@ public class LoginPresenter implements LoginContract.Presenter {
                             user.setRememberPassword(false);
                         }
                         userRepository.saveUser(user);
+                        friendRepository.addSystemFriendLocal(user.getAccount());
+
+                        PushService.start(context,PushService.FLAG_CLOSE);
                         PushService.start(context, PushService.FLAG_INIT);
                     })
                     // 提交设置并执行登录操作

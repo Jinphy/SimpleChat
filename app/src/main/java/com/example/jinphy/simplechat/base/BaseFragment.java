@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -56,7 +57,6 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Log.d(TAG, "onCreateView: ");
         this.presenter = getPresenter();
 
         int resourceId = getResourceId();
@@ -69,7 +69,6 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
         initView(root);
 
-
         /**
          * DESC: Must set to true,if you want to use options menu in the fragment
          *
@@ -77,7 +76,6 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
          * Created by jinphy, on 2018/1/9, at 8:44
          */
         setHasOptionsMenu(true);
-
 
         return root;
     }

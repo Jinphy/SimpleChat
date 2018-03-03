@@ -20,6 +20,8 @@ import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateFriend;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.Friend_;
 import com.example.jinphy.simplechat.models.user.UserRepository;
@@ -147,8 +149,15 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
                 break;
             case Friend.status_refuse:
                 statusItem.contentHint("您已拒绝对方好友申请");
+                break;
             case Friend.status_deleted:
                 statusItem.contentHint("已删除");
+                btnDelete.setVisibility(View.VISIBLE);
+                break;
+            case Friend.status_readd:
+                statusItem.contentHint("已重新添加，等待对方同意");
+                btnDelete.setVisibility(View.VISIBLE);
+                break;
             default:
                 break;
         }
@@ -197,6 +206,10 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
                     .contentGravity(GravityEnum.CENTER)
                     .positiveColor(App.activity().colorPrimary())
                     .onPositive((dialog, which) -> {
+                        if (Friend.status_deleted.equals(friend.getStatus())) {
+                            this.afterDeleteFriend();
+                            return;
+                        }
                         Map<String, Object> params = newParams()
                                 .add(Api.Key.account, friend.getAccount())
                                 .add(Api.Key.owner, friend.getOwner())
@@ -264,8 +277,6 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
     }
 
 
-
-
     /**
      * DESC: 创建菜单
      * Created by jinphy, on 2018/1/8, at 20:52
@@ -329,13 +340,13 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
         return false;
     }
 
-
     @Override
     public void afterModifyRemark() {
         App.showToast("备注修改成功！", false);
         friend.setRemark(remarkItem.content().toString());
         presenter.saveFriend(friend);
         finishActivity();
+        EventBus.getDefault().post(new EBUpdateView());
     }
 
     @Override
@@ -352,6 +363,7 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
             statusItem.contentHint("正常");
         }
         presenter.saveFriend(friend);
+        EventBus.getDefault().post(new EBUpdateView());
     }
 
     @Override
@@ -359,5 +371,6 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
         App.showToast("好友已删除！", false);
         presenter.deleteFriendLocal(friend);
         finishActivity();
+        EventBus.getDefault().post(new EBUpdateView());
     }
 }

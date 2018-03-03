@@ -111,5 +111,23 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
         }
     }
 
+    public void updateFriend(Friend friend) {
+        for (int i = 0; i < friends.size(); i++) {
+            LogUtils.e(friend.getAccount());
+            LogUtils.e(friends.get(i).getAccount());
+            if (StringUtils.equal(friend.getAccount(), friends.get(i).getAccount())) {
+                friends.set(i, friend);
+                notifyDataSetChanged();
+                return;
+            }
+        }
+        friends.add(friend);
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        friends.clear();
+        notifyDataSetChanged();
+    }
 }
 

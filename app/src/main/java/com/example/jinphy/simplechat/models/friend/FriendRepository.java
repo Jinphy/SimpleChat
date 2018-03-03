@@ -1,24 +1,24 @@
 package com.example.jinphy.simplechat.models.friend;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.text.TextUtils;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.models.api.common.Api;
-import com.example.jinphy.simplechat.models.api.common.ApiCallback;
 import com.example.jinphy.simplechat.models.api.common.ApiInterface;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
-import com.example.jinphy.simplechat.utils.ObjectHelper;
+import com.example.jinphy.simplechat.models.user.User_;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 
 import io.objectbox.Box;
-import io.objectbox.query.QueryFilter;
 
 /**
  * DESC:
@@ -51,9 +51,17 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
     public List<Friend> loadLocal(String owner, String... account) {
         if (account.length == 0) {
             return friendBox.query()
-                    .equal(Friend_.owner, owner)
-                    .and()
-                    .equal(Friend_.status, Friend.status_ok)
+                    .filter(friend->{
+                        if (StringUtils.equal(owner, friend.getOwner())) {
+                            switch (friend.getStatus()) {
+                                case Friend.status_ok:
+                                case Friend.status_black_listed:
+                                case Friend.status_black_listing:
+                                    return true;
+                            }
+                        }
+                        return false;
+                    })
                     .build().find();
         } else {
             return friendBox.query()
@@ -95,7 +103,24 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                 .cancellable(false)
                 .showProgress(false)
                 .dataType(Api.Data.MAP)
-                .onResponseYes(response -> save(Friend.parse(response.getData())))
+                .onResponseYes(response -> {
+                    Friend friend = Friend.parse(response.getData());
+                    save(friend);
+                })
+                .request();
+        Api.<Map<String,String>>common(context)
+                .path(Api.Path.getAvatar)
+                .param(Api.Key.account, account)
+                .cancellable(false)
+                .showProgress(false)
+                .dataType(Api.Data.MAP)
+                .onResponseYes(response -> {
+                    Map<String, String> data = response.getData();
+                    if (!"无".equals(data.get(User_.avatar.name))) {
+                        Bitmap bitmap = StringUtils.base64ToBitmap(data.get(User_.avatar.name));
+                        ImageUtil.storeAvatar(account, bitmap);
+                    }
+                })
                 .request();
     }
 
@@ -113,6 +138,9 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
 
     @Override
     public Friend get(String owner, String account) {
+        if (TextUtils.isEmpty(owner) || TextUtils.isEmpty(account)) {
+            return null;
+        }
         return friendBox.query()
                 .equal(Friend_.owner, owner)
                 .equal(Friend_.account, account)
@@ -210,7 +238,8 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
         if (friend == null) {
             return;
         }
-        friendBox.remove(friend);
+        List<Friend> friends = loadLocal(friend.getOwner(), friend.account);
+        friendBox.remove(friends);
     }
 
     @Override
@@ -225,4 +254,16 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                 .onFinal(task.getOnFinal()==null?null: task.getOnFinal()::call);
     }
 
+    @Override
+    public void addSystemFriendLocal(String owner) {
+        Friend system = get(owner, Friend.system);
+        if (system == null) {
+            Friend friend = new Friend();
+            friend.setStatus(Friend.status_waiting);
+            friend.setAccount(Friend.system);
+            friend.setOwner(owner);
+            friendBox.put(friend);
+        }
+
+    }
 }

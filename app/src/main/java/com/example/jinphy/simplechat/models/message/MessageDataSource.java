@@ -16,7 +16,7 @@ public interface MessageDataSource {
      * <p>
      * Created by jinphy, on 2018/1/18, at 9:01
      */
-    void save(Message... messages);
+    Message[] save(Message... messages);
 
     /**
      * DESC: 更新消息

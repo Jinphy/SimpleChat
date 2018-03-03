@@ -23,6 +23,6 @@ public interface MessageRecordDataSource {
 
     void delete(MessageRecord... records);
 
-
+    void delete(String owner, Friend width);
 
 }

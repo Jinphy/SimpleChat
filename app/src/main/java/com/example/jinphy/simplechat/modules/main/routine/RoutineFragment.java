@@ -2,11 +2,14 @@ package com.example.jinphy.simplechat.modules.main.routine;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
@@ -27,6 +30,8 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
 
     private int density;
     private RoutineRecyclerViewAdapter adapter;
+
+    private View root = null;
 
 
     public RoutineFragment() {
@@ -67,6 +72,14 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     public void fabAction(View view) {
 
     }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (root == null) {
+            root = super.onCreateView(inflater, container, savedInstanceState);
+        }
+        return root;
+    }
+
 
     @Override
     public void initData() {
@@ -86,7 +99,6 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
         recyclerView.setAdapter(adapter);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
-
     }
 
 

@@ -5,6 +5,8 @@ import android.content.Context;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
+import com.example.jinphy.simplechat.models.message.MessageRepository;
+import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 
@@ -19,6 +21,8 @@ public class ModifyFriendInfoPresenter implements ModifyFriendInfoContract.Prese
 
 
     private UserRepository userRepository;
+    private MessageRepository messageRepository;
+    private MessageRecordRepository recordRepository;
     private FriendRepository friendRepository;
 
     private final ModifyFriendInfoContract.View view;
@@ -26,6 +30,8 @@ public class ModifyFriendInfoPresenter implements ModifyFriendInfoContract.Prese
     public ModifyFriendInfoPresenter(ModifyFriendInfoContract.View view) {
         this.view = view;
         userRepository = UserRepository.getInstance();
+        messageRepository = MessageRepository.getInstance();
+        recordRepository = MessageRecordRepository.getInstance();
         friendRepository = FriendRepository.getInstance();
     }
 
@@ -77,6 +83,9 @@ public class ModifyFriendInfoPresenter implements ModifyFriendInfoContract.Prese
 
     @Override
     public void deleteFriendLocal(Friend friend) {
+        User user = userRepository.currentUser();
+        recordRepository.delete(user.getAccount(), friend);
+        messageRepository.delete(user.getAccount(), friend.getAccount());
         friendRepository.delete(friend);
     }
 }

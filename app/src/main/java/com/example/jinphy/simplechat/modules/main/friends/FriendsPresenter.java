@@ -46,7 +46,7 @@ public class FriendsPresenter implements FriendsContract.Presenter {
     @Override
     public void loadFriends(Context context) {
         String owner = userRepository.currentUser().getAccount();
-        if (friendRepository.count(owner) > 0) {
+        if (friendRepository.count(owner) > 1) {
             view.updateFriends(friendRepository.loadLocal(owner));
         } else {
             friendRepository.<List<Map<String,String>>>newTask()

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
@@ -107,8 +108,17 @@ public class AddFriendFragment extends BaseFragment<AddFriendPresenter> implemen
     @Override
     public void finish() {
         friend.setStatus(Friend.status_waiting);
-        friend.setRemark(remarkItem.content().toString());
+        if (!TextUtils.isEmpty(remarkItem.content())) {
+            friend.setRemark(remarkItem.content().toString());
+        }
         presenter.saveFriend(friend);
         activity().finish();
+    }
+
+    @Override
+    protected void onKeyboardEvent(boolean open) {
+        if (!open) {
+            MenuItemView.removeCurrent();
+        }
     }
 }

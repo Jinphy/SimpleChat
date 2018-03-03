@@ -8,6 +8,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.custom_libs.SChain;
+import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.models.user.UserRepository;
 
 /**
  * DESC:
@@ -22,6 +24,9 @@ public class DialogUtils {
      * Created by jinphy, on 2018/1/2, at 18:09
      */
     public static void showResponseNo(Response responseNo, Context context) {
+        if (context == null) {
+            return;
+        }
         int red = ContextCompat.getColor(context, R.color.color_red_D50000);
         CharSequence content = responseNo.getMsg();
         SChain sChain = SChain.with(content).sizeRelative(0.85f);
@@ -33,6 +38,7 @@ public class DialogUtils {
             default:
                 break;
         }
+        boolean accountUsable = !Response.NO_ACCESS_TOKEN.equals(responseNo.getCode());
         new MaterialDialog.Builder(context)
                 .title(SChain.with("错误").sizeRelative(0.8f).make())
                 .iconRes(R.drawable.ic_cry_red_24dp)
@@ -41,13 +47,12 @@ public class DialogUtils {
                 .positiveText("确定")
                 .titleColorRes(R.color.color_red_D50000)
                 .positiveColorRes(R.color.color_red_D50000)
-                .cancelable(true)
+                .cancelable(accountUsable)
                 .onPositive((dialog, which) -> {
-
+                    if (!accountUsable) {
+                        UserRepository.getInstance().logoutLocal();
+                    }
                 })
                 .show();
-
     }
-
-
 }

@@ -63,4 +63,7 @@ public interface UserDataSource {
 
     void loadAvatar(Context context, BaseRepository.Task<Map<String, String>> task);
 
+    void checkAccount(Context context);
+
+
 }

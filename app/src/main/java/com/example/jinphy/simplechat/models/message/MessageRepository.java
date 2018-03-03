@@ -1,9 +1,15 @@
 package com.example.jinphy.simplechat.models.message;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
+import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.models.user.UserRepository;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -38,7 +44,7 @@ public class MessageRepository implements MessageDataSource {
      * <p>
      * Created by jinphy, on 2018/1/18, at 9:01
      */
-    public void save(Message... messages) {
+    public Message[] save(Message... messages) {
         List<Message> list = new LinkedList<>();
         for (Message message : messages) {
             if (message.needSave()) {
@@ -52,6 +58,7 @@ public class MessageRepository implements MessageDataSource {
                 String owner = message.getOwner();
                 String account = message.getExtra();//好友的账号保存在该字段中
                 FriendRepository.getInstance().getOnline(null, owner, account);
+
             } else if (Message.TYPE_SYSTEM_DELETE_FRIEND.equals(message.getContentType())) {
                 String owner = message.getOwner();
                 String account = message.getExtra();//好友的账号保存在该字段中
@@ -63,6 +70,9 @@ public class MessageRepository implements MessageDataSource {
         if (messages.length > 0) {
             messageBox.put(list);
         }
+        messages = new Message[list.size()];
+
+        return list.toArray(messages);
     }
 
     /**
@@ -124,6 +134,7 @@ public class MessageRepository implements MessageDataSource {
                 .build()
                 .find()
         );
+
     }
 
     /**

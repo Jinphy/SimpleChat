@@ -111,6 +111,7 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
         notifyDataSetChanged();
     }
 
+
     //===================================================================\\
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -134,6 +135,36 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
             this.top = itemView.findViewById(R.id.top);
         }
     }
+
+    /**
+     * DESC: 跟新消息记录中对应的好友依赖
+     * Created by jinphy, on 2018/3/3, at 13:23
+     */
+    public void updateFriend(Friend friend) {
+        for (MessageRecord messageRecord : messageRecords) {
+            String account = messageRecord.getFriend().getAccount();
+            if (StringUtils.equal(account, friend.getAccount())) {
+                messageRecord.setWith(friend);
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    public void deleteRecord(Friend friend) {
+        for (MessageRecord messageRecord : messageRecords) {
+            String account = messageRecord.getFriend().getAccount();
+            if (StringUtils.equal(account, friend.getAccount())) {
+                messageRecords.remove(messageRecord);
+                break;
+            }
+        }
+        notifyDataSetChanged();
+    }
+    public void clear() {
+        messageRecords.clear();
+        notifyDataSetChanged();
+    }
+
 
 }
 

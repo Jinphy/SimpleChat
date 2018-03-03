@@ -37,15 +37,20 @@ public class NewFriendsPresenter implements NewFriendsContract.Presenter {
     }
 
     @Override
-    public NewFriendRecyclerViewAdapter getAdapter() {
+    public List<NewFriend> loadNewFriends() {
         User user = userRepository.currentUser();
         List<Message> messages = messageRepository.loadSystemMsg(
                 user.getAccount(), Message.TYPE_SYSTEM_ADD_FRIEND);
         List<NewFriend> newFriends = new LinkedList<>();
         for (Message message : messages) {
             Friend friend = friendRepository.get(user.getAccount(), message.getExtra());
-            newFriends.add(NewFriend.create(friend, message));
+            if (friend == null) {
+                messageRepository.delete(message);
+                messages.remove(message);
+            } else {
+                newFriends.add(NewFriend.create(friend, message));
+            }
         }
-        return new NewFriendRecyclerViewAdapter(newFriends);
+        return newFriends;
     }
 }

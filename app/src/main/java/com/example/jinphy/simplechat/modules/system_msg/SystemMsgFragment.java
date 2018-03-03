@@ -21,7 +21,6 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
     private View itemNewFriend;
     private View itemNotice;
 
-
     public SystemMsgFragment() {
         // Required empty public constructor
     }

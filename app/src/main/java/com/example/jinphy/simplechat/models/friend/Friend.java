@@ -27,6 +27,7 @@ public class Friend {
     public static final String status_black_listed = "blackListed";
     public static final String status_black_listing = "blackListing";
     public static final String status_deleted = "deleted";
+    public static final String status_readd = "readd";
 
     @Id protected long id;
 

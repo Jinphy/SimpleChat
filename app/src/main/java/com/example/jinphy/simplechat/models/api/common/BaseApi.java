@@ -428,23 +428,14 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
      */
     @Override
     public void request() {
-        RuntimePermission.newInstance(BaseApplication.activity())
-                .permission(Manifest.permission.READ_PHONE_STATE)
-                .onGranted(()->{
-                    threadPool.execute(()->{
-                        threadPool.execute(()->{
-                            getObservable()
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(ApiSubscriber.newInstance(this, context));
-                        });
-                    });
-                })
-                .onReject(()->{
-                    BaseApplication.showToast("您拒绝了读取设备状态的相关权限！", false);
-                })
-                .execute();
-
+        threadPool.execute(()->{
+            threadPool.execute(()->{
+                getObservable()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(ApiSubscriber.newInstance(this, context));
+            });
+        });
     }
 
     abstract protected Observable<T> getObservable();

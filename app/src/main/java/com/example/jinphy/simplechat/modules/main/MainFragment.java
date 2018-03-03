@@ -46,6 +46,8 @@ import com.example.jinphy.simplechat.modules.main.routine.RoutinePresenter;
 import com.example.jinphy.simplechat.modules.main.self.SelfContract;
 import com.example.jinphy.simplechat.modules.main.self.SelfFragment;
 import com.example.jinphy.simplechat.modules.main.self.SelfPresenter;
+import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
+import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.ImageUtil;
@@ -126,6 +128,8 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     @Override
     public void initData() {
+        presenter.checkAccount(activity());
+
         // 底部导航栏按钮的打开图标
         iconsOpen = new int[]{
                 R.drawable.ic_msg_open_24dp,
@@ -208,12 +212,13 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                             App.showToast("请输入正确的账号！", false);
                             return;
                         }
+
                         presenter.findUser(input.toString(),response->{
                             if (Response.YES.equals(response.getCode())) {
                                 AddFriendActivity.start(activity(), response.getData());
-                                dialog.dismiss();
                             }
                         });
+                        dialog.dismiss();
                     })
                     .cancelable(false)
                     .autoDismiss(false)
@@ -726,7 +731,17 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                     0,
                     Gravity.END);
         }
-        mainMenu.setOutsideTouchable(false);
+        mainMenu.setOutsideTouchable(true);
         mainMenu.setOnDismissListener(() -> mainMenu = null);
+    }
+
+    @Override
+    public void showUserInfo() {
+        ModifyUserActivity.start(activity());
+    }
+
+    @Override
+    public void showFriendInfo(String account) {
+        ModifyFriendInfoActivity.start(activity(), account);
     }
 }

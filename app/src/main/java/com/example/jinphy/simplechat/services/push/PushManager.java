@@ -61,7 +61,7 @@ public class PushManager {
         Message[] messages = Message.parse(messagesList);
 
         // 保存消息
-        messageRepository.save(messages);
+        messages = messageRepository.save(messages);
 
         // 更新消息记录
         updateMessageRecord(messages);

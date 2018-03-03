@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.modules.main;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 
 import com.example.jinphy.simplechat.models.api.common.Response;
@@ -54,12 +55,18 @@ public interface MainContract {
 
         void showMenu();
 
+        void showUserInfo();
+
+        void showFriendInfo(String account);
+
     }
 
 
     interface Presenter extends BasePresenter{
 
         void findUser(String account, BaseRepository.OnDataOk<Response<User>> callback);
+
+        void checkAccount(Context context);
 
     }
 }

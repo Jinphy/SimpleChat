@@ -3,10 +3,15 @@ package com.example.jinphy.simplechat.models.user;
 import android.content.Context;
 
 import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.api.common.ApiCallback;
 import com.example.jinphy.simplechat.models.api.common.ApiInterface;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseRepository;
+import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
+import com.example.jinphy.simplechat.modules.login.LoginActivity;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 import java.util.Map;
@@ -215,6 +220,8 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
         User user = currentUser();
         user.setStatus(User.STATUS_LOGOUT);
         userBox.put(user);
+        LoginActivity.start(App.activity());
+        EventBus.getDefault().post(new EBFinishActivityMsg(LoginActivity.class, false));
     }
 
     @Override
@@ -225,6 +232,23 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
                 .setup(api -> this.handleBuilder(api, task))
                 .request();
 
+    }
+
+    @Override
+    public void checkAccount(Context context) {
+        User user = currentUser();
+        Api.<Map<String, String>>common(context)
+                .path(Api.Path.checkAccount)
+                .param(Api.Key.account,user.getAccount())
+                .param(Api.Key.accessToken, user.getAccessToken())
+                .dataType(Api.Data.MAP)
+                .showProgress(false)
+                .cancellable(false)
+                .onResponseYes(response -> {
+                    user.setAccessToken(response.getData().get(User_.accessToken.name));
+                    userBox.put(user);
+                })
+                .request();
     }
 
     @Override

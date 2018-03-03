@@ -41,4 +41,6 @@ public interface FriendDataSource {
 
     void delete(Friend friend);
 
+    void addSystemFriendLocal(String owner);
+
 }

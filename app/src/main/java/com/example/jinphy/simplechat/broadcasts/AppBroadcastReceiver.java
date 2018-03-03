@@ -10,10 +10,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
-import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
-import com.example.jinphy.simplechat.models.event_bus.EBNewMsg;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateFriend;
 import com.example.jinphy.simplechat.models.user.UserRepository;
-import com.example.jinphy.simplechat.modules.login.LoginActivity;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -55,9 +54,9 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
         LogUtils.e(tag);
         switch (tag) {
             case MESSAGE:
+                LogUtils.e(MESSAGE);
                 // 新消息
-                // TODO: 2018/3/1 各个界面接收新消息
-                EventBus.getDefault().post(new EBNewMsg());
+                EventBus.getDefault().post(new EBUpdateView());
                 break;
             case LOGOUT:
                 new MaterialDialog.Builder(App.activity())
@@ -72,8 +71,6 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
                         .positiveColor(App.activity().colorPrimary())
                         .onPositive((dialog, which) -> {
                             UserRepository.getInstance().logoutLocal();
-                            LoginActivity.start(App.activity());
-                            EventBus.getDefault().post(new EBFinishActivityMsg(LoginActivity.class, false));
                         })
                         .show();
                 break;

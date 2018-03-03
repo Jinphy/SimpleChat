@@ -10,7 +10,11 @@ import android.view.View;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * DESC:
@@ -20,6 +24,7 @@ public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implem
 
     private RecyclerView recyclerView;
     private NewFriendRecyclerViewAdapter adapter;
+    private LinearLayoutManager linearLayoutManager;
 
 
     public NewFriendsFragment() {
@@ -56,11 +61,12 @@ public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implem
 
     @Override
     protected void setupViews() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-
-        adapter = presenter.getAdapter();
+        adapter = new NewFriendRecyclerViewAdapter();
         recyclerView.setAdapter(adapter);
+        adapter.update(presenter.loadNewFriends());
+
     }
 
     @Override
@@ -107,6 +113,16 @@ public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implem
                 String account = newFriend.friend.getAccount();
                 ModifyFriendInfoActivity.start(activity(), account);
                 break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateView(EBUpdateView msg) {
+        int i = linearLayoutManager.findFirstVisibleItemPosition();
+        adapter.clear();
+        adapter.update(presenter.loadNewFriends());
+        if (i >= 0 && i < adapter.getItemCount()) {
+            recyclerView.scrollToPosition(i);
         }
     }
 

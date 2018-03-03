@@ -15,6 +15,7 @@ import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -28,8 +29,8 @@ public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFri
 
     private List<NewFriend> newFriends;
 
-    public NewFriendRecyclerViewAdapter(List<NewFriend> newFriends) {
-        this.newFriends = newFriends;
+    public NewFriendRecyclerViewAdapter() {
+        this.newFriends = new LinkedList<>();
     }
 
     @Override
@@ -109,6 +110,16 @@ public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFri
             this.itemView = itemView;
 
         }
+    }
+
+    public void clear() {
+        newFriends.clear();
+        notifyDataSetChanged();
+    }
+
+    public void update(List<NewFriend> newFriends) {
+        this.newFriends.addAll(newFriends);
+        notifyDataSetChanged();
     }
 
 }

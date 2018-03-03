@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.models.verification_code.CodeRepository;
@@ -24,6 +25,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
     private final SignUpContract.View view;
     private UserRepository userRepository;
     private CodeRepository codeRepository;
+    private FriendRepository friendRepository;
     private WeakReference<Context> context;
 
 
@@ -31,6 +33,7 @@ public class SignUpPresenter implements SignUpContract.Presenter {
         this.view = Preconditions.checkNotNull(view);
         this.userRepository = UserRepository.getInstance();
         this.codeRepository = CodeRepository.getInstance();
+        this.friendRepository = FriendRepository.getInstance();
         this.context = new WeakReference<>(context);
     }
 
@@ -130,6 +133,8 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                         user.setPassword(EncryptUtils.aesEncrypt(password));
                         user.setRememberPassword(true);
                         userRepository.saveUser(user);
+                        friendRepository.addSystemFriendLocal(user.getAccount());
+                        PushService.start(context,PushService.FLAG_CLOSE);
                         PushService.start(context, PushService.FLAG_INIT);
                     })
                     // 提交设置并执行登录操作
