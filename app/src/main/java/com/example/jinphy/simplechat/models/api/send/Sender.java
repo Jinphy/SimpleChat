@@ -40,6 +40,7 @@ public class Sender extends WebSocketClient implements ObservableOnSubscribe<Sen
     private Type resultType;
     private ObservableEmitter<SendResult<SendTask>> emitter;
 
+    private static Sender sender;
 
     @Override
     public void onOpen(ServerHandshake handshake) {
@@ -65,6 +66,13 @@ public class Sender extends WebSocketClient implements ObservableOnSubscribe<Sen
             emitter.onNext(new SendResult<>(map.get("code"),  taskMap.remove(map.get("sendId"))));
         }
     }
+
+    public void fail(SendTask sendTask) {
+        if (emitter != null && !emitter.isDisposed()) {
+            emitter.onNext(new SendResult<>(SendResult.NO, sendTask));
+        }
+    }
+
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
@@ -105,10 +113,13 @@ public class Sender extends WebSocketClient implements ObservableOnSubscribe<Sen
     }
 
     private static class InstanceHolder{
-        static final Sender DEFAULT = init();
+        static Sender DEFAULT = init();
     }
 
     public static Sender getInstance() {
+        if (!InstanceHolder.DEFAULT.isOpen()) {
+            InstanceHolder.DEFAULT = init();
+        }
         return InstanceHolder.DEFAULT;
     }
 

@@ -11,10 +11,14 @@ import android.view.View;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
+import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 /**
  * DESC:
@@ -42,8 +46,18 @@ public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implem
         if (presenter == null) {
             this.presenter = getPresenter();
         }
-
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        List<Message> msg = adapter.getNewMsgAndSetOld();
+        if (msg.size() > 0) {
+            presenter.updateMsg(msg);
+            EventBus.getDefault().post(new EBUpdateView());
+        }
+    }
+
 
     @Override
     protected int getResourceId() {

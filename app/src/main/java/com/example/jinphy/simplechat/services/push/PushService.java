@@ -7,10 +7,17 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.apkfuns.logutils.LogUtils;
+import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
+import com.example.jinphy.simplechat.models.event_bus.EBService;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.utils.GsonUtils;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.ThreadPoolUtils;
 import com.google.gson.reflect.TypeToken;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -58,6 +65,7 @@ public class PushService extends Service {
                     }
                     started = true;
                     init();
+                    EventBus.getDefault().register(this);
                     // 返回该值，当进程被杀死后会自动重启，并且会重新传递intent
                     return START_REDELIVER_INTENT;
                 case FLAG_CLOSE:
@@ -69,6 +77,7 @@ public class PushService extends Service {
                         pushClient.close();
                         pushManager = null;
                     }
+                    EventBus.getDefault().unregister(this);
                     stopSelf();
                     return START_NOT_STICKY;
             }
@@ -116,5 +125,15 @@ public class PushService extends Service {
 
     public void onPushError() {
         init();
+    }
+
+    /**
+     * DESC: 通知主进程更新界面
+     * Created by jinphy, on 2018/3/4, at 12:48
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void eventBus(EBService msg) {
+        // 通知更新界面
+        AppBroadcastReceiver.send(this, AppBroadcastReceiver.MESSAGE);
     }
 }

@@ -11,7 +11,12 @@ import android.view.View;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.message.Message;
+
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.List;
 
 /**
  * DESC:
@@ -39,6 +44,16 @@ public class NoticeFragment extends BaseFragment<NoticePresenter> implements Not
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        List<Message> msg = adapter.getNewMsgAndSetOld();
+        if (msg.size() > 0) {
+            presenter.updateMsg(msg);
+            EventBus.getDefault().post(new EBUpdateView());
+        }
+    }
+
+    @Override
     protected int getResourceId() {
         return R.layout.fragment_notice;
     }
@@ -58,7 +73,8 @@ public class NoticeFragment extends BaseFragment<NoticePresenter> implements Not
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        adapter = presenter.getAdapter();
+        adapter =  new NoticeRecyclerViewAdapter();
+        adapter.update(presenter.loadNoticeMsg());
         recyclerView.setAdapter(adapter);
         if (adapter.getItemCount() > 0) {
             ((NoticeActivity) activity()).updateTitle(adapter.getItemCount());

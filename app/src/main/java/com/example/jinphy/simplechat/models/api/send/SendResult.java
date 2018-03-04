@@ -14,13 +14,13 @@ public class SendResult<T> {
      * DESC: 发送返回码
      * Created by jinphy, on 2018/1/19, at 9:45
      */
-    String code;
+    public String code;
 
     /**
      * DESC: 发送任务
      * Created by jinphy, on 2018/1/19, at 9:45
      */
-    T data;
+    public T data;
 
     public SendResult(String code, T data) {
         this.code = code;

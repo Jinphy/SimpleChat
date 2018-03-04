@@ -1,6 +1,6 @@
 package com.example.jinphy.simplechat.modules.chat;
 
-import android.support.annotation.NonNull;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +11,11 @@ import android.widget.TextView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
-import com.example.jinphy.simplechat.utils.Preconditions;
+import com.example.jinphy.simplechat.utils.StringUtils;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -26,8 +28,13 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
 
     private List<Message> messages;
 
-    ChatRecyclerViewAdapter(@NonNull List<Message> messages) {
-        this.messages = Preconditions.checkNotNull(messages);
+    private Bitmap ownerAvatar;
+    private Bitmap friendAvatar;
+
+    ChatRecyclerViewAdapter(String ownerAvatar,String friend) {
+        this.messages = new LinkedList<>();
+        this.ownerAvatar = StringUtils.base64ToBitmap(ownerAvatar);
+        friendAvatar = ImageUtil.loadAvatar(friend, 500, 500);
     }
 
 
@@ -82,24 +89,56 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
     // 绑定item中公共部分的View
     private void bindCommonView(ViewHolder holder, Message message,int position) {
         // TODO: 2017/8/13 设置头像 ，时间，
+        if (Message.SEND == message.getSourceType()) {
+            if (ownerAvatar != null) {
+                holder.avatarView.setImageBitmap(ownerAvatar);
+            }
+            if (Message.STATUS_NO.equals(message.getStatus())) {
+                holder.statusView.setVisibility(View.VISIBLE);
+            } else {
+                holder.statusView.setVisibility(View.GONE);
+            }
+
+        } else {
+            if (friendAvatar != null) {
+                holder.avatarView.setImageBitmap(friendAvatar);
+            }
+        }
+        if (position == 0) {
+            holder.timeView.setVisibility(View.VISIBLE);
+            holder.timeView.setText(StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
+        } else {
+            Message preMsg = messages.get(position - 1);
+            Long preTime = Long.valueOf(preMsg.getCreateTime());
+            Long time = Long.valueOf(message.getCreateTime());
+            if (time - preTime > 300_000) {
+                // 时间间隔超过5分钟，则显示时间
+                holder.timeView.setVisibility(View.VISIBLE);
+                holder.timeView.setText(
+                        StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
+            } else {
+                holder.timeView.setVisibility(View.GONE);
+            }
+        }
         if (click != null) {
-            holder.avatar.setOnClickListener(view ->
+            holder.avatarView.setOnClickListener(view ->
                     click.onClick(view,message,holder.type, position));
-            holder.content.setOnClickListener(view ->
+            holder.contentView.setOnClickListener(view ->
                     click.onClick(view, message, holder.type, position));
         }
         if (longClick != null) {
-            holder.avatar.setOnLongClickListener(view ->
+            holder.avatarView.setOnLongClickListener(view ->
             longClick.onLongClick(view,message,holder.type,position));
-            holder.content.setOnLongClickListener(view ->
+            holder.contentView.setOnLongClickListener(view ->
             longClick.onLongClick(view,message,holder.type,position));
         }
+
     }
 
     private void bindTextMsgView(ViewHolder holder, Message message) {
         holder.textMsg_content.setVisibility(View.VISIBLE);
         // TODO: 2017/8/13
-        //holder.textMsg_content.setText(title.getContent());
+        holder.textMsg_content.setText(message.getContent());
 
     }
 
@@ -124,7 +163,15 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
     }
 
 
-
+    public List<Message> getSendingMsg() {
+        List<Message> result = new LinkedList<>();
+        for (Message message : messages) {
+            if (Message.STATUS_SENDING.equals(message.getStatus())) {
+                result.add(message);
+            }
+        }
+        return result;
+    }
 
     @Override
     public int getItemCount() {
@@ -141,10 +188,11 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         // 公共部分
-        private TextView time;
-        private CircleImageView avatar;//头像的设置和点击View
-        private View content;// item的点击事件View
+        private TextView timeView;
+        private CircleImageView avatarView;//头像的设置和点击View
+        private View contentView;// item的点击事件View
         private View itemView;// 整个item，这里暂无点击功能
+        private View statusView;
         private int type;// 保存消息类型信息
 
         // 以下几种类型的View中，XXX_root 用来设置可见性，默认情况下都不可见
@@ -178,9 +226,12 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
             // 公共部分
             this.type = type;
             this.itemView = itemView;
-            this.time = itemView.findViewById(R.id.time_text);
-            this.avatar = itemView.findViewById(R.id.avatar_view);
-            this.content = itemView.findViewById(R.id.content_layout);
+            this.timeView = itemView.findViewById(R.id.time_text);
+            this.avatarView = itemView.findViewById(R.id.avatar_view);
+            this.contentView = itemView.findViewById(R.id.content_layout);
+            if (type == Message.SEND) {
+                statusView = itemView.findViewById(R.id.status_view);
+            }
 
             // 文本消息
             this.textMsg_content = itemView.findViewById(R.id.text_view);
@@ -201,6 +252,31 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
             this.fileMsg_root = itemView.findViewById(R.id.file_view);
             this.fileMsg_fileName = itemView.findViewById(R.id.file_name_text);
 
+        }
+    }
+
+    public void clear() {
+        messages.clear();
+        notifyDataSetChanged();
+    }
+
+    public void update(List<Message> messages) {
+        clear();
+        this.messages.addAll(messages);
+        notifyDataSetChanged();
+    }
+
+    public void add(Message message) {
+        messages.add(message);
+        notifyDataSetChanged();
+    }
+
+    public Message getLast() {
+        int index = messages.size() - 1;
+        if (index >= 0) {
+            return messages.get(index);
+        } else {
+            return null;
         }
     }
 

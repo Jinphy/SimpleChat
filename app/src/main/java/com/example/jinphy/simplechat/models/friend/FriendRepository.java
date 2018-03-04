@@ -4,16 +4,21 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.api.common.ApiInterface;
 import com.example.jinphy.simplechat.models.api.common.Response;
+import com.example.jinphy.simplechat.models.event_bus.EBBase;
+import com.example.jinphy.simplechat.models.event_bus.EBService;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.models.user.User_;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 import java.util.Map;
@@ -94,8 +99,15 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                 .request();
     }
 
+    /**
+     * DESC: 获取指定的好友
+     *
+     * @param whenOk 当获取成功后回调
+     * Created by jinphy, on 2018/3/4, at 12:52
+     */
     @Override
-    public void getOnline(Context context, String owner, String account) {
+    public void getOnline(Context context, String owner, String account, Runnable... whenOk) {
+        EBBase flag = new EBBase<String>(false, null);
         Api.<Map<String, String>>common(context)
                 .path(Api.Path.getFriend)
                 .param(Api.Key.owner, owner)
@@ -106,6 +118,16 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                 .onResponseYes(response -> {
                     Friend friend = Friend.parse(response.getData());
                     save(friend);
+                    synchronized (flag) {
+                        if (flag.ok) {
+                            if (whenOk.length > 0) {
+                                whenOk[0].run();
+                                LogUtils.e(1);
+                            }
+                        } else {
+                            flag.ok = true;
+                        }
+                    }
                 })
                 .request();
         Api.<Map<String,String>>common(context)
@@ -119,6 +141,16 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                     if (!"无".equals(data.get(User_.avatar.name))) {
                         Bitmap bitmap = StringUtils.base64ToBitmap(data.get(User_.avatar.name));
                         ImageUtil.storeAvatar(account, bitmap);
+                    }
+                    synchronized (flag) {
+                        if (flag.ok) {
+                            if (whenOk.length > 0) {
+                                whenOk[0].run();
+                                LogUtils.e(2);
+                            }
+                        } else {
+                            flag.ok = true;
+                        }
                     }
                 })
                 .request();
@@ -166,7 +198,6 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                 .setup(api -> this.handleBuilder(api, task))
                 .request();
     }
-
 
     @Override
     public void modifyStatus(Context context, Task<Map<String, String>> task) {

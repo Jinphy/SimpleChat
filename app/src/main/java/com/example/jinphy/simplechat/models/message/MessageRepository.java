@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.models.message;
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
+import com.example.jinphy.simplechat.models.event_bus.EBService;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
@@ -40,11 +41,11 @@ public class MessageRepository implements MessageDataSource {
     }
 
     /**
-     * DESC: 保存新消息
+     * DESC: 保存接收的信息
      * <p>
      * Created by jinphy, on 2018/1/18, at 9:01
      */
-    public Message[] save(Message... messages) {
+    public Message[] saveReceive(Message... messages) {
         List<Message> list = new LinkedList<>();
         for (Message message : messages) {
             if (message.needSave()) {
@@ -57,7 +58,14 @@ public class MessageRepository implements MessageDataSource {
                     || Message.TYPE_SYSTEM_RELOAD_FRIEND.equals(message.getContentType())) {
                 String owner = message.getOwner();
                 String account = message.getExtra();//好友的账号保存在该字段中
-                FriendRepository.getInstance().getOnline(null, owner, account);
+                FriendRepository.getInstance().getOnline(
+                        null,
+                        owner,
+                        account,
+                        () -> {
+                            EventBus.getDefault().post(new EBService());
+                            LogUtils.e("whenOk");
+                        });
 
             } else if (Message.TYPE_SYSTEM_DELETE_FRIEND.equals(message.getContentType())) {
                 String owner = message.getOwner();
@@ -76,6 +84,14 @@ public class MessageRepository implements MessageDataSource {
     }
 
     /**
+     * DESC: 保存发送的信息
+     * Created by jinphy, on 2018/3/4, at 15:18
+     */
+    public void saveSend(Message message) {
+
+    }
+
+    /**
      * DESC: 更新消息
      * Created by jinphy, on 2018/1/18, at 9:02
      */
@@ -83,6 +99,14 @@ public class MessageRepository implements MessageDataSource {
         if (messages.length > 0) {
             messageBox.put(messages);
         }
+    }
+
+    @Override
+    public void update(List<Message> messages) {
+        if (messages == null || messages.size() == 0) {
+            return;
+        }
+        messageBox.put(messages);
     }
 
     /**

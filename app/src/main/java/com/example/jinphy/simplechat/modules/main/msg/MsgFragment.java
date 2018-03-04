@@ -19,6 +19,7 @@ import com.example.jinphy.simplechat.models.event_bus.EBUpdateFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
+import com.example.jinphy.simplechat.modules.chat.ChatFragment;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.modules.system_msg.SystemMsgActivity;
 
@@ -141,8 +142,9 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     }
 
     @Override
-    public void showChatWindow(MessageRecord item) {
+    public void showChatWindow(MessageRecord record) {
         Intent intent = new Intent(getActivity(), ChatActivity.class);
+        intent.putExtra(ChatFragment.WITH_ACCOUNT, record.getFriend().getAccount());
         startActivity(intent);
     }
 

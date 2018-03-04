@@ -19,7 +19,7 @@ public interface FriendDataSource {
 
     void loadOnline(Context context, BaseRepository.Task<List<Map<String,String>>> task);
 
-    void getOnline(Context context, String owner, String account);
+    void getOnline(Context context, String owner, String account,Runnable...whenOk);
 
     Friend get(String owner, String account);
 

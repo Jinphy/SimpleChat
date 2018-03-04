@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 
 import com.example.jinphy.simplechat.R;
@@ -15,6 +16,7 @@ import com.example.jinphy.simplechat.base.BaseActivity;
 public class ChatActivity extends BaseActivity {
 
 
+    private ActionBar actionBar;
 
     public static void start(Activity activity, String withAccount) {
         Intent intent = new Intent(activity, ChatActivity.class);
@@ -29,16 +31,24 @@ public class ChatActivity extends BaseActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left_24dp);
 
-        getPresenter(addFragment(ChatFragment.newInstance(), R.id.fragment));
+        getPresenter(addFragment(ChatFragment.newInstance(
+                getIntent().getStringExtra(ChatFragment.WITH_ACCOUNT)), R.id.fragment));
     }
 
     @Override
     public ChatPresenter getPresenter(@NonNull Fragment fragment) {
         return new ChatPresenter((ChatContract.View) fragment);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        if (!TextUtils.isEmpty(title)) {
+            actionBar.setTitle(title);
+        }
     }
 }

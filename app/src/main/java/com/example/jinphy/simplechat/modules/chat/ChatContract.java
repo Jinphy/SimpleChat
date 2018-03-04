@@ -2,7 +2,9 @@ package com.example.jinphy.simplechat.modules.chat;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 
 import java.util.List;
 
@@ -55,15 +57,26 @@ public interface ChatContract {
 
         void animateHorizontal(float fromFactor, float toFactor, boolean exit);
 
+        void updateView();
+
+        void whenSendStart(Message message);
+
+        void whenSendFinal();
     }
 
     interface Presenter extends BasePresenter {
 
-        List<Message> loadMessages();
+        List<Message> loadMessages(String friendAccount);
 
-        ChatRecyclerViewAdapter getAdapter();
+        Friend getFriend(String friendAccount);
 
-        int getItemCount();
+        void sendTextMsg(String friendAccount, String content,int position);
+
+        void updateRecord(Message message);
+
+        String getUserAvatar();
+
+        void updateMsg(List<Message> messages);
 
     }
 }

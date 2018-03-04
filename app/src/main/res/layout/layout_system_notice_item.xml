@@ -38,11 +38,20 @@
                 android:id="@+id/time_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
+                android:layout_marginBottom="@dimen/dimen_3dp"
                 android:textColor="@color/colorAccent"
                 android:textSize="11sp"
                 tools:text="2017-8-10"/>
+
+            <View
+                android:id="@+id/new_msg_view"
+                android:background="@drawable/ic_blue_circle"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_width="@dimen/dimen_5dp"
+                android:layout_height="@dimen/dimen_5dp"/>
 
         </RelativeLayout>
 

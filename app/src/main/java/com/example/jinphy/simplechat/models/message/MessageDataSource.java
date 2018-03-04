@@ -12,17 +12,24 @@ public interface MessageDataSource {
 
 
     /**
-     * DESC: 保存新消息
-     * <p>
+     * DESC: 保存接收的信息
      * Created by jinphy, on 2018/1/18, at 9:01
      */
-    Message[] save(Message... messages);
+    Message[] saveReceive(Message... messages);
+
+    /**
+     * DESC: 保存发送的信息
+     * Created by jinphy, on 2018/3/4, at 15:19
+     */
+    void saveSend(Message message);
 
     /**
      * DESC: 更新消息
      * Created by jinphy, on 2018/1/18, at 9:02
      */
     void update(Message... messages);
+
+    void update(List<Message> messages);
 
     /**
      * DESC: 删除消息

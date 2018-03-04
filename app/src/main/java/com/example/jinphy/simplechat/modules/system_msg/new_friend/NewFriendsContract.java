@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.modules.system_msg.new_friend;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.message.Message;
 
 import java.util.List;
 
@@ -23,5 +24,7 @@ public interface NewFriendsContract {
 
         List<NewFriendRecyclerViewAdapter.NewFriend> loadNewFriends();
 
+
+        public void updateMsg(List<Message> messages);
     }
 }

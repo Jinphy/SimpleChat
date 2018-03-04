@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.models.api.send;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
@@ -13,7 +14,7 @@ import java.util.concurrent.ExecutorService;
  * DESC: 消息发射任务
  * Created by jinphy on 2018/1/19.
  */
-class SendTask {
+public class SendTask {
 
     private static ExecutorService threadPool = ThreadPoolUtils.threadPool;
 
@@ -21,8 +22,7 @@ class SendTask {
      * DESC: 消息发送器
      * Created by jinphy, on 2018/1/19, at 9:49
      */
-    private static final Sender sender = Sender.getInstance();
-
+    private Sender sender;
 
     /**
      * DESC: 发送id，唯一标识单个发送任务
@@ -48,6 +48,9 @@ class SendTask {
      */
     Message message;
 
+    public SendTask() {
+        sender = Sender.getInstance();
+    }
 
     /**
      * DESC: 设置消息发送开始时的回调
@@ -91,7 +94,11 @@ class SendTask {
 
             String body = GsonUtils.toJson(map);
             body = EncryptUtils.encodeThenEncrypt(body);
-            sender.send(body);
+            if (sender.isOpen()) {
+                sender.send(body);
+            } else {
+                sender.fail(sender.taskMap.remove(sendId));
+            }
         });
     }
 

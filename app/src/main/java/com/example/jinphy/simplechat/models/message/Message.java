@@ -1,10 +1,10 @@
 package com.example.jinphy.simplechat.models.message;
 
-import android.graphics.Rect;
 import android.support.annotation.NonNull;
 
 import com.example.jinphy.simplechat.models.friend.Friend;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -110,8 +110,12 @@ public class Message implements Comparable<Message>{
 
     public static final String TO_ACCOUNT = "toAccount";
 
+    public static final String STATUS_OK = "ok";
+    public static final String STATUS_SENDING = "sending";
+    public static final String STATUS_NO = "no";
+
     @Id
-    private long id;
+    private long id = 0;
 
     @NonNull
     private int sourceType;//消息来源类型，有发送和接收两种
@@ -127,9 +131,7 @@ public class Message implements Comparable<Message>{
     @NonNull
     private boolean isNew = true;// 消息的状态，分为未读消息和已读消息
 
-
-    private boolean hasSent = true; // 判断是否发送成功，默认是成功的
-
+    private String status = Message.STATUS_OK; // 判断是否发送成功，默认是成功的
 
     /**
      * DESC: 注意服务器中的消息类没有来源类型sourceType，owner和with，只有from 和 to
@@ -144,33 +146,6 @@ public class Message implements Comparable<Message>{
     private String with; // 消息的参与者，即该消息的参与者，
 
     private String extra;
-
-    public static Message[] parse(List<Map<String, String>> messageList) {
-        if (messageList==null || messageList.size() == 0) {
-            return null;
-        }
-        Message[] result = new Message[messageList.size()];
-        int i = 0;
-        for (Map<String, String> msg : messageList) {
-            result[i++] = parse(msg);
-        }
-        return result;
-    }
-
-    public static Message parse(Map<String, String> msg) {
-        Message message = new Message();
-        message.setContent(msg.get(Message_.content.name));
-        message.setContentType(msg.get(Message_.contentType.name));
-        message.setCreateTime(msg.get(Message_.createTime.name));
-        message.setSourceType(Message.RECEIVE);
-        message.setOwner(msg.get(Message.TO_ACCOUNT));
-        message.setWith(msg.get(Message.FROM_ACCOUNT));
-        message.setExtra(msg.get(Message_.extra.name));
-        return message;
-    }
-
-
-
 
     public long getId() {
         return id;
@@ -242,16 +217,12 @@ public class Message implements Comparable<Message>{
         this.with = with;
     }
 
-    public boolean hasSent() {
-        return hasSent;
+    public String getStatus() {
+        return status;
     }
 
-    public void setHasSent(boolean hasSent) {
-        this.hasSent = hasSent;
-    }
-
-    public boolean getHasSent() {
-        return this.hasSent;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getExtra() {
@@ -290,5 +261,63 @@ public class Message implements Comparable<Message>{
         } else {
             return 1;
         }
+    }
+
+    /**
+     * DESC: 解析接收的消息
+     * Created by jinphy, on 2018/3/4, at 14:54
+     */
+    public static Message[] parse(List<Map<String, String>> messageList) {
+        if (messageList==null || messageList.size() == 0) {
+            return null;
+        }
+        Message[] result = new Message[messageList.size()];
+        int i = 0;
+        for (Map<String, String> msg : messageList) {
+            result[i++] = parse(msg);
+        }
+        return result;
+    }
+
+    /**
+     * DESC: 解析接收的消息
+     * Created by jinphy, on 2018/3/4, at 14:55
+     */
+    public static Message parse(Map<String, String> msg) {
+        Message message = new Message();
+        message.setContent(msg.get(Message_.content.name));
+        message.setContentType(msg.get(Message_.contentType.name));
+        message.setCreateTime(msg.get(Message_.createTime.name));
+        message.setSourceType(Message.RECEIVE);
+        message.setOwner(msg.get(Message.TO_ACCOUNT));
+        message.setWith(msg.get(Message.FROM_ACCOUNT));
+        message.setExtra(msg.get(Message_.extra.name));
+        return message;
+    }
+
+
+
+    public static Message make(String owner, String with, String content) {
+        Message message = new Message();
+        message.setOwner(owner);
+        message.setWith(with);
+        message.setContent(content);
+        message.setContentType(Message.TYPE_CHAT_TEXT);
+        message.setNew(false);
+        message.setSourceType(Message.SEND);
+        message.setStatus(Message.STATUS_SENDING);
+        message.setCreateTime(System.currentTimeMillis() + "");
+        return message;
+    }
+
+    public static void sort(List<Message> messages) {
+        if (messages == null || messages.size() < 2) {
+            return;
+        }
+        Message[] temp = new Message[messages.size()];
+        messages.toArray(temp);
+        Arrays.sort(temp);
+        messages.clear();
+        messages.addAll(Arrays.asList(temp));
     }
 }

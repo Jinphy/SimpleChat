@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.services.push;
 
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
+import com.example.jinphy.simplechat.models.event_bus.EBService;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.message.Message;
@@ -10,7 +11,8 @@ import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
-import com.example.jinphy.simplechat.utils.ObjectHelper;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -61,15 +63,12 @@ public class PushManager {
         Message[] messages = Message.parse(messagesList);
 
         // 保存消息
-        messages = messageRepository.save(messages);
+        messages = messageRepository.saveReceive(messages);
 
         // 更新消息记录
         updateMessageRecord(messages);
 
-        // 通知更新界面
-        if (ObjectHelper.reference(pushService)) {
-            AppBroadcastReceiver.send(pushService.get(), AppBroadcastReceiver.MESSAGE);
-        }
+        EventBus.getDefault().post(new EBService());
     }
 
     /**

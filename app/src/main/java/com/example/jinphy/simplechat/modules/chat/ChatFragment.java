@@ -2,6 +2,8 @@ package com.example.jinphy.simplechat.modules.chat;
 
 import android.animation.AnimatorSet;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -9,14 +11,15 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -26,11 +29,21 @@ import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
+import com.example.jinphy.simplechat.models.api.send.Sender;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
+import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,14 +70,50 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     private FrameLayout btnMoreAndSend;
     private FrameLayout extraBottomLayout;
 
+    private Friend friend;
+
     // TODO: 2017/8/15 隐藏appBar时 statusBar 的初始颜色，从好友头像获取
     int startStatusColor;
     // 隐藏 appBar 后的statusBar的 最终颜色，为colorAccent
     int endStatusColor;
+    private String friendAccount;
+    private ChatRecyclerViewAdapter adapter;
+    private LinearLayoutManager linearLayoutManager;
 
 
     public ChatFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        friendAccount = getArguments().getString(ChatFragment.WITH_ACCOUNT);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
+            savedInstanceState) {
+        Sender.getInstance().open();
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Sender.getInstance().shutdown();
+        List<Message> sendingMsg = adapter.getSendingMsg();
+        for (Message message : sendingMsg) {
+            message.setStatus(Message.STATUS_NO);
+        }
+        presenter.updateMsg(sendingMsg);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.updateRecord(adapter.getLast());
+        EventBus.getDefault().post(new EBUpdateView());
     }
 
     @Override
@@ -77,8 +126,11 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
      * this fragment using the provided parameters.
      * @return A new app of fragment ChatFragment.
      */
-    public static ChatFragment newInstance() {
+    public static ChatFragment newInstance(String friendAccount) {
         ChatFragment fragment = new ChatFragment();
+        Bundle args = new Bundle();
+        args.putString(ChatFragment.WITH_ACCOUNT, friendAccount);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -102,18 +154,42 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     protected void setupViews(){
 
         appbarLayout.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
+        String name = "暂无昵称";
+        if (!TextUtils.isEmpty(friend.getRemark())) {
+            name = friend.getRemark();
+        } else if (!TextUtils.isEmpty(friend.getName())) {
+            name = friend.getName();
+        }
+        activity().setTitle(name);
 
         // 设置RecyclerView
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(presenter.getAdapter());
-        recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
+        adapter = new ChatRecyclerViewAdapter(presenter.getUserAvatar(),friendAccount);
+        recyclerView.setAdapter(adapter);
+        adapter.update(presenter.loadMessages(friendAccount));
+        int position = adapter.getItemCount() - 1;
+        if (position >= 0) {
+            recyclerView.scrollToPosition(position);
+        }
+
+        updateView();
+
 
         // TODO: 2017/8/15 根据好友的头像设置appbar颜色和statusBar颜色
 
         // TODO: 2017/8/15 这个要放在数据获取完成后才执行
         Keyboard.open(getContext(), findInputText());
+    }
 
+
+    @Override
+    public void updateView() {
+        int i = linearLayoutManager.findFirstVisibleItemPosition();
+        adapter.update(presenter.loadMessages(friendAccount));
+        if (i >= 0 && i < adapter.getItemCount()) {
+            recyclerView.scrollToPosition(i);
+        }
     }
 
     @Override
@@ -185,9 +261,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         String content = inputText.getText().toString();
 
         inputText.setText("");
-        // TODO: 2017/8/14 发送消息逻辑
-
-
+        presenter.sendTextMsg(friendAccount, content, adapter.getItemCount());
     }
 
     // 更多功能按钮的点击事件
@@ -222,13 +296,18 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         screenWidth = ScreenUtils.getScreenWidth(getContext());
         onThirdScreenWidth = screenWidth/3;
         maxElevation = ScreenUtils.dp2px(getContext(), 20);
+
+        friend = presenter.getFriend(friendAccount);
     }
 
     @Override
     public void fabAction(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
+                int position = adapter.getItemCount() - 1;
+                if (position >= 0) {
+                    recyclerView.smoothScrollToPosition(position);
+                }
                 showBar(recyclerView);
                 break;
             case R.id.fab_emotion:
@@ -308,7 +387,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         inputText.setVisibility(View.VISIBLE);
         inputText.requestFocus();
         Keyboard.open(getContext(),inputText);
-        recyclerView.smoothScrollToPosition(presenter.getItemCount()-1);
+        int position = adapter.getItemCount() - 1;
+        if (position >= 0) {
+            recyclerView.smoothScrollToPosition(position);
+        }
         findInputVoice().setVisibility(View.GONE);
 
     }
@@ -331,6 +413,12 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         return extraBottomLayout.findViewById(R.id.more_layout);
     }
 
+    @Override
+    protected void onKeyboardEvent(boolean open) {
+        if (!open) {
+            hideFabEmotion();
+        }
+    }
 
     @Override
     public void showEmotionLayout() {
@@ -392,7 +480,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                                 recyclerView,
                                 appbarLayout.getMeasuredHeight(),
                                 bottomBar.getMeasuredHeight());
-                        recyclerView.smoothScrollToPosition(presenter.getItemCount() - 1);
+                        int position = adapter.getItemCount() - 1;
+                        if (position >= 0) {
+                            recyclerView.smoothScrollToPosition(position);
+                        }
                     }
                 })
                 .animate();
@@ -627,4 +718,28 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         animateHorizontal(0,1,true);
         return false;
     }
+
+
+    @Override
+    public void whenSendStart(Message message) {
+        adapter.add(message);
+        recyclerView.smoothScrollToPosition(adapter.getItemCount());
+    }
+
+    @Override
+    public void whenSendFinal() {
+        int i = linearLayoutManager.findFirstVisibleItemPosition();
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(i);
+    }
+
+    /**
+     * DESC: 当在该聊天有新消息时更新界面
+     * Created by jinphy, on 2018/3/4, at 16:48
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void receiveMsg(EBUpdateView msg) {
+        updateView();
+    }
+
 }

@@ -12,6 +12,7 @@ import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,8 +24,8 @@ public class NoticeRecyclerViewAdapter extends BaseRecyclerViewAdapter<NoticeRec
 
     List<Message> messages;
 
-    public NoticeRecyclerViewAdapter(List<Message> messages) {
-        this.messages = messages;
+    public NoticeRecyclerViewAdapter() {
+        this.messages = new LinkedList<>();
     }
 
     @Override
@@ -41,6 +42,14 @@ public class NoticeRecyclerViewAdapter extends BaseRecyclerViewAdapter<NoticeRec
         holder.title.setText(TextUtils.isEmpty(message.getExtra()) ? "无标题" : message.getExtra());
         holder.content.setText(message.getContent());
         holder.time.setText(StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
+
+        if (message.isNew()) {
+            holder.newMsgView.setVisibility(View.VISIBLE);
+        } else {
+            holder.newMsgView.setVisibility(View.GONE);
+        }
+
+
         if (click != null) {
             holder.itemView.setOnClickListener(view -> click.onClick(view, message,0,position));
         }
@@ -58,13 +67,32 @@ public class NoticeRecyclerViewAdapter extends BaseRecyclerViewAdapter<NoticeRec
         private TextView title;
         private TextView time;
         private TextView content;
+        private View newMsgView;
 
         public ViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title_view);
             time = itemView.findViewById(R.id.time_view);
             content = itemView.findViewById(R.id.content_view);
+            newMsgView = itemView.findViewById(R.id.new_msg_view);
         }
+    }
+
+    public void update(List<Message> messages) {
+        this.messages.clear();
+        this.messages.addAll(messages);
+        notifyDataSetChanged();
+    }
+
+    public List<Message> getNewMsgAndSetOld() {
+        List<Message> result = new LinkedList<>();
+        for (Message message : messages) {
+            if (message.isNew()) {
+                message.setNew(false);
+                result.add(message);
+            }
+        }
+        return result;
     }
 }
 

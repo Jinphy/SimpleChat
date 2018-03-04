@@ -2,12 +2,21 @@ package com.example.jinphy.simplechat.modules.chat;
 
 import android.support.annotation.NonNull;
 
+import com.apkfuns.logutils.LogUtils;
+import com.example.jinphy.simplechat.models.api.send.SendCallback;
+import com.example.jinphy.simplechat.models.api.send.SendResult;
+import com.example.jinphy.simplechat.models.api.send.Sender;
+import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.models.message.MessageRepository;
+import com.example.jinphy.simplechat.models.message_record.MessageRecord;
+import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
+import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by jinphy on 2017/8/13.
@@ -15,14 +24,18 @@ import java.util.Random;
 
 public class ChatPresenter implements ChatContract.Presenter {
 
-
     private ChatContract.View view;
-
-    private List<Message> messages;
+    private UserRepository userRepository;
+    private FriendRepository friendRepository;
+    private MessageRepository messageRepository;
+    private MessageRecordRepository recordRepository;
 
     public ChatPresenter(@NonNull ChatContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-
+        userRepository = UserRepository.getInstance();
+        friendRepository = FriendRepository.getInstance();
+        messageRepository = MessageRepository.getInstance();
+        recordRepository = MessageRecordRepository.getInstance();
     }
 
 
@@ -33,54 +46,66 @@ public class ChatPresenter implements ChatContract.Presenter {
     }
 
     @Override
-    public List<Message> loadMessages() {
-        messages = new ArrayList<>(40);
+    public List<Message> loadMessages(String friendAccount) {
+        User user = userRepository.currentUser();
+        return messageRepository.load(user.getAccount(), friendAccount);
+    }
 
-        Random random = new Random(System.currentTimeMillis());
 
-        for (int i = 0; i < 40; i++) {
-            Message message = new Message();
-            if (i % 2 == 0) {
-                message.setSourceType(Message.SEND);
-            } else {
-                message.setSourceType(Message.RECEIVE);
-            }
-            int x  = random.nextInt(5);
-            String contentType;
-            switch (x) {
-                case 0:
-                    contentType = Message.TYPE_CHAT_FILE;
-                    break;
-                case 1:
-                    contentType = Message.TYPE_CHAT_IMAGE;
-                    break;
-                case 2:
-                    contentType = Message.TYPE_CHAT_TEXT;
-                    break;
-                case 3:
-                    contentType = Message.TYPE_CHAT_VIDEO;
-                    break;
-                default:
-                    contentType = Message.TYPE_CHAT_VOICE;
-                    break;
-            }
-            message.setContentType(contentType);
-            messages.add(message);
-        }
-        return messages;
+
+    @Override
+    public Friend getFriend(String friendAccount) {
+        User user = userRepository.currentUser();
+        return friendRepository.get(user.getAccount(), friendAccount);
     }
 
     @Override
-    public ChatRecyclerViewAdapter getAdapter() {
-        return new ChatRecyclerViewAdapter(loadMessages());
+    public void sendTextMsg(String friendAccount, String content,int position) {
+        User user = userRepository.currentUser();
+        Message message = Message.make(user.getAccount(), friendAccount, content);
+        Sender.newTask(message)
+                .whenStart(() -> {
+                    view.whenSendStart(message);
+                    messageRepository.saveSend(message);
+                })
+                .whenFinal(result -> {
+                    if (SendResult.OK.equals(result.code)) {
+                        message.setStatus(Message.STATUS_OK);
+                        view.whenSendFinal();
+                    } else {
+                        message.setStatus(Message.STATUS_NO);
+                        view.whenSendFinal();
+                    }
+                    messageRepository.update(message);
+                })
+                .send();
     }
 
     @Override
-    public int getItemCount() {
-        if (messages != null) {
-            return messages.size();
+    public void updateRecord(Message message) {
+        if (message == null) {
+            return;
         }
-        return 0;
+        Friend friend = friendRepository.get(message.getOwner(), message.getWith());
+        MessageRecord record = recordRepository.get(message.getOwner(), friend);
+        if (record == null) {
+            record = new MessageRecord();
+            record.setOwner(message.getOwner());
+            record.setWith(friend);
+        }
+        record.setNewMsgCount(0);
+        record.setLastMsg(message);
+        recordRepository.saveOrUpdate(record);
     }
 
+    @Override
+    public String getUserAvatar() {
+        return userRepository.currentUser().getAvatar();
+    }
+
+    @Override
+    public void updateMsg(List<Message> messages) {
+        messageRepository.update(messages);
+
+    }
 }

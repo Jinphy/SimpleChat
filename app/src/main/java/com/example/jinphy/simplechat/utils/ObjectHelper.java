@@ -1,7 +1,9 @@
 package com.example.jinphy.simplechat.utils;
 
 import java.lang.ref.Reference;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by jinphy on 2017/12/5.
@@ -93,6 +95,7 @@ public class ObjectHelper {
     public static boolean isEmpty(Collection values) {
         return values == null || values.isEmpty();
     }
+
 }
 
 

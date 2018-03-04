@@ -65,6 +65,12 @@ public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFri
         holder.msg.setText(newFriend.message.getContent());
         holder.time.setText(StringUtils.formatDate(Long.valueOf(newFriend.message.getCreateTime())));
 
+        if (newFriend.message.isNew()) {
+            holder.newMsgView.setVisibility(View.VISIBLE);
+        } else {
+            holder.newMsgView.setVisibility(View.GONE);
+        }
+
 
         if (click != null) {
             holder.itemView.setOnClickListener(v -> click.onClick(v, newFriend,0,position));
@@ -99,6 +105,7 @@ public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFri
         private TextView msg;
         private TextView time;
         private View itemView;
+        private View newMsgView;
 
 
         public ViewHolder(View itemView) {
@@ -107,8 +114,8 @@ public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFri
             this.name = itemView.findViewById(R.id.name);
             this.time = itemView.findViewById(R.id.time);
             this.msg = itemView.findViewById(R.id.last_msg);
+            this.newMsgView = itemView.findViewById(R.id.top);
             this.itemView = itemView;
-
         }
     }
 
@@ -121,5 +128,17 @@ public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFri
         this.newFriends.addAll(newFriends);
         notifyDataSetChanged();
     }
+
+    public List<Message> getNewMsgAndSetOld() {
+        List<Message> result = new LinkedList<>();
+        for (NewFriend newFriend : newFriends) {
+            if (newFriend.message.isNew()) {
+                newFriend.message.setNew(false);
+                result.add(newFriend.message);
+            }
+        }
+        return result;
+    }
+
 
 }

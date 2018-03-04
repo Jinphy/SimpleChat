@@ -331,4 +331,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         res.updateConfiguration(config, res.getDisplayMetrics());
         return res;
     }
+
+    public void setTitle(CharSequence title) {
+        // no-op
+    }
 }

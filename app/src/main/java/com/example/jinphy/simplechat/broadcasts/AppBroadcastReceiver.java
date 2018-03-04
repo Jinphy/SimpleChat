@@ -48,13 +48,13 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
 
         String tag = intent.getStringExtra(TAG);
         String msg = intent.getStringExtra(MSG);
+        LogUtils.e("3===========>");
         if (TextUtils.isEmpty(tag)) {
             return;
         }
         LogUtils.e(tag);
         switch (tag) {
             case MESSAGE:
-                LogUtils.e(MESSAGE);
                 // 新消息
                 EventBus.getDefault().post(new EBUpdateView());
                 break;
