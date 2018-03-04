@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
@@ -152,6 +153,8 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     @Override
     protected void setupViews(){
+        hideFabEmotion();
+//        Keyboard.open(getContext(), findInputText());
 
         appbarLayout.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
         String name = "暂无昵称";
@@ -168,18 +171,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         adapter = new ChatRecyclerViewAdapter(presenter.getUserAvatar(),friendAccount);
         recyclerView.setAdapter(adapter);
         adapter.update(presenter.loadMessages(friendAccount));
-        int position = adapter.getItemCount() - 1;
+        int position = adapter.getItemCount()-1;
         if (position >= 0) {
             recyclerView.scrollToPosition(position);
         }
-
-        updateView();
-
-
-        // TODO: 2017/8/15 根据好友的头像设置appbar颜色和statusBar颜色
-
-        // TODO: 2017/8/15 这个要放在数据获取完成后才执行
-        Keyboard.open(getContext(), findInputText());
     }
 
 
@@ -235,13 +230,12 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     // 文本输入框的焦点改变事件
     private void onFocusChangeOfInputText(View view, boolean hasFocus) {
-        Log.e(getClass().getSimpleName(), "height" + fabEmotion.getHeight());
         if (hasFocus) {
             hideExtraBottomLayout();
-            showFabEmotion();
+//            showFabEmotion();
         } else {
             Keyboard.close(getContext(), findInputText());
-            hideFabEmotion();
+//            hideFabEmotion();
         }
     }
 
@@ -304,7 +298,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     public void fabAction(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                int position = adapter.getItemCount() - 1;
+                int position = adapter.getItemCount();
                 if (position >= 0) {
                     recyclerView.smoothScrollToPosition(position);
                 }
@@ -387,7 +381,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         inputText.setVisibility(View.VISIBLE);
         inputText.requestFocus();
         Keyboard.open(getContext(),inputText);
-        int position = adapter.getItemCount() - 1;
+        int position = adapter.getItemCount();
         if (position >= 0) {
             recyclerView.smoothScrollToPosition(position);
         }
@@ -457,7 +451,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     @Override
     public void showFabEmotion() {
-        scaleFabEmotion(0,1,false);
+//        scaleFabEmotion(0,1,false);
     }
 
     @Override
@@ -480,7 +474,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                                 recyclerView,
                                 appbarLayout.getMeasuredHeight(),
                                 bottomBar.getMeasuredHeight());
-                        int position = adapter.getItemCount() - 1;
+                        int position = adapter.getItemCount();
                         if (position >= 0) {
                             recyclerView.smoothScrollToPosition(position);
                         }
@@ -549,7 +543,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     public void hideBar(View view) {
         if (isBarVisible) {
             isBarVisible = false;
-            fabEmotion.setVisibility(View.GONE);
+//            fabEmotion.setVisibility(View.GONE);
             animateBar(view,0,1,false);
         }
     }
