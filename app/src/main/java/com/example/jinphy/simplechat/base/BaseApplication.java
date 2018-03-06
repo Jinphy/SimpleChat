@@ -91,7 +91,11 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
         } else {
             toast.setDuration(Toast.LENGTH_SHORT);
         }
-        toast.setText(msg.toString());
+        if (msg instanceof CharSequence) {
+            toast.setText((CharSequence) msg);
+        } else {
+            toast.setText(msg.toString());
+        }
         toast.show();
     }
 

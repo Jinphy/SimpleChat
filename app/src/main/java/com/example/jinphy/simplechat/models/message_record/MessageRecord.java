@@ -1,13 +1,18 @@
 package com.example.jinphy.simplechat.models.message_record;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.text.TextUtils;
 
+import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.utils.ImageUtil;
+import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import io.objectbox.annotation.Entity;
@@ -27,8 +32,22 @@ public class MessageRecord implements Comparable<MessageRecord>{
 
     private String owner;
 
-    private ToOne<Friend> with;
+    /**
+     * DESC: 聊天对象是一个好友时，则赋该值
+     * Created by Jinphy, on 2018/3/6, at 14:32
+     */
+    private ToOne<Friend> withFriend;
 
+    /**
+     * DESC: 聊天对象时一个群时，则赋该值
+     * Created by Jinphy, on 2018/3/6, at 14:33
+     */
+    private ToOne<Group> withGroup;
+
+    /**
+     * DESC: 聊天记录的最新消息
+     * Created by Jinphy, on 2018/3/6, at 14:33
+     */
     private ToOne<Message> lastMsg;
 
     /**
@@ -63,19 +82,36 @@ public class MessageRecord implements Comparable<MessageRecord>{
         this.owner = owner;
     }
 
-    public ToOne<Friend> getWith() {
-        return with;
-    }
-    public Friend getFriend() {
-        return with.getTarget();
+    public ToOne<Friend> getWithFriend() {
+        return withFriend;
     }
 
-    public void setWith(ToOne<Friend> with) {
-        this.with = with;
+    public Friend getFriend() {
+        return withFriend.getTarget();
+    }
+
+    public void setWithFriend(ToOne<Friend> withFriend) {
+        this.withFriend = withFriend;
+    }
+
+    public void setGroup(Group group) {
+        this.withGroup.setTarget(group);
+    }
+
+    public ToOne<Group> getWithGroup() {
+        return withGroup;
+    }
+
+    public Group getGroup() {
+        return withGroup.getTarget();
+    }
+
+    public void setWithGroup(ToOne<Group> withGroup) {
+        this.withGroup = withGroup;
     }
 
     public void setWith(Friend with) {
-        this.with.setTarget(with);
+        this.withFriend.setTarget(with);
     }
 
     public ToOne<Message> getLastMsg() {
@@ -112,6 +148,68 @@ public class MessageRecord implements Comparable<MessageRecord>{
             toTop = 0;
         }
         this.toTop = toTop;
+    }
+
+    /**
+     * DESC: 获取聊天对象的账号，可能是一个好友的账号，也可能是一个群聊的群号
+     * Created by Jinphy, on 2018/3/6, at 14:29
+     */
+    public String getWith() {
+        if (withGroup.getTarget() != null) {
+            return withGroup.getTarget().getGroupNo();
+        }
+        if (withFriend.getTarget() != null) {
+            return withFriend.getTarget().getAccount();
+        }
+        return null;
+    }
+
+    public String getName() {
+        if (withGroup.getTarget() != null) {
+            return withGroup.getTarget().getName();
+        } else {
+            return withFriend.getTarget().getShowName();
+        }
+    }
+
+
+    /**
+     * DESC: 获取消息
+     * Created by Jinphy, on 2018/3/6, at 14:35
+     */
+    public String getMsg() {
+        if (lastMsg.getTarget() != null) {
+            return lastMsg.getTarget().getContent();
+        }
+        return "";
+    }
+
+    /**
+     * DESC: 获取聊天记录的头像
+     * Created by Jinphy, on 2018/3/6, at 14:58
+     */
+    public Bitmap getAvatar(int w, int h) {
+        Bitmap bitmap = ImageUtil.loadAvatar(getWith(), w, h);
+        if (bitmap != null) {
+            return bitmap;
+        }
+        if (App.app() != null) {
+            if (Friend.system.equals(getWith())) {
+                return ImageUtil.getBitmap(
+                        App.app().getResources(), R.drawable.ic_system_24dp, w, h);
+            } else if (withGroup.getTarget() != null) {
+                return ImageUtil.getBitmap(
+                        App.app().getResources(), R.drawable.ic_group_chat_24dp, w, h);
+            }
+        }
+        return null;
+    }
+
+    public String getTime() {
+        if (lastMsg.getTarget() != null) {
+            return StringUtils.formatDate(Long.valueOf(lastMsg.getTarget().getCreateTime()));
+        }
+        return "";
     }
 
     /**

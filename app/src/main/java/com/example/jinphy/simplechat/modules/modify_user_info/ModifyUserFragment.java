@@ -17,12 +17,12 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
+import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.event_bus.EBBitmap;
 import com.example.jinphy.simplechat.models.event_bus.EBUser;
 import com.example.jinphy.simplechat.models.user.User;
@@ -448,42 +448,32 @@ public class ModifyUserFragment extends BaseFragment<ModifyUserPresenter> implem
 
     @Override
     public void pickPhoto() {
-        RuntimePermission.newInstance(activity())
-                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .permission(Manifest.permission.CAMERA)
-                .onGranted(()->{
-                    if (activity() == null) {
-                        return;
-                    }
-                    new MaterialDialog.Builder(activity())
-                            .title("头像")
-                            .titleColor(colorPrimary())
-                            .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_photo_24dp,
-                                    colorPrimary()))
-                            .content("请选择图片获取方式！")
-                            .positiveText("相机")
-                            .negativeText("相册")
-                            .neutralText("取消")
-                            .contentGravity(GravityEnum.CENTER)
-                            .positiveColor(colorPrimary())
-                            .negativeColor(colorAccent())
-                            .neutralColorRes(R.color.color_red_D50000)
-                            .onPositive((dialog, which) -> {
-                                // 从相机获取图片
-                                PickPhotoActivity.start(activity(), PickPhotoActivity.Option.TAKE_PHOTO);
-                            })
-                            .onNegative((dialog, which) -> {
-                                // 从相册获取图片
-                                PickPhotoActivity.start(activity(), PickPhotoActivity.Option.CHOOSE_PHOTO);
-                            })
-                            .dismissListener(dialog -> MenuItemView.removeCurrent())
-                            .show();
+        if (activity() == null) {
+            return;
+        }
+        new MaterialDialog.Builder(activity())
+                .title("头像")
+                .titleColor(colorPrimary())
+                .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_photo_24dp,
+                        colorPrimary()))
+                .content("请选择图片获取方式！")
+                .positiveText("相机")
+                .negativeText("相册")
+                .neutralText("取消")
+                .contentGravity(GravityEnum.CENTER)
+                .positiveColor(colorPrimary())
+                .negativeColor(colorAccent())
+                .neutralColorRes(R.color.color_red_D50000)
+                .onPositive((dialog, which) -> {
+                    // 从相机获取图片
+                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.TAKE_PHOTO);
                 })
-                .onReject(()->{
-                    App.showToast("您拒绝了相关权限，该功能无法进行！", false);
+                .onNegative((dialog, which) -> {
+                    // 从相册获取图片
+                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.CHOOSE_PHOTO);
                 })
-                .execute();
-
+                .dismissListener(dialog -> MenuItemView.removeCurrent())
+                .show();
     }
 
     /**

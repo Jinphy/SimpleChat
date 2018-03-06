@@ -67,17 +67,20 @@
             android:name=".modules.add_friend.AddFriendActivity"
             android:theme="@style/AddFriendActivityTheme">
         </activity>
-
         <activity android:name=".modules.system_msg.SystemMsgActivity">
         </activity>
         <activity android:name=".modules.system_msg.new_friend.NewFriendsActivity">
         </activity>
         <activity android:name=".modules.system_msg.notice.NoticeActivity">
         </activity>
-        <activity android:name=".modules.modify_friend_info.ModifyFriendInfoActivity"
-                  android:theme="@style/ModifyUserActivityTheme">
+        <activity
+            android:name=".modules.modify_friend_info.ModifyFriendInfoActivity"
+            android:theme="@style/ModifyUserActivityTheme">
         </activity>
 
+        <activity android:name=".modules.group.create_group.CreateGroupActivity"
+                  android:theme="@style/ModifyUserActivityTheme">
+        </activity>
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.example.jinphy.simplechat.fileprovider"

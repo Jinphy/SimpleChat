@@ -11,14 +11,11 @@ import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.api.common.ApiInterface;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.event_bus.EBBase;
-import com.example.jinphy.simplechat.models.event_bus.EBService;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.models.user.User_;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 import java.util.Map;
@@ -267,6 +264,9 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
     @Override
     public void delete(Friend friend) {
         if (friend == null) {
+            return;
+        }
+        if (friend.groupCount > 0) {
             return;
         }
         List<Friend> friends = loadLocal(friend.getOwner(), friend.account);

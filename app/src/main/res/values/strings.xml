@@ -50,4 +50,6 @@
     <string name="verification_type">验证方式</string>
     <string name="male">男士</string>
     <string name="female">女士</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
 </resources>

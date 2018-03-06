@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.modules.main.msg;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -50,27 +51,15 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         MessageRecord messageRecord = messageRecords.get(position);
-        Friend friend = messageRecord.getFriend();
-        Message message = messageRecord.getMessage();
-        String name = "暂无昵称";
-        if (!TextUtils.isEmpty(friend.getRemark())) {
-            name = friend.getRemark();
-        } else if (!TextUtils.isEmpty(friend.getName())) {
-            name = friend.getName();
-        }
-        holder.name.setText(name);
-        holder.lastMsg.setText(message.getContent());
-        holder.time.setText(StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
 
-        if (!"无".equals(friend.getAvatar())) {
-            holder.avatar.setImageBitmap(
-                    ImageUtil.loadAvatar(
-                            friend.getAccount(),
-                            holder.avatar.getMeasuredWidth(),
-                            holder.avatar.getMeasuredHeight()));
-        }
-        if (Friend.system.equals(friend.getAccount())) {
-            holder.avatar.setImageResource(R.drawable.ic_system_24dp);
+        holder.name.setText(messageRecord.getName());
+        holder.lastMsg.setText(messageRecord.getMsg());
+        holder.time.setText(messageRecord.getTime());
+
+        Bitmap avatar = messageRecord.getAvatar(
+                holder.avatar.getMeasuredWidth(), holder.avatar.getMeasuredHeight());
+        if (avatar != null) {
+            holder.avatar.setImageBitmap(avatar);
         }
 
         // 设置未读消息数
@@ -164,7 +153,6 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
         messageRecords.clear();
         notifyDataSetChanged();
     }
-
 
 }
 

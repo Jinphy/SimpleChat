@@ -1,5 +1,7 @@
 package com.example.jinphy.simplechat.models.friend;
 
+import android.text.TextUtils;
+
 import com.example.jinphy.simplechat.models.user.User;
 
 import java.util.ArrayList;
@@ -28,6 +30,9 @@ public class Friend {
     public static final String status_black_listing = "blackListing";
     public static final String status_deleted = "deleted";
     public static final String status_readd = "readd";
+
+    // 消息免打扰
+    public static final String status_silent = "silent";
 
     @Id protected long id;
 
@@ -93,6 +98,12 @@ public class Friend {
     protected String status;
 
     protected String signature;
+
+    /**
+     * DESC: 该好友参与的群聊数
+     * Created by Jinphy, on 2018/3/6, at 8:35
+     */
+    protected int groupCount;
 
     /**
      * DESC: 一个好友只属于一个用户的，所以是一对一的关系，即一个Friend -> 一个User
@@ -200,6 +211,23 @@ public class Friend {
         this.signature = signature;
     }
 
+    public int getGroupCount() {
+        return groupCount;
+    }
+
+    public void setGroupCount(int groupCount) {
+        this.groupCount = groupCount;
+    }
+
+    public String getShowName() {
+        if (!TextUtils.isEmpty(remark)) {
+            return remark;
+        } else if (!TextUtils.isEmpty(name)) {
+            return name;
+        }
+        return "暂无昵称";
+    }
+
     public static Friend parse(Map<String, String> map) {
         if (map == null) {
             return null;
@@ -215,6 +243,7 @@ public class Friend {
         friend.owner = map.get(Friend_.owner.name);
         friend.status = map.get(Friend_.status.name);
         friend.signature = map.get(Friend_.signature.name);
+        friend.groupCount = Integer.valueOf(map.get(Friend_.groupCount.name));
         return friend;
     }
 

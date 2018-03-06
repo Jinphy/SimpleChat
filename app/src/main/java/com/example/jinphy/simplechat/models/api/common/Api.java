@@ -114,6 +114,12 @@ public abstract class Api {
         String deleteFriend = "/friend/deleteFriend";
         @Post
         String checkAccount = "/user/checkAccount";
+        @Post
+        String createGroup = "group/createGroup";
+        @Post
+        String loadGroups = "group/loadGroup";
+        @Post
+        String getGroup = "group/getGroup";
     }
 
     //===================参数key==========================================================
@@ -142,6 +148,9 @@ public abstract class Api {
         String owner = "owner";
         String confirm = "confirm";
         String status = "status";
+        String autoAdd = "autoAdd";
+        String maxCount = "maxCount";
+        String groupNo = "groupNo";
     }
 
 

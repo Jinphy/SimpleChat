@@ -5,19 +5,15 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.apkfuns.logutils.LogUtils;
-import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.models.api.common.Api;
-import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
-import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.models.user.User_;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.Preconditions;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

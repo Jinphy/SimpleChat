@@ -173,7 +173,7 @@
 
             </LinearLayout>
 
-            <!--the bottom layout with two button-->
+            <!--the bottom laywithFriendwith two button-->
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_marginTop="@dimen/dimen_10dp"

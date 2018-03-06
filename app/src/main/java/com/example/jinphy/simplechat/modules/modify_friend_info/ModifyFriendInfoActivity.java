@@ -2,20 +2,14 @@ package com.example.jinphy.simplechat.modules.modify_friend_info;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
-import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.Friend_;
-import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserActivity;
-import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserContract;
-import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserFragment;
-import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserPresenter;
 
 public class ModifyFriendInfoActivity extends BaseActivity {
 

@@ -27,6 +27,7 @@ import android.widget.RelativeLayout;
 
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
@@ -250,10 +251,17 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     // 发送按钮的点击事件
     private void onClickOfBtnSend(View view) {
+        switch (friend.getStatus()) {
+            case Friend.status_black_listed:
+                App.showToast("您已被对方拉入黑名单，不能发送消息！", false);
+                return;
+            case Friend.status_deleted:
+                App.showToast("对方不是好友，不能发送消息！", false);
+                return;
+        }
 
         EditText inputText =  findInputText();
         String content = inputText.getText().toString();
-
         inputText.setText("");
         presenter.sendTextMsg(friendAccount, content, adapter.getItemCount());
     }

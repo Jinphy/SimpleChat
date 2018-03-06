@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.models.message_record;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message.MessageRepository;
 import com.example.jinphy.simplechat.utils.StringUtils;
@@ -46,7 +47,15 @@ public class MessageRecordRepository implements MessageRecordDataSource {
     public MessageRecord get(String owner, Friend with) {
         return messageRecordBox.query()
                 .equal(MessageRecord_.owner, owner)
-                .equal(MessageRecord_.withId, with.getId())
+                .equal(MessageRecord_.withFriendId, with.getId())
+                .build().findFirst();
+    }
+
+    @Override
+    public MessageRecord get(String owner, Group group) {
+        return messageRecordBox.query()
+                .equal(MessageRecord_.owner, owner)
+                .equal(MessageRecord_.withGroupId, group.getId())
                 .build().findFirst();
     }
 
@@ -89,12 +98,24 @@ public class MessageRecordRepository implements MessageRecordDataSource {
     public void delete(String owner, Friend with) {
         List<MessageRecord> messageRecords = messageRecordBox.query()
                 .equal(MessageRecord_.owner, owner)
-                .equal(MessageRecord_.withId, with.getId())
+                .equal(MessageRecord_.withFriendId, with.getId())
                 .build().find();
         if (messageRecords != null && messageRecords.size() > 0) {
             messageRecordBox.remove(messageRecords);
         }
     }
+
+    @Override
+    public void delete(String owner, Group with) {
+        List<MessageRecord> messageRecords = messageRecordBox.query()
+                .equal(MessageRecord_.owner, owner)
+                .equal(MessageRecord_.withFriendId, with.getId())
+                .build().find();
+        if (messageRecords != null && messageRecords.size() > 0) {
+            messageRecordBox.remove(messageRecords);
+        }
+    }
+
 
 
     @Override

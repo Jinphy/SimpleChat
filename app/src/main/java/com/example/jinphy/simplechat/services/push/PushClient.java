@@ -2,7 +2,6 @@ package com.example.jinphy.simplechat.services.push;
 
 import android.util.Log;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.User_;

@@ -1,0 +1,270 @@
+package com.example.jinphy.simplechat.models.group;
+
+import com.example.jinphy.simplechat.models.member.Member;
+import com.example.jinphy.simplechat.utils.StringUtils;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import io.objectbox.annotation.Entity;
+import io.objectbox.annotation.Id;
+import io.objectbox.relation.ToMany;
+
+/**
+ * 群聊实体类
+ *
+ * Created by Jinphy on 2018/3/5.
+ */
+
+@Entity
+public class Group{
+
+    public static final int DEFAULT_MAX_COUNT = 500;
+
+    @Id
+    protected long id;
+
+    /**
+     * DESC: 创建者账号
+     * Created by Jinphy, on 2018/3/5, at 18:22
+     */
+    protected String creator;
+
+    /**
+     * DESC: 群聊拥有者，即该群聊属于当前登录账号
+     * Created by Jinphy, on 2018/3/6, at 9:41
+     */
+    protected String owner;
+
+    /**
+     * DESC: 群名称
+     * Created by Jinphy, on 2018/3/5, at 18:22
+     */
+    protected String name;
+
+    /**
+     * DESC: 群号
+     * Created by Jinphy, on 2018/3/5, at 18:21
+     */
+    protected String groupNo;
+
+
+    /**
+     * DESC: 群成员
+     * Created by Jinphy, on 2018/3/5, at 18:22
+     */
+    protected ToMany<Member> members;
+
+    /**
+     * DESC: 最大成员数量，需要满足：
+     *  1、不得小于1
+     *  2、不得小于当前成员数
+     *  3、不得大于默认最大成员数
+     *
+     *  @see Group#DEFAULT_MAX_COUNT
+     * Created by Jinphy, on 2018/3/5, at 16:28
+     */
+    protected int maxCount;
+
+    /**
+     * DESC: 成员是否可以自动添加
+     *
+     *  true:新成员申请加入时不需要群主的确认
+     *  false：新成员申请加入时需要群主的确认
+     *
+     *  todo 在新建群聊的时候需要提供接口让群主选择
+     * Created by Jinphy, on 2018/3/5, at 16:31
+     */
+    protected boolean autoAdd = true;
+
+    /**
+     * DESC: 是否在群聊天列表中显示成员昵称
+     *
+     * Created by Jinphy, on 2018/3/5, at 16:59
+     */
+    protected boolean showName = true;
+
+    /**
+     * DESC: 消息免打扰
+     * Created by Jinphy, on 2018/3/6, at 11:33
+     */
+    protected boolean keepSilent = false;
+
+    /**
+     * DESC: 拒绝接收群消息
+     * Created by Jinphy, on 2018/3/6, at 11:34
+     */
+    private boolean rejectMsg = false;
+
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setMembers(List<Member> members) {
+        if (members == null || members.size() == 0) {
+            return;
+        }
+        this.members.clear();
+        this.members.addAll(members);
+    }
+
+
+    public void setMembers(ToMany<Member> members) {
+        this.members = members;
+    }
+
+    public void setMembers(Member... members) {
+        if (members.length == 0) {
+            return;
+        }
+        this.members.clear();
+        this.members.addAll(Arrays.asList(members));
+    }
+
+    public void addMembers(Member... members) {
+        if (members.length == 0) {
+            return;
+        }
+        this.members.addAll(Arrays.asList(members));
+    }
+
+    public void addMembers(List<Member> members) {
+        if (members == null || members.size() == 0) {
+            return;
+        }
+        this.members.addAll(members);
+    }
+
+    public void deleteMember(Member member) {
+        this.members.remove(member);
+    }
+
+    public void deleteMember(long memberId) {
+        for (Member member : this.members) {
+            if (memberId == member.getId()) {
+                this.members.remove(member);
+                break;
+            }
+        }
+    }
+
+    public void deleteMember(String memberAccount) {
+        for (Member member : this.members) {
+            if (StringUtils.equal(memberAccount, member.getAccount())) {
+                this.members.remove(member);
+            }
+        }
+    }
+
+    public int getMaxCount() {
+        return maxCount;
+    }
+
+    public void setMaxCount(int maxCount) {
+        this.maxCount = maxCount;
+    }
+
+    public boolean isAutoAdd() {
+        return autoAdd;
+    }
+
+    public void setAutoAdd(boolean autoAdd) {
+        this.autoAdd = autoAdd;
+    }
+
+    public boolean isShowName() {
+        return showName;
+    }
+
+    public void setShowName(boolean showName) {
+        this.showName = showName;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getGroupNo() {
+        return groupNo;
+    }
+
+    public void setGroupNo(String groupNo) {
+        this.groupNo = groupNo;
+    }
+
+    public ToMany<Member> getMembers() {
+        return members;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public boolean isKeepSilent() {
+        return keepSilent;
+    }
+
+    public void setKeepSilent(boolean keepSilent) {
+        this.keepSilent = keepSilent;
+    }
+
+    public boolean isRejectMsg() {
+        return rejectMsg;
+    }
+
+    public void setRejectMsg(boolean rejectMsg) {
+        this.rejectMsg = rejectMsg;
+    }
+
+    public static List<Group> parse(List<Map<String, String>> maps) {
+        LinkedList<Group> groups = new LinkedList<>();
+        if (maps == null || maps.size() == 0) {
+            return groups;
+        }
+        for (Map<String, String> map : maps) {
+            groups.add(Group.parse(map));
+        }
+        return groups;
+    }
+
+    public static Group parse(Map<String, String> map) {
+        if (map == null) {
+            return null;
+        }
+        Group group = new Group();
+        group.setGroupNo(map.get(Group_.groupNo.name));
+        group.setOwner(map.get(Group_.owner.name));
+        group.setCreator(map.get(Group_.creator.name));
+        group.setAutoAdd(Boolean.parseBoolean(map.get(Group_.autoAdd.name)));
+        group.setMaxCount(Integer.parseInt(map.get(Group_.maxCount.name)));
+        group.setName(map.get(Group_.name.name));
+        group.setShowName(Boolean.parseBoolean(map.get(Group_.showName.name)));
+        group.setKeepSilent(Boolean.parseBoolean(map.get(Group_.keepSilent.name)));
+        group.setRejectMsg(Boolean.parseBoolean(map.get(Group_.rejectMsg.name)));
+        return group;
+    }
+
+}

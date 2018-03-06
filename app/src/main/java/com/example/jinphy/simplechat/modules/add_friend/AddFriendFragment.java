@@ -12,15 +12,10 @@ import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.friend.Friend;
-import com.example.jinphy.simplechat.models.friend.Friend_;
-import com.example.jinphy.simplechat.models.user.User;
-import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.Map;
-
-import io.objectbox.relation.ToOne;
 
 /**
  * DESC:
@@ -55,6 +50,9 @@ public class AddFriendFragment extends BaseFragment<AddFriendPresenter> implemen
         Bundle arguments = getArguments();
         if (arguments != null) {
             friend = GsonUtils.toBean(arguments.getString(USER_JSON), Friend.class);
+        }
+        if (presenter == null) {
+            this.presenter = getPresenter();
         }
     }
 
