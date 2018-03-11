@@ -621,7 +621,7 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
     @Override
     public void whenLoginSucceed(String msg) {
         BaseApplication.showToast(msg, false);
-        MainActivity.start(getActivity());
+        MainActivity.startFromLogin(getActivity());
         EventBus.getDefault().post(new EBFinishActivityMsg(WelcomeActivity.class));
         EventBus.getDefault().post(new EBFinishActivityMsg(LoginActivity.class));
         finishActivity();

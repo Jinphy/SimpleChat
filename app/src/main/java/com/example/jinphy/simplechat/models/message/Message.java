@@ -95,6 +95,12 @@ public class Message implements Comparable<Message>{
     public static final String TYPE_SYSTEM_DELETE_FRIEND = "system_delete_friend";
 
     /**
+     * DESC: 系统消息，新群聊
+     * Created by jinphy, on 2018/3/10, at 16:47
+     */
+    public static final String TYPE_SYSTEM_NEW_GROUP = "system_new_group";
+
+    /**
      * DESC: 系统消息，公告
      * Created by jinphy, on 2018/3/2, at 12:54
      */
@@ -145,7 +151,7 @@ public class Message implements Comparable<Message>{
     @NonNull
     private String with; // 消息的参与者，即该消息的参与者，
 
-    private String extra;
+    private String extra; //群消息时，该字段表示信息发送者
 
     public long getId() {
         return id;
@@ -246,6 +252,7 @@ public class Message implements Comparable<Message>{
                 case Message.TYPE_SYSTEM_ADD_FRIEND_AGREE:
                 case Message.TYPE_SYSTEM_RELOAD_FRIEND:
                 case Message.TYPE_SYSTEM_DELETE_FRIEND:
+                case Message.TYPE_SYSTEM_NEW_GROUP:
                     return false;
             }
         }

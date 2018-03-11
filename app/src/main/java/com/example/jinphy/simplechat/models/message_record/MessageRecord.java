@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.friend.Friend;
@@ -82,6 +83,8 @@ public class MessageRecord implements Comparable<MessageRecord>{
         this.owner = owner;
     }
 
+
+
     public ToOne<Friend> getWithFriend() {
         return withFriend;
     }
@@ -112,6 +115,10 @@ public class MessageRecord implements Comparable<MessageRecord>{
 
     public void setWith(Friend with) {
         this.withFriend.setTarget(with);
+    }
+
+    public void setWith(Group with) {
+        this.withGroup.setTarget(with);
     }
 
     public ToOne<Message> getLastMsg() {
@@ -182,27 +189,6 @@ public class MessageRecord implements Comparable<MessageRecord>{
             return lastMsg.getTarget().getContent();
         }
         return "";
-    }
-
-    /**
-     * DESC: 获取聊天记录的头像
-     * Created by Jinphy, on 2018/3/6, at 14:58
-     */
-    public Bitmap getAvatar(int w, int h) {
-        Bitmap bitmap = ImageUtil.loadAvatar(getWith(), w, h);
-        if (bitmap != null) {
-            return bitmap;
-        }
-        if (App.app() != null) {
-            if (Friend.system.equals(getWith())) {
-                return ImageUtil.getBitmap(
-                        App.app().getResources(), R.drawable.ic_system_24dp, w, h);
-            } else if (withGroup.getTarget() != null) {
-                return ImageUtil.getBitmap(
-                        App.app().getResources(), R.drawable.ic_group_chat_24dp, w, h);
-            }
-        }
-        return null;
     }
 
     public String getTime() {

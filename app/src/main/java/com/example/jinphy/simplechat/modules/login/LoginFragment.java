@@ -282,7 +282,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
     @Override
     public void whenLoginSucceed() {
         // 登录成功
-        MainActivity.start(getActivity());
+        MainActivity.startFromLogin(getActivity());
         EventBus.getDefault().post(new EBFinishActivityMsg(WelcomeActivity.class));
         finishActivity();
     }

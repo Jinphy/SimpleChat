@@ -30,11 +30,15 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
 
     private Bitmap ownerAvatar;
     private Bitmap friendAvatar;
+    private String withAccount;
 
-    ChatRecyclerViewAdapter(String ownerAvatar,String friend) {
+    ChatRecyclerViewAdapter(String ownerAvatar,String withAccount) {
         this.messages = new LinkedList<>();
+        this.withAccount = withAccount;
         this.ownerAvatar = StringUtils.base64ToBitmap(ownerAvatar);
-        friendAvatar = ImageUtil.loadAvatar(friend, 500, 500);
+        if (!withAccount.contains("G")) {
+            friendAvatar = ImageUtil.loadAvatar(withAccount, 500, 500);
+        }
     }
 
 
@@ -100,9 +104,17 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
             }
 
         } else {
-            if (friendAvatar != null) {
-                holder.avatarView.setImageBitmap(friendAvatar);
+            if (withAccount.contains("G")) {
+                Bitmap bitmap = ImageUtil.loadAvatar(message.getExtra(), 50, 50);
+                if (bitmap != null) {
+                    holder.avatarView.setImageBitmap(bitmap);
+                }
+            } else {
+                if (friendAvatar != null) {
+                    holder.avatarView.setImageBitmap(friendAvatar);
+                }
             }
+
         }
         if (position == 0) {
             holder.timeView.setVisibility(View.VISIBLE);
@@ -137,27 +149,47 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
 
     private void bindTextMsgView(ViewHolder holder, Message message) {
         holder.textMsg_content.setVisibility(View.VISIBLE);
+        holder.photoMsg_picture.setVisibility(View.GONE);
+        holder.voiceMsg_root.setVisibility(View.GONE);
+        holder.videoMsg_root.setVisibility(View.GONE);
+        holder.fileMsg_root.setVisibility(View.GONE);
         // TODO: 2017/8/13
         holder.textMsg_content.setText(message.getContent());
 
     }
 
     private void bindPhotoMsgView(ViewHolder holder, Message message) {
+        holder.textMsg_content.setVisibility(View.GONE);
         holder.photoMsg_picture.setVisibility(View.VISIBLE);
+        holder.voiceMsg_root.setVisibility(View.GONE);
+        holder.videoMsg_root.setVisibility(View.GONE);
+        holder.fileMsg_root.setVisibility(View.GONE);
         // TODO: 2017/8/13
     }
 
     private void bindVoiceMsgView(ViewHolder holder, Message message) {
+        holder.textMsg_content.setVisibility(View.GONE);
+        holder.photoMsg_picture.setVisibility(View.GONE);
         holder.voiceMsg_root.setVisibility(View.VISIBLE);
+        holder.videoMsg_root.setVisibility(View.GONE);
+        holder.fileMsg_root.setVisibility(View.GONE);
         // TODO: 2017/8/13
     }
 
     private void bindVideoMsgView(ViewHolder holder, Message message) {
+        holder.textMsg_content.setVisibility(View.GONE);
+        holder.photoMsg_picture.setVisibility(View.GONE);
+        holder.voiceMsg_root.setVisibility(View.GONE);
         holder.videoMsg_root.setVisibility(View.VISIBLE);
+        holder.fileMsg_root.setVisibility(View.GONE);
         // TODO: 2017/8/13
     }
 
     private void bindFileMsgView(ViewHolder holder, Message message) {
+        holder.textMsg_content.setVisibility(View.GONE);
+        holder.photoMsg_picture.setVisibility(View.GONE);
+        holder.voiceMsg_root.setVisibility(View.GONE);
+        holder.videoMsg_root.setVisibility(View.GONE);
         holder.fileMsg_root.setVisibility(View.VISIBLE);
         // TODO: 2017/8/13
     }

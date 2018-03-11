@@ -4,29 +4,45 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.event_bus.EBBitmap;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
+import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
+import com.example.jinphy.simplechat.modules.group.GroupMemberAdapter;
+import com.example.jinphy.simplechat.modules.main.msg.MsgRecyclerViewAdapter;
 import com.example.jinphy.simplechat.modules.pick_photo.PickPhotoActivity;
+import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,8 +56,12 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
     private MenuItemView autoAddItem;
     private MenuItemView maxCountItem;
     private View btnCreate;
+    private RecyclerView recyclerView;
 
     private Bitmap avatarBitmap;
+    private LinearLayoutManager linearLayoutManager;
+    private GroupMemberAdapter adapter;
+    private List<String> members;
 
 
     public CreateGroupFragment() {
@@ -82,11 +102,21 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
         autoAddItem = view.findViewById(R.id.item_auto_add);
         maxCountItem = view.findViewById(R.id.item_max_count);
         btnCreate = view.findViewById(R.id.btn_create);
+        recyclerView = view.findViewById(R.id.recycler_view);
     }
 
     @Override
     protected void setupViews() {
         maxCountItem.contentHint("请输入1~" + Group.DEFAULT_MAX_COUNT + "的整数！");
+
+
+        linearLayoutManager = new LinearLayoutManager(
+                getContext(),LinearLayoutManager.HORIZONTAL,false);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        adapter = new GroupMemberAdapter();
+        recyclerView.setAdapter(adapter);
+        adapter.update(presenter.loadFriends());
     }
 
     @Override
@@ -125,15 +155,66 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
                 autoAdd = false;
             }
 
-            Map<String, Object> params = newParams().add(Api.Key.avatar, StringUtils
-                    .bitmapToBase64(avatarBitmap))
+            members = adapter.getCheckedAccount();
+            String currentAccount = presenter.getCurrentAccount();
+            members.add(currentAccount);
+
+            Map<String, Object> params = newParams()
+                    .add(Api.Key.avatar, StringUtils.bitmapToBase64(avatarBitmap))
                     .add(Api.Key.name, name)
                     .add(Api.Key.autoAdd, autoAdd)
                     .add(Api.Key.maxCount, maxCount)
                     .add(Api.Key.accessToken, presenter.getAccessToken())
+                    .add(Api.Key.members, GsonUtils.toJson(members))
+                    .add(Api.Key.creator, currentAccount)
                     .build();
             presenter.createGroup(activity(), params);
         });
+        adapter.onClick((view, item, type, position) -> {
+            adapter.updateCheckStatus((Friend) item, view);
+        });
+    }
+
+
+    /**
+     * DESC: 创建菜单
+     * Created by jinphy, on 2018/1/8, at 20:52
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        //        inflater.inflate(R.menu.menu_chat_fragment,menu);
+    }
+
+    // 菜单点击事件
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        new MaterialDialog.Builder(activity())
+                .title("提示")
+                .titleColor(colorPrimary())
+                .iconRes(R.drawable.ic_warning_24dp)
+                .content("确定放弃创建群聊，直接退出吗？")
+                .contentGravity(GravityEnum.CENTER)
+                .widgetColor(colorPrimary())
+                .positiveText("确定")
+                .negativeText("取消")
+                .cancelable(false)
+                .positiveColor(colorPrimary())
+                .negativeColorRes(R.color.color_red_D50000)
+                .onPositive((dialog,which)-> finishActivity())
+                .show();
+        return false;
     }
 
 
@@ -142,6 +223,8 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
         if (!open) {
             MenuItemView.removeCurrent();
         }
+        recyclerView.setVisibility(open?View.GONE:View.VISIBLE);
+
     }
 
     @Override
@@ -186,15 +269,22 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
                 .iconRes(R.drawable.ic_flower_24dp)
                 .items(getString(R.string.yes), getString(R.string.no))
                 .itemsCallbackSingleChoice(-1, (dialog, view, which, text) -> {
-                    autoAddItem.content(text);
-                    return true;
+                    if (!TextUtils.isEmpty(text)) {
+                        autoAddItem.content(text);
+                        dialog.dismiss();
+                        return true;
+                    }
+                    App.showToast("请选择是否自动添加新成员！", false);
+                    return false;
                 })
+                .autoDismiss(false)
                 .widgetColor(colorPrimary())
                 .positiveText("确定")
                 .negativeText("取消")
                 .cancelable(false)
                 .positiveColor(colorPrimary())
                 .negativeColorRes(R.color.color_red_D50000)
+                .onNegative((dialog, which) -> dialog.dismiss())
                 .dismissListener(dialog -> MenuItemView.removeCurrent())
                 .show();
     }
@@ -220,5 +310,8 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
         App.showToast("群聊创建成功！", false);
         ChatActivity.start(activity(), group.getGroupNo());
         finishActivity();
+        presenter.saveMembers(group, members);
+        ImageUtil.storeAvatar(group.getGroupNo(), avatarBitmap);
+        EventBus.getDefault().post(new EBUpdateView());
     }
 }

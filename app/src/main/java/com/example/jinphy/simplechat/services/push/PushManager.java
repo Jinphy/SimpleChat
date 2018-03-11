@@ -5,6 +5,8 @@ import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
 import com.example.jinphy.simplechat.models.event_bus.EBService;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
+import com.example.jinphy.simplechat.models.group.Group;
+import com.example.jinphy.simplechat.models.group.GroupRepository;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message.MessageRepository;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
@@ -32,6 +34,8 @@ public class PushManager {
 
     private MessageRecordRepository messageRecordRepository;
 
+    private GroupRepository groupRepository;
+
     private WeakReference<PushService> pushService;
 
     private static class InstanceHolder{
@@ -48,6 +52,7 @@ public class PushManager {
         friendRepository = FriendRepository.getInstance();
         messageRepository = MessageRepository.getInstance();
         messageRecordRepository = MessageRecordRepository.getInstance();
+        groupRepository = GroupRepository.getInstance();
     }
 
     public User getUser() {
@@ -77,7 +82,8 @@ public class PushManager {
      */
     private void updateMessageRecord(Message[] messages) {
         MessageRecord record;
-        Friend friend;
+        Friend friend=null;
+        Group group=null;
 
         // 记录是否有需要退出当前账号的消息
         Message logoutMessage = null;
@@ -88,15 +94,26 @@ public class PushManager {
             if (!message.needSave()) {
                 continue;
             }
-            friend = friendRepository.get(message.getOwner(), message.getWith());
-            if (friend == null) {
-                continue;
+            if (message.getWith().contains("G")) {
+                group = groupRepository.get(message.getWith(), message.getOwner());
+                if (group == null) {
+                    continue;
+                }
+            } else {
+                friend = friendRepository.get(message.getOwner(), message.getWith());
+                if (friend == null) {
+                    continue;
+                }
             }
             record = messageRecordRepository.get(message.getOwner(),friend);
             if (record == null) {
                 record = new MessageRecord();
                 record.setOwner(message.getOwner());
-                record.setWith(friend);
+                if (friend == null) {
+                    record.setWith(group);
+                } else {
+                    record.setWith(friend);
+                }
             }
             record.setNewMsgCount(record.getNewMsgCount() + 1);
             record.setLastMsg(message);

@@ -59,7 +59,7 @@ public class RoutineRecyclerViewAdapter
         routines = new ArrayList<>(9);
         int[] icons = new int[]{
                 R.drawable.ic_active_zoom_24dp,
-                R.drawable.ic_translate_24dp,
+                R.drawable.ic_group_chat_24dp,
                 R.drawable.ic_credit_card_24dp,
                 R.drawable.ic_certificates_24dp,
                 R.drawable.ic_scenic_spot_24dp,
@@ -70,7 +70,7 @@ public class RoutineRecyclerViewAdapter
         };
         int[] tags = new int[]{
                 R.string.routine_active_zoom,
-                R.string.routine_translate,
+                R.string.routine_group_chat,
                 R.string.routine_credit_card_address,
                 R.string.routine_certificates,
                 R.string.routine_scenic_spot,

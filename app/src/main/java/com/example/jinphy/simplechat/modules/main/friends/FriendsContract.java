@@ -24,16 +24,12 @@ public interface FriendsContract {
 
         RecyclerView getRecyclerView();
 
-        void updateFriends(List<Friend> friends);
-
         void updateView();
     }
 
     interface Presenter extends BasePresenter {
 
-        void loadFriends(Context context);
-
-        void loadAvatar(Context context, Friend friend);
+        List<Friend> loadFriends();
 
     }
 }

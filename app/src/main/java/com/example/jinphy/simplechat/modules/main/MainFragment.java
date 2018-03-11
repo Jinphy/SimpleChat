@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,8 +33,11 @@ import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
+import com.example.jinphy.simplechat.models.event_bus.EBInitDataAfterLogin;
 import com.example.jinphy.simplechat.models.event_bus.EBLoginInfo;
 import com.example.jinphy.simplechat.modules.add_friend.AddFriendActivity;
+import com.example.jinphy.simplechat.modules.group.create_group.CreateGroupActivity;
+import com.example.jinphy.simplechat.modules.group.group_list.GroupListActivity;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsFragment;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsPresenter;
@@ -68,6 +72,8 @@ import java.util.List;
  */
 public class MainFragment extends BaseFragment<MainPresenter> implements MainContract.View {
 
+    public static final String FROM_LOGIN = "FROM_LOGIN";
+
     private static final String TAG = "MainFragment";
     public static final int MSG_FRAGMENT = 0;
     public static final int FRIEND_FRAGMENT = 1;
@@ -91,22 +97,24 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     private PopupWindow mainMenu;
     private MenuItemView addFriendItem;
     private MenuItemView groupChatItem;
+    private MenuItemView searchGroupItem;
+
+
     private MenuItemView scanItem;
-
-
     private LinearLayout btnMsg;
     private LinearLayout btnFriends;
     private LinearLayout btnRoutine;
+
+
     private LinearLayout btnSelf;
-
-
     private ViewGroup[] btn;
     private int[] iconsOpen;
+
     private int[] iconsClose;
 
     private int selectedTab = 0;
-
     private int density;
+    private boolean fromLogin;
 
 
     public MainFragment() {
@@ -119,10 +127,11 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
      *
      * @return A new app of fragment MainFragment.
      */
-    public static MainFragment newInstance() throws Exception{
+    public static MainFragment newInstance(boolean fromLogin) throws Exception{
         Thread.sleep(1000);
 
         MainFragment fragment = new MainFragment();
+        fragment.fromLogin = fromLogin;
         return fragment;
     }
 
@@ -146,7 +155,9 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                 R.drawable.ic_self_close_24dp
         };
         density = (int) ScreenUtils.getDensity(getContext());
-
+        if (fromLogin) {
+            presenter.loadDataAfterLogin();
+        }
     }
 
 
@@ -174,6 +185,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         addFriendItem = menuView.findViewById(R.id.item_add_friend);
         groupChatItem = menuView.findViewById(R.id.item_group_chat);
         scanItem = menuView.findViewById(R.id.item_scan);
+        searchGroupItem = menuView.findViewById(R.id.item_search_group);
     }
 
     @Override
@@ -233,8 +245,39 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
             mainMenu.dismiss();
         });
 
+        searchGroupItem.onClick((menuItemView, hasFocus) -> {
+            new MaterialDialog.Builder(activity())
+                    .title("查找群聊")
+                    .titleColor(colorPrimary())
+                    .icon(ImageUtil.getDrawable(activity(),R.drawable.ic_friends_open_24dp,colorPrimary()))
+                    .content("输入群号、群名")
+                    .input("请输入群号（以'G'开头）或群名", null, (dialog, input) -> {
+                        String text = input.toString();
+                        if (TextUtils.isEmpty(text)) {
+                            App.showToast("输入不能为空！", false);
+                            return;
+                        }
+                        presenter.findGroups(text, ()->{
+                            GroupListActivity.start(activity(), true);
+                            dialog.dismiss();
+                        });
+                    })
+                    .cancelable(false)
+                    .autoDismiss(false)
+                    .positiveText("查找")
+                    .negativeText("取消")
+                    .positiveColor(colorPrimary())
+                    .negativeColorRes(R.color.color_red_D50000)
+                    .onNegative((dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .show();
+            mainMenu.dismiss();
+        });
+
         groupChatItem.onClick((menuItemView, hasFocus) -> {
             // TODO: 2018/1/15 增加群聊功能
+            CreateGroupActivity.start(activity());
             mainMenu.dismiss();
         });
 
@@ -242,6 +285,8 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
             // TODO: 2018/1/15 增加扫一扫功能
             mainMenu.dismiss();
         });
+
+
 
 
     }
@@ -714,7 +759,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     @Override
     public void showMenu() {
-        LogUtils.e("ahu");
         if (mainMenu != null) {
             mainMenu.dismiss();
             return;

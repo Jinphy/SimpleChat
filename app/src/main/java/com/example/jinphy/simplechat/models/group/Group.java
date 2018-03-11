@@ -84,7 +84,7 @@ public class Group{
      *
      * Created by Jinphy, on 2018/3/5, at 16:59
      */
-    protected boolean showName = true;
+    protected boolean showMemberName = true;
 
     /**
      * DESC: 消息免打扰
@@ -96,7 +96,21 @@ public class Group{
      * DESC: 拒绝接收群消息
      * Created by Jinphy, on 2018/3/6, at 11:34
      */
-    private boolean rejectMsg = false;
+    protected boolean rejectMsg = false;
+
+    /**
+     * DESC: 是否是来自的搜索结果
+     * Created by jinphy, on 2018/3/11, at 10:36
+     */
+    protected boolean isFromSearch = false;
+
+    /**
+     * DESC: 判断是否是当前用户的群聊
+     * Created by jinphy, on 2018/3/11, at 12:57
+     */
+    protected boolean isMyGroup = false;
+
+
 
 
     public long getId() {
@@ -179,12 +193,12 @@ public class Group{
         this.autoAdd = autoAdd;
     }
 
-    public boolean isShowName() {
-        return showName;
+    public boolean isShowMemberName() {
+        return showMemberName;
     }
 
-    public void setShowName(boolean showName) {
-        this.showName = showName;
+    public void setShowMemberName(boolean showMemberName) {
+        this.showMemberName = showMemberName;
     }
 
     public String getCreator() {
@@ -239,6 +253,22 @@ public class Group{
         this.rejectMsg = rejectMsg;
     }
 
+    public boolean isFromSearch() {
+        return isFromSearch;
+    }
+
+    public boolean isMyGroup() {
+        return isMyGroup;
+    }
+
+    public void setMyGroup(boolean myGroup) {
+        isMyGroup = myGroup;
+    }
+
+    public void setFromSearch(boolean fromSearch) {
+        isFromSearch = fromSearch;
+    }
+
     public static List<Group> parse(List<Map<String, String>> maps) {
         LinkedList<Group> groups = new LinkedList<>();
         if (maps == null || maps.size() == 0) {
@@ -261,10 +291,24 @@ public class Group{
         group.setAutoAdd(Boolean.parseBoolean(map.get(Group_.autoAdd.name)));
         group.setMaxCount(Integer.parseInt(map.get(Group_.maxCount.name)));
         group.setName(map.get(Group_.name.name));
-        group.setShowName(Boolean.parseBoolean(map.get(Group_.showName.name)));
+        group.setShowMemberName(Boolean.parseBoolean(map.get(Group_.showMemberName.name)));
         group.setKeepSilent(Boolean.parseBoolean(map.get(Group_.keepSilent.name)));
         group.setRejectMsg(Boolean.parseBoolean(map.get(Group_.rejectMsg.name)));
         return group;
     }
+
+    /**
+     * DESC: 把所有的传入的groups都设置成temp
+     * Created by jinphy, on 2018/3/11, at 10:40
+     */
+    public static void setOwner(List<Group> groups, String owner) {
+        if (groups != null) {
+            for (Group group : groups) {
+                group.owner = owner;
+            }
+        }
+
+    }
+
 
 }

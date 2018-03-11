@@ -33,32 +33,4 @@ public class RoutinePresenter implements RoutineContract.Presenter {
         return new RoutineRecyclerViewAdapter();
     }
 
-    @Override
-    public void handleRecyclerViewEvent(View view, Object item, int type, int position) {
-
-        Routine routine = (Routine) item;
-
-        switch (routine.getTagId()) {
-            case R.string.routine_active_zoom:
-                this.view.showActiveZoneActivity();
-                break;
-            case R.string.routine_translate:
-                break;
-            case R.string.routine_credit_card_address:
-                break;
-            case R.string.routine_certificates:
-                break;
-            case R.string.routine_scenic_spot:
-                break;
-            case R.string.routine_bus_route:
-                break;
-            case R.string.routine_food_menu:
-                break;
-            case R.string.routine_express:
-                break;
-            case R.string.routine_weather:
-                break;
-
-        }
-    }
 }

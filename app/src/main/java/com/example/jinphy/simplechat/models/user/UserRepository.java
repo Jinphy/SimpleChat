@@ -225,13 +225,23 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
     }
 
     @Override
-    public void loadAvatar(Context context, Task<Map<String, String>> task) {
+    public void getAvatar(Context context, Task<Map<String, String>> task) {
         Api.<Map<String,String>>common(context)
+                .setup(api -> this.handleBuilder(api, task))
                 .path(Api.Path.getAvatar)
                 .dataType(Api.Data.MAP)
-                .setup(api -> this.handleBuilder(api, task))
                 .request();
 
+    }
+
+    @Override
+    public void loadAvatars(Context context, Task<List<Map<String, String>>> task) {
+        Api.<List<Map<String,String>>>common(context)
+                .hint("正在加载...")
+                .setup(api -> this.handleBuilder(api, task))
+                .path(Api.Path.loadAvatars)
+                .dataType(Api.Data.MAP)
+                .request();
     }
 
     @Override
@@ -251,17 +261,6 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
                 .request();
     }
 
-    @Override
-    protected<T> void handleBuilder(ApiInterface<Response<T>> api, Task<T> task) {
-        api.showProgress(task.isShowProgress())
-                .useCache(task.isUseCache())
-                .autoShowNo(task.isAutoShowNo())
-                .params(task.getParams())
-                .onResponseYes(task.getOnDataOk()==null?null: response -> task.getOnDataOk().call(response))
-                .onResponseNo(task.getOnDataNo()==null?null: response -> task.getOnDataNo().call(TYPE_CODE))
-                .onError(task.getOnDataNo()==null?null: e-> task.getOnDataNo().call(TYPE_ERROR))
-                .onFinal(task.getOnFinal()==null?null: task.getOnFinal()::call);
-    }
 
 
 }

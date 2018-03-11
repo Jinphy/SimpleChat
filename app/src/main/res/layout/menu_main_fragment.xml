@@ -24,6 +24,23 @@
             android:layout_marginBottom="@dimen/dimen_1dp"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_50dp"/>
+
+        <com.example.jinphy.simplechat.custom_view.MenuItemView
+            android:id="@+id/item_search_group"
+            app:icon_drawable="@drawable/ic_add_person_24dp"
+            app:icon_color="@color/colorAccent"
+            app:auto_animate="false"
+            app:title="查找群聊"
+            app:title_text_color="@color/colorAccent"
+            app:show_input="false"
+            app:show_right_layout="false"
+            app:show_arrow="false"
+            app:item_corner_radius="@dimen/dimen_0dp"
+            android:layout_marginBottom="@dimen/dimen_1dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_50dp"/>
+
+
         <com.example.jinphy.simplechat.custom_view.MenuItemView
             android:id="@+id/item_group_chat"
             app:icon_drawable="@drawable/ic_group_work24dp"

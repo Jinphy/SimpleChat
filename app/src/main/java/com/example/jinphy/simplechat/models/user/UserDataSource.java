@@ -61,7 +61,11 @@ public interface UserDataSource {
 
     boolean needToLogin();
 
-    void loadAvatar(Context context, BaseRepository.Task<Map<String, String>> task);
+    void getAvatar(Context context, BaseRepository.Task<Map<String, String>> task);
+
+
+    void loadAvatars(Context context, BaseRepository.Task<List<Map<String, String>>> task);
+
 
     void checkAccount(Context context);
 

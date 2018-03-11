@@ -13,7 +13,9 @@ import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.menu.Routine;
 import com.example.jinphy.simplechat.modules.active_zoom.ActiveZoneActivity;
+import com.example.jinphy.simplechat.modules.group.group_list.GroupListActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
@@ -105,7 +107,7 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     @Override
     protected void registerEvent() {
 
-        adapter.onClick(presenter::handleRecyclerViewEvent);
+        adapter.onClick(this::handleRecyclerViewEvent);
     }
 
 
@@ -129,7 +131,42 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
 
     @Override
     public void showActiveZoneActivity() {
-        Intent intent = new Intent(getActivity(), ActiveZoneActivity.class);
-        startActivity(intent);
+        ActiveZoneActivity.start(activity());
     }
+
+    @Override
+    public void showGroupListActivity() {
+        GroupListActivity.start(activity(),false);
+    }
+
+    @Override
+    public void handleRecyclerViewEvent(View view, Object item, int type, int position) {
+
+        Routine routine = (Routine) item;
+
+        switch (routine.getTagId()) {
+            case R.string.routine_active_zoom:
+                showActiveZoneActivity();
+                break;
+            case R.string.routine_group_chat:
+                showGroupListActivity();
+                break;
+            case R.string.routine_credit_card_address:
+                break;
+            case R.string.routine_certificates:
+                break;
+            case R.string.routine_scenic_spot:
+                break;
+            case R.string.routine_bus_route:
+                break;
+            case R.string.routine_food_menu:
+                break;
+            case R.string.routine_express:
+                break;
+            case R.string.routine_weather:
+                break;
+
+        }
+    }
+
 }

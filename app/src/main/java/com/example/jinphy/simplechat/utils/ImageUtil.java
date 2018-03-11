@@ -335,6 +335,9 @@ public class ImageUtil {
      * Created by jinphy, on 2018/3/1, at 10:01
      */
     public static void storeAvatar(String account, Bitmap bitmap) {
+        if (TextUtils.isEmpty(account) || bitmap == null) {
+            return;
+        }
         File file = new File(AVATAR_PATH,account);
         file.getParentFile().mkdirs();
         if (file.exists()) {

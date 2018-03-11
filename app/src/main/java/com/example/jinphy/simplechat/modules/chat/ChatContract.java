@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.modules.chat;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 
@@ -69,6 +70,8 @@ public interface ChatContract {
         List<Message> loadMessages(String friendAccount);
 
         Friend getFriend(String friendAccount);
+
+        Group getGroup(String groupNo);
 
         void sendTextMsg(String friendAccount, String content,int position);
 

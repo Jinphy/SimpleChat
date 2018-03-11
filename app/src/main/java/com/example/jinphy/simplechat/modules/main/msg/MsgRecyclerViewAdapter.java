@@ -56,11 +56,21 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MsgRecyclerV
         holder.lastMsg.setText(messageRecord.getMsg());
         holder.time.setText(messageRecord.getTime());
 
-        Bitmap avatar = messageRecord.getAvatar(
-                holder.avatar.getMeasuredWidth(), holder.avatar.getMeasuredHeight());
-        if (avatar != null) {
-            holder.avatar.setImageBitmap(avatar);
+        if (Friend.system.equals(messageRecord.getWith())) {
+            holder.avatar.setImageResource(R.drawable.ic_system_24dp);
+        } else {
+            Bitmap bitmap = ImageUtil.loadAvatar(messageRecord.getWith(),
+                    holder.avatar.getMeasuredWidth(), holder.avatar.getMeasuredHeight());
+            if (bitmap != null) {
+                holder.avatar.setImageBitmap(bitmap);
+            } else if (messageRecord.getWith().contains("G")) {
+                holder.avatar.setImageResource(R.drawable.ic_group_chat_white_24dp);
+            } else {
+                holder.avatar.setImageResource(R.drawable.ic_person_48dp);
+            }
+
         }
+
 
         // 设置未读消息数
         int count = messageRecord.getNewMsgCount();

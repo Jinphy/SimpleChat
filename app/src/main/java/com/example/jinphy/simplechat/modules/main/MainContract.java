@@ -66,7 +66,11 @@ public interface MainContract {
 
         void findUser(String account, BaseRepository.OnDataOk<Response<User>> callback);
 
+        void findGroups(String text, Runnable whenDataOk);
+
         void checkAccount(Context context);
 
+
+        void loadDataAfterLogin();
     }
 }

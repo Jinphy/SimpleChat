@@ -53,19 +53,12 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
             holder.date.setText(StringUtils.formatDate(Long.valueOf(friend.getDate())));
         }
 
-        if (!"无".equals(friend.getAvatar())){
-            int w = holder.avatar.getMeasuredWidth();
-            int h = holder.avatar.getMeasuredHeight();
-            Bitmap bitmap = ImageUtil.loadAvatar(friend.getAccount(), w, h);
-            if (bitmap != null) {
-                holder.avatar.setImageBitmap(bitmap);
-            } else {
-                if (!"loading".equals(friend.getAvatar())) {
-                    friend.setAvatar("loading");
-                    EventBus.getDefault().post(new EBFriend(friend));
-                }
-
-            }
+        Bitmap bitmap = ImageUtil.loadAvatar(
+                friend.getAccount(),
+                holder.avatar.getMeasuredWidth(),
+                holder.avatar.getMeasuredHeight());
+        if (bitmap != null) {
+            holder.avatar.setImageBitmap(bitmap);
         }
 
         if (click != null) {
@@ -83,6 +76,7 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
 
 
     public void update(List<Friend> friends) {
+        this.friends.clear();
         if (friends == null) {
             return;
         }

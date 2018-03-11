@@ -546,6 +546,9 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
     }
 
     public CharSequence content() {
+        if (content == null) {
+            return "";
+        }
         return content;
     }
 

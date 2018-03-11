@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
@@ -41,6 +42,8 @@ public class MsgPresenter implements MsgContract.Presenter {
     @Override
     public List<MessageRecord> loadMsgRecords() {
         messageRecords = recordRepository.load(userRepository.currentUser().getAccount());
+
+        LogUtils.e(messageRecords.size());
 
         MessageRecord.sort(messageRecords);
 

@@ -9,6 +9,9 @@ import android.support.v7.widget.Toolbar;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
+import com.example.jinphy.simplechat.models.event_bus.EBInitDataAfterLogin;
+
+import org.greenrobot.eventbus.EventBus;
 
 public class MainActivity extends BaseActivity {
 
@@ -22,6 +25,17 @@ public class MainActivity extends BaseActivity {
             return;
         }
         Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra(MainFragment.FROM_LOGIN, false);
+        activity.startActivity(intent);
+        activity.overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
+    }
+
+    public static void startFromLogin(Activity activity) {
+        if (activity == null) {
+            return;
+        }
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra(MainFragment.FROM_LOGIN, true);
         activity.startActivity(intent);
         activity.overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
     }
@@ -40,7 +54,7 @@ public class MainActivity extends BaseActivity {
         actionBar.setTitle(R.string.app_name);
         MainFragment fragment = null;
         try {
-            fragment = MainFragment.newInstance();
+            fragment = MainFragment.newInstance(getIntent().getBooleanExtra(MainFragment.FROM_LOGIN,false));
         } catch (Exception e) {
             e.printStackTrace();
         }

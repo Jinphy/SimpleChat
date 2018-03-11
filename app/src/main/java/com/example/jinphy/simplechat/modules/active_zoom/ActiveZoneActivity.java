@@ -1,5 +1,7 @@
 package com.example.jinphy.simplechat.modules.active_zoom;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,6 +14,14 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
 public class ActiveZoneActivity extends BaseActivity {
 
     private ActiveZonePresenter presenter;
+
+
+    public static void start(Activity activity) {
+        Intent intent = new Intent(activity, ActiveZoneActivity.class);
+
+        activity.startActivity(intent);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

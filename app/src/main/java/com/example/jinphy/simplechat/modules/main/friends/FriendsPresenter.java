@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
@@ -40,40 +39,8 @@ public class FriendsPresenter implements FriendsContract.Presenter {
     }
 
     @Override
-    public void loadFriends(Context context) {
+    public List<Friend> loadFriends() {
         String owner = userRepository.currentUser().getAccount();
-        if (friendRepository.count(owner) > 1) {
-            view.updateFriends(friendRepository.loadLocal(owner));
-        } else {
-            friendRepository.<List<Map<String,String>>>newTask()
-                    .param(Api.Key.owner, owner)
-                    .doOnDataOk(friendsData -> {
-                        LogUtils.e(friendsData);
-                        friendRepository.save(Friend.parse(friendsData.getData()));
-                        view.updateFriends(friendRepository.loadLocal(owner));
-                    })
-                    .submit(task -> friendRepository.loadOnline(context, task));
-        }
-    }
-
-    @Override
-    public void loadAvatar(Context context, Friend friend) {
-        userRepository.<Map<String,String>>newTask()
-                .param(Api.Key.account, friend.getAccount())
-                .showProgress(false)
-                .autoShowNo(false)
-                .doOnDataOk(avatarData -> {
-                    Map<String, String> data = avatarData.getData();
-                    if ("无".equals(data.get(User_.avatar.name))) {
-                        friend.setAvatar("无");
-                    } else {
-                        friend.setAvatar("有");
-                        Bitmap bitmap = StringUtils.base64ToBitmap(data.get(User_.avatar.name));
-                        ImageUtil.storeAvatar(friend.getAccount(), bitmap);
-                    }
-                    friendRepository.update(friend);
-                    view.updateView();
-                })
-                .submit(task -> userRepository.loadAvatar(context, task));
+        return friendRepository.loadLocal(owner);
     }
 }

@@ -16,15 +16,25 @@ public interface GroupDataSource {
 
     void createGroup(Context context, BaseRepository.Task<Map<String, String>> task);
 
-    List<Group> loadLocal(String owner);
+    List<Group> loadLocal(String owner,boolean showSearchResult);
 
     void loadOnline(Context context, BaseRepository.Task<List<Map<String,String>>> task);
+
+    void search(Context context, BaseRepository.Task<List<Map<String, String>>> task);
 
 
     void getOnline(Context context, String owner, String groupNo, Runnable... whenOk);
 
 
-    void save(Group... group);
+    void saveMyGroup(Group... groups);
+
+    void saveMyGroup(List<Group> groups);
+
+    void saveSearch(Group... groups);
+
+    void saveSearch(List<Group> groups);
+
+    void deleteSearch();
 
 
     Group get(String groupNo, String owner);

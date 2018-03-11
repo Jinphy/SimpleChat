@@ -119,7 +119,6 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                         if (flag.ok) {
                             if (whenOk.length > 0) {
                                 whenOk[0].run();
-                                LogUtils.e(1);
                             }
                         } else {
                             flag.ok = true;
@@ -143,7 +142,6 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                         if (flag.ok) {
                             if (whenOk.length > 0) {
                                 whenOk[0].run();
-                                LogUtils.e(2);
                             }
                         } else {
                             flag.ok = true;

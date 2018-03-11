@@ -52,4 +52,5 @@
     <string name="female">女士</string>
     <string name="yes">是</string>
     <string name="no">否</string>
+    <string name="routine_group_chat">群聊</string>
 </resources>

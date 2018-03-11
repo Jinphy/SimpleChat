@@ -43,8 +43,17 @@ abstract public  class BaseRepository {
         return new Task<>(new HashMap<>());
     }
 
-
-    abstract protected<T> void handleBuilder(ApiInterface<Response<T>> api, Task<T> task) ;
+    protected<T> void handleBuilder(ApiInterface<Response<T>> api, Task<T> task) {
+        api.showProgress(task.isShowProgress())
+                .useCache(task.isUseCache())
+                .autoShowNo(task.isAutoShowNo())
+                .showProgress(task.isShowProgress())
+                .params(task.getParams())
+                .onResponseYes(task.getOnDataOk()==null?null: response -> task.getOnDataOk().call(response))
+                .onResponseNo(task.getOnDataNo()==null?null: response -> task.getOnDataNo().call(TYPE_CODE))
+                .onError(task.getOnDataNo()==null?null: e-> task.getOnDataNo().call(TYPE_ERROR))
+                .onFinal(task.getOnFinal()==null?null: task.getOnFinal()::call);
+    }
 
 
     /**

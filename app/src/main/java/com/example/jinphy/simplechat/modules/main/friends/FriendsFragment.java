@@ -122,7 +122,7 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
         recyclerView.setLayoutManager(linearLayoutManager);
         adapter = new FriendsRecyclerViewAdapter();
         recyclerView.setAdapter(adapter);
-        presenter.loadFriends(activity());
+        adapter.update(presenter.loadFriends());
     }
 
     @Override
@@ -152,20 +152,6 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
         return recyclerView;
     }
 
-    @Override
-    public void updateFriends(List<Friend> friends) {
-        int i = linearLayoutManager.findFirstVisibleItemPosition();
-        adapter.clear();
-        adapter.update(friends);
-        if (i >= 0 && i < adapter.getItemCount()) {
-            recyclerView.scrollToPosition(i);
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void loadAvatar(EBFriend msg) {
-        presenter.loadAvatar(activity(), msg.data);
-    }
 
     @Override
     public void updateView() {
@@ -178,7 +164,6 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void updateFriend(EBUpdateView msg) {
-        LogUtils.e("friend");
-        presenter.loadFriends(activity());
+        adapter.update(presenter.loadFriends());
     }
 }

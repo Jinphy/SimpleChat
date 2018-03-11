@@ -25,7 +25,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
@@ -34,6 +33,7 @@ import com.example.jinphy.simplechat.listener_adapters.TextListener;
 import com.example.jinphy.simplechat.models.api.send.Sender;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
@@ -73,12 +73,13 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     private FrameLayout extraBottomLayout;
 
     private Friend friend;
+    private Group group;
 
     // TODO: 2017/8/15 隐藏appBar时 statusBar 的初始颜色，从好友头像获取
     int startStatusColor;
     // 隐藏 appBar 后的statusBar的 最终颜色，为colorAccent
     int endStatusColor;
-    private String friendAccount;
+    private String account;
     private ChatRecyclerViewAdapter adapter;
     private LinearLayoutManager linearLayoutManager;
 
@@ -90,7 +91,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        friendAccount = getArguments().getString(ChatFragment.WITH_ACCOUNT);
+        account = getArguments().getString(ChatFragment.WITH_ACCOUNT);
     }
 
     @Override
@@ -149,8 +150,21 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         inputTextAndVoice = view.findViewById(R.id.input_text_and_voice);
         btnMoreAndSend = view.findViewById(R.id.btn_more_and_send);
         extraBottomLayout = view.findViewById(R.id.extra_bottom_layout);
-
     }
+
+    @Override
+    protected void initData() {
+        screenWidth = ScreenUtils.getScreenWidth(getContext());
+        onThirdScreenWidth = screenWidth/3;
+        maxElevation = ScreenUtils.dp2px(getContext(), 20);
+
+        if (account.contains("G")) {
+            group = presenter.getGroup(account);
+        } else {
+            friend = presenter.getFriend(account);
+        }
+    }
+
 
     @Override
     protected void setupViews(){
@@ -158,20 +172,18 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 //        Keyboard.open(getContext(), findInputText());
 
         appbarLayout.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
-        String name = "暂无昵称";
-        if (!TextUtils.isEmpty(friend.getRemark())) {
-            name = friend.getRemark();
-        } else if (!TextUtils.isEmpty(friend.getName())) {
-            name = friend.getName();
+        if (account.contains("G")) {
+            activity().setTitle(group.getName());
+        } else {
+            activity().setTitle(friend.getShowName());
         }
-        activity().setTitle(name);
 
         // 设置RecyclerView
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        adapter = new ChatRecyclerViewAdapter(presenter.getUserAvatar(),friendAccount);
+        adapter = new ChatRecyclerViewAdapter(presenter.getUserAvatar(), account);
         recyclerView.setAdapter(adapter);
-        adapter.update(presenter.loadMessages(friendAccount));
+        adapter.update(presenter.loadMessages(account));
         int position = adapter.getItemCount()-1;
         if (position >= 0) {
             recyclerView.scrollToPosition(position);
@@ -182,7 +194,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     public void updateView() {
         int i = linearLayoutManager.findFirstVisibleItemPosition();
-        adapter.update(presenter.loadMessages(friendAccount));
+        adapter.update(presenter.loadMessages(account));
         if (i >= 0 && i < adapter.getItemCount()) {
             recyclerView.scrollToPosition(i);
         }
@@ -263,7 +275,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         EditText inputText =  findInputText();
         String content = inputText.getText().toString();
         inputText.setText("");
-        presenter.sendTextMsg(friendAccount, content, adapter.getItemCount());
+        presenter.sendTextMsg(account, content, adapter.getItemCount());
     }
 
     // 更多功能按钮的点击事件
@@ -293,14 +305,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     }
 
-    @Override
-    protected void initData() {
-        screenWidth = ScreenUtils.getScreenWidth(getContext());
-        onThirdScreenWidth = screenWidth/3;
-        maxElevation = ScreenUtils.dp2px(getContext(), 20);
-
-        friend = presenter.getFriend(friendAccount);
-    }
 
     @Override
     public void fabAction(View view) {

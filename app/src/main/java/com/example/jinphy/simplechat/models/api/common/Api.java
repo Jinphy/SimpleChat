@@ -14,7 +14,7 @@ import com.example.jinphy.simplechat.annotations.Post;
 public abstract class Api {
 
     // 宿舍WiFi
-//            public static String BASE_URL = "ws://192.168.0.3";
+    //            public static String BASE_URL = "ws://192.168.0.2";
     //    成和WiFi
     //    public static String BASE_URL = "ws://192.168.3.21";
     //    我的手机WiFi
@@ -22,7 +22,7 @@ public abstract class Api {
     //    公司WiFi
     //    public static String BASE_URL = "ws://172.16.11.134";
     // 简阅书吧 wifi
-//        public static String BASE_URL = "ws://192.168.1.199";
+    //        public static String BASE_URL = "ws://192.168.1.199";
 
     /**
      * DESC: 推送通道端口
@@ -105,6 +105,8 @@ public abstract class Api {
         @Post
         String getAvatar = "/user/getAvatar";
         @Post
+        String loadAvatars = "/user/loadAvatars";
+        @Post
         String getFriend = "/friend/getFriend";
         @Post
         String modifyRemark = "/friend/modifyRemark";
@@ -115,11 +117,11 @@ public abstract class Api {
         @Post
         String checkAccount = "/user/checkAccount";
         @Post
-        String createGroup = "group/createGroup";
+        String createGroup = "/group/createGroup";
         @Post
-        String loadGroups = "group/loadGroup";
+        String getGroups = "/group/getGroups";
         @Post
-        String getGroup = "group/getGroup";
+        String getMembers = "/member/getMembers";
     }
 
     //===================参数key==========================================================
@@ -132,6 +134,7 @@ public abstract class Api {
         String phone = "phone";
         String verificationCode = "verificationCode";
         String account = "account";
+        String accounts = "accounts";
         String password = "password";
         String deviceId = "deviceId";
         String date = "date";
@@ -151,32 +154,36 @@ public abstract class Api {
         String autoAdd = "autoAdd";
         String maxCount = "maxCount";
         String groupNo = "groupNo";
+        String members = "members";
+        String creator = "creator";
+        String text = "text";
+        String groupNos = "groupNos";
     }
 
 
     /**
      * DESC: 网络请求返回数据类型的枚举类
-     *
-     *      该枚举对应于{@link Response#data} 的数据类型
-     *
-     *      在执行网络请求时可以通过调用{@link ApiInterface#dataType(Data, Class[])} 来设置{@code data}
-     *      的返回类型
-     *
-     *      例如：
-     *        Api.<List<GSUser>>common(context)
-     *                    .dataType(Api.Data.MODEL_LIST,GSUser.class)
-     *                    .path(Api.Path.login)
-     *                    .onResponseYes(response -> {
-     *                          List<GSUser> data = response.getBitmapFromActivity();
-     *                    })
-     *                    .request();
-     *      注意：
-     *          1、需要在common方法前加上尖括号，并指定需要的返回的data的类型，例如：List<GSUser>
-     *          2、调用方法{@link ApiInterface#dataType(Data, Class[])},根据指定类型选择对应的枚举常量
-     *          3、在上面示例代码中的{@code onResponseYes()}中，就可以直接调用Response类的对象
-     *              response的方法getData()获取指定类型的data数据，{@link Response#getData()}
-     *
-     *
+     * <p>
+     * 该枚举对应于{@link Response#data} 的数据类型
+     * <p>
+     * 在执行网络请求时可以通过调用{@link ApiInterface#dataType(Data, Class[])} 来设置{@code data}
+     * 的返回类型
+     * <p>
+     * 例如：
+     * Api.<List<GSUser>>common(context)
+     * .dataType(Api.Data.MODEL_LIST,GSUser.class)
+     * .path(Api.Path.login)
+     * .onResponseYes(response -> {
+     * List<GSUser> data = response.getBitmapFromActivity();
+     * })
+     * .request();
+     * 注意：
+     * 1、需要在common方法前加上尖括号，并指定需要的返回的data的类型，例如：List<GSUser>
+     * 2、调用方法{@link ApiInterface#dataType(Data, Class[])},根据指定类型选择对应的枚举常量
+     * 3、在上面示例代码中的{@code onResponseYes()}中，就可以直接调用Response类的对象
+     * response的方法getData()获取指定类型的data数据，{@link Response#getData()}
+     * <p>
+     * <p>
      * Created by jinphy, on 2018/1/5, at 13:47
      */
     public enum Data {
@@ -184,7 +191,7 @@ public abstract class Api {
 
         /**
          * DESC: 当data 类型为具体的某个model类型，例如：GSUser类时，使用该枚举
-         *
+         * <p>
          * 函数调用：dataType(Api.Data.MODEL, GSUser.class);
          *
          * @see ApiInterface#dataType(Data, Class[])
@@ -195,7 +202,7 @@ public abstract class Api {
 
         /**
          * DESC: 当data类型为Map<String,String>时，使用该枚举
-         *
+         * <p>
          * 函数调用：dataType(Api.Data.MAP)
          *
          * @see ApiInterface#dataType(Data, Class[])
@@ -206,9 +213,8 @@ public abstract class Api {
 
         /**
          * DESC: 当data类型为某个model数组类型，例如：GSUser[]时，使用该枚举
-         *
+         * <p>
          * 函数调用：dataType(Api.Data.MODEL_ARRAY, GSUser[].class)
-         *
          *
          * @see ApiInterface#dataType(Data, Class[])
          * @see BaseApi#dataType(Data, Class[])
@@ -218,9 +224,8 @@ public abstract class Api {
 
         /**
          * DESC: 当data类型为Map<String,String>[] 时，使用该枚举
-         *
+         * <p>
          * 函数调用：dataType(Api.Data.MAP_ARRAY)
-         *
          *
          * @see ApiInterface#dataType(Data, Class[])
          * @see BaseApi#dataType(Data, Class[])
@@ -230,9 +235,8 @@ public abstract class Api {
 
         /**
          * DESC: 当data类型为某个model的list列表，例如List<GSUser>时，使用该枚举
-         *
+         * <p>
          * 函数调用：dataType(Api.Data.MODEL_LIST, GSUser.class)
-         *
          *
          * @see ApiInterface#dataType(Data, Class[])
          * @see BaseApi#dataType(Data, Class[])
@@ -242,7 +246,7 @@ public abstract class Api {
 
         /**
          * DESC: 当data类型为List<Map<String,String>>时，使用该枚举
-         *
+         * <p>
          * 函数调用：dataType(Api.Data.MAP_LIST)
          *
          * @see ApiInterface#dataType(Data, Class[])

@@ -77,10 +77,11 @@
             android:name=".modules.modify_friend_info.ModifyFriendInfoActivity"
             android:theme="@style/ModifyUserActivityTheme">
         </activity>
-
-        <activity android:name=".modules.group.create_group.CreateGroupActivity"
-                  android:theme="@style/ModifyUserActivityTheme">
+        <activity
+            android:name=".modules.group.create_group.CreateGroupActivity"
+            android:theme="@style/ModifyUserActivityTheme">
         </activity>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.example.jinphy.simplechat.fileprovider"
@@ -108,6 +109,8 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".modules.group.group_list.GroupListActivity">
+        </activity>
     </application>
 
 </manifest>
