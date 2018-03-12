@@ -259,6 +259,11 @@ public class MainPresenter implements MainContract.Presenter {
                     .doOnDataOk(membersData -> {
                         List<Member> members = Member.parse(membersData.getData());
                         memberRepository.save(members);
+                        for (Group group : groups) {
+                            List<Member> temp = memberRepository.get(group.getGroupNo(), group.getOwner());
+                            group.setMembers(temp);
+                            groupRepository.update(group);
+                        }
                         EventBus.getDefault().post(new EBUpdateView());
                     })
                     .submit(task -> memberRepository.loadOnline(context, task));

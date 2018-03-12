@@ -101,6 +101,25 @@ public class Message implements Comparable<Message>{
     public static final String TYPE_SYSTEM_NEW_GROUP = "system_new_group";
 
     /**
+     * DESC: 系统消息，重新加载群聊
+     * Created by jinphy, on 2018/3/12, at 18:56
+     */
+    public static final String TYPE_SYSTEM_RELOAD_GROUP = "system_reload_group";
+
+    /**
+     * DESC: 系统消息，加载新成员
+     * Created by jinphy, on 2018/3/12, at 21:36
+     */
+    public static final String TYPE_SYSTEM_NEW_MEMBER = "system_new_member";
+
+    /**
+     * DESC: 系统消息，有账号申请加入群聊
+     * Created by jinphy, on 2018/3/12, at 21:37
+     */
+    public static final String TYPE_SYSTEM_APPLY_JOIN_GROUP = "system_apply_join_group";
+
+
+    /**
      * DESC: 系统消息，公告
      * Created by jinphy, on 2018/3/2, at 12:54
      */
@@ -253,6 +272,7 @@ public class Message implements Comparable<Message>{
                 case Message.TYPE_SYSTEM_RELOAD_FRIEND:
                 case Message.TYPE_SYSTEM_DELETE_FRIEND:
                 case Message.TYPE_SYSTEM_NEW_GROUP:
+                case Message.TYPE_SYSTEM_NEW_MEMBER:
                     return false;
             }
         }

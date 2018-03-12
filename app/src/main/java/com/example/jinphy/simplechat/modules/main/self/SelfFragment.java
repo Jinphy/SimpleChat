@@ -204,7 +204,6 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     int baseTransY;
     float oldY;
 
-    boolean isHeadViewMoveUp = false;
     boolean hasActionMove = false;
 
     private int moveOrientation;
@@ -241,22 +240,22 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
                         if (factor > 1.0f / 4) {
                             // 收起
                             animateVertical(factor, 1);
-                            isHeadViewMoveUp = true;
+                            presenter.setNeedMoveUp(true);
                         } else {
                             // 展开
                             animateVertical(factor, 0);
-                            isHeadViewMoveUp = false;
+                            presenter.setNeedMoveUp(false);
                         }
                     } else {
                         //向下滑动
                         if (factor < 3.0f / 4) {
                             // 展开
                             animateVertical(factor, 0);
-                            isHeadViewMoveUp = false;
+                            presenter.setNeedMoveUp(false);
                         } else {
                             // 收起
                             animateVertical(factor, 1);
-                            isHeadViewMoveUp = true;
+                            presenter.setNeedMoveUp(true);
                         }
                     }
                 }
@@ -309,7 +308,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         return true;
     }
 
-    // 手指移动过程中的动画转换
+    /**
+     * DESC: 手指移动过程中的动画转换
+     * Created by jinphy, on 2018/3/12, at 9:08
+     */
     @Override
     public void moveVertical(float faction) {
         Observable.just("check null")
@@ -389,7 +391,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
             case 1:
                 break;
             case 2:
-                if (isHeadViewMoveUp) {
+                if (presenter.needMoveUp()) {
                     moveVertical(1);
                     ViewUtils.setAlpha(offset,avatarView,nameText);
                 } else {

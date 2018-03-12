@@ -60,6 +60,7 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
             Group old = get(group.groupNo, group.owner);
             if (old != null) {
                 group.setId(old.getId());
+                group.setMembers(old.getMembers());
             } else {
                 group.setId(0);
             }
@@ -67,12 +68,18 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
         groupBox.put(groups);
     }
 
-
     public void saveMyGroup(List<Group> groups) {
         if (groups == null || groups.size() == 0) {
             return;
         }
         saveMyGroup(groups.toArray(new Group[groups.size()]));
+    }
+
+    @Override
+    public void update(Group group) {
+        if (group != null) {
+            groupBox.put(group);
+        }
     }
 
     @Override
@@ -198,28 +205,32 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
     @Override
     public void createGroup(Context context, Task<Map<String, String>> task) {
         Api.<Map<String, String>>common(context)
+                .setup(api -> this.handleBuilder(api, task))
                 .hint("正在创建...")
                 .path(Api.Path.createGroup)
                 .dataType(Api.Data.MAP)
-                .setup(api -> this.handleBuilder(api, task))
                 .request();
     }
 
-
     @Override
-    protected <T> void handleBuilder(ApiInterface<Response<T>> api, Task<T> task) {
-        api.showProgress(task.isShowProgress())
-                .useCache(task.isUseCache())
-                .autoShowNo(task.isAutoShowNo())
-                .showProgress(task.isShowProgress())
-                .params(task.getParams())
-                .onResponseYes(task.getOnDataOk() == null ? null : response -> task.getOnDataOk()
-                        .call(response))
-                .onResponseNo(task.getOnDataNo() == null ? null : response -> task.getOnDataNo()
-                        .call(TYPE_CODE))
-                .onError(task.getOnDataNo() == null ? null : e -> task.getOnDataNo().call
-                        (TYPE_ERROR))
-                .onFinal(task.getOnFinal() == null ? null : task.getOnFinal()::call);
+    public void modifyGroup(Context context, Task<String> task) {
+        Api.<String>common(context)
+                .setup(api -> this.handleBuilder(api, task))
+                .hint("正在修改...")
+                .path(Api.Path.modifyGroup)
+                .dataType(Api.Data.MAP)
+                .request();
+
     }
 
+    @Override
+    public void joinGroup(Context context, Task<String> task) {
+        Api.<String>common(context)
+                .setup(api -> this.handleBuilder(api, task))
+                .hint("正在修改...")
+                .path(Api.Path.joinGroup)
+                .dataType(Api.Data.MAP)
+                .request();
+
+    }
 }

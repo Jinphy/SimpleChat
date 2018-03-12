@@ -118,6 +118,21 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
     }
 
     /**
+     * DESC: 该方法用来更新当前用户的一些普通属性
+     * Created by jinphy, on 2018/3/12, at 8:59
+     */
+    @Override
+    public void updateUser(User user) {
+        if (user == null || user.getId() == 0) {
+            return;
+        }
+        User exist = userBox.get(user.id);
+        if (exist != null) {
+            userBox.put(user);
+        }
+    }
+
+    /**
      * DESC: 更新当前账号信息
      * Created by jinphy, on 2018/1/7, at 11:07
      */

@@ -50,6 +50,7 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
     private MenuItemView sexItem;
     private MenuItemView addressItem;
 
+    private View bottomView;
     private View btnAgree;
     private View btnRefuse;
     private View btnDelete;
@@ -100,6 +101,7 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
         sexItem = view.findViewById(R.id.item_sex);
         addressItem = view.findViewById(R.id.item_address);
 
+        bottomView = view.findViewById(R.id.bottom_layout);
         btnAgree = view.findViewById(R.id.btn_agree);
         btnRefuse = view.findViewById(R.id.btn_refuse);
         btnDelete = view.findViewById(R.id.btn_delete);
@@ -267,6 +269,9 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
         super.onKeyboardEvent(open);
         if (!open) {
             MenuItemView.removeCurrent();
+            bottomView.setVisibility(View.VISIBLE);
+        } else {
+            bottomView.setVisibility(View.GONE);
         }
     }
 

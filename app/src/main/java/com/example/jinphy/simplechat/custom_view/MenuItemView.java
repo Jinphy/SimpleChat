@@ -45,9 +45,12 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
     private TextView contentTextView;
     private EditText contentEditText;
     private ImageView arrowView;
+    private Runnable onGetFocus;
+    private Runnable onReleaseFocus;
+
+
 
     private static WeakReference<MenuItemView> currentFocus;
-
 
     /**
      * DESC: 移除当前的焦点
@@ -58,6 +61,7 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
             currentFocus.get().removeFocus();
         }
     }
+
 
 
     public MenuItemView(Context context) {
@@ -259,7 +263,7 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
             // 当前没有任何MenuItemView获取焦点，则当前MenuItemView直接获取焦点
             this.getFocus();
         }
-        if (onClickListener != null) {
+        if (showArrow && onClickListener != null) {
             onClickListener.call(this, hasFocus);
         }
     }
@@ -280,6 +284,20 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
             }
             Keyboard.open(getContext(), contentEditText);
         }
+        if (showRightLayout && showArrow && this.onGetFocus != null) {
+            this.onGetFocus.run();
+
+        }
+    }
+
+
+    /**
+     * DESC: 设置在获取焦点时的回调
+     * Created by jinphy, on 2018/3/12, at 15:03
+     */
+    public MenuItemView onGetFocus(Runnable onGetFocus) {
+        this.onGetFocus = onGetFocus;
+        return this;
     }
 
     /**
@@ -294,7 +312,21 @@ public class MenuItemView extends CardView  implements View.OnClickListener{
             this.contentTextView.setVisibility(VISIBLE);
             Keyboard.close(getContext(), contentEditText);
         }
+        if (showRightLayout && showArrow && this.onReleaseFocus != null) {
+            this.onReleaseFocus.run();
+        }
     }
+
+
+    /**
+     * DESC: 设置在释放焦点时的回调
+     * Created by jinphy, on 2018/3/12, at 15:04
+     */
+    public MenuItemView onReleaseFocus(Runnable onReleaseFocus) {
+        this.onReleaseFocus = onReleaseFocus;
+        return this;
+    }
+
 
     private void animateElevation(int fromElevation, int toElevation) {
         if (!autoAnimate) {

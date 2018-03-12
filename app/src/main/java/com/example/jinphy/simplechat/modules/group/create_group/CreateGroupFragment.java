@@ -266,7 +266,7 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
         new MaterialDialog.Builder(activity())
                 .title("选择成员添加是否验证")
                 .titleColor(colorPrimary())
-                .iconRes(R.drawable.ic_flower_24dp)
+                .iconRes(R.drawable.ic_add_circle_24dp)
                 .items(getString(R.string.yes), getString(R.string.no))
                 .itemsCallbackSingleChoice(-1, (dialog, view, which, text) -> {
                     if (!TextUtils.isEmpty(text)) {

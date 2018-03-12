@@ -12,8 +12,14 @@ import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.custom_view.MenuItemView;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.group.Group;
+import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
 import com.example.jinphy.simplechat.modules.main.msg.MsgRecyclerViewAdapter;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * DESC: 群列表
@@ -83,7 +89,6 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
     @Override
     protected void registerEvent() {
         adapter.onClick((view, item, type, position) -> {
-            App.showToast("click", false);
             Group group = (Group) item;
             switch (view.getId()) {
                 case R.id.qr_code_view:// qRCodeView
@@ -91,7 +96,7 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
                     // TODO: 2018/3/11 展示二维码
                     break;
                 default:// itemView
-
+                    ModifyGroupActivity.start(activity(), group.getGroupNo());
                     break;
 
             }
@@ -125,6 +130,11 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
     public boolean onBackPressed() {
         finishActivity();
         return false;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateView(EBUpdateView msg) {
+        adapter.update(presenter.loadGroups(showSearchResult));
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.models.message;
 
 import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.models.event_bus.EBInteger;
 import com.example.jinphy.simplechat.models.event_bus.EBService;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
@@ -29,6 +30,11 @@ public class MessageRepository implements MessageDataSource {
 
     private Box<Message> messageBox;
 
+    FriendRepository friendRepository;
+    GroupRepository groupRepository;
+    MessageRecordRepository mrRepository;
+    MemberRepository memberRepository;
+
 
     private static class InstanceHolder{
         static final MessageRepository DEFAULT = new MessageRepository();
@@ -40,6 +46,10 @@ public class MessageRepository implements MessageDataSource {
 
     private MessageRepository() {
         messageBox = App.boxStore().boxFor(Message.class);
+        friendRepository = FriendRepository.getInstance();
+        groupRepository = GroupRepository.getInstance();
+        mrRepository = MessageRecordRepository.getInstance();
+        memberRepository = MemberRepository.getInstance();
     }
 
     /**
@@ -56,45 +66,41 @@ public class MessageRepository implements MessageDataSource {
             }
             String owner;
             String account;
+            String groupNo;
             // 如果是添加新好友的消息，则先预加载该好友的信息
             switch (message.getContentType()) {
                 case Message.TYPE_SYSTEM_ADD_FRIEND:
                 case Message.TYPE_SYSTEM_ADD_FRIEND_AGREE:
                 case Message.TYPE_SYSTEM_RELOAD_FRIEND:
-                    owner = message.getOwner();
-                    account = message.getExtra();//好友的账号保存在该字段中
-                    FriendRepository.getInstance().getOnline(
+                    friendRepository.getOnline(
                             null,
-                            owner,
-                            account,
+                            message.getOwner(),
+                            message.getExtra(),//好友的账号保存在该字段中
                             () -> EventBus.getDefault().post(new EBService()));
-
                     break;
                 case Message.TYPE_SYSTEM_DELETE_FRIEND:
-                    owner = message.getOwner();
                     account = message.getExtra();//好友的账号保存在该字段中
-                    Friend friend = FriendRepository.getInstance().get(owner, account);
+                    Friend friend = FriendRepository.getInstance().get(message.getOwner(), account);
                     friend.setStatus(Friend.status_deleted);
-                    FriendRepository.getInstance().update(friend);
+                    friendRepository.update(friend);
                     break;
                 case Message.TYPE_SYSTEM_NEW_GROUP:
                     String msgContent = message.getContent();
                     // split[0] :groupNo, split[1]:群成员的账号
                     String[] split = message.getExtra().split("@");
-                    String groupNo = split[0];
+                    groupNo = split[0];
                     String[] members = GsonUtils.toBean(split[1], String[].class);
 
                     // 从服务器获取群聊对象
-                    GroupRepository.getInstance().getOnline(
+                    groupRepository.getOnline(
                             null,
                             message.getOwner(),
                             groupNo,
                             ()->{
-                                Group group = GroupRepository.getInstance().get(groupNo, message.getOwner());
                                 // 群聊信息获取成功后，加载群聊中的成员
+                                Group group = groupRepository.get(groupNo, message.getOwner());
 
                                 // 加载所有成员的好友信息
-                                FriendRepository friendRepository = FriendRepository.getInstance();
                                 for (String member : members) {
                                     friendRepository.getOnline(
                                             null,
@@ -108,9 +114,9 @@ public class MessageRepository implements MessageDataSource {
                                                 newMember.setGroupNo(groupNo);
                                                 newMember.setAllowChat(true);
                                                 newMember.setId(0);
-                                                MemberRepository mr = MemberRepository.getInstance();
-                                                mr.save(newMember);
-                                                group.addMembers(newMember);
+                                                memberRepository.save(newMember);
+                                                group.addMember(newMember);
+                                                groupRepository.update(group);
                                                 EventBus.getDefault().post(new EBService());
                                             });
                                 }
@@ -124,19 +130,47 @@ public class MessageRepository implements MessageDataSource {
                                 newMsg.setWith(groupNo);
                                 newMsg.setOwner(message.getOwner());
                                 newMsg.setExtra(group.getCreator());// 群消息时，该字段表示信息发送者
+                                this.saveSend(newMsg);
 
-                                MessageRepository.getInstance().saveSend(newMsg);
                                 MessageRecord record = new MessageRecord();
                                 record.setNewMsgCount(1);
                                 record.setLastMsg(newMsg);
                                 record.setWith(group);
                                 record.setOwner(message.getOwner());
-                                MessageRecordRepository.getInstance().saveOrUpdate(record);
+                                mrRepository.saveOrUpdate(record);
                                 EventBus.getDefault().post(new EBService());
                             }
                     );
                     break;
-
+                case Message.TYPE_SYSTEM_RELOAD_GROUP:
+                    groupRepository.getOnline(
+                            null,
+                            message.getOwner(),
+                            message.getExtra(),//需要重新加载的群聊的群号在extra字段中
+                            ()-> EventBus.getDefault().post(new EBService()));
+                    break;
+                case Message.TYPE_SYSTEM_NEW_MEMBER:
+                    groupNo = message.getContent();
+                    account = message.getExtra();
+                    friendRepository.getOnline(
+                            null,
+                            message.getOwner(),
+                            account,
+                            ()->{
+                                Member newMember = new Member();
+                                newMember.setStatus(Member.STATUS_OK);
+                                newMember.setPerson(friendRepository.get(message.getOwner(), account));
+                                newMember.setOwner(message.getOwner());
+                                newMember.setGroupNo(groupNo);
+                                newMember.setAllowChat(true);
+                                newMember.setId(0);
+                                memberRepository.save(newMember);
+                                Group group = groupRepository.get(groupNo, message.getOwner());
+                                group.addMember(newMember);
+                                groupRepository.update(group);
+                                EventBus.getDefault().post(new EBService());
+                            });
+                    break;
                 default:
                     break;
             }

@@ -122,6 +122,10 @@ public abstract class Api {
         String getGroups = "/group/getGroups";
         @Post
         String getMembers = "/member/getMembers";
+        @Post
+        String modifyGroup = "/group/modifyGroup";
+        @Post
+        String joinGroup = "/group/joinGroup";
     }
 
     //===================参数key==========================================================
@@ -158,6 +162,9 @@ public abstract class Api {
         String creator = "creator";
         String text = "text";
         String groupNos = "groupNos";
+        String showMemberName = "showMemberName";
+        String keepSilent = "keepSilent";
+        String rejectMsg = "rejectMsg";
     }
 
 

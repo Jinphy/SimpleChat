@@ -23,6 +23,10 @@ public class Group{
 
     public static final int DEFAULT_MAX_COUNT = 500;
 
+    public static final String STATUS_WAITING = "waiting";
+    public static final String STATUS_OK = "ok";
+    public static final String STATUS_NO = "no";
+
     @Id
     protected long id;
 
@@ -143,10 +147,18 @@ public class Group{
     }
 
     public void addMembers(Member... members) {
-        if (members.length == 0) {
-            return;
+        if (members.length > 0) {
+            for (Member member : members) {
+                addMember(member);
+            }
+
         }
-        this.members.addAll(Arrays.asList(members));
+    }
+
+    public void addMember(Member member) {
+        if (member != null) {
+            this.members.add(member);
+        }
     }
 
     public void addMembers(List<Member> members) {
@@ -311,4 +323,16 @@ public class Group{
     }
 
 
+    /**
+     * DESC: 判断是否是群主
+     * Created by jinphy, on 2018/3/12, at 10:22
+     */
+    public boolean isCreator() {
+        return StringUtils.equal(creator, owner);
+    }
+
+
+    public int getMemberCount() {
+        return members.size();
+    }
 }

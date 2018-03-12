@@ -27,6 +27,8 @@ public interface UserDataSource {
 
     void saveUser(User user);
 
+    void updateUser(User user);
+
     /**
      * DESC: 更新当前账号信息
      * Created by jinphy, on 2018/1/7, at 11:07

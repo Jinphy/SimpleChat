@@ -765,7 +765,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         }
         mainMenu = new PopupWindow(menuView,
                 ScreenUtils.dp2px(activity(), 150),
-                ScreenUtils.dp2px(activity(), 152));
+                ScreenUtils.dp2px(activity(), 200));
         mainMenu.setAnimationStyle(R.style.main_menu_animate);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mainMenu.setElevation(ScreenUtils.dp2px(activity(),6));

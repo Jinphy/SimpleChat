@@ -1,14 +1,11 @@
 package com.example.jinphy.simplechat.models.message_record;
 
 import com.example.jinphy.simplechat.application.App;
-import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message.MessageRepository;
-import com.example.jinphy.simplechat.utils.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 import io.objectbox.Box;
@@ -61,37 +58,15 @@ public class MessageRecordRepository implements MessageRecordDataSource {
 
     @Override
     public List<MessageRecord> load(String owner) {
-        List<MessageRecord> messageRecords = messageRecordBox.query()
-                .equal(MessageRecord_.owner,owner)
+        return messageRecordBox.query()
+                .filter(record -> {
+                    if (record.getWith() == null) {
+                        messageRecordBox.remove(record);
+                        return false;
+                    }
+                    return true;
+                })
                 .build().find();
-
-        for (MessageRecord record : messageRecords) {
-            if (record.getFriend() == null) {
-                messageRecordBox.remove(record);
-                messageRecords.remove(record);
-            } else if (record.getMessage() == null) {
-                MessageRepository messageRepository = MessageRepository.getInstance();
-                List<Message> messages = messageRepository.load(owner,record.getFriend().getAccount());
-                if (messages == null || messages.size() == 0) {
-                    messageRecordBox.remove(record);
-                    messageRecords.remove(record);
-                }
-                Message lastMessage = null;
-                int newMsgCount = 0;
-                for (Message message : messages) {
-                    if (message.isNew()) {
-                        newMsgCount++;
-                    }
-                    if (lastMessage == null || lastMessage.compareTo(message) < 0) {
-                        lastMessage = message;
-                    }
-                }
-                record.setLastMsg(lastMessage);
-                record.setNewMsgCount(newMsgCount);
-                messageRecordBox.put(record);
-            }
-        }
-        return messageRecords;
     }
 
     @Override

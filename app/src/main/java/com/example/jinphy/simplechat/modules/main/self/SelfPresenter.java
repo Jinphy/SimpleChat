@@ -53,4 +53,16 @@ public class SelfPresenter implements SelfContract.Presenter {
                 })
                 .submit(task -> userRepository.logout(context, task));
     }
+
+    @Override
+    public void setNeedMoveUp(boolean moveUp) {
+        User user = userRepository.currentUser();
+        user.setNeedMoveUp(moveUp);
+        userRepository.updateUser(user);
+    }
+
+    @Override
+    public boolean needMoveUp() {
+        return userRepository.currentUser().needMoveUp();
+    }
 }

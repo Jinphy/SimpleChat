@@ -39,6 +39,10 @@ public interface SelfContract {
         User getUser();
 
         void logout(Context context, String account, String accessToken);
+
+        void setNeedMoveUp(boolean moveUp);
+
+        boolean needMoveUp();
     }
 }
 

@@ -100,6 +100,12 @@ public class User implements Serializable{
      */
     public ToMany<Friend> friends;
 
+    /**
+     * DESC: 该字段标志在主页中的“我的”中是否需要把headView移到最顶端
+     * Created by jinphy, on 2018/3/12, at 8:53
+     */
+    private boolean needMoveUp = false;
+
     public User(){}
 
     public User(int id, String account, String password, long date, String avatar) {
@@ -220,5 +226,17 @@ public class User implements Serializable{
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public boolean isNeedMoveUp() {
+        return needMoveUp;
+    }
+
+    public boolean needMoveUp() {
+        return needMoveUp;
+    }
+
+    public void setNeedMoveUp(boolean needMoveUp) {
+        this.needMoveUp = needMoveUp;
     }
 }

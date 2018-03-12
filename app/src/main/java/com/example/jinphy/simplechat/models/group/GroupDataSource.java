@@ -25,6 +25,7 @@ public interface GroupDataSource {
 
     void getOnline(Context context, String owner, String groupNo, Runnable... whenOk);
 
+    void update(Group group);
 
     void saveMyGroup(Group... groups);
 
@@ -36,6 +37,9 @@ public interface GroupDataSource {
 
     void deleteSearch();
 
-
     Group get(String groupNo, String owner);
+
+    void modifyGroup(Context context, BaseRepository.Task<String> task);
+
+    void joinGroup(Context context, BaseRepository.Task<String> task);
 }

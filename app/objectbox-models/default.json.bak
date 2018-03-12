@@ -218,7 +218,7 @@
     },
     {
       "id": "7:516009074711836424",
-      "lastPropertyId": "13:2104686477368090533",
+      "lastPropertyId": "15:5736974471557719006",
       "name": "Group",
       "properties": [
         {
@@ -260,6 +260,14 @@
         {
           "id": "13:2104686477368090533",
           "name": "showMemberName"
+        },
+        {
+          "id": "14:4830869775450306448",
+          "name": "isFromSearch"
+        },
+        {
+          "id": "15:5736974471557719006",
+          "name": "isMyGroup"
         }
       ],
       "relations": [

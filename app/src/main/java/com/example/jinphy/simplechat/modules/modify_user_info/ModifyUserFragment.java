@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -434,14 +435,22 @@ public class ModifyUserFragment extends BaseFragment<ModifyUserPresenter> implem
                 .iconRes(R.drawable.ic_flower_24dp)
                 .items(getString(R.string.male), getString(R.string.female))
                 .itemsCallbackSingleChoice(-1, (dialog, view, which, text) -> {
-                    sexItem.content(text);
-                    return true;
+                    if (!TextUtils.isEmpty(text)) {
+                        sexItem.content(text);
+                        dialog.dismiss();
+                        return true;
+                    }
+                    App.showToast("请选择是否自动添加新成员！", false);
+                    return false;
                 })
                 .widgetColor(colorPrimary())
                 .positiveText("确定")
                 .negativeText("取消")
+                .autoDismiss(false)
+                .cancelable(false)
                 .positiveColor(colorPrimary())
                 .negativeColorRes(R.color.color_red_D50000)
+                .onNegative((dialog, which) -> dialog.dismiss())
                 .dismissListener(dialog -> MenuItemView.removeCurrent())
                 .show();
     }
