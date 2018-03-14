@@ -55,7 +55,7 @@ public class PushService extends Service {
 
     private static final String TAG = "PushService";
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public synchronized int onStartCommand(Intent intent, int flags, int startId) {
         // 当第一次启动时，初始化
         if (intent != null) {
             switch (intent.getStringExtra(FLAG)) {

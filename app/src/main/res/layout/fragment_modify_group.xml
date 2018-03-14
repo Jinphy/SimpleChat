@@ -109,17 +109,32 @@
             <!--date-->
             <com.example.jinphy.simplechat.custom_view.MenuItemView
                 android:id="@+id/item_auto_add"
-                app:title="入群方式"
-                app:show_input="false"
-                app:show_arrow="false"
-                app:auto_animate="false"
-                app:icon_drawable="@drawable/ic_add_circle_24dp"
-                app:icon_color="@color/green_primary"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="@dimen/dimen_10dp"
                 android:layout_marginLeft="@dimen/dimen_10dp"
                 android:layout_marginRight="@dimen/dimen_10dp"
-                android:layout_marginBottom="@dimen/dimen_10dp"
+                app:auto_animate="false"
+                app:icon_color="@color/green_primary"
+                app:icon_drawable="@drawable/ic_add_circle_24dp"
+                app:show_arrow="false"
+                app:show_input="false"
+                app:title="入群方式"/>
+
+            <com.example.jinphy.simplechat.custom_view.MenuItemView
+                android:id="@+id/item_extra_msg"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"/>
+                android:layout_height="60dp"
+                android:layout_marginBottom="@dimen/dimen_10dp"
+                android:layout_marginLeft="@dimen/dimen_10dp"
+                android:layout_marginRight="@dimen/dimen_10dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:icon_color="@color/green_primary"
+                app:icon_drawable="@drawable/ic_remark_24dp"
+                app:content_hint="请输入验证信息"
+                app:title="验证信息"/>
+
 
             <!--sex-->
             <com.example.jinphy.simplechat.custom_view.MenuItemView
@@ -257,6 +272,28 @@
                 android:background="@drawable/btn_alpha"
                 android:clickable="true"
                 android:textColor="@color/green_primary"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/btn_delete_local"
+            app:cardCornerRadius="@dimen/dimen_5dp"
+            app:cardElevation="@dimen/dimen_1dp"
+            tools:visibility="visible"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/white"
+            app:cardUseCompatPadding="true"
+            android:layout_width="@dimen/dimen_100dp"
+            android:layout_height="@dimen/dimen_50dp">
+
+            <TextView
+                android:id="@+id/delete_local"
+                android:text="删除"
+                android:gravity="center"
+                android:background="@drawable/btn_alpha"
+                android:clickable="true"
+                android:textColor="@color/color_red_D50000"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </android.support.v7.widget.CardView>

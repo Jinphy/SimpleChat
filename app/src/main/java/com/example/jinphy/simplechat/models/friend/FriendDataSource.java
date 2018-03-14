@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.models.friend;
 import android.content.Context;
 
 import com.example.jinphy.simplechat.base.BaseRepository;
+import com.example.jinphy.simplechat.custom_libs.SChain;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public interface FriendDataSource {
 
     void loadOnline(Context context, BaseRepository.Task<List<Map<String,String>>> task);
 
-    void getOnline(Context context, String owner, String account,Runnable...whenOk);
+    void getOnline(Context context, String owner, String account,SChain.Consumer<Friend>...whenOk);
 
     Friend get(String owner, String account);
 
@@ -43,4 +44,6 @@ public interface FriendDataSource {
 
     void addSystemFriendLocal(String owner);
 
+
+    void subGroupCount(Friend friend);
 }

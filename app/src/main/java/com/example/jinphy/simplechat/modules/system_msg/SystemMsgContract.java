@@ -18,5 +18,16 @@ public interface SystemMsgContract {
 
     interface Presenter extends BasePresenter{
 
+        int countFriends();
+
+        int countNewFriends();
+
+        int countMembers();
+
+        int countNewMembers();
+
+        int countNotices();
+
+        int countNewNotices();
     }
 }

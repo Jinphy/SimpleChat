@@ -11,12 +11,9 @@ import android.widget.TextView;
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.models.event_bus.EBFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,25 +24,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/10.
  */
 
-public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsRecyclerViewAdapter.ViewHolder> {
+public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<Friend, FriendsRecyclerViewAdapter.ViewHolder> {
 
-    private List<Friend> friends;
-
-    public FriendsRecyclerViewAdapter() {
-        this.friends = new ArrayList<>();
-    }
 
     @Override
-    public FriendsRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.main_tab_friends_item, parent, false);
-
-        return new FriendsRecyclerViewAdapter.ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Friend friend = friends.get(position);
+    public void onBindViewHolder(ViewHolder holder, Friend friend, int position) {
         holder.remark.setText(friend.getRemark());
         holder.account.setText(friend.getAccount());
         holder.address.setText(friend.getAddress());
@@ -61,27 +44,22 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
             holder.avatar.setImageBitmap(bitmap);
         }
 
-        if (click != null) {
-            holder.itemView.setOnClickListener(view -> click.onClick(view,friend,0,position));
-        }
-        if (longClick != null) {
-            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,friend,0,position));
-        }
+        setClick(friend, position, 0, holder.itemView);
+
+        setLongClick(friend, position, 0, holder.itemView);
+
+
+
     }
 
     @Override
-    public int getItemCount() {
-        return friends.size();
+    protected int getResourceId() {
+        return R.layout.main_tab_friends_item;
     }
 
-
-    public void update(List<Friend> friends) {
-        this.friends.clear();
-        if (friends == null) {
-            return;
-        }
-        this.friends.addAll(friends);
-        notifyDataSetChanged();
+    @Override
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return new ViewHolder(itemView);
     }
 
     //===============================================================\\
@@ -106,21 +84,21 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<FriendsR
     }
 
     public void updateFriend(Friend friend) {
-        for (int i = 0; i < friends.size(); i++) {
+        for (int i = 0; i < data.size(); i++) {
             LogUtils.e(friend.getAccount());
-            LogUtils.e(friends.get(i).getAccount());
-            if (StringUtils.equal(friend.getAccount(), friends.get(i).getAccount())) {
-                friends.set(i, friend);
+            LogUtils.e(data.get(i).getAccount());
+            if (StringUtils.equal(friend.getAccount(), data.get(i).getAccount())) {
+                data.set(i, friend);
                 notifyDataSetChanged();
                 return;
             }
         }
-        friends.add(friend);
+        data.add(friend);
         notifyDataSetChanged();
     }
 
     public void clear() {
-        friends.clear();
+        data.clear();
         notifyDataSetChanged();
     }
 }

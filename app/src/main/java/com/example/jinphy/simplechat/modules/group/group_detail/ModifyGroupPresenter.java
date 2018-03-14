@@ -6,12 +6,22 @@ import android.text.TextUtils;
 
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.group.GroupRepository;
+import com.example.jinphy.simplechat.models.member.Member;
+import com.example.jinphy.simplechat.models.member.MemberRepository;
+import com.example.jinphy.simplechat.models.message.MessageRepository;
+import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
+
+import org.greenrobot.eventbus.EventBus;
+
+import java.time.temporal.ValueRange;
+import java.util.List;
 
 /**
  * DESC:
@@ -24,11 +34,17 @@ public class ModifyGroupPresenter implements ModifyGroupContract.Presenter {
 
     private GroupRepository groupRepository;
     private UserRepository userRepository;
+    private MemberRepository memberRepository;
+    private MessageRecordRepository recordRepository;
+    private MessageRepository messageRepository;
 
     public ModifyGroupPresenter(ModifyGroupContract.View view) {
         this.view = view;
         groupRepository = GroupRepository.getInstance();
         userRepository = UserRepository.getInstance();
+        memberRepository = MemberRepository.getInstance();
+        recordRepository = MessageRecordRepository.getInstance();
+        messageRepository = MessageRepository.getInstance();
     }
 
 
@@ -41,6 +57,11 @@ public class ModifyGroupPresenter implements ModifyGroupContract.Presenter {
     public Group getGroup(String groupNo) {
         User user = userRepository.currentUser();
         return groupRepository.get(groupNo, user.getAccount());
+    }
+
+    @Override
+    public int countMembers(Group group) {
+        return (int) memberRepository.count(group.getGroupNo(), group.getOwner());
     }
 
     @Override
@@ -144,16 +165,61 @@ public class ModifyGroupPresenter implements ModifyGroupContract.Presenter {
     }
 
     @Override
-    public void joinGroup(Context context, Group group) {
+    public void joinGroup(Context context, Group group,String extraMsg) {
         User user = userRepository.currentUser();
         groupRepository.<String>newTask()
                 .param(Api.Key.groupNo, group.getGroupNo())
-                .param(Api.Key.creator, group.getOwner())
-                .param(Api.Key.account,user.getAccount())
+                .param(Api.Key.creator, group.getCreator())
+                .param(Api.Key.account, user.getAccount())
+                .param(Api.Key.extraMsg, extraMsg)
                 .doOnDataOk(okData -> {
                     App.showToast(okData.getMsg(), false);
                 })
                 .submit(task -> groupRepository.joinGroup(context, task));
 
+    }
+
+    @Override
+    public void breakGroup(Context context, Group group) {
+        groupRepository.<String>newTask()
+                .param(Api.Key.groupNo, group.getGroupNo())
+                .param(Api.Key.operator, group.getOwner())
+                .doOnDataOk(okData -> {
+                    groupRepository.remove(group);
+                    memberRepository.removeForGroup(group);
+                    recordRepository.delete(group.getOwner(), group);
+                    messageRepository.delete(group.getOwner(), group.getGroupNo());
+                    EventBus.getDefault().post(new EBUpdateView("FromModifyGroupFragment"));
+                    view.whenBreakGroupOk();
+                })
+                .submit(task -> groupRepository.exitGroup(context, task));
+    }
+
+    @Override
+    public void exitGroup(Context context, Group group) {
+        groupRepository.<String>newTask()
+                .param(Api.Key.groupNo, group.getGroupNo())
+                .param(Api.Key.operator, group.getOwner())
+                .param(Api.Key.account, group.getOwner())
+                .doOnDataOk(okData -> {
+                    groupRepository.remove(group);
+                    memberRepository.removeForGroup(group);
+                    recordRepository.delete(group.getOwner(), group);
+                    messageRepository.delete(group.getOwner(), group.getGroupNo());
+                    EventBus.getDefault().post(new EBUpdateView("FromModifyGroupFragment"));
+                    view.whenExitGroupOk();
+                })
+                .submit(task -> groupRepository.exitGroup(context, task));
+
+    }
+
+    @Override
+    public void deleteGroupLocal(Group group) {
+        groupRepository.remove(group);
+        memberRepository.removeForGroup(group);
+        recordRepository.delete(group.getOwner(), group);
+        messageRepository.delete(group.getOwner(), group.getGroupNo());
+        EventBus.getDefault().post(new EBUpdateView("FromModifyGroupFragment"));
+        view.whenDeleteGroupLocalOk();
     }
 }

@@ -60,12 +60,11 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
             Group old = get(group.groupNo, group.owner);
             if (old != null) {
                 group.setId(old.getId());
-                group.setMembers(old.getMembers());
             } else {
                 group.setId(0);
             }
+            groupBox.put(group);
         }
-        groupBox.put(groups);
     }
 
     public void saveMyGroup(List<Group> groups) {
@@ -153,6 +152,11 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
         }
     }
 
+
+    public void remove(Group group) {
+        groupBox.remove(group);
+    }
+
     @Override
     public void getOnline(Context context, String owner, String groupNo, Runnable... whenOk) {
         EBBase flag = new EBBase<String>(false, null);
@@ -162,6 +166,7 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
                 .param(Api.Key.groupNo, groupNo)
                 .cancellable(false)
                 .showProgress(false)
+                .autoShowNo(false)
                 .dataType(Api.Data.MAP)
                 .onResponseYes(response -> {
                     Group group = Group.parse(response.getData());
@@ -182,6 +187,7 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
                 .param(Api.Key.account, groupNo)
                 .cancellable(false)
                 .showProgress(false)
+                .autoShowNo(false)
                 .dataType(Api.Data.MAP)
                 .onResponseYes(response -> {
                     Map<String, String> data = response.getData();
@@ -227,8 +233,29 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
     public void joinGroup(Context context, Task<String> task) {
         Api.<String>common(context)
                 .setup(api -> this.handleBuilder(api, task))
-                .hint("正在修改...")
+                .hint("正在申请加入...")
                 .path(Api.Path.joinGroup)
+                .dataType(Api.Data.MAP)
+                .request();
+
+    }
+
+    @Override
+    public void agreeJoinGroup(Context context, Task<String> task) {
+        Api.<String>common(context)
+                .setup(api -> this.handleBuilder(api, task))
+                .hint("正在同意加入...")
+                .path(Api.Path.agreeJoinGroup)
+                .dataType(Api.Data.MAP)
+                .request();
+    }
+
+    @Override
+    public void exitGroup(Context context, Task<String> task) {
+        Api.<String>common(context)
+                .setup(api -> this.handleBuilder(api, task))
+                .hint("正在操作...")
+                .path(Api.Path.exitGroup)
                 .dataType(Api.Data.MAP)
                 .request();
 

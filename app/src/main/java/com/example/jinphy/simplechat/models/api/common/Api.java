@@ -14,7 +14,7 @@ import com.example.jinphy.simplechat.annotations.Post;
 public abstract class Api {
 
     // 宿舍WiFi
-    //            public static String BASE_URL = "ws://192.168.0.2";
+//                public static String BASE_URL = "ws://192.168.0.4";
     //    成和WiFi
     //    public static String BASE_URL = "ws://192.168.3.21";
     //    我的手机WiFi
@@ -126,6 +126,10 @@ public abstract class Api {
         String modifyGroup = "/group/modifyGroup";
         @Post
         String joinGroup = "/group/joinGroup";
+        @Post
+        String agreeJoinGroup = "/group/agreeJoinGroup";
+        @Post
+        String exitGroup = "/group/exitGroup";
     }
 
     //===================参数key==========================================================
@@ -165,6 +169,8 @@ public abstract class Api {
         String showMemberName = "showMemberName";
         String keepSilent = "keepSilent";
         String rejectMsg = "rejectMsg";
+        String extraMsg = "extraMsg";
+        String operator = "operator";
     }
 
 

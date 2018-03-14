@@ -119,6 +119,10 @@ public class Message implements Comparable<Message>{
     public static final String TYPE_SYSTEM_APPLY_JOIN_GROUP = "system_apply_join_group";
 
 
+    public static final String TYPE_SYSTEM_BREAK_GROUP = "system_break_group";
+
+    public static final String TYPE_SYSTEM_DELETE_MEMBER = "system_delete_member";
+
     /**
      * DESC: 系统消息，公告
      * Created by jinphy, on 2018/3/2, at 12:54
@@ -273,6 +277,9 @@ public class Message implements Comparable<Message>{
                 case Message.TYPE_SYSTEM_DELETE_FRIEND:
                 case Message.TYPE_SYSTEM_NEW_GROUP:
                 case Message.TYPE_SYSTEM_NEW_MEMBER:
+                case Message.TYPE_SYSTEM_RELOAD_GROUP:
+                case Message.TYPE_SYSTEM_DELETE_MEMBER:
+                case Message.TYPE_SYSTEM_BREAK_GROUP:
                     return false;
             }
         }

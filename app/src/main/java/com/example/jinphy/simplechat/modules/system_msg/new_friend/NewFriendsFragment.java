@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.event_bus.EBInteger;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
@@ -27,6 +28,7 @@ import java.util.List;
 public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implements NewFriendsContract.View {
 
     private RecyclerView recyclerView;
+    private View emptyView;
     private NewFriendRecyclerViewAdapter adapter;
     private LinearLayoutManager linearLayoutManager;
 
@@ -56,6 +58,7 @@ public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implem
             presenter.updateMsg(msg);
             EventBus.getDefault().post(new EBUpdateView());
         }
+        EventBus.getDefault().post(new EBInteger(1));
     }
 
 
@@ -71,6 +74,7 @@ public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implem
     @Override
     protected void findViewsById(View view) {
         recyclerView = view.findViewById(R.id.recycler_view);
+        emptyView = view.findViewById(R.id.empty_view);
     }
 
     @Override
@@ -80,8 +84,17 @@ public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implem
         adapter = new NewFriendRecyclerViewAdapter();
         recyclerView.setAdapter(adapter);
         adapter.update(presenter.loadNewFriends());
-
+        setupEmptyView();
     }
+
+    private void setupEmptyView() {
+        if (adapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+    }
+
 
     @Override
     protected void registerEvent() {
@@ -138,6 +151,8 @@ public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implem
         if (i >= 0 && i < adapter.getItemCount()) {
             recyclerView.scrollToPosition(i);
         }
+
+        setupEmptyView();
     }
 
 }

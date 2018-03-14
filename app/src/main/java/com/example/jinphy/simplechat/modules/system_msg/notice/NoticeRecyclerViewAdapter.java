@@ -20,47 +20,36 @@ import java.util.List;
  * Created by jinphy on 2018/3/2.
  */
 
-public class NoticeRecyclerViewAdapter extends BaseRecyclerViewAdapter<NoticeRecyclerViewAdapter.ViewHolder> {
+public class NoticeRecyclerViewAdapter extends BaseRecyclerViewAdapter<Message, NoticeRecyclerViewAdapter.ViewHolder> {
 
-    List<Message> messages;
 
-    public NoticeRecyclerViewAdapter() {
-        this.messages = new LinkedList<>();
-    }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.layout_system_notice_item, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
-    }
+    public void onBindViewHolder(ViewHolder holder, Message item, int position) {
+        holder.title.setText(TextUtils.isEmpty(item.getExtra()) ? "无标题" : item.getExtra());
+        holder.content.setText(item.getContent());
+        holder.time.setText(StringUtils.formatDate(Long.valueOf(item.getCreateTime())));
 
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Message message = messages.get(position);
-        holder.title.setText(TextUtils.isEmpty(message.getExtra()) ? "无标题" : message.getExtra());
-        holder.content.setText(message.getContent());
-        holder.time.setText(StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
-
-        if (message.isNew()) {
+        if (item.isNew()) {
             holder.newMsgView.setVisibility(View.VISIBLE);
         } else {
             holder.newMsgView.setVisibility(View.GONE);
         }
 
 
-        if (click != null) {
-            holder.itemView.setOnClickListener(view -> click.onClick(view, message,0,position));
-        }
-        if (longClick != null) {
-            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view, message,0,position));
-        }
+        setClick(item, position, 0, holder.itemView);
+
+        setLongClick(item, position, 0, holder.itemView);
     }
 
     @Override
-    public int getItemCount() {
-        return messages.size();
+    protected int getResourceId() {
+        return R.layout.layout_system_notice_item;
+    }
+
+    @Override
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return new ViewHolder(itemView);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -78,15 +67,9 @@ public class NoticeRecyclerViewAdapter extends BaseRecyclerViewAdapter<NoticeRec
         }
     }
 
-    public void update(List<Message> messages) {
-        this.messages.clear();
-        this.messages.addAll(messages);
-        notifyDataSetChanged();
-    }
-
     public List<Message> getNewMsgAndSetOld() {
         List<Message> result = new LinkedList<>();
-        for (Message message : messages) {
+        for (Message message : data) {
             if (message.isNew()) {
                 message.setNew(false);
                 result.add(message);

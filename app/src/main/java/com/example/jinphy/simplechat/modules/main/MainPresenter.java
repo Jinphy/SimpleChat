@@ -47,6 +47,8 @@ public class MainPresenter implements MainContract.Presenter {
     private GroupRepository groupRepository;
     private MemberRepository memberRepository;
 
+    private int readTimeout = 60_000;// 一分钟
+
 
     public MainPresenter(Context context, MainContract.View view) {
         this.view = Preconditions.checkNotNull(view);
@@ -107,6 +109,12 @@ public class MainPresenter implements MainContract.Presenter {
                         if (whenDataOk != null) {
                             whenDataOk.run();
                         }
+                        String[] groupNos = new String[groups.size()];
+                        int i = 0;
+                        for (Group group : groups) {
+                            groupNos[i++] = group.getGroupNo();
+                        }
+                        loadAvatars(groupNos);
                     })
                     .doOnDataNo(reason -> {
                         if (BaseRepository.TYPE_CODE.equals(reason)) {
@@ -144,6 +152,7 @@ public class MainPresenter implements MainContract.Presenter {
         friendRepository.<List<Map<String, String>>>newTask()
                 .param(Api.Key.owner, owner)
                 .autoShowNo(false)
+                .readTimeout(readTimeout)
                 .doOnDataOk(friendsData -> {
                     LogUtils.e("加载好友成功！");
                     List<Friend> friends = Friend.parse(friendsData.getData());
@@ -171,6 +180,7 @@ public class MainPresenter implements MainContract.Presenter {
                     .param(Api.Key.account, account)
                     .showProgress(false)
                     .autoShowNo(false)
+                    .readTimeout(readTimeout)
                     .doOnDataOk(avatarData -> {
                         Map<String, String> data = avatarData.getData();
                         String avatar = data.get(User_.avatar.name);
@@ -231,6 +241,8 @@ public class MainPresenter implements MainContract.Presenter {
         }
         groupRepository.<List<Map<String, String>>>newTask()
                 .param(Api.Key.owner, owner)
+                .autoShowNo(false)
+                .readTimeout(readTimeout)
                 .doOnDataOk(groupsData -> {
                     LogUtils.e("加载群聊成功！");
                     List<Group> groups = Group.parse(groupsData.getData());
@@ -256,14 +268,11 @@ public class MainPresenter implements MainContract.Presenter {
             }
             memberRepository.<List<Map<String, String>>>newTask()
                     .param(Api.Key.groupNos, GsonUtils.toJson(groupNos))
+                    .autoShowNo(false)
+                    .readTimeout(readTimeout)
                     .doOnDataOk(membersData -> {
                         List<Member> members = Member.parse(membersData.getData());
                         memberRepository.save(members);
-                        for (Group group : groups) {
-                            List<Member> temp = memberRepository.get(group.getGroupNo(), group.getOwner());
-                            group.setMembers(temp);
-                            groupRepository.update(group);
-                        }
                         EventBus.getDefault().post(new EBUpdateView());
                     })
                     .submit(task -> memberRepository.loadOnline(context, task));

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseRepository;
+import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.api.common.ApiInterface;
 import com.example.jinphy.simplechat.models.api.common.Response;
@@ -103,22 +104,24 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
      * Created by jinphy, on 2018/3/4, at 12:52
      */
     @Override
-    public void getOnline(Context context, String owner, String account, Runnable... whenOk) {
-        EBBase flag = new EBBase<String>(false, null);
+    public void getOnline(Context context, String owner, String account, SChain.Consumer<Friend>... whenOk) {
+        EBBase<Friend> flag = new EBBase<>(false, null);
         Api.<Map<String, String>>common(context)
                 .path(Api.Path.getFriend)
                 .param(Api.Key.owner, owner)
                 .param(Api.Key.account, account)
                 .cancellable(false)
                 .showProgress(false)
+                .autoShowNo(false)
                 .dataType(Api.Data.MAP)
                 .onResponseYes(response -> {
                     Friend friend = Friend.parse(response.getData());
+                    flag.data = friend;
                     save(friend);
                     synchronized (flag) {
                         if (flag.ok) {
                             if (whenOk.length > 0) {
-                                whenOk[0].run();
+                                whenOk[0].accept(friend);
                             }
                         } else {
                             flag.ok = true;
@@ -131,6 +134,7 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                 .param(Api.Key.account, account)
                 .cancellable(false)
                 .showProgress(false)
+                .autoShowNo(false)
                 .dataType(Api.Data.MAP)
                 .onResponseYes(response -> {
                     Map<String, String> data = response.getData();
@@ -141,7 +145,7 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                     synchronized (flag) {
                         if (flag.ok) {
                             if (whenOk.length > 0) {
-                                whenOk[0].run();
+                                whenOk[0].accept(flag.data);
                             }
                         } else {
                             flag.ok = true;
@@ -265,10 +269,26 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
             return;
         }
         if (friend.groupCount > 0) {
+            friend.setStatus(Friend.status_deleted);
+            friendBox.put(friend);
             return;
         }
         List<Friend> friends = loadLocal(friend.getOwner(), friend.account);
         friendBox.remove(friends);
+    }
+
+    @Override
+    public void subGroupCount(Friend friend) {
+        if (friend == null) {
+            return;
+        }
+        int groupCount = friend.getGroupCount();
+        if (groupCount < 2 && StringUtils.equal(friend.status, Friend.status_deleted)) {
+            friendBox.remove(friend);
+        } else {
+            friend.setGroupCount(groupCount - 1);
+            friendBox.put(friend);
+        }
     }
 
     @Override

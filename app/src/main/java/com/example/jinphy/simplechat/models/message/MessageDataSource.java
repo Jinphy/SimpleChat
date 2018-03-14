@@ -15,7 +15,7 @@ public interface MessageDataSource {
      * DESC: 保存接收的信息
      * Created by jinphy, on 2018/1/18, at 9:01
      */
-    Message[] saveReceive(Message... messages);
+    void saveReceive(Message... messages);
 
     /**
      * DESC: 保存发送的信息

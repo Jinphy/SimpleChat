@@ -117,6 +117,8 @@
 
         <activity android:name=".modules.system_msg.new_member.NewMemberActivity">
         </activity>
+        <activity android:name=".modules.group.member_list.MemberListActivity">
+        </activity>
     </application>
 
 </manifest>

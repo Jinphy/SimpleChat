@@ -1,4 +1,4 @@
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,4 +12,6 @@
 
     </android.support.v7.widget.RecyclerView>
 
-</LinearLayout>
+    <include layout="@layout/layout_empty_view"/>
+
+</RelativeLayout>

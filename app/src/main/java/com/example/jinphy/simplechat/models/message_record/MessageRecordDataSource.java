@@ -29,4 +29,6 @@ public interface MessageRecordDataSource {
     void delete(String owner, Friend width);
 
     void delete(String owner, Group group);
+
+    void update(Message msg, boolean resetNewMsgCount);
 }

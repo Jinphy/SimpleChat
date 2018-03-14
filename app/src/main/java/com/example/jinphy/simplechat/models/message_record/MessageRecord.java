@@ -98,6 +98,9 @@ public class MessageRecord implements Comparable<MessageRecord>{
     }
 
     public void setGroup(Group group) {
+        if (group == null) {
+            return;
+        }
         this.withGroup.setTarget(group);
     }
 
@@ -114,10 +117,16 @@ public class MessageRecord implements Comparable<MessageRecord>{
     }
 
     public void setWith(Friend with) {
+        if (with == null) {
+            return;
+        }
         this.withFriend.setTarget(with);
     }
 
     public void setWith(Group with) {
+        if (with == null) {
+            return;
+        }
         this.withGroup.setTarget(with);
     }
 
@@ -143,8 +152,17 @@ public class MessageRecord implements Comparable<MessageRecord>{
     }
 
     public void setNewMsgCount(int newMsgCount) {
-        this.newMsgCount = newMsgCount;
+        if (newMsgCount < 0) {
+            this.newMsgCount = 0;
+        } else {
+            this.newMsgCount = newMsgCount;
+        }
     }
+
+    public void addNewMsgCount() {
+        setNewMsgCount(getNewMsgCount() + 1);
+    }
+
 
     public int getToTop() {
         return toTop;
@@ -222,6 +240,7 @@ public class MessageRecord implements Comparable<MessageRecord>{
         if (records == null || records.size() == 0) {
             return;
         }
+        LogUtils.e(records.size());
         MessageRecord[] temp = new MessageRecord[records.size()];
         records.toArray(temp);
         Arrays.sort(temp);

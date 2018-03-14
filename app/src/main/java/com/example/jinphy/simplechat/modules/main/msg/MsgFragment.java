@@ -34,6 +34,7 @@ import org.greenrobot.eventbus.ThreadMode;
 public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContract.View{
 
     private RecyclerView recyclerView;
+    private View emptyView;
 
     private FloatingActionButton fab;
     private MsgRecyclerViewAdapter adapter;
@@ -117,7 +118,7 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     @Override
     protected void findViewsById(View view) {
         recyclerView = view.findViewById(R.id.recycler_view);
-
+        emptyView = view.findViewById(R.id.empty_view);
     }
 
     @Override
@@ -128,6 +129,15 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
         adapter = new MsgRecyclerViewAdapter();
         recyclerView.setAdapter(adapter);
         adapter.update(presenter.loadMsgRecords());
+        setupEmptyView();
+    }
+
+    private void setupEmptyView() {
+        if (adapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -158,6 +168,7 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
         if (i >= 0 && i < adapter.getItemCount()) {
             recyclerView.scrollToPosition(i);
         }
+        setupEmptyView();
     }
 
     public <T>void handleItemEvent(View view, T item,int type,int position) {

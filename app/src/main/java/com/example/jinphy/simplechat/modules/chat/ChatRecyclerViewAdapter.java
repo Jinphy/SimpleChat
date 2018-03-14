@@ -24,16 +24,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/13.
  */
 
-public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecyclerViewAdapter.ViewHolder> {
+public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<Message, ChatRecyclerViewAdapter.ViewHolder> {
 
-    private List<Message> messages;
 
     private Bitmap ownerAvatar;
     private Bitmap friendAvatar;
     private String withAccount;
 
     ChatRecyclerViewAdapter(String ownerAvatar,String withAccount) {
-        this.messages = new LinkedList<>();
+        super();
         this.withAccount = withAccount;
         this.ownerAvatar = StringUtils.base64ToBitmap(ownerAvatar);
         if (!withAccount.contains("G")) {
@@ -61,32 +60,38 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
         return new ViewHolder(itemView,viewType);
     }
 
-
+    @Override
+    protected int getResourceId() {
+        return 0;
+    }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Message message = messages.get(position);
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return null;
+    }
 
-        bindCommonView(holder,message,position);
+    @Override
+    public void onBindViewHolder(ViewHolder holder, Message item, int position) {
 
-        switch (message.getContentType()) {
+        bindCommonView(holder, item, position);
+        switch (item.getContentType()) {
             case Message.TYPE_CHAT_TEXT:
-                bindTextMsgView(holder,message);
+                bindTextMsgView(holder, item);
                 break;
             case Message.TYPE_CHAT_IMAGE:
-                bindPhotoMsgView(holder,message);
+                bindPhotoMsgView(holder, item);
                 break;
             case Message.TYPE_CHAT_VOICE:
-                bindVoiceMsgView(holder,message);
+                bindVoiceMsgView(holder, item);
                 break;
             case Message.TYPE_CHAT_VIDEO:
-                bindVideoMsgView(holder,message);
+                bindVideoMsgView(holder, item);
                 break;
             case Message.TYPE_CHAT_FILE:
-                bindFileMsgView(holder,message);
+                bindFileMsgView(holder, item);
                 break;
             default:
-                ObjectHelper.throwRuntime("unknown message type!");
+                ObjectHelper.throwRuntime("unknown item type!");
         }
     }
 
@@ -120,7 +125,7 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
             holder.timeView.setVisibility(View.VISIBLE);
             holder.timeView.setText(StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
         } else {
-            Message preMsg = messages.get(position - 1);
+            Message preMsg = data.get(position - 1);
             Long preTime = Long.valueOf(preMsg.getCreateTime());
             Long time = Long.valueOf(message.getCreateTime());
             if (time - preTime > 300_000) {
@@ -197,7 +202,7 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
 
     public List<Message> getSendingMsg() {
         List<Message> result = new LinkedList<>();
-        for (Message message : messages) {
+        for (Message message : data) {
             if (Message.STATUS_SENDING.equals(message.getStatus())) {
                 result.add(message);
             }
@@ -205,14 +210,10 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
         return result;
     }
 
-    @Override
-    public int getItemCount() {
-        return messages.size();
-    }
 
     @Override
     public int getItemViewType(int position) {
-        return messages.get(position).getSourceType();
+        return data.get(position).getSourceType();
     }
 
 
@@ -288,25 +289,19 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<ChatRecycle
     }
 
     public void clear() {
-        messages.clear();
-        notifyDataSetChanged();
-    }
-
-    public void update(List<Message> messages) {
-        clear();
-        this.messages.addAll(messages);
+        data.clear();
         notifyDataSetChanged();
     }
 
     public void add(Message message) {
-        messages.add(message);
+        data.add(message);
         notifyDataSetChanged();
     }
 
     public Message getLast() {
-        int index = messages.size() - 1;
+        int index = data.size() - 1;
         if (index >= 0) {
-            return messages.get(index);
+            return data.get(index);
         } else {
             return null;
         }

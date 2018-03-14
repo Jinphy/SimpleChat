@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.models.friend.Friend;
@@ -25,41 +24,43 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2018/3/9.
  */
 
-public class GroupMemberAdapter extends BaseRecyclerViewAdapter<GroupMemberAdapter.ViewHolder> {
+public class GroupMemberAdapter extends BaseRecyclerViewAdapter<Friend, GroupMemberAdapter.ViewHolder> {
 
-    private List<Friend> friends;
     private Map<Friend, Boolean> checks;
 
-    public GroupMemberAdapter() {
-        checks = new HashMap<>();
-        friends = new LinkedList<>();
+
+    @Override
+    protected int getResourceId() {
+        return R.layout.layout_group_member_item;
     }
 
+    @Override
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return new ViewHolder(itemView);
+    }
+
+    public GroupMemberAdapter() {
+        super();
+        checks = new HashMap<>();
+    }
+
+    @Override
     public void update(List<Friend> friends) {
         if (friends == null || friends.size() == 0) {
             return;
         }
-        this.friends.clear();
-        this.friends.addAll(friends);
+        this.data.clear();
+        this.data.addAll(friends);
         checks.clear();
-        for (Friend friend : this.friends) {
+        for (Friend friend : this.data) {
             checks.put(friend, false);
         }
         notifyDataSetChanged();
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.layout_group_member_item, parent, false);
-
-        return new ViewHolder(itemView);
-    }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Friend friend = friends.get(position);
+    public void onBindViewHolder(ViewHolder holder, Friend friend, int position) {
         Bitmap bitmap = ImageUtil.loadAvatar(friend.getAccount(), 100, 100);
         if (bitmap != null) {
             holder.avatar.setImageBitmap(bitmap);
@@ -69,9 +70,7 @@ public class GroupMemberAdapter extends BaseRecyclerViewAdapter<GroupMemberAdapt
         holder.name.setText(friend.getShowName());
         holder.check.setVisibility(checks.get(friend) ? View.VISIBLE : View.GONE);
 
-        if (click != null) {
-            holder.clickView.setOnClickListener(v -> click.onClick(v, friend, 0, position));
-        }
+        setClick(friend, position, 0, holder.clickView);
     }
 
     /**
@@ -82,11 +81,6 @@ public class GroupMemberAdapter extends BaseRecyclerViewAdapter<GroupMemberAdapt
         Boolean check = !checks.get(friend);
         checks.put(friend, check);
         view.findViewById(R.id.check_view).setVisibility(check ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    public int getItemCount() {
-        return friends.size();
     }
 
 

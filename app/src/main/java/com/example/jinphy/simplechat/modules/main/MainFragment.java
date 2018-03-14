@@ -1,6 +1,9 @@
 package com.example.jinphy.simplechat.modules.main;
 
 import android.animation.AnimatorSet;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -286,8 +289,11 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
             mainMenu.dismiss();
         });
 
-
-
+        menuView.setOnClickListener(v -> {
+            if (mainMenu != null) {
+                mainMenu.dismiss();
+            }
+        });
 
     }
 
@@ -501,14 +507,18 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
-
-
-
-
-
+    @Override
+    public boolean onBackPressed() {
+        if (mainMenu != null) {
+            mainMenu.dismiss();
+        } else {
+            Intent home = new Intent(Intent.ACTION_MAIN);
+            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            home.addCategory(Intent.CATEGORY_HOME);
+            startActivity(home);
+        }
+        return false;
+    }
 
 
     //----------mvp中的View函数--------------------------------------------
@@ -749,6 +759,9 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         if (selectedTab == 3) {
             return selfFragment.handleVerticalTouchEvent(event);
         }
+        if (mainMenu != null) {
+            mainMenu.dismiss();
+        }
         return false;
     }
 
@@ -764,8 +777,8 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
             return;
         }
         mainMenu = new PopupWindow(menuView,
-                ScreenUtils.dp2px(activity(), 150),
-                ScreenUtils.dp2px(activity(), 200));
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
         mainMenu.setAnimationStyle(R.style.main_menu_animate);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mainMenu.setElevation(ScreenUtils.dp2px(activity(),6));
@@ -775,7 +788,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                     0,
                     Gravity.END);
         }
-        mainMenu.setOutsideTouchable(true);
         mainMenu.setOnDismissListener(() -> mainMenu = null);
     }
 
@@ -788,4 +800,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     public void showFriendInfo(String account) {
         ModifyFriendInfoActivity.start(activity(), account);
     }
+
+
 }

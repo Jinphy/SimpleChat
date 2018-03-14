@@ -49,6 +49,7 @@ abstract public  class BaseRepository {
                 .autoShowNo(task.isAutoShowNo())
                 .showProgress(task.isShowProgress())
                 .params(task.getParams())
+                .readTimeout(task.readTimeout)
                 .onResponseYes(task.getOnDataOk()==null?null: response -> task.getOnDataOk().call(response))
                 .onResponseNo(task.getOnDataNo()==null?null: response -> task.getOnDataNo().call(TYPE_CODE))
                 .onError(task.getOnDataNo()==null?null: e-> task.getOnDataNo().call(TYPE_ERROR))
@@ -78,6 +79,9 @@ abstract public  class BaseRepository {
 
         private boolean autoShowNo = true;
 
+        private int readTimeout = 20_000;
+
+
         public Task(Map<String, Object> params) {
             this.params = params;
         }
@@ -98,6 +102,11 @@ abstract public  class BaseRepository {
 
         public Task<T> param(String key, Object value) {
             this.params.put(key, value);
+            return this;
+        }
+
+        public Task<T> readTimeout(int readTimeout) {
+            this.readTimeout = readTimeout;
             return this;
         }
 

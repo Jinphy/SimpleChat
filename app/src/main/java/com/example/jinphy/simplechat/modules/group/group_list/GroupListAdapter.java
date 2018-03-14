@@ -10,11 +10,9 @@ import android.widget.TextView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
 import com.example.jinphy.simplechat.models.group.Group;
-import com.example.jinphy.simplechat.modules.group.GroupMemberAdapter;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -24,55 +22,33 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2018/3/11.
  */
 
-public class GroupListAdapter extends BaseRecyclerViewAdapter<GroupListAdapter.ViewHolder> {
+public class GroupListAdapter extends BaseRecyclerViewAdapter<Group, GroupListAdapter.ViewHolder> {
 
-    private List<Group> groups;
-
-    public GroupListAdapter() {
-        groups = new ArrayList<>();
-    }
-
-    public void update(List<Group> groups) {
-        this.groups.clear();
-        if (groups == null || groups.size() == 0) {
-            return;
-        }
-        this.groups.addAll(groups);
-        notifyDataSetChanged();
-    }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.layout_group_list_item, parent, false);
-        return new ViewHolder(itemView);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Group group = groups.get(position);
-        Bitmap bitmap = ImageUtil.loadAvatar(group.getGroupNo(), 100, 100);
+    public void onBindViewHolder(ViewHolder holder, Group item, int position) {
+        Bitmap bitmap = ImageUtil.loadAvatar(item.getGroupNo(), 100, 100);
         if (bitmap != null) {
             holder.avatar.setImageBitmap(bitmap);
         } else {
             holder.avatar.setImageResource(R.drawable.ic_group_chat_white_24dp);
         }
-        holder.name.setText(group.getName());
-        holder.groupNo.setText(group.getGroupNo());
+        holder.name.setText(item.getName());
+        holder.groupNo.setText(item.getGroupNo());
 
-        if (click != null) {
-            holder.itemView.setOnClickListener(v -> click.onClick(v, group, 0, position));
-            holder.qRCode.setOnClickListener(v -> click.onClick(v, group, 0, position));
-        }
+        setClick(item, position, 0, holder.itemView, holder.qRCode);
 
-        if (longClick != null) {
-            holder.itemView.setOnLongClickListener(v -> longClick.onLongClick(v, group, 0, position));
-        }
+        setLongClick(item, position, 0, holder.itemView);
     }
 
     @Override
-    public int getItemCount() {
-        return groups.size();
+    protected int getResourceId() {
+        return R.layout.layout_group_list_item;
+    }
+
+    @Override
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return new ViewHolder(itemView);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{

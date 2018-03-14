@@ -11,12 +11,9 @@ import android.view.View;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
-import com.example.jinphy.simplechat.modules.main.msg.MsgRecyclerViewAdapter;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -32,12 +29,13 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
 
 
     private RecyclerView recyclerView;
+    private View emptyView;
     private LinearLayoutManager linearLayoutManager;
     private GroupListAdapter adapter;
     private boolean showSearchResult = false;
 
     public GroupListFragment() {
-        // Required empty public constructor
+        // Required emptyView public constructor
     }
 
     public static GroupListFragment newInstance(boolean showSearchResult) {
@@ -75,6 +73,7 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
     @Override
     protected void findViewsById(View view) {
         recyclerView = view.findViewById(R.id.recycler_view);
+        emptyView = view.findViewById(R.id.empty_view);
     }
 
     @Override
@@ -84,7 +83,17 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
         adapter = new GroupListAdapter();
         recyclerView.setAdapter(adapter);
         adapter.update(presenter.loadGroups(showSearchResult));
+        setupEmptyView();
     }
+
+    private void setupEmptyView() {
+        if (adapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+    }
+
 
     @Override
     protected void registerEvent() {
@@ -135,6 +144,9 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void updateView(EBUpdateView msg) {
         adapter.update(presenter.loadGroups(showSearchResult));
+        App.showToast("群聊信息已更新", false);
+        setupEmptyView();
     }
+
 
 }

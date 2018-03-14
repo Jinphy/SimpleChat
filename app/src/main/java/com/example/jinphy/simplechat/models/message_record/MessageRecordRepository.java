@@ -2,9 +2,12 @@ package com.example.jinphy.simplechat.models.message_record;
 
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.group.Group;
+import com.example.jinphy.simplechat.models.group.GroupRepository;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message.MessageRepository;
+import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.List;
 
@@ -58,15 +61,16 @@ public class MessageRecordRepository implements MessageRecordDataSource {
 
     @Override
     public List<MessageRecord> load(String owner) {
-        return messageRecordBox.query()
+        List<MessageRecord> messageRecords = messageRecordBox.query()
                 .filter(record -> {
-                    if (record.getWith() == null) {
-                        messageRecordBox.remove(record);
+                    if (record.getWith() == null || record.getMessage() == null) {
                         return false;
                     }
-                    return true;
+                    return StringUtils.equal(record.getOwner(), owner);
                 })
                 .build().find();
+
+        return messageRecords;
     }
 
     @Override
@@ -105,5 +109,44 @@ public class MessageRecordRepository implements MessageRecordDataSource {
         if (records.length > 0) {
             messageRecordBox.remove(records);
         }
+    }
+
+    /**
+     * DESC: 更新消息记录
+     *
+     * @param resetNewMsgCount 标志是否需要清空新消息条数
+     * Created by jinphy, on 2018/3/14, at 9:17
+     */
+    @Override
+    public void update(Message msg,boolean resetNewMsgCount) {
+        MessageRecord record;
+        String with = msg.getWith();
+        Friend friend=null;
+        Group group = null;
+        if ((friend = FriendRepository.getInstance().get(msg.getOwner(), with)) != null) {
+            record = get(msg.getOwner(), friend);
+        } else if ((group = GroupRepository.getInstance().get(with, msg.getOwner())) != null) {
+            record = get(msg.getOwner(), group);
+        } else {
+            return;
+        }
+        if (record != null) {
+            record.setLastMsg(msg);
+            if (resetNewMsgCount) {
+                record.setNewMsgCount(0);
+            } else {
+                record.addNewMsgCount();
+            }
+        } else {
+            record = new MessageRecord();
+            record.setLastMsg(msg);
+            record.setOwner(msg.getOwner());
+            record.setWith(friend);
+            record.setWith(group);
+            if (!resetNewMsgCount) {
+                record.addNewMsgCount();
+            }
+        }
+        messageRecordBox.put(record);
     }
 }

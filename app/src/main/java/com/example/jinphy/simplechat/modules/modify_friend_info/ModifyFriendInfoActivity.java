@@ -21,7 +21,7 @@ public class ModifyFriendInfoActivity extends BaseActivity {
         Intent intent = new Intent(activity, ModifyFriendInfoActivity.class);
         intent.putExtra(Friend_.account.name, account);
         activity.startActivity(intent);
-//        activity.overridePendingTransition(R.anim.alpha_in,R.anim.anim_no);
+        activity.overridePendingTransition(R.anim.alpha_in,R.anim.anim_no);
     }
 
     @Override

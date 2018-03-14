@@ -35,6 +35,8 @@ import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
+import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
@@ -511,7 +513,11 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_friend:
-
+                if (account.contains("G")) {
+                    ModifyGroupActivity.start(activity(), account);
+                } else {
+                    ModifyFriendInfoActivity.start(activity(), account);
+                }
                 break;
             case android.R.id.home:
                 onBackPressed();
@@ -719,8 +725,14 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 .animate();
     }
 
+    private boolean exit = false;
+
     @Override
     public boolean onBackPressed() {
+        if (exit) {
+            return false;
+        }
+        exit = true;
         animateHorizontal(0,1,true);
         return false;
     }

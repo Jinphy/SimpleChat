@@ -85,8 +85,8 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
         this.headers = new HashMap<>();
         this.baseUrl = Api.BASE_URL;
         this.port = Api.COMMON_PORT;
-        this.connectTimeout = 10_000;
-        this.readTimeout = 15_000;
+        this.connectTimeout = 15_000;
+        this.readTimeout = 20_000;
 
         /**
          * DESC: 这是返回数据类型的默认实现，使用该默认实现则不能访问{@link Response#getData()}方法

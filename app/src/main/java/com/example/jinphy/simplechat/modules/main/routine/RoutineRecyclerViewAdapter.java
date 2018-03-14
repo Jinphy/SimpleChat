@@ -19,44 +19,37 @@ import java.util.List;
  */
 
 public class RoutineRecyclerViewAdapter
-        extends BaseRecyclerViewAdapter<RoutineRecyclerViewAdapter.ViewHolder> {
-
-    List<Routine> routines;
+        extends BaseRecyclerViewAdapter<Routine, RoutineRecyclerViewAdapter.ViewHolder> {
 
 
     public RoutineRecyclerViewAdapter() {
+        super();
         initRoutines();
     }
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View root = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.main_tab_routine_item, parent, false);
-
-        return new ViewHolder(root);
-    }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Routine routine = routines.get(position);
+    public void onBindViewHolder(ViewHolder holder, Routine routine,  int position) {
         holder.icon.setImageResource(routine.getIconId());
         holder.tag.setText(routine.getTagId());
-        if (click != null) {
-            holder.itemView.setOnClickListener(view -> click.onClick(view,routine,0,position));
-        }
-        if (longClick != null) {
-            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,routine,0,position));
-        }
 
+        setClick(routine, position, 0, holder.itemView);
+
+        setLongClick(routine, position, 0, holder.itemView);
     }
 
     @Override
-    public int getItemCount() {
-        return routines.size();
+    protected int getResourceId() {
+        return R.layout.main_tab_routine_item;
+    }
+
+    @Override
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return new ViewHolder(itemView);
     }
 
 
     private void initRoutines() {
-        routines = new ArrayList<>(9);
+        data = new ArrayList<>(9);
         int[] icons = new int[]{
                 R.drawable.ic_active_zoom_24dp,
                 R.drawable.ic_group_chat_24dp,
@@ -80,7 +73,7 @@ public class RoutineRecyclerViewAdapter
                 R.string.routine_weather
         };
         for (int i = 0; i < icons.length; i++) {
-            routines.add(new Routine(icons[i], tags[i]));
+            data.add(new Routine(icons[i], tags[i]));
         }
 
     }

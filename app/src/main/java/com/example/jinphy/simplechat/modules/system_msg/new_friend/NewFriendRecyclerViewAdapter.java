@@ -25,29 +25,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2018/3/2.
  */
 
-public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFriendRecyclerViewAdapter.ViewHolder> {
+public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFriendRecyclerViewAdapter.NewFriend,NewFriendRecyclerViewAdapter.ViewHolder> {
 
-    private List<NewFriend> newFriends;
 
-    public NewFriendRecyclerViewAdapter() {
-        this.newFriends = new LinkedList<>();
-    }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.main_tab_msg_item, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-
-        return holder;
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        NewFriend newFriend = newFriends.get(position);
-        if (!"无".equals(newFriend.friend.getAvatar())) {
+    public void onBindViewHolder(ViewHolder holder, NewFriend item, int position) {
+        if (!"无".equals(item.friend.getAvatar())) {
             Bitmap bitmap = ImageUtil.loadAvatar(
-                    newFriend.friend.getAccount(),
+                    item.friend.getAccount(),
                     holder.avatar.getMeasuredWidth(),
                     holder.avatar.getMeasuredHeight());
             if (bitmap != null) {
@@ -56,33 +42,36 @@ public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFri
         }
 
         String name = "暂无昵称";
-        if (!TextUtils.isEmpty(newFriend.friend.getRemark())) {
-            name = newFriend.friend.getRemark();
-        } else if (!TextUtils.isEmpty(newFriend.friend.getName())) {
-            name = newFriend.friend.getName();
+        if (!TextUtils.isEmpty(item.friend.getRemark())) {
+            name = item.friend.getRemark();
+        } else if (!TextUtils.isEmpty(item.friend.getName())) {
+            name = item.friend.getName();
         }
         holder.name.setText(name);
-        holder.msg.setText(newFriend.message.getContent());
-        holder.time.setText(StringUtils.formatDate(Long.valueOf(newFriend.message.getCreateTime())));
+        holder.msg.setText(item.message.getContent());
+        holder.time.setText(StringUtils.formatDate(Long.valueOf(item.message.getCreateTime())));
 
-        if (newFriend.message.isNew()) {
+        if (item.message.isNew()) {
             holder.newMsgView.setVisibility(View.VISIBLE);
         } else {
             holder.newMsgView.setVisibility(View.GONE);
         }
 
 
-        if (click != null) {
-            holder.itemView.setOnClickListener(v -> click.onClick(v, newFriend,0,position));
-        }
-        if (longClick != null) {
-            holder.itemView.setOnLongClickListener(v -> longClick.onLongClick(v, newFriend,0,position));
-        }
+        setClick(item, position, 0, holder.itemView);
+
+        setLongClick(item, position, 0, holder.itemView);
+
     }
 
     @Override
-    public int getItemCount() {
-        return newFriends.size();
+    protected int getResourceId() {
+        return R.layout.main_tab_msg_item;
+    }
+
+    @Override
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return new ViewHolder(itemView);
     }
 
 
@@ -120,18 +109,18 @@ public class NewFriendRecyclerViewAdapter extends BaseRecyclerViewAdapter<NewFri
     }
 
     public void clear() {
-        newFriends.clear();
+        data.clear();
         notifyDataSetChanged();
     }
 
     public void update(List<NewFriend> newFriends) {
-        this.newFriends.addAll(newFriends);
+        this.data.addAll(newFriends);
         notifyDataSetChanged();
     }
 
     public List<Message> getNewMsgAndSetOld() {
         List<Message> result = new LinkedList<>();
-        for (NewFriend newFriend : newFriends) {
+        for (NewFriend newFriend : data) {
             if (newFriend.message.isNew()) {
                 newFriend.message.setNew(false);
                 result.add(newFriend.message);

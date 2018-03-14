@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.modules.group.create_group;
 
 import android.content.Context;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.group.Group;
@@ -106,17 +107,16 @@ public class CreateGroupPresenter implements CreateGroupContract.Presenter {
         if (members == null || members.size() == 0) {
             return;
         }
+        LogUtils.e("member size: " + members.size());
         User user = userRepository.currentUser();
-        Member member = new Member();
-        member.setStatus(Member.STATUS_OK);
-        member.setAllowChat(true);
-        member.setGroupNo(group.getGroupNo());
-        member.setOwner(user.getAccount());
         for (String m : members) {
-            member.setId(0);
+            Member member = new Member();
+            member.setStatus(Member.STATUS_OK);
+            member.setAllowChat(true);
+            member.setGroupNo(group.getGroupNo());
+            member.setOwner(user.getAccount());
             member.setPerson(friendRepository.get(user.getAccount(), m));
             memberRepository.save(member);
         }
-
     }
 }

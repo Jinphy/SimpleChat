@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.models.member;
 import android.content.Context;
 
 import com.example.jinphy.simplechat.base.BaseRepository;
+import com.example.jinphy.simplechat.models.group.Group;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,9 @@ public interface MemberDataSource {
 
     void loadOnline(Context context, BaseRepository.Task<List<Map<String, String>>> task);
 
+    void removeForGroup(Group group);
+
+    void removeFromGroup(Group group,String account);
 
     Member get(String groupNo, String account, String owner);
 

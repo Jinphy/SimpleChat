@@ -57,130 +57,10 @@ public class MessageRepository implements MessageDataSource {
      * <p>
      * Created by jinphy, on 2018/1/18, at 9:01
      */
-    public Message[] saveReceive(Message... messages) {
-        List<Message> list = new LinkedList<>();
-        for (Message message : messages) {
-            if (message.needSave()) {
-                message.setId(0);
-                list.add(message);
-            }
-            String owner;
-            String account;
-            String groupNo;
-            // 如果是添加新好友的消息，则先预加载该好友的信息
-            switch (message.getContentType()) {
-                case Message.TYPE_SYSTEM_ADD_FRIEND:
-                case Message.TYPE_SYSTEM_ADD_FRIEND_AGREE:
-                case Message.TYPE_SYSTEM_RELOAD_FRIEND:
-                    friendRepository.getOnline(
-                            null,
-                            message.getOwner(),
-                            message.getExtra(),//好友的账号保存在该字段中
-                            () -> EventBus.getDefault().post(new EBService()));
-                    break;
-                case Message.TYPE_SYSTEM_DELETE_FRIEND:
-                    account = message.getExtra();//好友的账号保存在该字段中
-                    Friend friend = FriendRepository.getInstance().get(message.getOwner(), account);
-                    friend.setStatus(Friend.status_deleted);
-                    friendRepository.update(friend);
-                    break;
-                case Message.TYPE_SYSTEM_NEW_GROUP:
-                    String msgContent = message.getContent();
-                    // split[0] :groupNo, split[1]:群成员的账号
-                    String[] split = message.getExtra().split("@");
-                    groupNo = split[0];
-                    String[] members = GsonUtils.toBean(split[1], String[].class);
-
-                    // 从服务器获取群聊对象
-                    groupRepository.getOnline(
-                            null,
-                            message.getOwner(),
-                            groupNo,
-                            ()->{
-                                // 群聊信息获取成功后，加载群聊中的成员
-                                Group group = groupRepository.get(groupNo, message.getOwner());
-
-                                // 加载所有成员的好友信息
-                                for (String member : members) {
-                                    friendRepository.getOnline(
-                                            null,
-                                            message.getOwner(),
-                                            member,
-                                            ()->{
-                                                Member newMember = new Member();
-                                                newMember.setStatus(Member.STATUS_OK);
-                                                newMember.setPerson(friendRepository.get(message.getOwner(), member));
-                                                newMember.setOwner(message.getOwner());
-                                                newMember.setGroupNo(groupNo);
-                                                newMember.setAllowChat(true);
-                                                newMember.setId(0);
-                                                memberRepository.save(newMember);
-                                                group.addMember(newMember);
-                                                groupRepository.update(group);
-                                                EventBus.getDefault().post(new EBService());
-                                            });
-                                }
-
-                                // 创建新消息
-                                Message newMsg = new Message();
-                                newMsg.setCreateTime(System.currentTimeMillis()+"");
-                                newMsg.setSourceType(Message.RECEIVE);
-                                newMsg.setContent(msgContent);
-                                newMsg.setContentType(Message.TYPE_CHAT_TEXT);
-                                newMsg.setWith(groupNo);
-                                newMsg.setOwner(message.getOwner());
-                                newMsg.setExtra(group.getCreator());// 群消息时，该字段表示信息发送者
-                                this.saveSend(newMsg);
-
-                                MessageRecord record = new MessageRecord();
-                                record.setNewMsgCount(1);
-                                record.setLastMsg(newMsg);
-                                record.setWith(group);
-                                record.setOwner(message.getOwner());
-                                mrRepository.saveOrUpdate(record);
-                                EventBus.getDefault().post(new EBService());
-                            }
-                    );
-                    break;
-                case Message.TYPE_SYSTEM_RELOAD_GROUP:
-                    groupRepository.getOnline(
-                            null,
-                            message.getOwner(),
-                            message.getExtra(),//需要重新加载的群聊的群号在extra字段中
-                            ()-> EventBus.getDefault().post(new EBService()));
-                    break;
-                case Message.TYPE_SYSTEM_NEW_MEMBER:
-                    groupNo = message.getContent();
-                    account = message.getExtra();
-                    friendRepository.getOnline(
-                            null,
-                            message.getOwner(),
-                            account,
-                            ()->{
-                                Member newMember = new Member();
-                                newMember.setStatus(Member.STATUS_OK);
-                                newMember.setPerson(friendRepository.get(message.getOwner(), account));
-                                newMember.setOwner(message.getOwner());
-                                newMember.setGroupNo(groupNo);
-                                newMember.setAllowChat(true);
-                                newMember.setId(0);
-                                memberRepository.save(newMember);
-                                Group group = groupRepository.get(groupNo, message.getOwner());
-                                group.addMember(newMember);
-                                groupRepository.update(group);
-                                EventBus.getDefault().post(new EBService());
-                            });
-                    break;
-                default:
-                    break;
-            }
-        }
+    public void saveReceive(Message... messages) {
         if (messages.length > 0) {
-            messageBox.put(list);
+            messageBox.put(messages);
         }
-        messages = new Message[list.size()];
-
-        return list.toArray(messages);
     }
 
     /**
@@ -201,7 +81,9 @@ public class MessageRepository implements MessageDataSource {
      */
     public void update(Message... messages) {
         if (messages.length > 0) {
-            messageBox.put(messages);
+            for (Message message : messages) {
+                messageBox.put(message);
+            }
         }
     }
 
@@ -210,7 +92,9 @@ public class MessageRepository implements MessageDataSource {
         if (messages == null || messages.size() == 0) {
             return;
         }
-        messageBox.put(messages);
+        for (Message message : messages) {
+            messageBox.put(message);
+        }
     }
 
     /**
@@ -281,6 +165,39 @@ public class MessageRepository implements MessageDataSource {
                 .build()
                 .find();
     }
+
+    public long count(String with,String owner) {
+        return messageBox.query()
+                .equal(Message_.with, with)
+                .equal(Message_.owner,owner)
+                .build().count();
+    }
+
+    public long countNew(String with,String owner) {
+        return messageBox.query()
+                .equal(Message_.with, with)
+                .equal(Message_.owner, owner)
+                .equal(Message_.isNew, true)
+                .build().count();
+    }
+
+    public long count(String with, String owner, String contentType) {
+        return messageBox.query()
+                .equal(Message_.with, with)
+                .equal(Message_.owner, owner)
+                .equal(Message_.contentType, contentType)
+                .build().count();
+    }
+
+    public long countNew(String with,String owner, String contentType) {
+        return messageBox.query()
+                .equal(Message_.with, with)
+                .equal(Message_.owner, owner)
+                .equal(Message_.contentType, contentType)
+                .equal(Message_.isNew, true)
+                .build().count();
+    }
+
 
     @Override
     public List<Message> loadSystemMsg(String owner, String contentType) {

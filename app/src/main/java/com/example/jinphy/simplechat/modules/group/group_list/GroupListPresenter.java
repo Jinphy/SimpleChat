@@ -33,9 +33,6 @@ public class GroupListPresenter implements GroupListContract.Presenter {
     @Override
     public List<Group> loadGroups(boolean showSearchResult) {
         User user = userRepository.currentUser();
-        if (showSearchResult) {
-
-        }
         return groupRepository.loadLocal(user.getAccount(), showSearchResult);
     }
 

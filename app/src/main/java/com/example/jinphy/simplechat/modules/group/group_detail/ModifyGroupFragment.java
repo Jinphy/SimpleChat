@@ -4,11 +4,13 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.jinphy.simplechat.R;
@@ -21,6 +23,7 @@ import com.example.jinphy.simplechat.models.event_bus.EBBitmap;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
+import com.example.jinphy.simplechat.modules.group.member_list.MemberListActivity;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
 import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserActivity;
 import com.example.jinphy.simplechat.modules.pick_photo.PickPhotoActivity;
@@ -50,6 +53,7 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
     private MenuItemView membersItem;
     private MenuItemView maxCountItem;
     private MenuItemView autoAddItem;
+    private MenuItemView extraMsgItem;
     private MenuItemView showMemberNameItem;
     private MenuItemView keepSilentItem;
     private MenuItemView rejectMsgItem;
@@ -61,6 +65,7 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
     private View btnExitGroup;
     private View btnChat;
     private View btnAdd;
+    private View btnDeleteLocal;
 
 
     public ModifyGroupFragment() {
@@ -105,6 +110,7 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
         membersItem = view.findViewById(R.id.item_members);
         maxCountItem = view.findViewById(R.id.item_max_count);
         autoAddItem = view.findViewById(R.id.item_auto_add);
+        extraMsgItem = view.findViewById(R.id.item_extra_msg);
         showMemberNameItem = view.findViewById(R.id.item_show_member_name);
         keepSilentItem = view.findViewById(R.id.item_keep_silent);
         rejectMsgItem = view.findViewById(R.id.item_reject_msg);
@@ -114,6 +120,7 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
         btnExitGroup = view.findViewById(R.id.btn_exit_group);
         btnChat = view.findViewById(R.id.btn_chat);
         btnAdd = view.findViewById(R.id.btn_add_group);
+        btnDeleteLocal = view.findViewById(R.id.btn_delete_local);
     }
 
     @Override
@@ -132,12 +139,19 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
             creatorItem.showArrow(false);
             membersItem.setVisibility(View.GONE);
             maxCountItem.setVisibility(View.GONE);
-            autoAddItem.setVisibility(View.GONE);
             showMemberNameItem.setVisibility(View.GONE);
             keepSilentItem.setVisibility(View.GONE);
             rejectMsgItem.setVisibility(View.GONE);
+            if (!group.isAutoAdd()&& !group.isBroke()) {
+                extraMsgItem.setVisibility(View.VISIBLE);
+            }
+            if (group.isBroke()) {
+                btnDeleteLocal.setVisibility(View.VISIBLE);
+                avatarItem.content("该群已被群主解散");
+            } else {
+                btnAdd.setVisibility(View.VISIBLE);
+            }
 
-            btnAdd.setVisibility(View.VISIBLE);
         } else {
             if (group.isCreator()) {
                 // 是群主
@@ -158,14 +172,12 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
         bitmap = ImageUtil.loadAvatar(groupNo, 500, 500);
         if (bitmap != null) {
             avatarItem.iconDrawable(new BitmapDrawable(getResources(), bitmap));
-        } else {
-            avatarItem.iconColor(ContextCompat.getColor(activity(), R.color.green_primary));
         }
         nameItem.content(group.getName());
         groupNoIem.content(groupNo);
         creatorItem.content(group.getCreator());
         maxCountItem.content(group.getMaxCount() + "");
-        membersItem.contentHint("点击查看（" + group.getMemberCount() + "）");
+        membersItem.contentHint("点击查看（" + presenter.countMembers(group) + "）");
         autoAddItem.content(group.isAutoAdd() ? AUTO : NO_AUTO);
         showMemberNameItem.content(group.isShowMemberName() ? "是" : "否");
         keepSilentItem.content(group.isKeepSilent() ? "是" : "否");
@@ -194,7 +206,7 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
             }
         });
         membersItem.onClick((menuItemView, hasFocus) -> {
-            // TODO: 2018/3/12
+            MemberListActivity.start(activity(), groupNo);
         });
         maxCountItem.onReleaseFocus(() -> {
             String s = maxCountItem.content().toString();
@@ -209,15 +221,16 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
                 return;
             }
             Integer maxCount = Integer.valueOf(s);
-            if (maxCount <= group.getMemberCount() || maxCount > Group.DEFAULT_MAX_COUNT) {
+            int currentMemberCount = presenter.countMembers(group);
+
+            if (maxCount <= currentMemberCount || maxCount > Group.DEFAULT_MAX_COUNT) {
                 App.showToast(
                         "当前成员数：" +
-                                SChain.with(
-                                        group.getMemberCount()).colorForText(Color.GREEN).make()
+                                SChain.with(currentMemberCount+"").colorForText(Color.GREEN).make()
                                 + "\n" +
                                 "请确保输入范围：" +
-                                SChain.with((group.getMemberCount() + 1) + "~" + Group
-                                        .DEFAULT_MAX_COUNT)
+                                SChain.with((currentMemberCount + 1) + "~"
+                                        + Group.DEFAULT_MAX_COUNT)
                                         .colorForText(Color.YELLOW).make(),
                         false);
                 maxCountItem.content(group.getMaxCount() + "");
@@ -240,16 +253,56 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
         });
 
         btnBreakGroup.findViewById(R.id.break_group).setOnClickListener(v -> {
+            new MaterialDialog.Builder(activity())
+                    .title("解除群聊")
+                    .titleColor(colorPrimary())
+                    .content("您将解散该群聊，并且操作不可恢复，是否继续？")
+                    .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_warning_24dp, colorPrimary()))
+                    .positiveText("确定")
+                    .negativeText("不了")
+                    .positiveColor(colorPrimary())
+                    .negativeColorRes(R.color.color_red_D50000)
+                    .onPositive((dialog, which) -> {
+                        presenter.breakGroup(activity(), group);
+                    })
+                    .show();
 
         });
         btnExitGroup.findViewById(R.id.exit_group).setOnClickListener(v->{
-
+            new MaterialDialog.Builder(activity())
+                    .title("退出群聊")
+                    .titleColor(colorPrimary())
+                    .content("您将退出该群聊，并且操作不可恢复，是否继续？")
+                    .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_warning_24dp, colorPrimary()))
+                    .positiveText("确定")
+                    .negativeText("不了")
+                    .positiveColor(colorPrimary())
+                    .negativeColorRes(R.color.color_red_D50000)
+                    .onPositive((dialog, which) -> {
+                        presenter.exitGroup(activity(), group);
+                    })
+                    .show();
         });
         btnChat.findViewById(R.id.chat).setOnClickListener(v -> {
             ChatActivity.start(activity(), groupNo);
         });
         btnAdd.findViewById(R.id.add_group).setOnClickListener(v -> {
-
+            presenter.joinGroup(activity(), group, extraMsgItem.content().toString());
+        });
+        btnDeleteLocal.findViewById(R.id.delete_local).setOnClickListener(v -> {
+            new MaterialDialog.Builder(activity())
+                    .title("删除群聊")
+                    .titleColor(colorPrimary())
+                    .content("您将从本地删除该解散的群聊，是否继续？")
+                    .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_warning_24dp, colorPrimary()))
+                    .positiveText("确定")
+                    .negativeText("不了")
+                    .positiveColor(colorPrimary())
+                    .negativeColorRes(R.color.color_red_D50000)
+                    .onPositive((dialog, which) -> {
+                        presenter.deleteGroupLocal(group);
+                    })
+                    .show();
         });
     }
 
@@ -500,5 +553,45 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
         group.setRejectMsg(rejectMsg);
         presenter.updateGroup(group);
         EventBus.getDefault().post(new EBUpdateView());
+    }
+
+    private boolean exit = false;
+
+    @Override
+    public void whenExitGroupOk() {
+        App.showToast("退出群聊成功！", false);
+        exit = true;
+        finishActivity();
+    }
+
+    @Override
+    public void whenBreakGroupOk() {
+        App.showToast("解散群聊成功！", false);
+        exit = true;
+        finishActivity();
+    }
+
+    @Override
+    public void whenDeleteGroupLocalOk() {
+        App.showToast("群聊已删除！", false);
+        exit = true;
+        finishActivity();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateView(EBUpdateView msg) {
+        if ("FromModifyGroupFragment".equals(msg.data)) {
+            return;
+        }
+
+
+        App.showToast("该群信息已更新！", false);
+        group = presenter.getGroup(groupNo);
+        if (group == null) {
+            App.showToast("该群已经被删除！", false);
+            finishActivity();
+        } else {
+            setupViews();
+        }
     }
 }

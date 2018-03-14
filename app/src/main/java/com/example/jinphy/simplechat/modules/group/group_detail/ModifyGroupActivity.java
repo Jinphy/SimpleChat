@@ -19,7 +19,7 @@ public class ModifyGroupActivity extends BaseActivity {
         Intent intent = new Intent(activity, ModifyGroupActivity.class);
         intent.putExtra(ModifyGroupFragment.GROUP_NO, groupNo);
         activity.startActivity(intent);
-
+        activity.overridePendingTransition(R.anim.alpha_in,R.anim.anim_no);
     }
 
 

@@ -35,6 +35,7 @@ import java.util.List;
 public class FriendsFragment extends BaseFragment<FriendsPresenter> implements FriendsContract.View {
 
     RecyclerView recyclerView;
+    View emptyView;
 
     FloatingActionButton fab;
     private FriendsRecyclerViewAdapter adapter;
@@ -106,7 +107,9 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     @Override
     protected void findViewsById(View view) {
         recyclerView = view.findViewById(R.id.recycler_view);
+        emptyView = view.findViewById(R.id.empty_view);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -123,7 +126,16 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
         adapter = new FriendsRecyclerViewAdapter();
         recyclerView.setAdapter(adapter);
         adapter.update(presenter.loadFriends());
+        setupEmptyView();
     }
+    private void setupEmptyView() {
+        if (adapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+    }
+
 
     @Override
     protected void registerEvent() {
@@ -160,10 +172,12 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
         if (i >= 0 && i < adapter.getItemCount()) {
             recyclerView.scrollToPosition(i);
         }
+        setupEmptyView();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void updateFriend(EBUpdateView msg) {
         adapter.update(presenter.loadFriends());
+        setupEmptyView();
     }
 }

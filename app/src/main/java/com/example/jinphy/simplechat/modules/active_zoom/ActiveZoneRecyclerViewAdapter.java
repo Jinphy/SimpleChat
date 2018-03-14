@@ -19,41 +19,31 @@ import java.util.List;
  * Created by jinphy on 2017/8/15.
  */
 
-public class ActiveZoneRecyclerViewAdapter extends BaseRecyclerViewAdapter<ActiveZoneRecyclerViewAdapter.ViewHolder> {
-
-    List<Blog> blogs;
-
-    public ActiveZoneRecyclerViewAdapter(List<Blog> blogs) {
-        this.blogs = Preconditions.checkNotNull(blogs);
-    }
+public class ActiveZoneRecyclerViewAdapter extends BaseRecyclerViewAdapter<Blog, ActiveZoneRecyclerViewAdapter.ViewHolder> {
 
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View root = LayoutInflater
-                .from(parent.getContext())
-                .inflate(R.layout.blog_item, parent, false);
-        return new ViewHolder(root);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Blog blog = blogs.get(position);
+    public void onBindViewHolder(ViewHolder holder, Blog item, int position) {
         // TODO: 2017/8/16 设置头像，昵称，内容等信息
 
-        if (click != null) {
-            // TODO: 2017/8/16
-        }
 
-        if (longClick != null) {
-            // TODO: 2017/8/16
-        }
+        // TODO: 2018/3/14 添加具体的View的点击事件
+        setClick(item, position, 0);
+
+        // TODO: 2018/3/14 添加具体的View的长按点击事件
+        setLongClick(item, position, 0);
     }
 
     @Override
-    public int getItemCount() {
-        return blogs.size();
+    protected int getResourceId() {
+        return R.layout.blog_item;
     }
+
+    @Override
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return new ViewHolder(itemView);
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 

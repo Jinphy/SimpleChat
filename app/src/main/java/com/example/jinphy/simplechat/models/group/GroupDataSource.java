@@ -42,4 +42,8 @@ public interface GroupDataSource {
     void modifyGroup(Context context, BaseRepository.Task<String> task);
 
     void joinGroup(Context context, BaseRepository.Task<String> task);
+
+    void agreeJoinGroup(Context context, BaseRepository.Task<String> task);
+
+    void exitGroup(Context context, BaseRepository.Task<String> task);
 }

@@ -92,10 +92,11 @@ public class ActiveZoneFragment extends BaseFragment<ActiveZonePresenter>
 
     @Override
     protected void setupViews() {
-        adapter = presenter.getAdapter();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+        adapter = new ActiveZoneRecyclerViewAdapter();
         recyclerView.setAdapter(adapter);
+        adapter.update(presenter.loadBlogs());
     }
 
     @Override

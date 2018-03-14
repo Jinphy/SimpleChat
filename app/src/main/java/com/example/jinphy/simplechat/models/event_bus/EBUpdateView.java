@@ -19,6 +19,10 @@ public class EBUpdateView extends EBBase<String> {
         super(true, null);
     }
 
+    public EBUpdateView(String data) {
+        super(true, data);
+    }
+
     public EBUpdateView(int which) {
         super(true, null);
         switch (which) {

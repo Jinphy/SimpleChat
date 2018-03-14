@@ -391,6 +391,9 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
             case 1:
                 break;
             case 2:
+                if (presenter == null) {
+                    return;
+                }
                 if (presenter.needMoveUp()) {
                     moveVertical(1);
                     ViewUtils.setAlpha(offset,avatarView,nameText);

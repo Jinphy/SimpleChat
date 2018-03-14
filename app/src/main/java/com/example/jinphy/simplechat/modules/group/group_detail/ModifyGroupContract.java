@@ -33,6 +33,12 @@ public class ModifyGroupContract {
 
         void whenModifyRejectMsgOk(boolean rejectMsg);
 
+        void whenExitGroupOk();
+
+        void whenBreakGroupOk();
+
+        void whenDeleteGroupLocalOk();
+
         void setAutoAdd();
 
         void setShowMemberName();
@@ -40,6 +46,7 @@ public class ModifyGroupContract {
         void setKeepSilent();
 
         void setRejectMsg();
+
 
     }
 
@@ -50,6 +57,11 @@ public class ModifyGroupContract {
         Group getGroup(String groupNo);
 
         void updateGroup(Group group);
+
+        int countMembers(Group group);
+
+
+        void deleteGroupLocal(Group group);
 
         void modifyAvatar(Context context, Group group, Bitmap bitmap);
 
@@ -65,6 +77,12 @@ public class ModifyGroupContract {
 
         void modifyRejectMsg(Context context, Group group, boolean rejectMsg);
 
-        void joinGroup(Context context, Group group);
+        void joinGroup(Context context, Group group, String extraMsg);
+
+        void breakGroup(Context context, Group group);
+
+        void exitGroup(Context context, Group group);
+
+
     }
 }

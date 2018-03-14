@@ -26,6 +26,7 @@ public class Group{
     public static final String STATUS_WAITING = "waiting";
     public static final String STATUS_OK = "ok";
     public static final String STATUS_NO = "no";
+    public static final String STATUS_INVALIDATE = "invalidate";
 
     @Id
     protected long id;
@@ -54,12 +55,6 @@ public class Group{
      */
     protected String groupNo;
 
-
-    /**
-     * DESC: 群成员
-     * Created by Jinphy, on 2018/3/5, at 18:22
-     */
-    protected ToMany<Member> members;
 
     /**
      * DESC: 最大成员数量，需要满足：
@@ -114,6 +109,11 @@ public class Group{
      */
     protected boolean isMyGroup = false;
 
+    /**
+     * DESC: 标志该群是否已被群主解散
+     * Created by jinphy, on 2018/3/14, at 14:16
+     */
+    protected boolean isBroke = false;
 
 
 
@@ -123,70 +123,6 @@ public class Group{
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public void setMembers(List<Member> members) {
-        if (members == null || members.size() == 0) {
-            return;
-        }
-        this.members.clear();
-        this.members.addAll(members);
-    }
-
-
-    public void setMembers(ToMany<Member> members) {
-        this.members = members;
-    }
-
-    public void setMembers(Member... members) {
-        if (members.length == 0) {
-            return;
-        }
-        this.members.clear();
-        this.members.addAll(Arrays.asList(members));
-    }
-
-    public void addMembers(Member... members) {
-        if (members.length > 0) {
-            for (Member member : members) {
-                addMember(member);
-            }
-
-        }
-    }
-
-    public void addMember(Member member) {
-        if (member != null) {
-            this.members.add(member);
-        }
-    }
-
-    public void addMembers(List<Member> members) {
-        if (members == null || members.size() == 0) {
-            return;
-        }
-        this.members.addAll(members);
-    }
-
-    public void deleteMember(Member member) {
-        this.members.remove(member);
-    }
-
-    public void deleteMember(long memberId) {
-        for (Member member : this.members) {
-            if (memberId == member.getId()) {
-                this.members.remove(member);
-                break;
-            }
-        }
-    }
-
-    public void deleteMember(String memberAccount) {
-        for (Member member : this.members) {
-            if (StringUtils.equal(memberAccount, member.getAccount())) {
-                this.members.remove(member);
-            }
-        }
     }
 
     public int getMaxCount() {
@@ -235,10 +171,6 @@ public class Group{
 
     public void setGroupNo(String groupNo) {
         this.groupNo = groupNo;
-    }
-
-    public ToMany<Member> getMembers() {
-        return members;
     }
 
     public String getOwner() {
@@ -332,7 +264,11 @@ public class Group{
     }
 
 
-    public int getMemberCount() {
-        return members.size();
+    public boolean isBroke() {
+        return isBroke;
+    }
+
+    public void setBroke(boolean broke) {
+        isBroke = broke;
     }
 }

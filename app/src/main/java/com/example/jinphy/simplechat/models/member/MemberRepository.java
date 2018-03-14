@@ -7,7 +7,9 @@ import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.api.common.ApiInterface;
 import com.example.jinphy.simplechat.models.api.common.Response;
+import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
+import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.List;
@@ -23,8 +25,6 @@ import io.objectbox.Box;
 public class MemberRepository extends BaseRepository implements MemberDataSource{
 
     private Box<Member> memberBox;
-
-
 
 
     private static class InstanceHolder{
@@ -56,9 +56,9 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
                 } else {
                     member.setId(0);
                 }
+                memberBox.put(member);
             }
         }
-        memberBox.put(members);
     }
 
     @Override
@@ -71,15 +71,16 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
 
     @Override
     public Member get(String groupNo, String account, String owner) {
-        return memberBox.query()
-                .filter(member -> {
-                    return StringUtils.equal(groupNo, member.getGroupNo())
-                            && StringUtils.equal(account, member.getPerson().getTarget()
-                            .getAccount())
-                            && StringUtils.equal(owner, member.getOwner());
-                })
+        List<Member> members = memberBox.query()
+                .filter(member -> StringUtils.equal(groupNo, member.getGroupNo())
+                        && StringUtils.equal(account, member.getPerson().getTarget().getAccount())
+                        && StringUtils.equal(owner, member.getOwner()))
                 .build()
-                .findFirst();
+                .find();
+        if (members != null && members.size() > 0) {
+            return members.get(0);
+        }
+        return null;
     }
 
     @Override
@@ -90,29 +91,55 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
                 .build().find();
     }
 
+    /**
+     * DESC: 统计当前账号的指定群中的成员数量
+     * Created by jinphy, on 2018/3/13, at 18:43
+     */
+    public long count(String groupNo, String owner) {
+        return memberBox.query()
+                .equal(Member_.groupNo, groupNo)
+                .equal(Member_.owner, owner)
+                .build().count();
+    }
+
+    /**
+     * DESC: 删除某个群聊的所有成员
+     * Created by jinphy, on 2018/3/14, at 9:41
+     */
     @Override
-    public void loadOnline(Context context, Task<List<Map<String, String>>> task) {
-        Api.<List<Map<String, String>>>common(context)
-                .hint("正在加载...")
-                .path(Api.Path.getMembers)
-                .dataType(Api.Data.MAP_LIST)
-                .setup(api -> this.handleBuilder(api, task))
-                .request();
+    public void removeForGroup(Group group) {
+        String groupNo = group.getGroupNo();
+        String owner = group.getOwner();
+        List<Member> members = get(groupNo, owner);
+        for (Member member : members) {
+            Friend friend = member.getPerson().getTarget();
+            FriendRepository.getInstance().subGroupCount(friend);
+            memberBox.remove(member);
+        }
+    }
+
+
+    /**
+     * DESC: 将指定成员从指定的群聊中删除
+     * Created by jinphy, on 2018/3/14, at 9:44
+     */
+    @Override
+    public void removeFromGroup(Group group, String account) {
+        String groupNo = group.getGroupNo();
+        String owner = group.getOwner();
+        Member member = get(groupNo, account, owner);
+        Friend friend = member.getPerson().getTarget();
+        FriendRepository.getInstance().subGroupCount(friend);
+        memberBox.remove(member);
     }
 
     @Override
-    protected <T> void handleBuilder(ApiInterface<Response<T>> api, Task<T> task) {
-        api.showProgress(task.isShowProgress())
-                .useCache(task.isUseCache())
-                .autoShowNo(task.isAutoShowNo())
-                .showProgress(task.isShowProgress())
-                .params(task.getParams())
-                .onResponseYes(task.getOnDataOk() == null ? null : response -> task.getOnDataOk()
-                        .call(response))
-                .onResponseNo(task.getOnDataNo() == null ? null : response -> task.getOnDataNo()
-                        .call(TYPE_CODE))
-                .onError(task.getOnDataNo() == null ? null : e -> task.getOnDataNo().call
-                        (TYPE_ERROR))
-                .onFinal(task.getOnFinal() == null ? null : task.getOnFinal()::call);
+    public void loadOnline(Context context, Task<List<Map<String, String>>> task) {
+        Api.<List<Map<String, String>>>common(context)
+                .setup(api -> this.handleBuilder(api, task))
+                .hint("正在加载...")
+                .path(Api.Path.getMembers)
+                .dataType(Api.Data.MAP_LIST)
+                .request();
     }
 }

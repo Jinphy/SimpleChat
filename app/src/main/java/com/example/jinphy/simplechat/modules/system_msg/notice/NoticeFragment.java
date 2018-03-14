@@ -11,6 +11,7 @@ import android.view.View;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.event_bus.EBInteger;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.message.Message;
 
@@ -24,6 +25,7 @@ import java.util.List;
  */
 public class NoticeFragment extends BaseFragment<NoticePresenter> implements NoticeContract.View {
     private RecyclerView recyclerView;
+    private View emptyView;
     private NoticeRecyclerViewAdapter adapter;
 
     public NoticeFragment() {
@@ -51,6 +53,7 @@ public class NoticeFragment extends BaseFragment<NoticePresenter> implements Not
             presenter.updateMsg(msg);
             EventBus.getDefault().post(new EBUpdateView());
         }
+        EventBus.getDefault().post(new EBInteger(3));
     }
 
     @Override
@@ -66,6 +69,7 @@ public class NoticeFragment extends BaseFragment<NoticePresenter> implements Not
     @Override
     protected void findViewsById(View view) {
         recyclerView = view.findViewById(R.id.recycler_view);
+        emptyView = view.findViewById(R.id.empty_view);
     }
 
     @Override
@@ -79,7 +83,16 @@ public class NoticeFragment extends BaseFragment<NoticePresenter> implements Not
         if (adapter.getItemCount() > 0) {
             ((NoticeActivity) activity()).updateTitle(adapter.getItemCount());
         }
+        setupEmptyView();
     }
+    private void setupEmptyView() {
+        if (adapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+    }
+
 
     @Override
     protected void registerEvent() {
