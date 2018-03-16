@@ -161,8 +161,9 @@ public class NewMemberFragment extends BaseFragment<NewMemberPresenter> implemen
     public void whenAgreeOk(NewMember newMember) {
         App.showToast("您已同意该成员加入群聊！", false);
         newMember.agree();
-        presenter.updateMsg(newMember.message);
         int i = linearLayoutManager.findFirstVisibleItemPosition();
+        presenter.updateMsg(newMember.message);
+        adapter.update(presenter.loadNewMembers());
         adapter.notifyDataSetChanged();
         recyclerView.scrollToPosition(i);
         setupEmptyView();

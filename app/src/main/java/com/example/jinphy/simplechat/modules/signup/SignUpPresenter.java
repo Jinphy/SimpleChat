@@ -91,7 +91,6 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                     .autoShowNo(false)
                     // 找到账号时回调
                     .doOnDataOk(response -> view.findUserOk())
-                    // 没有找到或者网络异常时回调，网络请求底层已做好了对应提示，我已这里无需再提示
                     .doOnDataNo(view::findUserNo)
                     // 提交设置并执行用户查找
                     .submit(task -> userRepository.findUser(context, task));
@@ -108,9 +107,6 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                     .param(Api.Key.date, date)
                     // 注册成功时回调
                     .doOnDataOk(response -> view.whenSignUpSucceed("账号注册成功！"))
-                    // 没有找到或者网络异常时回调，网络请求底层已做好了对应提示，我已这里无需再提示
-                    .doOnDataNo(view::findUserNo)
-                    // 提交设置并执行用户查找
                     .submit(task -> userRepository.signUp(context, task));
 
         }

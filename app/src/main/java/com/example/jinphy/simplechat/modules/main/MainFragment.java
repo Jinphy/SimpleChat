@@ -25,6 +25,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -229,7 +230,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                         }
 
                         presenter.findUser(input.toString(),response->{
-                            if (Response.YES.equals(response.getCode())) {
+                            if (response != null && Response.YES.equals(response.getCode())) {
                                 AddFriendActivity.start(activity(), response.getData());
                             }
                         });
@@ -748,7 +749,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         if (view == null) {
             return;
         }
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(view.getLayoutParams());
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(view.getLayoutParams());
         lp.setMargins(lp.leftMargin, (int) margin,lp.rightMargin, (int) margin);
         view.setLayoutParams(lp);
         view.requestLayout();

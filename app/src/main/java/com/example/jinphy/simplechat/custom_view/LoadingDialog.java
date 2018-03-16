@@ -307,7 +307,10 @@ public class LoadingDialog extends AlertDialog {
     }
 
     public void title(CharSequence title) {
-        ((TextView) findViewById(R.id.title_view)).setText(title);
+        TextView titleView = findViewById(R.id.title_view);
+        if (titleView != null) {
+            titleView.setText(title);
+        }
 
     }
 

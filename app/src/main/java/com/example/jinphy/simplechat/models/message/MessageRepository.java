@@ -82,8 +82,22 @@ public class MessageRepository implements MessageDataSource {
     public void update(Message... messages) {
         if (messages.length > 0) {
             for (Message message : messages) {
-                messageBox.put(message);
+                update(message);
             }
+        }
+    }
+
+    public synchronized void update(Message message) {
+        if (message == null) {
+            return;
+        }
+        Message old = messageBox.get(message.getId());
+        if (old != null) {
+            old.update(message);
+            messageBox.put(old);
+        } else {
+            message.setId(0);
+            messageBox.put(message);
         }
     }
 
@@ -93,7 +107,7 @@ public class MessageRepository implements MessageDataSource {
             return;
         }
         for (Message message : messages) {
-            messageBox.put(message);
+            update(message);
         }
     }
 

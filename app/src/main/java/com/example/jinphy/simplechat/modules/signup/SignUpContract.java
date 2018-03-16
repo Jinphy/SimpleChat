@@ -4,6 +4,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.api.common.Response;
 
 /**
  * Created by jinphy on 2017/8/9.
@@ -23,7 +24,7 @@ public interface SignUpContract {
 
         void findUserOk();
 
-        void findUserNo(String reason);
+        void findUserNo(Response reason);
 
         void whenSignUpSucceed(String msg);
 

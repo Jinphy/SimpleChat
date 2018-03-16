@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.models.member;
 import android.content.Context;
 
 import com.example.jinphy.simplechat.base.BaseRepository;
+import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
 
 import java.util.List;
@@ -26,5 +27,11 @@ public interface MemberDataSource {
 
     Member get(String groupNo, String account, String owner);
 
+    void saveNew(Friend friend, String groupNo);
+
     List<Member> get(String groupNo, String owner);
+
+    void update(Member member);
+
+    void modifyAllowChat(Context context, BaseRepository.Task<String> task);
 }

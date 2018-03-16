@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.modules.system_msg.notice;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.message.Message;
@@ -50,12 +51,16 @@ public class NoticePresenter implements NoticeContract.Presenter{
     @Override
     public void updateMsg(List<Message> messages) {
         if (messages.size() > 0) {
+            LogUtils.e("1");
             messageRepository.update(messages);
+            LogUtils.e("2");
             Message message = messages.get(0);
             Friend friend = friendRepository.get(message.getOwner(), Friend.system);
             MessageRecord record = recordRepository.get(message.getOwner(), friend);
             record.setNewMsgCount(record.getNewMsgCount() - messages.size());
+            LogUtils.e("3");
             recordRepository.saveOrUpdate(record);
+            LogUtils.e("4");
         }
     }
 }

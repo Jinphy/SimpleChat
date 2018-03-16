@@ -232,6 +232,22 @@
             android:layout_width="@dimen/dimen_100dp"
             android:layout_height="@dimen/dimen_100dp"/>
 
+        <TextView
+            android:id="@+id/status_invalidate_view"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="70dp"
+            android:text="已无效"
+            android:gravity="center"
+            android:textSize="23sp"
+            android:textColor="@color/white"
+            android:rotation="-45"
+            android:background="@drawable/ic_stroke_gray_circle_background"
+            android:layout_marginRight="@dimen/dimen_40dp"
+            android:layout_width="@dimen/dimen_100dp"
+            android:layout_height="@dimen/dimen_100dp"/>
+
+
     </RelativeLayout>
 
 

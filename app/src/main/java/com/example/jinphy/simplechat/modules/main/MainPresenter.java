@@ -47,7 +47,7 @@ public class MainPresenter implements MainContract.Presenter {
     private GroupRepository groupRepository;
     private MemberRepository memberRepository;
 
-    private int readTimeout = 60_000;// 一分钟
+    private int readTimeout = 30_000;// 半分钟
 
 
     public MainPresenter(Context context, MainContract.View view) {
@@ -88,9 +88,7 @@ public class MainPresenter implements MainContract.Presenter {
             userRepository.<User>newTask()
                     .param(Api.Key.account, account)
                     .doOnDataOk(callback::call)
-                    .doOnDataNo(msg -> {
-                        callback.call(new Response<>(Response.NO, msg, null));
-                    })
+                    .doOnDataNo(callback::call)
                     .submit(task -> userRepository.findUser(context, task));
         }
     }

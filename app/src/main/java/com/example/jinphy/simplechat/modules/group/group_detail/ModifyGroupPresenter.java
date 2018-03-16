@@ -5,7 +5,9 @@ import android.graphics.Bitmap;
 import android.text.TextUtils;
 
 import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.group.GroupRepository;
@@ -16,6 +18,7 @@ import com.example.jinphy.simplechat.models.message_record.MessageRecordReposito
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.utils.ImageUtil;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -55,6 +58,9 @@ public class ModifyGroupPresenter implements ModifyGroupContract.Presenter {
 
     @Override
     public Group getGroup(String groupNo) {
+        if (ObjectHelper.isTrimEmpty(groupNo)) {
+            return null;
+        }
         User user = userRepository.currentUser();
         return groupRepository.get(groupNo, user.getAccount());
     }
@@ -172,8 +178,16 @@ public class ModifyGroupPresenter implements ModifyGroupContract.Presenter {
                 .param(Api.Key.creator, group.getCreator())
                 .param(Api.Key.account, user.getAccount())
                 .param(Api.Key.extraMsg, extraMsg)
+                .autoShowNo(false)
                 .doOnDataOk(okData -> {
                     App.showToast(okData.getMsg(), false);
+                })
+                .doOnDataNo(noData -> {
+                    if (noData != null) {
+                        App.showToast(noData.getMsg(), false);
+                    } else {
+                        App.showToast("请求异常！", false);
+                    }
                 })
                 .submit(task -> groupRepository.joinGroup(context, task));
 

@@ -130,6 +130,9 @@ public abstract class Api {
         String agreeJoinGroup = "/group/agreeJoinGroup";
         @Post
         String exitGroup = "/group/exitGroup";
+        @Post
+        String modifyAllowChat = "/member/modifyAllowChat";
+
     }
 
     //===================参数key==========================================================
@@ -171,6 +174,7 @@ public abstract class Api {
         String rejectMsg = "rejectMsg";
         String extraMsg = "extraMsg";
         String operator = "operator";
+        String allowChat = "allowChat";
     }
 
 

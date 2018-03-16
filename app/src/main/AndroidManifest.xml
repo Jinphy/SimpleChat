@@ -49,6 +49,7 @@
         </activity>
         <activity
             android:name=".modules.chat.ChatActivity"
+            android:launchMode="singleTask"
             android:theme="@style/translucentBackgroundTheme">
         </activity>
         <activity

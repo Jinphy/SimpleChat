@@ -271,4 +271,23 @@ public class Group{
     public void setBroke(boolean broke) {
         isBroke = broke;
     }
+
+
+    public void update(Group newOne) {
+        if (newOne == null) {
+            return;
+        }
+        this.setBroke(newOne.isBroke);
+        this.setMyGroup(newOne.isMyGroup);
+        this.setRejectMsg(newOne.rejectMsg);
+        this.setKeepSilent(newOne.keepSilent);
+        this.setShowMemberName(newOne.showMemberName);
+        this.setAutoAdd(newOne.autoAdd);
+        this.setMaxCount(newOne.maxCount);
+        this.setName(newOne.name);
+        this.setOwner(newOne.owner);
+        this.setCreator(newOne.creator);
+        this.setFromSearch(newOne.isFromSearch);
+        this.setGroupNo(newOne.groupNo);
+    }
 }

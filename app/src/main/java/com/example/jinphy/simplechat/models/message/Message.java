@@ -119,10 +119,24 @@ public class Message implements Comparable<Message>{
     public static final String TYPE_SYSTEM_APPLY_JOIN_GROUP = "system_apply_join_group";
 
 
+    /**
+     * DESC: 系统消息，群主解散了群聊
+     * Created by jinphy, on 2018/3/16, at 10:33
+     */
     public static final String TYPE_SYSTEM_BREAK_GROUP = "system_break_group";
 
+    /**
+     * DESC: 系统消息，群主移除了群成员
+     * Created by jinphy, on 2018/3/16, at 10:32
+     */
     public static final String TYPE_SYSTEM_DELETE_MEMBER = "system_delete_member";
 
+
+    /**
+     * DESC: 系统消息，群主修改了群成员是否允许发言
+     * Created by jinphy, on 2018/3/16, at 10:32
+     */
+    public static final String TYPE_SYSTEM_MEMBER_ALLOW_CHAT = "system_member_allow_chat";
     /**
      * DESC: 系统消息，公告
      * Created by jinphy, on 2018/3/2, at 12:54
@@ -280,6 +294,7 @@ public class Message implements Comparable<Message>{
                 case Message.TYPE_SYSTEM_RELOAD_GROUP:
                 case Message.TYPE_SYSTEM_DELETE_MEMBER:
                 case Message.TYPE_SYSTEM_BREAK_GROUP:
+                case Message.TYPE_SYSTEM_MEMBER_ALLOW_CHAT:
                     return false;
             }
         }
@@ -353,5 +368,20 @@ public class Message implements Comparable<Message>{
         Arrays.sort(temp);
         messages.clear();
         messages.addAll(Arrays.asList(temp));
+    }
+
+    public void update(Message newOne) {
+        if (newOne == null) {
+            return;
+        }
+        this.setExtra(newOne.extra);
+        this.setOwner(newOne.owner);
+        this.setWith(newOne.with);
+        this.setSourceType(newOne.sourceType);
+        this.setCreateTime(newOne.createTime);
+        this.setContent(newOne.content);
+        this.setContentType(newOne.contentType);
+        this.setNew(newOne.isNew);
+        this.setStatus(newOne.status);
     }
 }

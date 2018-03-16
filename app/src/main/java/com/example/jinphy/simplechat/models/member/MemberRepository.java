@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.models.member;
 
 import android.content.Context;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.models.api.common.Api;
@@ -42,23 +43,35 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
 
     @Override
     public void save(Member... members) {
+
         if (members.length == 0) {
             return;
         }
         for (Member member : members) {
-            if (member != null) {
-                Member old = memberBox.query()
-                        .equal(Member_.groupNo, member.getGroupNo())
-                        .equal(Member_.owner, member.getOwner())
-                        .build().findFirst();
-                if (old != null) {
-                    member.setId(old.getId());
-                } else {
-                    member.setId(0);
-                }
-                memberBox.put(member);
-            }
+            save(member);
         }
+    }
+
+    public void save(Member member) {
+        if (member == null) {
+            return;
+        }
+        List<Member> old = memberBox.query()
+                .filter(entity -> {
+                    if (StringUtils.equal(entity.getGroupNo(), member.getGroupNo())
+                            && StringUtils.equal(entity.getOwner(), member.getOwner())
+                            && StringUtils.equal(entity.getAccount(), member.getAccount())) {
+                        return true;
+                    }
+                    return false;
+                })
+                .build().find();
+        if (old != null && old.size() > 0) {
+            memberBox.remove(old);
+        }
+
+        member.setId(0);
+        memberBox.put(member);
     }
 
     @Override
@@ -66,7 +79,9 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
         if (members == null || members.size() == 0) {
             return;
         }
-        save(members.toArray(new Member[members.size()]));
+        for (Member member : members) {
+            save(member);
+        }
     }
 
     @Override
@@ -133,6 +148,32 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
         memberBox.remove(member);
     }
 
+    public void saveNew(Friend friend,String groupNo) {
+        Member member = new Member();
+        member.setPerson(friend);
+        member.setOwner(friend.getOwner());
+        member.setStatus(Member.STATUS_OK);
+        member.setAllowChat(true);
+        member.setGroupNo(groupNo);
+        member.setId(0);
+        save(member);
+    }
+
+    @Override
+    public void update(Member member) {
+        if (member == null) {
+            return;
+        }
+        Member old = memberBox.get(member.getId());
+        if (old != null) {
+            old.update(member);
+            memberBox.put(old);
+        } else {
+            member.setId(0);
+            memberBox.put(member);
+        }
+    }
+
     @Override
     public void loadOnline(Context context, Task<List<Map<String, String>>> task) {
         Api.<List<Map<String, String>>>common(context)
@@ -141,5 +182,16 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
                 .path(Api.Path.getMembers)
                 .dataType(Api.Data.MAP_LIST)
                 .request();
+    }
+
+    @Override
+    public void modifyAllowChat(Context context, Task<String> task) {
+        Api.<String>common(context)
+                .setup(api -> this.handleBuilder(api, task))
+                .hint("正在修改...")
+                .path(Api.Path.modifyAllowChat)
+                .dataType(Api.Data.MODEL,String.class)
+                .request();
+
     }
 }

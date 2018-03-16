@@ -60,7 +60,7 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends RecyclerView.ViewHol
     protected void setLongClick(T item, int position, int type,  View... views) {
         if (longClick != null) {
             for (View view : views) {
-                view.setOnClickListener(v -> longClick.onLongClick(v, item, position, type));
+                view.setOnLongClickListener(v -> longClick.onLongClick(v, item, position, type));
             }
         }
     }

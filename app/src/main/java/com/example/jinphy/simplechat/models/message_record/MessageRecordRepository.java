@@ -40,6 +40,22 @@ public class MessageRecordRepository implements MessageRecordDataSource {
      */
     @Override
     public void saveOrUpdate(MessageRecord record) {
+        if (record == null) {
+            return;
+        }
+        List<MessageRecord> old = messageRecordBox.query()
+                .filter(entity -> {
+                    if (StringUtils.equal(entity.getOwner(), record.getOwner())
+                            && StringUtils.equal(entity.getWith(), record.getWith())) {
+                        return true;
+                    }
+                    return false;
+                })
+                .build().find();
+        if (old != null && old.size() > 0) {
+            messageRecordBox.remove(old);
+        }
+        record.setId(0);
         messageRecordBox.put(record);
     }
 

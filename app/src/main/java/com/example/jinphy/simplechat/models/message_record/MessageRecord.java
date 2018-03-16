@@ -247,4 +247,13 @@ public class MessageRecord implements Comparable<MessageRecord>{
         records.clear();
         records.addAll(Arrays.asList(temp));
     }
+
+    public void update(MessageRecord newOne) {
+        this.setNewMsgCount(newOne.newMsgCount);
+        this.setWithGroup(newOne.withGroup);
+        this.setWithFriend(newOne.withFriend);
+        this.setOwner(newOne.owner);
+        this.setLastMsg(newOne.lastMsg);
+        this.setToTop(newOne.toTop);
+    }
 }

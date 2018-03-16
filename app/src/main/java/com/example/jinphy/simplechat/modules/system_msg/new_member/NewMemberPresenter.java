@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.example.jinphy.simplechat.base.BaseRepository;
+import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.friend.Friend;
@@ -113,7 +114,23 @@ public class NewMemberPresenter implements NewMemberContract.Presenter {
                 .param(Api.Key.account, newMember.getAccount())
                 .doOnDataOk(okData -> {
                     view.whenAgreeOk(newMember);
+                    User user = userRepository.currentUser();
+                    Friend friend = friendRepository.get(user.getAccount(), newMember.getAccount());
+                    if (friend != null) {
+                        memberRepository.saveNew(friend, newMember.getGroupNo());
+                    } else {
+                        friendRepository.getOnline(
+                                null,
+                                user.getAccount(),
+                                newMember.getAccount(),
+                                friend1 -> {
+                                    memberRepository.saveNew(friend1, newMember.getGroupNo());
+                                }
+                        );
+
+                    }
                 })
                 .submit(task -> groupRepository.agreeJoinGroup(context, task));
     }
+
 }

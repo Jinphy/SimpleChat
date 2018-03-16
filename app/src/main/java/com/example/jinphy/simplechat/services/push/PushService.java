@@ -12,6 +12,7 @@ import com.example.jinphy.simplechat.models.event_bus.EBService;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
+import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ThreadPoolUtils;
 import com.google.gson.reflect.TypeToken;
 
@@ -37,9 +38,19 @@ public class PushService extends Service {
     private PushManager pushManager;
     private Type messageType;
 
+    private int i = 0;
 
-    private boolean started = false;
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        EventBus.getDefault().register(this);
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 
     /**
      * DESC: 根据指定的命令启动服务，同时可以利用该命令来控制该服务
@@ -55,34 +66,18 @@ public class PushService extends Service {
 
     private static final String TAG = "PushService";
     @Override
-    public synchronized int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         // 当第一次启动时，初始化
-        if (intent != null) {
-            switch (intent.getStringExtra(FLAG)) {
-                case FLAG_INIT:
-                    if (started) {
-                        return START_REDELIVER_INTENT;
-                    }
-                    started = true;
-                    init();
-                    EventBus.getDefault().register(this);
-                    // 返回该值，当进程被杀死后会自动重启，并且会重新传递intent
-                    return START_REDELIVER_INTENT;
-                case FLAG_CLOSE:
-                    if (!started) {
-                        return START_NOT_STICKY;
-                    }
-                    started = false;
-                    if (pushClient != null && !pushClient.isClosed()) {
-                        pushClient.close();
-                        pushManager = null;
-                    }
-                    EventBus.getDefault().unregister(this);
-                    stopSelf();
-                    return START_NOT_STICKY;
+        if (intent != null && StringUtils.equal(FLAG_CLOSE, intent.getStringExtra(FLAG))) {
+            if (pushClient != null && pushClient.isOpen()) {
+                pushClient.forceClose();
+                pushManager = null;
             }
+            stopSelf();
+            LogUtils.e("service stop!");
+            return START_STICKY_COMPATIBILITY;
         }
-
+        init();
         return START_REDELIVER_INTENT;
     }
     @Override
@@ -97,33 +92,32 @@ public class PushService extends Service {
      * Created by jinphy, on 2018/1/16, at 13:35
      */
     private synchronized void init() {
-        ThreadPoolUtils.threadPool.execute(()->{
-            if (pushClient != null && !pushClient.isClosed()) {
-                pushClient.close();
+        LogUtils.e("init invoked");
+        if (pushClient != null) {
+            LogUtils.e("pushClient is not null");
+            if (pushClient.isOpen() || pushClient.isTrying()) {
+                return;
             }
-            pushManager = PushManager.getInstance(this);
-            pushClient = PushClient.start(this);
-            messageType = new TypeToken<List<Map<String, String>>>() {}.getType();
-        });
+        }
+        LogUtils.e("pushClient is not open");
+        pushManager = PushManager.getInstance(this);
+        pushClient = PushClient.start(this);
+        messageType = new TypeToken<List<Map<String, String>>>() {}.getType();
     }
-    public User getUser() {
-        return pushManager.getUser();
-    }
-
     /**
      * DESC: 处理从服务器中推送过来的消息
      *
-     * @param msgs json数组，是一个消息列表
+     * @param messageStr json数组，是一个消息列表
      * Created by jinphy, on 2018/1/16, at 13:01
      */
-    public void handleMsg(String msgs) {
+    public void handleMsg(String messageStr) {
         threadPool.execute(()->{
-            List<Map<String, String>> messages = GsonUtils.toBean(msgs, messageType);
+            List<Map<String, String>> messages = GsonUtils.toBean(messageStr, messageType);
             pushManager.handleMessage(messages);
         });
     }
 
-    public void onPushError() {
+    public void onPushInvalidate() {
         init();
     }
 

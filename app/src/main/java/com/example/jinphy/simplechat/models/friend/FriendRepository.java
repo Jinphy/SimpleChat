@@ -9,6 +9,7 @@ import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.api.common.ApiCallback;
 import com.example.jinphy.simplechat.models.api.common.ApiInterface;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.event_bus.EBBase;
@@ -120,8 +121,10 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                     save(friend);
                     synchronized (flag) {
                         if (flag.ok) {
-                            if (whenOk.length > 0) {
-                                whenOk[0].accept(friend);
+                            for (SChain.Consumer<Friend> consumer : whenOk) {
+                                if (consumer != null) {
+                                    consumer.accept(friend);
+                                }
                             }
                         } else {
                             flag.ok = true;
@@ -142,10 +145,14 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                         Bitmap bitmap = StringUtils.base64ToBitmap(data.get(User_.avatar.name));
                         ImageUtil.storeAvatar(account, bitmap);
                     }
+                })
+                .onFinal(() -> {
                     synchronized (flag) {
                         if (flag.ok) {
-                            if (whenOk.length > 0) {
-                                whenOk[0].accept(flag.data);
+                            for (SChain.Consumer<Friend> consumer : whenOk) {
+                                if (consumer != null) {
+                                    consumer.accept(flag.data);
+                                }
                             }
                         } else {
                             flag.ok = true;
@@ -181,60 +188,70 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
     @Override
     public void addFriend(Context context, Task<Map<String, String>> task) {
         Api.<Map<String, String>>common(context)
+                .setup(api -> this.handleBuilder(api, task))
                 .hint("正在申请...")
                 .path(Api.Path.addFriend)
                 .dataType(Api.Data.MAP)
-                .setup(api -> this.handleBuilder(api, task))
                 .request();
     }
 
     @Override
     public void modifyRemark(Context context, Task<Map<String, String>> task) {
         Api.<Map<String, String>>common(context)
+                .setup(api -> this.handleBuilder(api, task))
                 .hint("正在修改...")
                 .path(Api.Path.modifyRemark)
                 .dataType(Api.Data.MAP)
-                .setup(api -> this.handleBuilder(api, task))
                 .request();
     }
 
     @Override
     public void modifyStatus(Context context, Task<Map<String, String>> task) {
         Api.<Map<String, String>>common(context)
+                .setup(api -> this.handleBuilder(api, task))
                 .hint("正在修改...")
                 .path(Api.Path.modifyStatus)
                 .dataType(Api.Data.MAP)
-                .setup(api -> this.handleBuilder(api, task))
                 .request();
     }
 
     @Override
     public void deleteFriend(Context context, Task<Map<String, String>> task) {
         Api.<Map<String, String>>common(context)
+                .setup(api -> this.handleBuilder(api, task))
                 .hint("正在删除...")
                 .path(Api.Path.deleteFriend)
                 .dataType(Api.Data.MAP)
-                .setup(api -> this.handleBuilder(api, task))
                 .request();
 
     }
 
     @Override
     public void save(List<Friend> friends) {
-        if (friends == null) {
+        if (friends == null || friends.size() == 0) {
             return;
         }
-        User user = UserRepository.getInstance().currentUser();
         for (Friend friend : friends) {
-            Friend old = get(friend.owner, friend.account);
-            if (old != null) {
-                friend.setId(old.getId());
-            } else {
-                friend.setId(0);
-                friend.setUser(user);
-            }
+            save(friend);
         }
-        friendBox.put(friends);
+    }
+
+    public void save(Friend friend) {
+        if (friend == null) {
+            return;
+        }
+        Friend old = friendBox.query()
+                .equal(Friend_.account, friend.getAccount())
+                .equal(Friend_.owner, friend.getOwner())
+                .build().findFirst();
+
+        if (old != null) {
+            old.update(friend);
+            friendBox.put(old);
+        } else {
+            friend.setId(0);
+            friendBox.put(friend);
+        }
     }
 
     @Override
@@ -242,17 +259,9 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
         if (friends.length == 0) {
             return;
         }
-        User user = UserRepository.getInstance().currentUser();
         for (Friend friend : friends) {
-            Friend old = get(friend.owner, friend.account);
-            if (old != null) {
-                friend.setId(old.getId());
-            } else {
-                friend.setId(0);
-                friend.setUser(user);
-            }
+            save(friend);
         }
-        friendBox.put(friends);
     }
 
     @Override
@@ -260,7 +269,14 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
         if (friend == null) {
             return;
         }
-        friendBox.put(friend);
+        Friend old = friendBox.get(friend.getId());
+        if (old != null) {
+            old.update(friend);
+            friendBox.put(old);
+        } else {
+            friend.setId(0);
+            friendBox.put(friend);
+        }
     }
 
     @Override
@@ -289,18 +305,6 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
             friend.setGroupCount(groupCount - 1);
             friendBox.put(friend);
         }
-    }
-
-    @Override
-    protected <T> void handleBuilder(ApiInterface<Response<T>> api, Task<T> task) {
-        api.showProgress(task.isShowProgress())
-                .useCache(task.isUseCache())
-                .autoShowNo(task.isAutoShowNo())
-                .params(task.getParams())
-                .onResponseYes(task.getOnDataOk()==null?null: response -> task.getOnDataOk().call(response))
-                .onResponseNo(task.getOnDataNo()==null?null: response -> task.getOnDataNo().call(TYPE_CODE))
-                .onError(task.getOnDataNo()==null?null: e-> task.getOnDataNo().call(TYPE_ERROR))
-                .onFinal(task.getOnFinal()==null?null: task.getOnFinal()::call);
     }
 
     @Override

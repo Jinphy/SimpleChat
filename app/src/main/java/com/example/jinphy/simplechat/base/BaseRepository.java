@@ -51,8 +51,8 @@ abstract public  class BaseRepository {
                 .params(task.getParams())
                 .readTimeout(task.readTimeout)
                 .onResponseYes(task.getOnDataOk()==null?null: response -> task.getOnDataOk().call(response))
-                .onResponseNo(task.getOnDataNo()==null?null: response -> task.getOnDataNo().call(TYPE_CODE))
-                .onError(task.getOnDataNo()==null?null: e-> task.getOnDataNo().call(TYPE_ERROR))
+                .onResponseNo(task.getOnDataNo()==null?null: response -> task.getOnDataNo().call(response))
+                .onError(task.getOnDataNo()==null?null: e-> task.getOnDataNo().call(null))
                 .onFinal(task.getOnFinal()==null?null: task.getOnFinal()::call);
     }
 
@@ -198,7 +198,13 @@ abstract public  class BaseRepository {
      * Created by jinphy, on 2018/1/6, at 12:41
      */
     public interface OnDataNo{
-        void call(String reason);
+        /**
+         * DESC:
+         *
+         * @param noData 如果是异常失败则为null
+         * Created by jinphy, on 2018/3/16, at 13:04
+         */
+        void call(Response noData);
     }
 
     /**

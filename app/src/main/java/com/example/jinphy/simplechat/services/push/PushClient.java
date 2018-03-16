@@ -2,8 +2,11 @@ package com.example.jinphy.simplechat.services.push;
 
 import android.util.Log;
 
+import com.apkfuns.logutils.LogUtils;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.models.user.User_;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
@@ -34,11 +37,14 @@ public class PushClient extends WebSocketClient {
     private String url;
     private WeakReference<PushService> service;
 
+    private boolean forceClose = false;
 
+    private boolean trying = false;
 
     private static final String TAG = "PushClient";
+
     public static PushClient start(PushService service) {
-        User user = service.getUser();
+        User user = UserRepository.getInstance().currentUser();
         if (user == null) {
             return null;
         }
@@ -71,28 +77,59 @@ public class PushClient extends WebSocketClient {
         this.url = url;
     }
 
+    @Override
+    public void connect() {
+        this.trying = true;
+        super.connect();
+    }
+
+    public void forceClose() {
+        forceClose = true;
+        close();
+    }
+
+    public boolean isTrying() {
+        return trying;
+    }
 
     @Override
     public void onOpen(ServerHandshake handshake) {
-
+        trying = false;
     }
 
     @Override
     public void onMessage(String message) {
+        LogUtils.e("PushClient: " + message);
         if (ObjectHelper.reference(service)) {
             service.get().handleMsg(EncryptUtils.decryptThenDecode(message));
+        } else {
+            PushService.start(App.app(), PushService.FLAG_INIT);
         }
     }
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-
+        trying = false;
+        if (!forceClose && ObjectHelper.reference(service)) {
+            service.get().onPushInvalidate();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void onError(Exception ex) {
+        trying = false;
         if (ObjectHelper.reference(service)) {
-            service.get().onPushError();
+            service.get().onPushInvalidate();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

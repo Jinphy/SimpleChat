@@ -49,28 +49,32 @@ public class NewMemberAdapter extends BaseRecyclerViewAdapter<NewMemberAdapter.N
             case Group.STATUS_OK:
                 holder.statusOk.setVisibility(View.VISIBLE);
                 holder.statusNo.setVisibility(View.GONE);
+                holder.statusInvalidate.setVisibility(View.GONE);
                 holder.btnReject.setVisibility(View.GONE);
                 holder.btnAgree.setVisibility(View.GONE);
                 break;
             case Group.STATUS_NO:
                 holder.statusOk.setVisibility(View.GONE);
                 holder.statusNo.setVisibility(View.VISIBLE);
+                holder.statusInvalidate.setVisibility(View.GONE);
                 holder.btnReject.setVisibility(View.GONE);
                 holder.btnAgree.setVisibility(View.GONE);
                 break;
             case Group.STATUS_WAITING:
                 holder.statusOk.setVisibility(View.GONE);
                 holder.statusNo.setVisibility(View.GONE);
+                holder.statusInvalidate.setVisibility(View.GONE);
                 holder.btnReject.setVisibility(View.VISIBLE);
                 holder.btnAgree.setVisibility(View.VISIBLE);
                 holder.btnReject.setEnabled(true);
                 holder.btnAgree.setEnabled(true);
-                holder.btnReject.setTextColor(0xD50000);
+                holder.btnReject.setTextColor(0xffD50000);
                 holder.btnAgree.setTextColor(0xff558B2F);
                 break;
             case Group.STATUS_INVALIDATE:
                 holder.statusOk.setVisibility(View.GONE);
                 holder.statusNo.setVisibility(View.GONE);
+                holder.statusInvalidate.setVisibility(View.VISIBLE);
                 holder.btnReject.setVisibility(View.VISIBLE);
                 holder.btnAgree.setVisibility(View.VISIBLE);
                 holder.btnReject.setEnabled(false);
@@ -125,6 +129,7 @@ public class NewMemberAdapter extends BaseRecyclerViewAdapter<NewMemberAdapter.N
         TextView extraMsg;
         View statusOk;
         View statusNo;
+        View statusInvalidate;
         View btnHead;
         TextView btnReject;
         TextView btnAgree;
@@ -141,6 +146,7 @@ public class NewMemberAdapter extends BaseRecyclerViewAdapter<NewMemberAdapter.N
             extraMsg = itemView.findViewById(R.id.extra_msg_view);
             statusOk = itemView.findViewById(R.id.status_ok_view);
             statusNo = itemView.findViewById(R.id.status_no_view);
+            statusInvalidate = itemView.findViewById(R.id.status_invalidate_view);
             btnHead = itemView.findViewById(R.id.btn_head);
             btnReject = itemView.findViewById(R.id.btn_reject);
             btnAgree = itemView.findViewById(R.id.btn_agree);

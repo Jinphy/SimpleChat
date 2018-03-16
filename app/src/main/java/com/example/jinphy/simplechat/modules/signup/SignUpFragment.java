@@ -24,6 +24,7 @@ import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
 import com.example.jinphy.simplechat.custom_view.CustomVerticalStepperFormLayout;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
+import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
 import com.example.jinphy.simplechat.modules.login.LoginActivity;
 import com.example.jinphy.simplechat.modules.main.MainActivity;
@@ -575,9 +576,15 @@ public class SignUpFragment extends BaseFragment<SignUpPresenter> implements
      * Created by jinphy, on 2018/1/6, at 18:02
      */
     @Override
-    public void findUserNo(String reason) {
-        if (BaseRepository.TYPE_CODE.equals(reason)) {
-            verticalStepperForm.next(STEP_ACCOUNT);
+    public void findUserNo(Response response) {
+        if (response != null) {
+            if (Response.NO_FIND_USER.equals(response.getCode())) {
+                verticalStepperForm.next(STEP_ACCOUNT);
+            } else {
+                App.showToast(response.getMsg(), false);
+            }
+        } else {
+            App.showToast("请求异常！", false);
         }
     }
 

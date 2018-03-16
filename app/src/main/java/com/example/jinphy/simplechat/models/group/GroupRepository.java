@@ -59,11 +59,12 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
             group.isFromSearch = false;
             Group old = get(group.groupNo, group.owner);
             if (old != null) {
-                group.setId(old.getId());
+                old.update(group);
+                groupBox.put(old);
             } else {
                 group.setId(0);
+                groupBox.put(group);
             }
-            groupBox.put(group);
         }
     }
 
@@ -76,7 +77,15 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
 
     @Override
     public void update(Group group) {
-        if (group != null) {
+        if (group == null) {
+            return;
+        }
+        Group old = groupBox.get(group.getId());
+        if (old != null) {
+            old.update(group);
+            groupBox.put(old);
+        } else {
+            group.setId(0);
             groupBox.put(group);
         }
     }
@@ -154,7 +163,10 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
 
 
     public void remove(Group group) {
-        groupBox.remove(group);
+        if (group == null) {
+            return;
+        }
+        groupBox.remove(group.getId());
     }
 
     @Override
@@ -173,8 +185,10 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
                     saveMyGroup(group);
                     synchronized (flag) {
                         if (flag.ok) {
-                            if (whenOk.length > 0) {
-                                whenOk[0].run();
+                            for (Runnable runnable : whenOk) {
+                                if (runnable != null) {
+                                    runnable.run();
+                                }
                             }
                         } else {
                             flag.ok = true;
@@ -191,19 +205,22 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
                 .dataType(Api.Data.MAP)
                 .onResponseYes(response -> {
                     Map<String, String> data = response.getData();
-                    if (!"无".equals(data.get(User_.avatar.name))) {
-                        Bitmap bitmap = StringUtils.base64ToBitmap(data.get(User_.avatar.name));
-                        ImageUtil.storeAvatar(groupNo, bitmap);
-                    }
+                    Bitmap bitmap = StringUtils.base64ToBitmap(data.get(User_.avatar.name));
+                    ImageUtil.storeAvatar(groupNo, bitmap);
+                })
+                .onFinal(()->{
                     synchronized (flag) {
                         if (flag.ok) {
-                            if (whenOk.length > 0) {
-                                whenOk[0].run();
+                            for (Runnable runnable : whenOk) {
+                                if (runnable != null) {
+                                    runnable.run();
+                                }
                             }
                         } else {
                             flag.ok = true;
                         }
                     }
+
                 })
                 .request();
     }
