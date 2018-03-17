@@ -12,32 +12,31 @@ import com.example.jinphy.simplechat.modules.group.group_list.GroupListAdapter;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Created by jinphy on 2017/8/15.
  */
 
-public abstract class BaseRecyclerViewAdapter<T, VH extends RecyclerView.ViewHolder>
+public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> {
 
 
-    protected OnClickListener click;
+    protected OnClickListener<T> click;
 
-    protected OnLongClickListener longClick;
+    protected OnLongClickListener<T> longClick;
 
     protected List<T> data;
 
-
-
     protected abstract void onBindViewHolder(VH holder, T item, int position);
 
-    protected abstract int getResourceId();
+    protected abstract int getResourceId(int viewType);
 
     protected abstract VH onCreateViewHolder(View itemView);
 
     //--------------------------------
 
-    public BaseRecyclerViewAdapter() {
+    public BaseAdapter() {
         data = new LinkedList<>();
     }
 
@@ -52,7 +51,7 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends RecyclerView.ViewHol
     protected void setClick(T item, int position, int type,  View... views) {
         if (click != null) {
             for (View view : views) {
-                view.setOnClickListener(v -> click.onClick(v, item, position, type));
+                view.setOnClickListener(v -> click.onClick(v, item, type, position));
             }
         }
     }
@@ -60,7 +59,7 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends RecyclerView.ViewHol
     protected void setLongClick(T item, int position, int type,  View... views) {
         if (longClick != null) {
             for (View view : views) {
-                view.setOnLongClickListener(v -> longClick.onLongClick(v, item, position, type));
+                view.setOnLongClickListener(v -> longClick.onLongClick(v, item, type, position));
             }
         }
     }
@@ -69,7 +68,7 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends RecyclerView.ViewHol
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(
-                parent.getContext()).inflate(getResourceId(), parent, false);
+                parent.getContext()).inflate(getResourceId(viewType), parent, false);
         return onCreateViewHolder(itemView);
     }
 
@@ -84,12 +83,13 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends RecyclerView.ViewHol
         return data.size();
     }
 
-    public void onClick(OnClickListener listener) {
+
+    public void onClick(OnClickListener<T> listener) {
         this.click = listener;
 
     }
 
-    public void onLongClick(OnLongClickListener listener) {
+    public void onLongClick(OnLongClickListener<T> listener) {
         this.longClick = listener;
     }
 
@@ -104,4 +104,8 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends RecyclerView.ViewHol
     }
 
 
+    public interface Filter<T>{
+
+        boolean filter(T item);
+    }
 }

@@ -149,6 +149,10 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
                 btnDeleteLocal.setVisibility(View.VISIBLE);
                 avatarItem.content("该群已被群主解散");
             } else {
+                if (!group.isFromSearch()) {
+                    btnDeleteLocal.setVisibility(View.VISIBLE);
+                    avatarItem.content("您已被群主移出该群");
+                }
                 btnAdd.setVisibility(View.VISIBLE);
             }
 
@@ -273,6 +277,7 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
                     .title("退出群聊")
                     .titleColor(colorPrimary())
                     .content("您将退出该群聊，并且操作不可恢复，是否继续？")
+                    .contentGravity(GravityEnum.CENTER)
                     .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_warning_24dp, colorPrimary()))
                     .positiveText("确定")
                     .negativeText("不了")

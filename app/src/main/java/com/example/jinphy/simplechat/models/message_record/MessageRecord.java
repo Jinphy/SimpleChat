@@ -28,7 +28,7 @@ import io.objectbox.relation.ToOne;
 @Entity
 public class MessageRecord implements Comparable<MessageRecord>{
 
-    @Id
+    @Id(assignable = true)
     private long id;
 
     private String owner;
@@ -246,14 +246,5 @@ public class MessageRecord implements Comparable<MessageRecord>{
         Arrays.sort(temp);
         records.clear();
         records.addAll(Arrays.asList(temp));
-    }
-
-    public void update(MessageRecord newOne) {
-        this.setNewMsgCount(newOne.newMsgCount);
-        this.setWithGroup(newOne.withGroup);
-        this.setWithFriend(newOne.withFriend);
-        this.setOwner(newOne.owner);
-        this.setLastMsg(newOne.lastMsg);
-        this.setToTop(newOne.toTop);
     }
 }

@@ -131,8 +131,11 @@ public abstract class Api {
         @Post
         String exitGroup = "/group/exitGroup";
         @Post
+        String removeMembers = "/group/removeMembers";
+        @Post
         String modifyAllowChat = "/member/modifyAllowChat";
-
+        @Post
+        String addMembers = "/group/addMembers";
     }
 
     //===================参数key==========================================================

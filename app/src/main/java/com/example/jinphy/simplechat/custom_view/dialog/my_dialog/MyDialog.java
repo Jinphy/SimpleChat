@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.custom_view.dialog;
+package com.example.jinphy.simplechat.custom_view.dialog.my_dialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -16,7 +16,7 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
  * Created by jinphy on 2018/3/14.
  */
 
-public class MyDialog extends AlertDialog implements Dialog{
+public class MyDialog extends AlertDialog implements MyDialogInterface {
 
     private int width;
 
@@ -30,7 +30,7 @@ public class MyDialog extends AlertDialog implements Dialog{
         super(context);
     }
 
-    public static Dialog create(Context context) {
+    public static MyDialogInterface create(Context context) {
         return new MyDialog(context);
     }
 
@@ -54,29 +54,35 @@ public class MyDialog extends AlertDialog implements Dialog{
     }
 
     @Override
-    public Dialog width(int valueDp) {
+    public MyDialogInterface width(int valueDp) {
         this.width = valueDp;
         return this;
     }
 
     @Override
-    public Dialog height(int valueDp) {
+    public MyDialogInterface height(int valueDp) {
         this.height = valueDp;
         return this;
     }
 
     @Override
-    public Dialog view(View view) {
+    public MyDialogInterface view(View view) {
         this.view = view;
         setView(view);
         return this;
     }
 
     @Override
-    public Dialog view(int resourceId) {
+    public MyDialogInterface view(int resourceId) {
         view =LayoutInflater.from(getContext())
                 .inflate(resourceId, null, false);
         setView(view);
+        return this;
+    }
+
+    @Override
+    public MyDialogInterface cancelable(boolean cancelable) {
+        setCancelable(cancelable);
         return this;
     }
 
@@ -94,9 +100,9 @@ public class MyDialog extends AlertDialog implements Dialog{
     public static class Holder{
         public final View view;
 
-        public final Dialog dialog;
+        public final MyDialogInterface dialog;
 
-        public Holder(View view, Dialog dialog) {
+        public Holder(View view, MyDialogInterface dialog) {
             this.view = view;
             this.dialog = dialog;
         }

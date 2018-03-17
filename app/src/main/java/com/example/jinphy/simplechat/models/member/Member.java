@@ -25,7 +25,7 @@ public class Member {
     public static final String STATUS_WAITING = "waiting";
     public static final String STATUS_OK = "ok";
 
-    @Id
+    @Id(assignable = true)
     private long id;
 
     private ToOne<Friend> person;
@@ -151,15 +151,4 @@ public class Member {
         return member;
     }
 
-
-    public void update(Member newOne) {
-        if (newOne == null) {
-            return;
-        }
-        this.setAllowChat(newOne.allowChat);
-        this.setGroupNo(newOne.groupNo);
-        this.setStatus(newOne.status);
-        this.setOwner(newOne.owner);
-        this.setPerson(newOne.person);
-    }
 }

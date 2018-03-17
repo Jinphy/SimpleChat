@@ -55,7 +55,7 @@ import java.util.List;
  *                      .append(",")
  *                      .append("点我有惊喜哦！")
  *                      .colorForBackground(0x677876)
- *                      .click(value -> {
+ *                      .onClick(value -> {
  *                          // “点我有惊喜哦！” 这段文本的点击事件
  *                      })
  *                      .into(textView);// 或者你可以调用make()来获取上面设置好的结果

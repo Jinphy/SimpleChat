@@ -3,20 +3,15 @@ package com.example.jinphy.simplechat.modules.main.friends;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -24,7 +19,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/10.
  */
 
-public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<Friend, FriendsRecyclerViewAdapter.ViewHolder> {
+public class FriendsRecyclerViewAdapter extends BaseAdapter<Friend, FriendsRecyclerViewAdapter.ViewHolder> {
 
 
     @Override
@@ -53,7 +48,7 @@ public class FriendsRecyclerViewAdapter extends BaseRecyclerViewAdapter<Friend, 
     }
 
     @Override
-    protected int getResourceId() {
+    protected int getResourceId(int viewType) {
         return R.layout.main_tab_friends_item;
     }
 

@@ -34,7 +34,8 @@ public class Friend {
     // 消息免打扰
     public static final String status_silent = "silent";
 
-    @Id protected long id;
+    @Id(assignable = true)
+    protected long id;
 
     /**
      * DESC: 账号
@@ -258,21 +259,4 @@ public class Friend {
         return friends;
     }
 
-    public void update(Friend newOne) {
-        if (newOne == null) {
-            return;
-        }
-        this.setRemark(newOne.remark);
-        this.setStatus(newOne.status);
-        this.setGroupCount(newOne.groupCount);
-        this.setOwner(newOne.owner);
-        this.setAccount(newOne.account);
-        this.setDate(newOne.date);
-        this.setAvatar(newOne.avatar);
-        this.setUser(newOne.user);
-        this.setAddress(newOne.address);
-        this.setName(newOne.name);
-        this.setSex(newOne.sex);
-        this.setSignature(newOne.signature);
-    }
 }

@@ -2,20 +2,15 @@ package com.example.jinphy.simplechat.modules.main.msg;
 
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
-
-import java.util.LinkedList;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -23,7 +18,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/10.
  */
 
-public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MessageRecord ,MsgRecyclerViewAdapter.ViewHolder> {
+public class MsgRecyclerViewAdapter extends BaseAdapter<MessageRecord ,MsgRecyclerViewAdapter.ViewHolder> {
 
 
     @Override
@@ -71,7 +66,7 @@ public class MsgRecyclerViewAdapter extends BaseRecyclerViewAdapter<MessageRecor
     }
 
     @Override
-    protected int getResourceId() {
+    protected int getResourceId(int viewType) {
         return R.layout.main_tab_msg_item;
     }
 

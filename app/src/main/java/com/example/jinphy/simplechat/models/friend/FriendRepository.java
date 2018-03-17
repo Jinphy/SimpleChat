@@ -83,6 +83,29 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
         }
     }
 
+    @Override
+    public List<Friend> loadExclude(String owner, List<String> excludeAccount) {
+        return friendBox.query()
+                .filter(friend->{
+                    if (StringUtils.equal(owner, friend.getOwner())) {
+                        switch (friend.getStatus()) {
+                            case Friend.status_ok:
+                            case Friend.status_black_listed:
+                            case Friend.status_black_listing:
+                                for (String s : excludeAccount) {
+                                    if (StringUtils.equal(s, friend.getAccount())) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                        }
+                    }
+                    return false;
+                })
+                .build().find();
+
+    }
+
     /**
      * DESC: 从服务器中获取好友列表
      * Created by jinphy, on 2018/2/28, at 18:29
@@ -246,12 +269,11 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
                 .build().findFirst();
 
         if (old != null) {
-            old.update(friend);
-            friendBox.put(old);
+            friend.setId(old.getId());
         } else {
             friend.setId(0);
-            friendBox.put(friend);
         }
+        friendBox.put(friend);
     }
 
     @Override
@@ -269,14 +291,7 @@ public class FriendRepository extends BaseRepository implements FriendDataSource
         if (friend == null) {
             return;
         }
-        Friend old = friendBox.get(friend.getId());
-        if (old != null) {
-            old.update(friend);
-            friendBox.put(old);
-        } else {
-            friend.setId(0);
-            friendBox.put(friend);
-        }
+        friendBox.put(friend);
     }
 
     @Override

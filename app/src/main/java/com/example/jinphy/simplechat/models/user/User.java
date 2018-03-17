@@ -20,7 +20,7 @@ public class User implements Serializable{
     public static final String STATUS_LOGOUT = "LOGOUT";
 
 
-    @Id
+    @Id(assignable = true)
     protected long id;
 
     /**

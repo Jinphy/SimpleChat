@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.models.message;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.event_bus.EBInteger;
 import com.example.jinphy.simplechat.models.event_bus.EBService;
@@ -12,6 +13,7 @@ import com.example.jinphy.simplechat.models.member.MemberRepository;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.utils.GsonUtils;
+import com.example.jinphy.simplechat.utils.ThreadPoolUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -81,33 +83,20 @@ public class MessageRepository implements MessageDataSource {
      */
     public void update(Message... messages) {
         if (messages.length > 0) {
-            for (Message message : messages) {
-                update(message);
-            }
+            messageBox.put(messages);
         }
     }
 
     public synchronized void update(Message message) {
-        if (message == null) {
-            return;
-        }
-        Message old = messageBox.get(message.getId());
-        if (old != null) {
-            old.update(message);
-            messageBox.put(old);
-        } else {
-            message.setId(0);
+        if (message != null) {
             messageBox.put(message);
         }
     }
 
     @Override
     public void update(List<Message> messages) {
-        if (messages == null || messages.size() == 0) {
-            return;
-        }
-        for (Message message : messages) {
-            update(message);
+        if (messages != null && messages.size() > 0) {
+            messageBox.put(messages);
         }
     }
 

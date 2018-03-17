@@ -75,7 +75,8 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.1'
     // 权限请求
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
-    compile 'io.objectbox:objectbox-rxjava:0.9.8'
+//    compile 'io.objectbox:objectbox-rxjava:0.9.8'
+    compile 'io.objectbox:objectbox-android:1.4.4'
     compile 'com.afollestad.material-dialogs:core:0.9.5.0'
     compile 'com.afollestad.material-dialogs:commons:0.9.5.0'
     compile 'jp.wasabeef:recyclerview-animators:2.2.7'

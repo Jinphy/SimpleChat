@@ -90,7 +90,7 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
 
     @Override
     protected void findViewsById(View view) {
-        //        GridLayout container = view.findViewById(R.id.grid_layout);
+        //        GridLayout container = item.findViewById(R.id.grid_layout);
         recyclerView = view.findViewById(R.id.recycler_view);
     }
 

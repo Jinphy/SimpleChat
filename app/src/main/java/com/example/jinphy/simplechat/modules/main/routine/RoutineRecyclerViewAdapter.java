@@ -1,25 +1,22 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.models.menu.Routine;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jinphy on 2017/8/15.
  */
 
 public class RoutineRecyclerViewAdapter
-        extends BaseRecyclerViewAdapter<Routine, RoutineRecyclerViewAdapter.ViewHolder> {
+        extends BaseAdapter<Routine, RoutineRecyclerViewAdapter.ViewHolder> {
 
 
     public RoutineRecyclerViewAdapter() {
@@ -38,7 +35,7 @@ public class RoutineRecyclerViewAdapter
     }
 
     @Override
-    protected int getResourceId() {
+    protected int getResourceId(int viewType) {
         return R.layout.main_tab_routine_item;
     }
 

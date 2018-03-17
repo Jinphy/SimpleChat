@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.member.CheckableMember;
 import com.example.jinphy.simplechat.models.member.Member;
 
@@ -22,6 +23,11 @@ public interface MemberListContract {
         void whenModifyRemarkOk();
 
         void whenModifyAllowChatOk(String msg);
+
+        void whenRemoveMemberOk(CheckableMember member);
+
+        void whenRemoveMembersOk();
+
     }
 
 
@@ -36,5 +42,15 @@ public interface MemberListContract {
 
         void modifyAllowChat(Context context, CheckableMember member);
 
+        void removeMember(Context context, CheckableMember member);
+
+        void removeMembers(Context context, String groupNo, List<String> members);
+
+        String getOwner();
+
+        Group getGroup(String groupNo);
+
+
+        void addMembers(Context context, String groupNo, List<String> accounts);
     }
 }

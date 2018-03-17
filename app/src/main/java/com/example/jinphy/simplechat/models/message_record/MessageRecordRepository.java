@@ -43,19 +43,6 @@ public class MessageRecordRepository implements MessageRecordDataSource {
         if (record == null) {
             return;
         }
-        List<MessageRecord> old = messageRecordBox.query()
-                .filter(entity -> {
-                    if (StringUtils.equal(entity.getOwner(), record.getOwner())
-                            && StringUtils.equal(entity.getWith(), record.getWith())) {
-                        return true;
-                    }
-                    return false;
-                })
-                .build().find();
-        if (old != null && old.size() > 0) {
-            messageRecordBox.remove(old);
-        }
-        record.setId(0);
         messageRecordBox.put(record);
     }
 
@@ -131,13 +118,13 @@ public class MessageRecordRepository implements MessageRecordDataSource {
      * DESC: 更新消息记录
      *
      * @param resetNewMsgCount 标志是否需要清空新消息条数
-     * Created by jinphy, on 2018/3/14, at 9:17
+     *                         Created by jinphy, on 2018/3/14, at 9:17
      */
     @Override
-    public void update(Message msg,boolean resetNewMsgCount) {
-        MessageRecord record;
+    public void update(Message msg, boolean resetNewMsgCount) {
+                MessageRecord record;
         String with = msg.getWith();
-        Friend friend=null;
+        Friend friend = null;
         Group group = null;
         if ((friend = FriendRepository.getInstance().get(msg.getOwner(), with)) != null) {
             record = get(msg.getOwner(), friend);

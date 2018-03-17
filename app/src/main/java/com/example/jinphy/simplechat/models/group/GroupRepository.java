@@ -59,13 +59,12 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
             group.isFromSearch = false;
             Group old = get(group.groupNo, group.owner);
             if (old != null) {
-                old.update(group);
-                groupBox.put(old);
+                group.setId(old.getId());
             } else {
                 group.setId(0);
-                groupBox.put(group);
             }
         }
+        groupBox.put(groups);
     }
 
     public void saveMyGroup(List<Group> groups) {
@@ -80,14 +79,7 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
         if (group == null) {
             return;
         }
-        Group old = groupBox.get(group.getId());
-        if (old != null) {
-            old.update(group);
-            groupBox.put(old);
-        } else {
-            group.setId(0);
-            groupBox.put(group);
-        }
+        groupBox.put(group);
     }
 
     @Override
@@ -99,13 +91,12 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
             Group old = get(group.groupNo, group.owner);
             if (old != null) {
                 old.isFromSearch = true;
-                groupBox.put(old);
             } else {
                 group.isFromSearch = true;
                 group.setId(0);
-                groupBox.put(group);
             }
         }
+        groupBox.put(groups);
     }
 
     @Override
@@ -241,7 +232,7 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
                 .setup(api -> this.handleBuilder(api, task))
                 .hint("正在修改...")
                 .path(Api.Path.modifyGroup)
-                .dataType(Api.Data.MAP)
+                .dataType(Api.Data.MODEL,String.class)
                 .request();
 
     }
@@ -252,7 +243,7 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
                 .setup(api -> this.handleBuilder(api, task))
                 .hint("正在申请加入...")
                 .path(Api.Path.joinGroup)
-                .dataType(Api.Data.MAP)
+                .dataType(Api.Data.MODEL,String.class)
                 .request();
 
     }
@@ -263,7 +254,7 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
                 .setup(api -> this.handleBuilder(api, task))
                 .hint("正在同意加入...")
                 .path(Api.Path.agreeJoinGroup)
-                .dataType(Api.Data.MAP)
+                .dataType(Api.Data.MODEL, String.class)
                 .request();
     }
 
@@ -273,8 +264,27 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
                 .setup(api -> this.handleBuilder(api, task))
                 .hint("正在操作...")
                 .path(Api.Path.exitGroup)
-                .dataType(Api.Data.MAP)
+                .dataType(Api.Data.MODEL,String.class)
                 .request();
+    }
 
+    @Override
+    public void removeMembers(Context context, Task<String> task) {
+        Api.<String>common(context)
+                .setup(api -> this.handleBuilder(api, task))
+                .hint("正在操作...")
+                .path(Api.Path.removeMembers)
+                .dataType(Api.Data.MODEL,String.class)
+                .request();
+    }
+
+    @Override
+    public void addMembers(Context context, Task<String> task) {
+        Api.<String>common(context)
+                .setup(api -> this.handleBuilder(api, task))
+                .hint("正在操作...")
+                .path(Api.Path.addMembers)
+                .dataType(Api.Data.MODEL,String.class)
+                .request();
     }
 }

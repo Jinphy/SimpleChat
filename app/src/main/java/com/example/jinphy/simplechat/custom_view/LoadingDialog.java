@@ -287,12 +287,12 @@ public class LoadingDialog extends AlertDialog {
         LinearLayout rootView = findViewById(R.id.root_view);
         rootView.setBackgroundColor(builder.backgroundColor);
 
-        // setup title view
+        // setup title item
         TextView titleView = findViewById(R.id.title_view);
         titleView.setText(builder.title);
         titleView.setTextColor(builder.titleColor);
 
-        // setup animate view
+        // setup animate item
         FrameLayout spotLayout = findViewById(R.id.spot_layout);
         spotViews = new SpotView[builder.spotCount];
         for (int i = 0; i < spotViews.length; i++) {

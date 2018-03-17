@@ -3,23 +3,25 @@ package com.example.jinphy.simplechat.modules.group.member_list;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.custom_view.MenuItemView;
-import com.example.jinphy.simplechat.custom_view.dialog.MyDialog;
+import com.example.jinphy.simplechat.custom_libs.SChain;
+import com.example.jinphy.simplechat.custom_view.dialog.friend_selector.FriendSelector;
+import com.example.jinphy.simplechat.custom_view.dialog.my_dialog.MyDialog;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
+import com.example.jinphy.simplechat.models.friend.CheckedFriend;
+import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.member.CheckableMember;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
 import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserActivity;
@@ -30,6 +32,9 @@ import com.example.jinphy.simplechat.utils.StringUtils;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * DESC:
  * Created by jinphy, on 2018/3/14, at 15:31
@@ -38,6 +43,8 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
         MemberListContract.View {
 
     public static final String GROUP_NO = "GROUP_NO";
+
+    public static final String TAG = "MemberListFragment";
 
     private RecyclerView recyclerView;
     private View bottomView;
@@ -135,7 +142,33 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
         });
 
         btnRemoveMembers.setOnClickListener(v -> {
-            // TODO: 2018/3/15 要判断群主是否被选中，如果群主被选中，则应该提示用户，并终止操作
+            List<String> checkedMembers = adapter.getCheckedAccounts();
+            for (String member : checkedMembers) {
+                if (StringUtils.equal(member, presenter.getOwner())) {
+                    App.showToast("删除成员不能包括自己", false);
+                    return;
+                }
+            }
+            if (checkedMembers.size() == 0) {
+                App.showToast("请选择需要移出的成员", false);
+                return;
+            }
+            new MaterialDialog.Builder(activity())
+                    .title("移除成员")
+                    .titleColor(colorPrimary())
+                    .content("您将移出所选成员，并且操作不可恢复，是否继续？")
+                    .contentGravity(GravityEnum.CENTER)
+                    .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_warning_24dp, colorPrimary()))
+                    .positiveText("确定")
+                    .negativeText("不了")
+                    .positiveColor(colorPrimary())
+                    .negativeColorRes(R.color.color_red_D50000)
+                    .onPositive((dialog, which) -> {
+                        presenter.removeMembers(activity(), groupNo, checkedMembers);
+                    })
+                    .show();
+
+
         });
 
         btnBuildNewGroup.setOnClickListener(v -> {
@@ -198,7 +231,21 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
         if (removeMemberView.getVisibility() == View.VISIBLE) {
             removeMemberView.setOnClickListener(v -> {
                 holder.dialog.dismiss();
-                // TODO: 2018/3/15
+                new MaterialDialog.Builder(activity())
+                        .title("移除成员")
+                        .titleColor(colorPrimary())
+                        .content("您将移出该成员，并且操作不可恢复，是否继续？")
+                        .contentGravity(GravityEnum.CENTER)
+                        .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_warning_24dp, colorPrimary()))
+                        .positiveText("确定")
+                        .negativeText("不了")
+                        .positiveColor(colorPrimary())
+                        .negativeColorRes(R.color.color_red_D50000)
+                        .onPositive((dialog, which) -> {
+                            presenter.removeMember(activity(), member);
+                        })
+                        .show();
+
             });
         }
         if (allowToChatView.getVisibility() == View.VISIBLE) {
@@ -250,11 +297,18 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
                 .view(R.layout.menu_member_more)
                 .width(200)
                 .display();
-        holder.view.findViewById(R.id.add_member_view)
-                .setOnClickListener(v -> {
-                    holder.dialog.dismiss();
-                    // TODO: 2018/3/15
-                });
+        Group group = presenter.getGroup(groupNo);
+        View addMemberView = holder.view.findViewById(R.id.add_member_view);
+        if (group.isMyGroup()) {
+            addMemberView.setVisibility(View.VISIBLE);
+            addMemberView.setOnClickListener(v -> {
+                holder.dialog.dismiss();
+                showSelectFriendsDialog();
+            });
+        } else {
+            addMemberView.setVisibility(View.GONE);
+        }
+
 
         holder.view.findViewById(R.id.select_view)
                 .setOnClickListener(v -> {
@@ -263,6 +317,36 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
                         setShowCheckBoxStatus();
                     }
                 });
+    }
+
+
+    private void showSelectFriendsDialog() {
+        FriendSelector SelectorDialog = FriendSelector.create(activity())
+                .titleColor(colorPrimary())
+                .exclude(adapter.getAllAccounts())
+                .onSelect(value -> {
+                    List<String> selectedAccounts = new ArrayList<>(value.size());
+                    for (CheckedFriend it : value) {
+                        selectedAccounts.add(it.getAccount());
+                    }
+                    new MaterialDialog.Builder(activity())
+                            .title("添加成员")
+                            .titleColor(colorPrimary())
+                            .content("所选的好友将会加入到该群聊，是否继续？")
+                            .contentGravity(GravityEnum.CENTER)
+                            .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_warning_24dp, colorPrimary()))
+                            .positiveText("确定")
+                            .negativeText("不了")
+                            .positiveColor(colorPrimary())
+                            .negativeColorRes(R.color.color_red_D50000)
+                            .onPositive((dialog, which) -> {
+                                presenter.addMembers(activity(), groupNo, selectedAccounts);
+                            })
+                            .show();
+
+                })
+                .display();
+
     }
 
 
@@ -321,8 +405,27 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
         refresh();
     }
 
+    @Override
+    public void whenRemoveMemberOk(CheckableMember member) {
+        App.showToast("成员：" + member.getName() + "(" + member.getAccount() + ")已被移除！", false);
+        int i = linearLayoutManager.findFirstVisibleItemPosition();
+        adapter.remove(member);
+        if (i < adapter.getItemCount()) {
+            recyclerView.scrollToPosition(i);
+        }
+    }
+
+    @Override
+    public void whenRemoveMembersOk() {
+        App.showToast("所选成员以删除！", false);
+        adapter.removeChecked();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void updateView(EBUpdateView msg) {
+        if (TAG.equals(msg.data)) {
+            return;
+        }
         adapter.update(presenter.loadMembers(groupNo));
         App.showToast("成员信息已更新", false);
     }

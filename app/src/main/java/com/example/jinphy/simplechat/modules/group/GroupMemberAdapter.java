@@ -2,13 +2,11 @@ package com.example.jinphy.simplechat.modules.group;
 
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 
@@ -24,13 +22,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2018/3/9.
  */
 
-public class GroupMemberAdapter extends BaseRecyclerViewAdapter<Friend, GroupMemberAdapter.ViewHolder> {
+public class GroupMemberAdapter extends BaseAdapter<Friend, GroupMemberAdapter.ViewHolder> {
 
     private Map<Friend, Boolean> checks;
 
 
     @Override
-    protected int getResourceId() {
+    protected int getResourceId(int viewType) {
         return R.layout.layout_group_member_item;
     }
 

@@ -13,7 +13,6 @@ import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.member.MemberRepository;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message.MessageRepository;
-import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
@@ -98,203 +97,39 @@ public class PushManager {
                 case Message.TYPE_SYSTEM_ADD_FRIEND_AGREE:
                 case Message.TYPE_SYSTEM_RELOAD_FRIEND:
                     // 1
-                    friendRepository.getOnline(
-                            null,
-                            message.getOwner(),
-                            message.getExtra(),//好友的账号保存在该字段中
-                            friend1 -> {
-                                if (Message.TYPE_SYSTEM_ADD_FRIEND
-                                        .equals(message.getContentType())) {
-                                    if (Friend.status_deleted.equals(friend1.getStatus())) {
-                                        friend1.setStatus(Friend.status_waiting);
-                                        friendRepository.save(friend1);
-                                    }
-                                }
-                                EventBus.getDefault().post(new EBService());
-                            });
+                    getFriend(message);
                     break;
                 case Message.TYPE_SYSTEM_DELETE_FRIEND:
                     // 2
-                    String account2 = message.getExtra();//好友的账号保存在该字段中
-                    Friend friend2 = FriendRepository.getInstance().get(message.getOwner(), account2);
-                    friend2.setStatus(Friend.status_deleted);
-                    friendRepository.update(friend2);
-                    Message msg2 = new Message();
-                    msg2.setOwner(message.getOwner());
-                    msg2.setWith(Friend.system);
-                    msg2.setContentType(Message.TYPE_SYSTEM_NOTICE);
-                    msg2.setExtra("删除好友");
-                    msg2.setContent(friend2.getShowName() + "（" + account2 + ")" + message.getContent());
-                    msg2.setCreateTime(System.currentTimeMillis()+"");
-                    msg2.setSourceType(Message.RECEIVE);
-
-                    MessageRepository.getInstance().saveReceive(msg2);
-                    MessageRecordRepository.getInstance().update(msg2, false);
-
+                    deleteFriend(message);
                     break;
                 case Message.TYPE_SYSTEM_NEW_GROUP:
                     // 3
-                    String msgContent = message.getContent();
-                    // split[0] :groupNo, split[1]:群成员的账号
-                    String[] split3 = message.getExtra().split("@");
-                    String groupNo3 = split3[0];
-                    String[] member3 = GsonUtils.toBean(split3[1], String[].class);
-
-                    // 从服务器获取群聊对象
-                    groupRepository.getOnline(
-                            null,
-                            message.getOwner(),
-                            groupNo3,
-                            ()->{
-                                // 群聊信息获取成功后，加载群聊中的成员
-                                Group tempGroup = groupRepository.get(groupNo3, message.getOwner());
-
-                                // 加载所有成员的好友信息
-                                for (String member : member3) {
-                                    Friend oldFriend2 = friendRepository.get(message.getOwner(), member);
-                                    if (oldFriend2 != null) {
-                                        memberRepository.saveNew(oldFriend2, groupNo3);
-                                        continue;
-                                    }
-                                    friendRepository.getOnline(
-                                            null,
-                                            message.getOwner(),
-                                            member,
-                                            friend3->{
-                                                memberRepository.saveNew(friend3, groupNo3);
-                                                EventBus.getDefault().post(new EBService());
-                                            });
-                                }
-                                EventBus.getDefault().post(new EBService());
-                                // 创建新消息
-                                Message msg3 = new Message();
-                                msg3.setCreateTime(System.currentTimeMillis()+"");
-                                msg3.setSourceType(Message.RECEIVE);
-                                msg3.setContent(msgContent);
-                                msg3.setContentType(Message.TYPE_CHAT_TEXT);
-                                msg3.setWith(groupNo3);
-                                msg3.setOwner(message.getOwner());
-                                msg3.setExtra(tempGroup.getCreator());// 群消息时，该字段表示信息发送者
-                                messageRepository.saveSend(msg3);
-
-                                messageRecordRepository.update(msg3, false);
-                                EventBus.getDefault().post(new EBService());
-                            }
-                    );
+                    getNewGroup(message);
                     break;
                 case Message.TYPE_SYSTEM_APPLY_JOIN_GROUP:
                     // 4
-                    String[] split4 = message.getExtra().split("@");
-                    split4[3] = EncryptUtils.aesDecrypt(split4[3]);
-                    message.setExtra(TextUtils.join("@", split4));
+                    joinGroup(message);
                     break;
                 case Message.TYPE_SYSTEM_RELOAD_GROUP:
                     // 5
-                    groupRepository.getOnline(
-                            null,
-                            message.getOwner(),
-                            message.getExtra(),//需要重新加载的群聊的群号在extra字段中
-                            ()-> EventBus.getDefault().post(new EBService()));
+                    updateGroup(message);
                     break;
                 case Message.TYPE_SYSTEM_NEW_MEMBER:
                     // 6
-                    String groupNo6 = message.getContent();
-                    String account6 = message.getExtra();
-                    Friend oldFriend6 = friendRepository.get(message.getOwner(), account6);
-                    Group group6 = groupRepository.get(groupNo6, message.getOwner());
-
-                    // 创建新消息
-                    Message msg6 = new Message();
-                    msg6.setCreateTime(System.currentTimeMillis()+"");
-                    msg6.setSourceType(Message.RECEIVE);
-                    msg6.setContent(account6 + "加入群聊：" + group6.getName() + "(" + groupNo6 + ")");
-                    msg6.setContentType(Message.TYPE_SYSTEM_NOTICE);
-                    msg6.setWith(Friend.system);
-                    msg6.setOwner(message.getOwner());
-                    msg6.setExtra("加入群聊");// 群消息时，该字段表示信息发送者
-                    EventBus.getDefault().post(new EBService());
-                    if (oldFriend6 != null) {
-                        memberRepository.saveNew(oldFriend6, groupNo6);
-                        messageRepository.saveSend(msg6);
-                        messageRecordRepository.update(msg6, false);
-                        EventBus.getDefault().post(new EBService());
-                    } else {
-                        friendRepository.getOnline(
-                                null,
-                                message.getOwner(),
-                                account6,
-                                friend6->{
-                                    memberRepository.saveNew(friend6, groupNo6);
-                                    messageRepository.saveSend(msg6);
-                                    messageRecordRepository.update(msg6, false);
-                                    EventBus.getDefault().post(new EBService());
-                                    // TODO: 2018/3/16 在群聊中增加新成员入群的提示信息
-                                });
-
-                    }
+                    getNewMember(message);
                     break;
                 case Message.TYPE_SYSTEM_BREAK_GROUP:
                     // 7
-                    String groupNo7 = message.getExtra();
-                    Group group7 = groupRepository.get(groupNo7, message.getOwner());
-                    group7.setMyGroup(false);
-                    group7.setBroke(true);
-                    groupRepository.update(group7);
-                    memberRepository.removeForGroup(group7);
-
-                    // 创建新消息
-                    Message msg7 = new Message();
-                    msg7.setCreateTime(System.currentTimeMillis()+"");
-                    msg7.setSourceType(Message.RECEIVE);
-                    msg7.setContent("群聊："+group7.getName()+"（"+groupNo7+"）"+message.getContent());
-                    msg7.setContentType(Message.TYPE_SYSTEM_NOTICE);
-                    msg7.setWith(Friend.system);
-                    msg7.setOwner(message.getOwner());
-                    msg7.setExtra("解散群聊");// 群消息时，该字段表示信息发送者
-                    messageRepository.saveReceive(msg7);
-
-                    messageRecordRepository.update(msg7, false);
-                    EventBus.getDefault().post(new EBService());
-
+                    deleteGroup(message);
                     break;
                 case Message.TYPE_SYSTEM_DELETE_MEMBER:
                     // 8
-                    String[] split8 = message.getExtra().split("@");
-                    String groupNo8 = split8[0];
-                    String account8 = split8[1];
-                    Group group8 = groupRepository.get(groupNo8, message.getOwner());
-                    memberRepository.removeFromGroup(group8, account8);
-
-                    // 创建新消息
-                    Message msg8 = new Message();
-                    msg8.setCreateTime(System.currentTimeMillis()+"");
-                    msg8.setSourceType(Message.RECEIVE);
-                    msg8.setContent(message.getContent()+"："+group8.getName()+"("+groupNo8+")");
-                    msg8.setContentType(Message.TYPE_SYSTEM_NOTICE);
-                    msg8.setWith(Friend.system);
-                    msg8.setOwner(message.getOwner());
-                    msg8.setExtra("退出群聊");// 群消息时，该字段表示信息发送者
-                    messageRepository.saveReceive(msg8);
-
-                    messageRecordRepository.update(msg8, false);
-                    EventBus.getDefault().post(new EBService());
+                    deleteMember(message);
                     break;
                 case Message.TYPE_SYSTEM_MEMBER_ALLOW_CHAT:
                     // 9
-                    String[] split9 = message.getExtra().split("@");
-                    String groupNo9 = split9[0];
-                    String account9 = split9[1];
-                    User user9 = userRepository.currentUser();
-                    Friend friend9 = friendRepository.get(user9.getAccount(), account9);
-                    Member member = memberRepository.get(groupNo9, account9, user9.getAccount());
-                    if (member != null) {
-                        member.setAllowChat(!member.isAllowChat());
-                        memberRepository.update(member);
-                    }
-                    // TODO: 2018/3/16 在这里生成一条新的本地消息，类型是在聊天中提示
-                    String content = message.getContent();//content: 已被群主禁言！
-
-
+                    updateMember(message);
                     break;
                 default:
                     break;
@@ -340,4 +175,255 @@ public class PushManager {
         }
     }
 
+
+    /**
+     * DESC: 获取好友
+     * Created by jinphy, on 2018/3/17, at 13:09
+     */
+    private void getFriend(Message message) {
+        friendRepository.getOnline(
+                null,
+                message.getOwner(),
+                message.getExtra(),//好友的账号保存在该字段中
+                friend1 -> {
+                    if (Message.TYPE_SYSTEM_ADD_FRIEND
+                            .equals(message.getContentType())) {
+                        if (Friend.status_deleted.equals(friend1.getStatus())) {
+                            friend1.setStatus(Friend.status_waiting);
+                            friendRepository.save(friend1);
+                        }
+                    }
+                    EventBus.getDefault().post(new EBService());
+                });
+
+    }
+
+
+    /**
+     * DESC: 删除好友
+     * Created by jinphy, on 2018/3/17, at 13:11
+     */
+    private void deleteFriend(Message message) {
+        String account2 = message.getExtra();//好友的账号保存在该字段中
+        Friend friend2 = FriendRepository.getInstance().get(message.getOwner(), account2);
+        friend2.setStatus(Friend.status_deleted);
+        friendRepository.update(friend2);
+        Message msg2 = new Message();
+        msg2.setOwner(message.getOwner());
+        msg2.setWith(Friend.system);
+        msg2.setContentType(Message.TYPE_SYSTEM_NOTICE);
+        msg2.setExtra("删除好友");
+        msg2.setContent(friend2.getShowName() + "（" + account2 + ")" + message.getContent());
+        msg2.setCreateTime(System.currentTimeMillis()+"");
+        msg2.setSourceType(Message.RECEIVE);
+
+        MessageRepository.getInstance().saveReceive(msg2);
+        MessageRecordRepository.getInstance().update(msg2, false);
+
+    }
+
+    /**
+     * DESC: 获取群聊
+     * Created by jinphy, on 2018/3/17, at 13:12
+     */
+    private void getNewGroup(Message message) {
+        String msgContent = message.getContent();
+        // split[0] :groupNo, split[1]:群成员的账号
+        String[] split3 = message.getExtra().split("@");
+        String groupNo3 = split3[0];
+        String[] member3 = GsonUtils.toBean(split3[1], String[].class);
+
+        // 从服务器获取群聊对象
+        groupRepository.getOnline(
+                null,
+                message.getOwner(),
+                groupNo3,
+                ()->{
+                    // 群聊信息获取成功后，加载群聊中的成员
+                    Group tempGroup = groupRepository.get(groupNo3, message.getOwner());
+
+                    // 加载所有成员的好友信息
+                    for (String member : member3) {
+                        Friend oldFriend2 = friendRepository.get(message.getOwner(), member);
+                        if (oldFriend2 != null) {
+                            memberRepository.saveNew(oldFriend2, groupNo3);
+                            continue;
+                        }
+                        friendRepository.getOnline(
+                                null,
+                                message.getOwner(),
+                                member,
+                                friend3->{
+                                    memberRepository.saveNew(friend3, groupNo3);
+                                    EventBus.getDefault().post(new EBService());
+                                });
+                    }
+                    EventBus.getDefault().post(new EBService());
+                    // 创建新消息
+                    Message msg3 = new Message();
+                    msg3.setCreateTime(System.currentTimeMillis()+"");
+                    msg3.setSourceType(Message.RECEIVE);
+                    msg3.setContent(msgContent);
+                    msg3.setContentType(Message.TYPE_CHAT_TEXT);
+                    msg3.setWith(groupNo3);
+                    msg3.setOwner(message.getOwner());
+                    msg3.setExtra(tempGroup.getCreator());// 群消息时，该字段表示信息发送者
+                    messageRepository.saveSend(msg3);
+
+                    messageRecordRepository.update(msg3, false);
+                    EventBus.getDefault().post(new EBService());
+                }
+        );
+    }
+
+    /**
+     * DESC: 处理加入群聊的消息
+     * Created by jinphy, on 2018/3/17, at 13:13
+     */
+    private void joinGroup(Message message) {
+        String[] split4 = message.getExtra().split("@");
+        split4[3] = EncryptUtils.aesDecrypt(split4[3]);
+        message.setExtra(TextUtils.join("@", split4));
+    }
+
+    /**
+     * DESC: 更新群聊
+     * Created by jinphy, on 2018/3/17, at 13:16
+     */
+    private void updateGroup(Message message) {
+        groupRepository.getOnline(
+                null,
+                message.getOwner(),
+                message.getExtra(),//需要重新加载的群聊的群号在extra字段中
+                ()-> EventBus.getDefault().post(new EBService()));
+    }
+
+    /**
+     * DESC: 有新成员加入，获取新成员
+     * Created by jinphy, on 2018/3/17, at 13:16
+     */
+    private void getNewMember(Message message) {
+        String groupNo = message.getContent();
+        String[] accounts = GsonUtils.toBean(message.getExtra(), String[].class);
+        Group group = groupRepository.get(groupNo, message.getOwner());
+
+        // 创建新消息
+        Message msg = new Message();
+        msg.setCreateTime(message.getCreateTime());
+        msg.setSourceType(Message.RECEIVE);
+        msg.setContentType(Message.TYPE_SYSTEM_NOTICE);
+        msg.setWith(Friend.system);
+        msg.setOwner(message.getOwner());
+        msg.setExtra("加入群聊");// 群消息时，该字段表示信息发送者
+        Friend oldFriend;
+        for (String account : accounts) {
+            msg.setContent(account + "加入群聊：" + group.getName() + "(" + groupNo + ")");
+            oldFriend = friendRepository.get(message.getOwner(), account);
+            if (oldFriend != null) {
+                memberRepository.saveNew(oldFriend, groupNo);
+                messageRepository.saveSend(msg);
+                messageRecordRepository.update(msg, false);
+                EventBus.getDefault().post(new EBService());
+            } else {
+                friendRepository.getOnline(
+                        null,
+                        message.getOwner(),
+                        account,
+                        friend->{
+                            memberRepository.saveNew(friend, groupNo);
+                            messageRepository.saveSend(msg);
+                            messageRecordRepository.update(msg, false);
+                            EventBus.getDefault().post(new EBService());
+                            // TODO: 2018/3/16 在群聊中增加新成员入群的提示信息
+                        });
+
+            }
+
+        }
+    }
+
+    /**
+     * DESC: 群聊被解散，删除群聊
+     * Created by jinphy, on 2018/3/17, at 13:17
+     */
+    private void deleteGroup(Message message) {
+        String groupNo = message.getExtra();
+        Group group = groupRepository.get(groupNo, message.getOwner());
+        group.setMyGroup(false);
+        group.setBroke(true);
+        groupRepository.update(group);
+        memberRepository.removeForGroup(group);
+
+        // 创建新消息
+        Message msg = new Message();
+        msg.setCreateTime(message.getCreateTime());
+        msg.setSourceType(Message.RECEIVE);
+        msg.setContent("群聊："+group.getName()+"（"+groupNo+"）"+message.getContent());
+        msg.setContentType(Message.TYPE_SYSTEM_NOTICE);
+        msg.setWith(Friend.system);
+        msg.setOwner(message.getOwner());
+        msg.setExtra("解散群聊");// 群消息时，该字段表示信息发送者
+        messageRepository.saveReceive(msg);
+
+        messageRecordRepository.update(msg, false);
+        EventBus.getDefault().post(new EBService());
+
+    }
+
+    /**
+     * DESC: 有成员退出群聊，删除该成员
+     *
+     * Created by jinphy, on 2018/3/17, at 13:19
+     */
+    private void deleteMember(Message message) {
+        String[] split = message.getExtra().split("@");
+        String groupNo = split[0];
+        String account = split[1];
+        Group group = groupRepository.get(groupNo, message.getOwner());
+
+        // 创建新消息
+        Message msg = new Message();
+        msg.setCreateTime(message.getCreateTime());
+        msg.setSourceType(Message.RECEIVE);
+        msg.setContentType(Message.TYPE_SYSTEM_NOTICE);
+        msg.setWith(Friend.system);
+        msg.setOwner(message.getOwner());
+
+        if (StringUtils.equal(account, message.getOwner())) {
+            // 要删除的成员是自己，所以是被群主移出了群聊
+            group.setMyGroup(false);
+            groupRepository.update(group);
+            memberRepository.removeForGroup(group);
+            msg.setContent("您已被群主移出群聊："+group.getName()+"("+groupNo+")");
+            msg.setExtra("移出群聊");
+        } else {
+            memberRepository.removeFromGroup(group, account);
+            msg.setContent(message.getContent()+"："+group.getName()+"("+groupNo+")");
+            msg.setExtra("退出群聊");// 群消息时，该字段表示信息发送者
+        }
+        messageRepository.saveReceive(msg);
+        messageRecordRepository.update(msg, false);
+        EventBus.getDefault().post(new EBService());
+    }
+
+    /**
+     * DESC: 更新成员
+     * Created by jinphy, on 2018/3/17, at 13:20
+     */
+    private void updateMember(Message message) {
+
+        String[] split9 = message.getExtra().split("@");
+        String groupNo9 = split9[0];
+        String account9 = split9[1];
+        User user9 = userRepository.currentUser();
+        Friend friend9 = friendRepository.get(user9.getAccount(), account9);
+        Member member = memberRepository.get(groupNo9, account9, user9.getAccount());
+        if (member != null) {
+            member.setAllowChat(!member.isAllowChat());
+            memberRepository.update(member);
+        }
+        // TODO: 2018/3/16 在这里生成一条新的本地消息，类型是在聊天中提示
+        String content = message.getContent();//content: 已被群主禁言！
+
+    }
 }

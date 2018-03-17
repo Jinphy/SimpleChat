@@ -73,7 +73,7 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
     protected void setupViews() {
 
         showAnimator();
-        //        ViewTreeObserver observer = view.getViewTreeObserver();
+        //        ViewTreeObserver observer = item.getViewTreeObserver();
         //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
         //            observer.addOnGlobalLayoutListener( () -> {
         //                if (!hasLoaded) {

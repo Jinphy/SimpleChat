@@ -157,7 +157,7 @@ public class Message implements Comparable<Message>{
     public static final String STATUS_SENDING = "sending";
     public static final String STATUS_NO = "no";
 
-    @Id
+    @Id(assignable = true)
     private long id = 0;
 
     @NonNull
@@ -345,7 +345,6 @@ public class Message implements Comparable<Message>{
     }
 
 
-
     public static Message make(String owner, String with, String content) {
         Message message = new Message();
         message.setOwner(owner);
@@ -368,20 +367,5 @@ public class Message implements Comparable<Message>{
         Arrays.sort(temp);
         messages.clear();
         messages.addAll(Arrays.asList(temp));
-    }
-
-    public void update(Message newOne) {
-        if (newOne == null) {
-            return;
-        }
-        this.setExtra(newOne.extra);
-        this.setOwner(newOne.owner);
-        this.setWith(newOne.with);
-        this.setSourceType(newOne.sourceType);
-        this.setCreateTime(newOne.createTime);
-        this.setContent(newOne.content);
-        this.setContentType(newOne.contentType);
-        this.setNew(newOne.isNew);
-        this.setStatus(newOne.status);
     }
 }

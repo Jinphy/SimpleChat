@@ -47,7 +47,7 @@ public class MainPresenter implements MainContract.Presenter {
     private GroupRepository groupRepository;
     private MemberRepository memberRepository;
 
-    private int readTimeout = 30_000;// 半分钟
+    private int readTimeout = 15_000;// 15秒
 
 
     public MainPresenter(Context context, MainContract.View view) {

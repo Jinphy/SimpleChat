@@ -17,6 +17,8 @@ public interface FriendDataSource {
 
     List<Friend> loadLocal(String owner, String... account);
 
+    List<Friend> loadExclude(String owner, List<String> excludeAccount);
+
 
     void loadOnline(Context context, BaseRepository.Task<List<Map<String,String>>> task);
 

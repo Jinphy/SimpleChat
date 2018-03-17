@@ -314,7 +314,7 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
      */
     @Override
     public void moveVertical(float faction) {
-        Observable.just("check null")
+        Observable.just("onCheck null")
                 .map(this::checkViewNull)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

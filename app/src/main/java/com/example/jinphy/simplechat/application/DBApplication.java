@@ -1,7 +1,7 @@
 package com.example.jinphy.simplechat.application;
 
 import com.example.jinphy.simplechat.base.BaseApplication;
-import com.example.jinphy.simplechat.models.friend.MyObjectBox;
+import com.example.jinphy.simplechat.models.MyObjectBox;
 
 import io.objectbox.BoxStore;
 

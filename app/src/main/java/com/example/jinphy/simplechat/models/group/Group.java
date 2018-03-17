@@ -28,7 +28,7 @@ public class Group{
     public static final String STATUS_NO = "no";
     public static final String STATUS_INVALIDATE = "invalidate";
 
-    @Id
+    @Id(assignable = true)
     protected long id;
 
     /**

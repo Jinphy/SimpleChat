@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
@@ -24,7 +24,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/13.
  */
 
-public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<Message, ChatRecyclerViewAdapter.ViewHolder> {
+public class ChatRecyclerViewAdapter extends BaseAdapter<Message, ChatRecyclerViewAdapter.ViewHolder> {
 
 
     private Bitmap ownerAvatar;
@@ -61,7 +61,7 @@ public class ChatRecyclerViewAdapter extends BaseRecyclerViewAdapter<Message, Ch
     }
 
     @Override
-    protected int getResourceId() {
+    protected int getResourceId(int viewType) {
         return 0;
     }
 

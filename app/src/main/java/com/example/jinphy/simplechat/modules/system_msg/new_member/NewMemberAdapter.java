@@ -2,13 +2,11 @@ package com.example.jinphy.simplechat.modules.system_msg.new_member;
 
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
+import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
@@ -26,7 +24,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2018/3/12.
  */
 
-public class NewMemberAdapter extends BaseRecyclerViewAdapter<NewMemberAdapter.NewMember, NewMemberAdapter.ViewHolder> {
+public class NewMemberAdapter extends BaseAdapter<NewMemberAdapter.NewMember, NewMemberAdapter.ViewHolder> {
 
 
 
@@ -90,7 +88,7 @@ public class NewMemberAdapter extends BaseRecyclerViewAdapter<NewMemberAdapter.N
     }
 
     @Override
-    protected int getResourceId() {
+    protected int getResourceId(int viewType) {
         return R.layout.layout_new_member_item;
     }
 

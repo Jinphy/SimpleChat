@@ -7,14 +7,10 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.custom_libs.SChain;
+import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.models.member.CheckableMember;
-import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.utils.ImageUtil;
-import com.example.jinphy.simplechat.utils.StringUtils;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,7 +21,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2018/3/14.
  */
 
-public class MemberListAdapter extends BaseRecyclerViewAdapter<CheckableMember, MemberListAdapter.ViewHolder> {
+public class MemberListAdapter extends BaseAdapter<CheckableMember, MemberListAdapter.ViewHolder> {
 
 
     private boolean showCheckbox;
@@ -73,7 +69,7 @@ public class MemberListAdapter extends BaseRecyclerViewAdapter<CheckableMember, 
     }
 
     @Override
-    protected int getResourceId() {
+    protected int getResourceId(int viewType) {
         return R.layout.layout_member_list_item;
     }
 
@@ -132,6 +128,14 @@ public class MemberListAdapter extends BaseRecyclerViewAdapter<CheckableMember, 
         return result;
     }
 
+    public List<String> getAllAccounts() {
+        List<String> result = new LinkedList<>();
+        for (CheckableMember item : data) {
+            result.add(item.getAccount());
+        }
+        return result;
+    }
+
 
     public boolean isShowCheckbox() {
         return showCheckbox;
@@ -161,6 +165,20 @@ public class MemberListAdapter extends BaseRecyclerViewAdapter<CheckableMember, 
             checkBox = itemView.findViewById(R.id.check_box);
             notAllowChat = itemView.findViewById(R.id.not_allow_chat_view);
         }
+    }
+
+    public void remove(CheckableMember member) {
+        data.remove(member);
+        notifyDataSetChanged();
+    }
+
+    public void removeChecked() {
+        for (CheckableMember member : data) {
+            if (member.isChecked()) {
+                data.remove(member);
+            }
+        }
+        notifyDataSetChanged();
     }
 }
 

@@ -43,10 +43,10 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
 
     @Override
     public void save(Member... members) {
-
         if (members.length == 0) {
             return;
         }
+
         for (Member member : members) {
             save(member);
         }
@@ -56,21 +56,12 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
         if (member == null) {
             return;
         }
-        List<Member> old = memberBox.query()
-                .filter(entity -> {
-                    if (StringUtils.equal(entity.getGroupNo(), member.getGroupNo())
-                            && StringUtils.equal(entity.getOwner(), member.getOwner())
-                            && StringUtils.equal(entity.getAccount(), member.getAccount())) {
-                        return true;
-                    }
-                    return false;
-                })
-                .build().find();
-        if (old != null && old.size() > 0) {
-            memberBox.remove(old);
+        Member old = get(member.getGroupNo(), member.getAccount(), member.getOwner());
+        if (old != null) {
+            member.setId(old.getId());
+        } else {
+            member.setId(0);
         }
-
-        member.setId(0);
         memberBox.put(member);
     }
 
@@ -164,14 +155,7 @@ public class MemberRepository extends BaseRepository implements MemberDataSource
         if (member == null) {
             return;
         }
-        Member old = memberBox.get(member.getId());
-        if (old != null) {
-            old.update(member);
-            memberBox.put(old);
-        } else {
-            member.setId(0);
-            memberBox.put(member);
-        }
+        memberBox.put(member);
     }
 
     @Override
