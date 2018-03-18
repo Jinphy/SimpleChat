@@ -11,10 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.custom_libs.SChain;
@@ -26,16 +26,13 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 /**
- * DESC:
+ * DESC: 选择好友对话框
  * Created by jinphy on 2018/3/17.
  */
-
 public class FriendSelector extends AlertDialog implements FriendSelectorInterface<CheckedFriend>{
 
-    private int width = 200;
+    private int width = 350;
 
     private int height = 500;
 
@@ -53,6 +50,8 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
 
     private RecyclerView recyclerView;
 
+    private View emptyView;
+
     private TextView titleView;
 
     private ImageView cancelView;
@@ -63,7 +62,7 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
 
     private FriendSelectorPresenter presenter;
 
-    private List<String> exculdeAccount;
+    private List<String> excludeAccounts;
 
 
     private SChain.Consumer<List<CheckedFriend>> onSelect;
@@ -77,14 +76,15 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
         super(context);
         setCancelable(false);
         presenter = new FriendSelectorPresenter(this);
-        exculdeAccount = new LinkedList<>();
+        excludeAccounts = new LinkedList<>();
+
+        // 设置View时不能再onCreate()中设置，否则无法显示
+        initView();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        initView();
 
         config();
 
@@ -102,6 +102,7 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
         recyclerView = view.findViewById(R.id.recycler_view);
         cancelView = view.findViewById(R.id.cancel_view);
         confirmView = view.findViewById(R.id.confirm_view);
+        emptyView = view.findViewById(R.id.empty_view);
 
         titleView.setText(title);
         titleView.setTextColor(titleColor);
@@ -112,18 +113,18 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        recyclerView.setAdapter(getAdapter());
+        initAdapter();
+
+        if (adapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+        }
     }
 
-    private MyAdapter<CheckedFriend> getAdapter() {
-
+    private void initAdapter() {
         adapter = MyAdapter.<CheckedFriend>newInstance()
                 .onGetItemViewType(item -> 0)
                 .onInflate(viewType -> R.layout.layout_select_item)
                 .onCreateView(holder -> {
-                    holder.circleImageView = new CircleImageView[1];
-                    holder.checkBox = new CheckBox[1];
-                    holder.textView = new TextView[1];
                     holder.circleImageView[0] = holder.item.findViewById(R.id.avatar_view);
                     holder.checkBox[0] = holder.item.findViewById(R.id.check_box);
                     holder.textView[0] = holder.item.findViewById(R.id.name_view);
@@ -137,18 +138,17 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
                     holder.checkBox[0].setChecked(item.isChecked());
 
                     holder.setClickedViews(holder.item);
-                    holder.setCheckedBoxs(holder.checkBox[0]);
+                    holder.setCheckedBoxes(holder.checkBox[0]);
                     //                    holder.setLongClickedViews(holder.textView[0]);
                 })
-                .data(presenter.loadFriends(exculdeAccount))
+                .data(presenter.loadFriends(excludeAccounts))
                 .onClick((v, item, holder, type, position) -> {
                     holder.checkBox[0].setChecked(!item.isChecked());
                 })
                 .onCheck((checkBox, item, holder, type, position) -> {
                     item.setChecked(checkBox.isChecked());
                 })
-                .make();
-        return adapter;
+                .into(recyclerView);
     }
 
     private void registerEvent() {
@@ -238,12 +238,21 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
         return this;
     }
 
+    /**
+     * DESC: 设置不包含的好友账号
+     * Created by jinphy, on 2018/3/18, at 8:57
+     */
     @Override
     public FriendSelectorInterface<CheckedFriend> exclude(List<String> exclude) {
+        LogUtils.e(exclude);
         if (exclude == null || exclude.size() == 0) {
             return this;
         }
-        this.exculdeAccount.addAll(exclude);
+        this.excludeAccounts.addAll(exclude);
+        adapter.update(presenter.loadFriends(excludeAccounts));
+        if (adapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+        }
         return this;
     }
 

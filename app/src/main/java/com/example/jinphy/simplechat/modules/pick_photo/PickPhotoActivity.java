@@ -28,13 +28,14 @@ public class PickPhotoActivity extends BaseActivity {
      * @param option 选择，拍照或者从相册选取图片
      * Created by jinphy, on 2018/1/10, at 9:45
      */
-    public static void start(Activity activity,@NonNull Option option) {
+    public static void start(Activity activity,@NonNull Option option,String tag) {
         if (option == null) {
             ObjectHelper.throwRuntime("option cannot be null!");
         }
         if (activity != null) {
             Intent intent = new Intent(activity, PickPhotoActivity.class);
             intent.putExtra(OPTION, option.get());
+            intent.putExtra(PickPhotoFragment.TAG, tag);
             activity.startActivity(intent);
         }
     }
@@ -54,7 +55,9 @@ public class PickPhotoActivity extends BaseActivity {
         actionBar.setTitle("图片裁剪");
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left_24dp);
 
-        getPresenter(addFragment(PickPhotoFragment.newInstance(getIntent().getStringExtra(OPTION)), R.id.fragment));
+        String option = getIntent().getStringExtra(OPTION);
+        String tag = getIntent().getStringExtra(PickPhotoFragment.TAG);
+        getPresenter(addFragment(PickPhotoFragment.newInstance(option, tag), R.id.fragment));
 
     }
 

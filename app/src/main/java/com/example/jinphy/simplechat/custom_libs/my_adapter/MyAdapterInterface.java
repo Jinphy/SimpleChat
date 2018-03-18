@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.custom_libs.my_adapter;
 
+import android.support.v7.widget.RecyclerView;
 import android.widget.CompoundButton;
 
 import java.util.List;
@@ -30,7 +31,8 @@ public interface MyAdapterInterface<T> {
     MyAdapterInterface<T> data(List<T> data);
 
 
-    MyAdapter<T> make();
+    MyAdapter<T> into(RecyclerView recyclerView);
+
 
 
 

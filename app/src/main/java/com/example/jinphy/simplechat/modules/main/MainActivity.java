@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.models.event_bus.EBInitDataAfterLogin;
+import com.example.jinphy.simplechat.services.push.PushService;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -64,6 +65,11 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PushService.start(this, PushService.FLAG_INIT);
+    }
 
     @Override
     public MainPresenter getPresenter(Fragment fragment) {

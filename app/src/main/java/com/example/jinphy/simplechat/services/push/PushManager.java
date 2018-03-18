@@ -186,8 +186,7 @@ public class PushManager {
                 message.getOwner(),
                 message.getExtra(),//好友的账号保存在该字段中
                 friend1 -> {
-                    if (Message.TYPE_SYSTEM_ADD_FRIEND
-                            .equals(message.getContentType())) {
+                    if (Message.TYPE_SYSTEM_ADD_FRIEND.equals(message.getContentType())) {
                         if (Friend.status_deleted.equals(friend1.getStatus())) {
                             friend1.setStatus(Friend.status_waiting);
                             friendRepository.save(friend1);

@@ -92,14 +92,11 @@ public class PushService extends Service {
      * Created by jinphy, on 2018/1/16, at 13:35
      */
     private synchronized void init() {
-        LogUtils.e("init invoked");
         if (pushClient != null) {
-            LogUtils.e("pushClient is not null");
             if (pushClient.isOpen() || pushClient.isTrying()) {
                 return;
             }
         }
-        LogUtils.e("pushClient is not open");
         pushManager = PushManager.getInstance(this);
         pushClient = PushClient.start(this);
         messageType = new TypeToken<List<Map<String, String>>>() {}.getType();

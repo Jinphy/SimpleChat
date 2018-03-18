@@ -261,6 +261,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                             App.showToast("输入不能为空！", false);
                             return;
                         }
+
                         presenter.findGroups(text, ()->{
                             GroupListActivity.start(activity(), true);
                             dialog.dismiss();

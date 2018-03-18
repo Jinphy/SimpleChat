@@ -9,6 +9,7 @@ import com.example.jinphy.simplechat.models.member.CheckableMember;
 import com.example.jinphy.simplechat.models.member.Member;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * DESC:
@@ -27,6 +28,9 @@ public interface MemberListContract {
         void whenRemoveMemberOk(CheckableMember member);
 
         void whenRemoveMembersOk();
+
+        void whenCreateGroupOk(Group group);
+
 
     }
 
@@ -50,7 +54,14 @@ public interface MemberListContract {
 
         Group getGroup(String groupNo);
 
+        String getAccessToken();
+
 
         void addMembers(Context context, String groupNo, List<String> accounts);
+
+        void createGroup(Context context, Map<String, Object> params);
+
+        void saveMembers(Group group, List<String> members);
+
     }
 }

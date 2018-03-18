@@ -6,11 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.base.BaseAdapter;
+import com.example.jinphy.simplechat.custom_libs.SChain;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -127,8 +127,8 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
             }
         }
 
-        if (onCheck != null && holder.checkedBoxs != null) {
-            for (CheckBox checkedBox : holder.checkedBoxs) {
+        if (onCheck != null && holder.checkedBoxes != null) {
+            for (CheckBox checkedBox : holder.checkedBoxes) {
                 checkedBox.setOnCheckedChangeListener((view, isChecked) -> {
                     onCheck.onCheck(checkedBox, item, holder, viewType, position);
                 });
@@ -174,6 +174,17 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
             }
         }
         return result;
+    }
+
+    /**
+     * DESC: 获取数据项
+     * Created by jinphy, on 2018/3/18, at 18:08
+     */
+    public T getItem(int position) {
+        if (position < 0 || position >= data.size()) {
+            return null;
+        }
+        return data.get(position);
     }
 
     @Override
@@ -228,7 +239,8 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
     }
 
     @Override
-    public MyAdapter<T> make() {
+    public MyAdapter<T> into(RecyclerView recyclerView) {
+        recyclerView.setAdapter(this);
         return this;
     }
 
@@ -237,19 +249,85 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
         notifyDataSetChanged();
     }
 
+    /**
+     * DESC: 遍历每一项
+     *
+     * @param autoUpdate 调用该方法时设置是否自动更新界面，默认不更新
+     * Created by jinphy, on 2018/3/18, at 14:03
+     */
+    public void forEach(SChain.Consumer<T> forEach, boolean... autoUpdate) {
+        if (data.size() == 0 || forEach == null) {
+            return;
+        }
+        for (T item : data) {
+            forEach.accept(item);
+        }
+
+        if (autoUpdate.length > 0 && autoUpdate[0]) {
+            notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * DESC: 删除指定的数据项，通过返回回调结果决定是否删除
+     *
+     * 如果回调返回的值是true，则删除
+     * 否则不删除
+     * Created by jinphy, on 2018/3/18, at 14:38
+     */
+    public void remove(BaseAdapter.Filter<T> forEach) {
+        if (data.size()==0 || forEach==null) {
+            return;
+        }
+        for (int i = 0; i < data.size(); i++) {
+            if (forEach.filter(data.get(i))) {
+                data.remove(i--);
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
+     * DESC: 所处指定项
+     * Created by jinphy, on 2018/3/18, at 14:42
+     */
+    public void remove(T item) {
+        data.remove(item);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * DESC: 所处指定项
+     * Created by jinphy, on 2018/3/18, at 14:42
+     */
+    public void remove(int position) {
+        data.remove(position);
+        notifyDataSetChanged();
+    }
+
+
+    /**
+     * DESC:
+     * Created by jinphy, on 2018/3/18, at 14:40
+     */
+    public void clear() {
+        data.clear();
+        notifyDataSetChanged();
+    }
+
     //-------------------------------------------------------------------------------------
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        public ImageView[] imageView;
+        public ImageView[] imageView = new ImageView[1];
 
-        public TextView[] textView;
+        public TextView[] textView = new TextView[3];
 
-        public CheckBox[] checkBox;
+        public CheckBox[] checkBox = new CheckBox[1];
 
-        public CircleImageView[] circleImageView;
+        public CircleImageView[] circleImageView = new CircleImageView[5];
 
-        public View[] view;
+        public View[] view = new View[3];
 
         public final View item;
 
@@ -269,7 +347,7 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
          * DESC: 设置的监听器的CheckBox
          * Created by jinphy, on 2018/3/17, at 19:33
          */
-        private CheckBox[] checkedBoxs;
+        private CheckBox[] checkedBoxes;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -296,8 +374,8 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
          * DESC: 调用该方法添加需要设置check监听的CheckBox
          * Created by jinphy, on 2018/3/17, at 19:36
          */
-        public void setCheckedBoxs(CheckBox... checkedBoxs) {
-            this.checkedBoxs = checkedBoxs;
+        public void setCheckedBoxes(CheckBox... checkedBoxs) {
+            this.checkedBoxes = checkedBoxs;
         }
     }
 

@@ -48,6 +48,10 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
     private TextView rotateDegreeView;
     private FloatingActionButton fab;
 
+    public static final String TAG = "TAG";
+
+    private String tag = "";
+
 
     /**
      * DESC: 判断是否是顺时针方向
@@ -64,10 +68,11 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
     }
 
 
-    public static PickPhotoFragment newInstance(String option) {
+    public static PickPhotoFragment newInstance(String option,String tag) {
         PickPhotoFragment fragment = new PickPhotoFragment();
         Bundle args = new Bundle();
         args.putString(OPTION,option);
+        args.putString(TAG, tag);
         fragment.setArguments(args);
         return fragment;
     }
@@ -86,6 +91,7 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
         } else {
             this.option = PickPhotoActivity.Option.CHOOSE_PHOTO;
         }
+        tag = arguments.getString(TAG);
     }
 
     @Override
@@ -151,7 +157,7 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
             isRecapture = true;
         });
         btnFinish.setOnClickListener(view->{
-            EventBus.getDefault().post(new EBBitmap(true, cropper.getCroppedImage(200,200)));
+            EventBus.getDefault().post(new EBBitmap(true, cropper.getCroppedImage(200,200),tag));
             finishActivity();
         });
     }
@@ -195,12 +201,12 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
                 .neutralColorRes(R.color.half_alpha_gray)
                 .onPositive((dialog, which) -> {
                     // 保存图片并退出
-                    EventBus.getDefault().post(new EBBitmap(true, cropper.getCroppedImage()));
+                    EventBus.getDefault().post(new EBBitmap(true, cropper.getCroppedImage(),tag));
                     finishActivity();
                 })
                 .onNegative((dialog, which) -> {
                     // 不保存图片且退出
-                    EventBus.getDefault().post(new EBBitmap(false, null));
+                    EventBus.getDefault().post(new EBBitmap(false, null, tag));
                     finishActivity();
                 })
                 .onNeutral((dialog, which)->{

@@ -40,6 +40,7 @@ import org.greenrobot.eventbus.ThreadMode;
  */
 public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> implements ModifyGroupContract.View {
 
+    public static final String TAG = "ModifyGroupFragment";
     public static final String GROUP_NO = "GROUP_NO";
     public static final String AUTO = "自动加入";
     public static final String NO_AUTO = "群主验证";
@@ -391,11 +392,11 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
                 .neutralColorRes(R.color.color_red_D50000)
                 .onPositive((dialog, which) -> {
                     // 从相机获取图片
-                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.TAKE_PHOTO);
+                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.TAKE_PHOTO, TAG);
                 })
                 .onNegative((dialog, which) -> {
                     // 从相册获取图片
-                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.CHOOSE_PHOTO);
+                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.CHOOSE_PHOTO, TAG);
                 })
                 .dismissListener(dialog -> MenuItemView.removeCurrent())
                 .show();
@@ -408,6 +409,9 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void pickPhotoResult(EBBitmap result) {
+        if (!TAG.equals(result.tag)) {
+            return;
+        }
         if (result.ok) {
             // 图片获取成功
             bitmap = result.data;

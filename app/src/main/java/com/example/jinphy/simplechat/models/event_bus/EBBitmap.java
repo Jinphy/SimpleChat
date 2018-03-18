@@ -9,7 +9,10 @@ import android.graphics.Bitmap;
 
 public class EBBitmap extends EBBase<Bitmap> {
 
-    public EBBitmap(boolean ok, Bitmap data) {
+    public String tag = "";
+
+    public EBBitmap(boolean ok, Bitmap data,String tag) {
         super(ok, data);
+        this.tag = tag;
     }
 }

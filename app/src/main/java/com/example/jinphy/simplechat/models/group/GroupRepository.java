@@ -91,12 +91,13 @@ public class GroupRepository extends BaseRepository implements GroupDataSource {
             Group old = get(group.groupNo, group.owner);
             if (old != null) {
                 old.isFromSearch = true;
+                groupBox.put(old);
             } else {
                 group.isFromSearch = true;
                 group.setId(0);
+                groupBox.put(group);
             }
         }
-        groupBox.put(groups);
     }
 
     @Override

@@ -20,7 +20,7 @@ public class MyDialog extends AlertDialog implements MyDialogInterface {
 
     private int width;
 
-    private int height ;
+    private int height;
 
     private int resourceId;
 

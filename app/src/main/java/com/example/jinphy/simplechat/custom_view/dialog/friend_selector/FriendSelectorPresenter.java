@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.custom_view.dialog.friend_selector;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.friend.CheckedFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
@@ -29,6 +30,7 @@ public class FriendSelectorPresenter {
 
 
     public List<CheckedFriend> loadFriends(List<String> exclude) {
+        LogUtils.e(exclude);
         User user = userRepository.currentUser();
         List<Friend> friends = friendRepository.loadExclude(user.getAccount(), exclude);
         return CheckedFriend.create(friends);

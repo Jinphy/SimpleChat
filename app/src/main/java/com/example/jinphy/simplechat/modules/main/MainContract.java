@@ -7,6 +7,7 @@ import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsPresenter;
 import com.example.jinphy.simplechat.modules.main.msg.MsgPresenter;
@@ -69,7 +70,6 @@ public interface MainContract {
         void findGroups(String text, Runnable whenDataOk);
 
         void checkAccount(Context context);
-
 
         void loadDataAfterLogin();
     }

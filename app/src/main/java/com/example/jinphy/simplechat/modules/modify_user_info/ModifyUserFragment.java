@@ -475,11 +475,11 @@ public class ModifyUserFragment extends BaseFragment<ModifyUserPresenter> implem
                 .neutralColorRes(R.color.color_red_D50000)
                 .onPositive((dialog, which) -> {
                     // 从相机获取图片
-                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.TAKE_PHOTO);
+                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.TAKE_PHOTO,TAG);
                 })
                 .onNegative((dialog, which) -> {
                     // 从相册获取图片
-                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.CHOOSE_PHOTO);
+                    PickPhotoActivity.start(activity(), PickPhotoActivity.Option.CHOOSE_PHOTO,TAG);
                 })
                 .dismissListener(dialog -> MenuItemView.removeCurrent())
                 .show();
@@ -491,6 +491,9 @@ public class ModifyUserFragment extends BaseFragment<ModifyUserPresenter> implem
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void pickPhotoResult(EBBitmap result) {
+        if (!TAG.equals(result.tag)) {
+            return;
+        }
         if (result.ok) {
             // 图片获取成功
             avatarBitmap = result.data;
