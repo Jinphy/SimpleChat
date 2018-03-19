@@ -162,14 +162,41 @@ public class MessageRepository implements MessageDataSource {
      * Created by jinphy, on 2018/1/18, at 9:11
      */
     public List<Message> load(String owner, String with) {
-        return messageBox.query()
+        List<Message> messages = messageBox.query()
                 .equal(Message_.owner, owner)
                 .equal(Message_.with, with)
                 .build()
                 .find();
+        for (Message message : messages) {
+            if (message.isNew()) {
+                message.setNew(false);
+                messageBox.put(message);
+            }
+        }
+        return messages;
     }
 
-    public long count(String with,String owner) {
+    @Override
+    public List<Message> loadNew(String owner, String with) {
+        List<Message> messages = messageBox.query()
+                .equal(Message_.owner, owner)
+                .equal(Message_.with, with)
+                .equal(Message_.isNew, true)
+                .build()
+                .find();
+        if (messages != null) {
+            for (Message message : messages) {
+                message.setNew(false);
+            }
+            messageBox.put(messages);
+
+            return messages;
+        } else {
+            return new LinkedList<>();
+        }
+    }
+
+    public long count(String with, String owner) {
         return messageBox.query()
                 .equal(Message_.with, with)
                 .equal(Message_.owner,owner)

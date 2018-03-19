@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
 import com.example.jinphy.simplechat.models.event_bus.EBService;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.group.Group;
@@ -130,6 +131,9 @@ public class PushManager {
                 case Message.TYPE_SYSTEM_MEMBER_ALLOW_CHAT:
                     // 9
                     updateMember(message);
+                    break;
+                case Message.TYPE_CHAT_TEXT:
+                    handleChatTextMsg(message);
                     break;
                 default:
                     break;
@@ -259,17 +263,17 @@ public class PushManager {
                     }
                     EventBus.getDefault().post(new EBService());
                     // 创建新消息
-                    Message msg3 = new Message();
-                    msg3.setCreateTime(System.currentTimeMillis()+"");
-                    msg3.setSourceType(Message.RECEIVE);
-                    msg3.setContent(msgContent);
-                    msg3.setContentType(Message.TYPE_CHAT_TEXT);
-                    msg3.setWith(groupNo3);
-                    msg3.setOwner(message.getOwner());
-                    msg3.setExtra(tempGroup.getCreator());// 群消息时，该字段表示信息发送者
-                    messageRepository.saveSend(msg3);
+                    Message msg = new Message();
+                    msg.setCreateTime(System.currentTimeMillis()+"");
+                    msg.setSourceType(Message.RECEIVE);
+                    msg.setContent(msgContent);
+                    msg.setContentType(Message.TYPE_CHAT_TEXT);
+                    msg.setWith(groupNo3);
+                    msg.setOwner(message.getOwner());
+                    msg.extra(Message.KEY_SENDER, tempGroup.getOwner());
+                    messageRepository.saveSend(msg);
 
-                    messageRecordRepository.update(msg3, false);
+                    messageRecordRepository.update(msg, false);
                     EventBus.getDefault().post(new EBService());
                 }
         );
@@ -424,5 +428,19 @@ public class PushManager {
         // TODO: 2018/3/16 在这里生成一条新的本地消息，类型是在聊天中提示
         String content = message.getContent();//content: 已被群主禁言！
 
+    }
+
+    /**
+     * DESC: 处理聊天的文本信息
+     * Created by jinphy, on 2018/3/18, at 21:40
+     */
+    private void handleChatTextMsg(Message message) {
+        String chatWithGroup = message.removeExtra(Message.KEY_CHAT_GROUP);
+        if (chatWithGroup != null && "true".equals(chatWithGroup)) {
+            // 群聊
+            String groupNo = message.removeExtra(Message.KEY_GROUP_NO);
+            message.setWith(groupNo);
+            message.setExtra(null);
+        }
     }
 }

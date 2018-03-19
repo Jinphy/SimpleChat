@@ -13,16 +13,29 @@ import android.widget.EditText;
 public class Keyboard {
 
     public static void open(Context context, EditText editText) {
+        if (context == null || editText == null) {
+            return;
+        }
         InputMethodManager imm =
                 (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) {
+            return;
+        }
         imm.showSoftInput(editText, InputMethodManager.RESULT_SHOWN);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         editText.requestFocus();
     }
 
     public static void close(Context context, EditText editText) {
-        InputMethodManager imm =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (context == null || editText == null) {
+            return;
+        }
+        InputMethodManager imm = (InputMethodManager) context
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        if (imm == null) {
+            return;
+        }
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         editText.clearFocus();
     }

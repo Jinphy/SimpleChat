@@ -9,6 +9,7 @@ public class EBUpdateView extends EBBase<String> {
     public static final int ALL = 0;
     public static final int MAIN_MSG = 1;// 主界面中的消息记录页
     public static final int MAIN_FRIEND = 2;// 主界面中的好友页
+    public static final int CHAT = 3;
 
     // 更新那个界面
     public int which = ALL;
@@ -31,5 +32,10 @@ public class EBUpdateView extends EBBase<String> {
                 this.which = which;
                 break;
         }
+    }
+
+    public EBUpdateView(int which, String data) {
+        super(true, data);
+        this.which = which;
     }
 }

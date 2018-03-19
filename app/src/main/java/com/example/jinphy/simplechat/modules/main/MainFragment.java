@@ -68,6 +68,11 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -119,11 +124,14 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     private int selectedTab = 0;
     private int density;
     private boolean fromLogin;
+    private Disposable disposable;
 
 
     public MainFragment() {
         // Required empty public constructor
     }
+
+
 
     /**
      * Use this factory method to create a new app of
@@ -141,7 +149,6 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     @Override
     public void initData() {
-        presenter.checkAccount(activity());
 
         // 底部导航栏按钮的打开图标
         iconsOpen = new int[]{
@@ -162,8 +169,24 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         if (fromLogin) {
             presenter.loadDataAfterLogin();
         }
+        Observable.timer(3, TimeUnit.SECONDS)
+                .doOnNext(aLong -> {
+                    presenter.checkAccount(activity());
+                })
+                .doOnSubscribe(disposable -> {
+                    this.disposable = disposable;
+                })
+                .subscribe();
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
+    }
 
     @Override
     protected int getResourceId() {

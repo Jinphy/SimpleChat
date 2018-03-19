@@ -52,11 +52,9 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
 
         String tag = intent.getStringExtra(TAG);
         String msg = intent.getStringExtra(MSG);
-        LogUtils.e("3===========>");
         if (TextUtils.isEmpty(tag)) {
             return;
         }
-        LogUtils.e(tag);
         switch (tag) {
             case MESSAGE:
                 // 新消息

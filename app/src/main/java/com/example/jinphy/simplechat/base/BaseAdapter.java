@@ -1,18 +1,12 @@
 package com.example.jinphy.simplechat.base;
 
-import android.support.annotation.CallSuper;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.modules.chat.ChatRecyclerViewAdapter;
-import com.example.jinphy.simplechat.modules.group.group_list.GroupListAdapter;
-
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Created by jinphy on 2017/8/15.

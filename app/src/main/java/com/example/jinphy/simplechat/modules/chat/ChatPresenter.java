@@ -2,14 +2,14 @@ package com.example.jinphy.simplechat.modules.chat;
 
 import android.support.annotation.NonNull;
 
-import com.apkfuns.logutils.LogUtils;
-import com.example.jinphy.simplechat.models.api.send.SendCallback;
 import com.example.jinphy.simplechat.models.api.send.SendResult;
 import com.example.jinphy.simplechat.models.api.send.Sender;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.group.GroupRepository;
+import com.example.jinphy.simplechat.models.member.Member;
+import com.example.jinphy.simplechat.models.member.MemberRepository;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message.MessageRepository;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
@@ -32,6 +32,7 @@ public class ChatPresenter implements ChatContract.Presenter {
     private MessageRepository messageRepository;
     private MessageRecordRepository recordRepository;
     private GroupRepository groupRepository;
+    private MemberRepository memberRepository;
 
     public ChatPresenter(@NonNull ChatContract.View view) {
         this.view = Preconditions.checkNotNull(view);
@@ -40,6 +41,7 @@ public class ChatPresenter implements ChatContract.Presenter {
         messageRepository = MessageRepository.getInstance();
         recordRepository = MessageRecordRepository.getInstance();
         groupRepository = GroupRepository.getInstance();
+        memberRepository = MemberRepository.getInstance();
     }
 
 
@@ -55,7 +57,15 @@ public class ChatPresenter implements ChatContract.Presenter {
         return messageRepository.load(user.getAccount(), withAccount);
     }
 
-
+    public List<Message> loadNewMessages(String withAccount) {
+        User user = userRepository.currentUser();
+        return messageRepository.loadNew(user.getAccount(), withAccount);
+    }
+    @Override
+    public List<Member> loadMembers(String groupNo) {
+        User user = userRepository.currentUser();
+        return memberRepository.get(groupNo, user.getAccount());
+    }
 
     @Override
     public Friend getFriend(String friendAccount) {
@@ -70,24 +80,15 @@ public class ChatPresenter implements ChatContract.Presenter {
     }
 
     @Override
-    public void sendTextMsg(String friendAccount, String content,int position) {
-        User user = userRepository.currentUser();
-        Message message = Message.make(user.getAccount(), friendAccount, content);
+    public String getOwner() {
+        return userRepository.currentUser().getAccount();
+    }
+
+    @Override
+    public void sendTextMsg(Message message) {
         Sender.newTask(message)
-                .whenStart(() -> {
-                    view.whenSendStart(message);
-                    messageRepository.saveSend(message);
-                })
-                .whenFinal(result -> {
-                    if (SendResult.OK.equals(result.code)) {
-                        message.setStatus(Message.STATUS_OK);
-                        view.whenSendFinal();
-                    } else {
-                        message.setStatus(Message.STATUS_NO);
-                        view.whenSendFinal();
-                    }
-                    messageRepository.update(message);
-                })
+                .whenStart(() -> view.whenSendStart())
+                .whenFinal(result -> view.whenSendFinal())
                 .send();
     }
 
@@ -125,6 +126,12 @@ public class ChatPresenter implements ChatContract.Presenter {
     @Override
     public String getUserAvatar() {
         return userRepository.currentUser().getAvatar();
+    }
+
+    @Override
+    public Member getSelfMember(String groupNo) {
+        String owner = userRepository.currentUser().getAccount();
+        return memberRepository.get(groupNo, owner, owner);
     }
 
     @Override

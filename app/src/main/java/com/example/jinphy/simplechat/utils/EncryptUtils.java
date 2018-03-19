@@ -229,6 +229,35 @@ public class EncryptUtils {
     }
 
 
+    /**
+     * DESC: 编码
+     * Created by jinphy, on 2018/3/18, at 18:54
+     */
+    public static String encode(String original) {
+        if (original == null) {
+            return "";
+        }
+        try {
+            return URLEncoder.encode(original, UTF_8);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 
-
+    /**
+     * DESC: 解码
+     * Created by jinphy, on 2018/3/18, at 18:54
+     */
+    public static String decode(String original) {
+        if (original == null) {
+            return "";
+        }
+        try {
+            return URLDecoder.decode(original, UTF_8);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

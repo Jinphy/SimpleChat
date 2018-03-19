@@ -144,7 +144,9 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void updateView(EBUpdateView msg) {
         adapter.update(presenter.loadGroups(showSearchResult));
-        App.showToast("群聊信息已更新", false);
+        if (App.activity() instanceof GroupListActivity) {
+            App.showToast("群聊信息已更新", false);
+        }
         setupEmptyView();
     }
 

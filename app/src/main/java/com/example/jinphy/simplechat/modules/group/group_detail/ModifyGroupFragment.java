@@ -13,8 +13,10 @@ import android.view.View;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.custom_libs.SChain.Consumer;
@@ -592,12 +594,15 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
         if ("FromModifyGroupFragment".equals(msg.data)) {
             return;
         }
+        if (App.activity() instanceof ModifyGroupActivity){
+            App.showToast("该群信息已更新！", false);
+        }
 
-
-        App.showToast("该群信息已更新！", false);
         group = presenter.getGroup(groupNo);
         if (group == null) {
-            App.showToast("该群已经被删除！", false);
+            if (App.activity() instanceof ModifyGroupActivity) {
+                App.showToast("该群已经被删除！", false);
+            }
             finishActivity();
         } else {
             setupViews();

@@ -240,7 +240,6 @@ public class MessageRecord implements Comparable<MessageRecord>{
         if (records == null || records.size() == 0) {
             return;
         }
-        LogUtils.e(records.size());
         MessageRecord[] temp = new MessageRecord[records.size()];
         records.toArray(temp);
         Arrays.sort(temp);

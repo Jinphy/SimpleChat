@@ -1,7 +1,10 @@
 package com.example.jinphy.simplechat.models.api.send;
 
 import com.apkfuns.logutils.LogUtils;
+import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.models.message.MessageRepository;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.ThreadPoolUtils;
@@ -79,6 +82,7 @@ public class SendTask {
             return;
         }
         if (onStart != null) {
+            MessageRepository.getInstance().saveSend(message);
             onStart.run();
         }
         threadPool.execute(()->{
@@ -91,13 +95,23 @@ public class SendTask {
             map.put("createTime", message.getCreateTime());
             map.put("content", message.getContent());
             map.put("contentType", message.getContentType());
+            map.put("extra", message.getExtra());
 
-            String body = GsonUtils.toJson(map);
-            body = EncryptUtils.encodeThenEncrypt(body);
             if (sender.isOpen()) {
+                String body = GsonUtils.toJson(map);
+                body = EncryptUtils.encodeThenEncrypt(body);
                 sender.send(body);
             } else {
-                sender.fail(sender.taskMap.remove(sendId));
+                if (onFinal != null) {
+                    BaseActivity activity = App.activity();
+                    if (activity != null) {
+                        activity.runOnUiThread(()->{
+                            message.setStatus(Message.STATUS_NO);
+                            MessageRepository.getInstance().update(message);
+                            onFinal.call(new SendResult<>(SendResult.NO, message));
+                        });
+                    }
+                }
             }
         });
     }

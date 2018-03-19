@@ -154,14 +154,13 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     @Override
     public void showChatWindow(MessageRecord record) {
         Intent intent = new Intent(getActivity(), ChatActivity.class);
-        intent.putExtra(ChatFragment.WITH_ACCOUNT, record.getFriend().getAccount());
+        intent.putExtra(ChatFragment.WITH_ACCOUNT, record.getWith());
         startActivity(intent);
     }
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void updateView(EBUpdateView msg) {
-        LogUtils.e("message");
         int i = linearLayoutManager.findFirstVisibleItemPosition();
         adapter.clear();
         adapter.update(presenter.loadMsgRecords());
@@ -175,7 +174,7 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
         MessageRecord record = (MessageRecord) item;
         switch (view.getId()) {
             case R.id.item_view:
-                String with = record.getFriend().getAccount();
+                String with = record.getWith();
                 if (Friend.system.equals(with)) {
                     SystemMsgActivity.start(activity());
                 } else {

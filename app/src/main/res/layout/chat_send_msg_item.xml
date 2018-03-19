@@ -26,6 +26,12 @@
         android:layout_height="wrap_content"
         android:gravity="end"
         android:orientation="horizontal">
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_marginRight="@dimen/dimen_3dp"
+            android:layout_gravity="center_vertical"
+            android:layout_width="@dimen/dimen_20dp"
+            android:layout_height="@dimen/dimen_20dp"/>
 
         <View
             android:id="@+id/status_view"
@@ -48,9 +54,11 @@
                 android:clickable="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/dimen_48dp"
+                android:minHeight="@dimen/dimen_43dp"
+                android:minWidth="@dimen/dimen_43dp"
+                android:gravity="center_horizontal"
                 android:background="@drawable/pic_chat_send_msg_item"
-                android:orientation="horizontal">
+                android:orientation="vertical">
                 <!--文本类型的消息-->
                 <TextView
                     android:id="@+id/text_view"
@@ -58,12 +66,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxWidth="248dp"
-                    android:minHeight="@dimen/dimen_48dp"
+                    android:minHeight="@dimen/dimen_43dp"
                     android:gravity="center_vertical"
+                    tools:visibility="visible"
                     android:padding="@dimen/dimen_5dp"
-                    android:textSize="@dimen/size_18sp"
+                    android:textSize="@dimen/size_15sp"
                     android:textColor="#dfffffff"
-                    android:text="hello this ix a massage,nice to meet you "/>
+                    tools:text="content here"/>
 
                 <!--图片类型的消息-->
                 <ImageView

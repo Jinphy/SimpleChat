@@ -2,14 +2,24 @@ package com.example.jinphy.simplechat.models.message;
 
 import android.support.annotation.NonNull;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.utils.EncryptUtils;
+import com.example.jinphy.simplechat.utils.GsonUtils;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
+import com.example.jinphy.simplechat.utils.StringUtils;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
+import io.objectbox.annotation.Transient;
 
 /**
  * DESC: 消息类
@@ -143,6 +153,13 @@ public class Message implements Comparable<Message>{
      */
     public static final String TYPE_SYSTEM_NOTICE = "system_notice";
 
+
+    public static final String KEY_SENDER = "KEY_SENDER";
+
+    public static final String KEY_GROUP_NO = "KEY_GROUP_NO";
+
+    public static final String KEY_CHAT_GROUP = "KEY_CHAT_GROUP";
+
     /**
      * DESC: 聊天的文件消息
      * Created by jinphy, on 2018/1/16, at 16:50
@@ -188,7 +205,22 @@ public class Message implements Comparable<Message>{
     @NonNull
     private String with; // 消息的参与者，即该消息的参与者，
 
+
+    /**
+     * DESC: 注意：
+     *      1、在所有的聊天的消息中，该字段都已json数组格式保存
+     *      2、所有字段都需要先编码再生成json数组格式
+     *
+     * Created by jinphy, on 2018/3/18, at 18:37
+     */
     private String extra; //群消息时，该字段表示信息发送者
+
+
+
+    transient private Map<String, String> extraMap = new HashMap<>();
+
+    private static Type mapType = new TypeToken<Map<String, String>>() {}.getType();
+
 
     public long getId() {
         return id;
@@ -269,11 +301,27 @@ public class Message implements Comparable<Message>{
     }
 
     public String getExtra() {
+        if (ObjectHelper.isEmpty(extra) && extraMap != null && extraMap.size() > 0) {
+            extra = GsonUtils.toJson(extraMap);
+        }
         return extra;
     }
 
     public void setExtra(String extra) {
         this.extra = extra;
+        if (extra != null) {
+            try {
+                Map<String, String> tempMap = GsonUtils.toBean(extra, mapType);
+                if (tempMap != null && tempMap.size() > 0) {
+                    extraMap.clear();
+                    for (Map.Entry<String, String> entry : tempMap.entrySet()) {
+                        extraMap.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -313,6 +361,47 @@ public class Message implements Comparable<Message>{
     }
 
     /**
+     * DESC: 保存extra信息
+     * Created by jinphy, on 2018/3/18, at 19:20
+     */
+    public void extra(String key, Object value) {
+        if (value != null) {
+            extraMap.put(key, EncryptUtils.aesEncrypt(value.toString()));
+        }
+    }
+
+
+    /**
+     * DESC: 通过key获取extra信息
+     * Created by jinphy, on 2018/3/18, at 19:20
+     */
+    public String extra(String key) {
+        if (key == null) {
+            return "";
+        }
+        if (extraMap.size() == 0 && !ObjectHelper.isEmpty(extra)) {
+            setExtra(extra);
+        }
+        String value = extraMap.get(key);
+
+        return EncryptUtils.aesDecrypt(value);
+    }
+
+
+    public String removeExtra(String key) {
+        if (extraMap != null) {
+            String remove = extraMap.remove(key);
+            return EncryptUtils.aesDecrypt(remove);
+        }
+        return null;
+    }
+
+
+
+
+    //------------------------------------------------------------
+
+    /**
      * DESC: 解析接收的消息
      * Created by jinphy, on 2018/3/4, at 14:54
      */
@@ -345,7 +434,14 @@ public class Message implements Comparable<Message>{
     }
 
 
-    public static Message make(String owner, String with, String content) {
+    /**
+     * DESC: 创建文本消息
+     *
+     * 如果是群聊，则把发送者的账号保存在extra中
+     * Created by jinphy, on 2018/3/18, at 18:35
+     */
+    public static Message makeText(String owner, String with, String content, boolean isFriend) {
+
         Message message = new Message();
         message.setOwner(owner);
         message.setWith(with);
@@ -355,6 +451,10 @@ public class Message implements Comparable<Message>{
         message.setSourceType(Message.SEND);
         message.setStatus(Message.STATUS_SENDING);
         message.setCreateTime(System.currentTimeMillis() + "");
+        if (!isFriend) {
+            // 不是好友间的聊天，是群聊，则需要把消息发送者的账号信息保存在extra字段中
+            message.extra(KEY_SENDER, owner);
+        }
         return message;
     }
 

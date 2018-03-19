@@ -11,7 +11,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,21 +24,25 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
 import com.example.jinphy.simplechat.models.api.send.Sender;
+import com.example.jinphy.simplechat.models.event_bus.EBSendError;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
+import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
@@ -48,6 +51,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -76,14 +83,17 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     private Friend friend;
     private Group group;
+    private Member selfMember;// 群聊成员自己
 
-    // TODO: 2017/8/15 隐藏appBar时 statusBar 的初始颜色，从好友头像获取
     int startStatusColor;
     // 隐藏 appBar 后的statusBar的 最终颜色，为colorAccent
     int endStatusColor;
-    private String account;
-    private ChatRecyclerViewAdapter adapter;
+    private String withAccount;
+    private String ownerAccount;
+    private ChatAdapter adapter;
     private LinearLayoutManager linearLayoutManager;
+
+    private boolean isFriend;
 
 
     public ChatFragment() {
@@ -93,7 +103,22 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        account = getArguments().getString(ChatFragment.WITH_ACCOUNT);
+        Bundle args = getArguments();
+        if (args == null) {
+            App.showToast("启动异常！", false);
+            finishActivity();
+            return;
+        }
+        withAccount = args.getString(ChatFragment.WITH_ACCOUNT);
+        ownerAccount = presenter.getOwner();
+        if (ObjectHelper.isTrimEmpty(withAccount)) {
+            App.showToast("数据异常！", false);
+            finishActivity();
+            return;
+        }
+        isFriend = !withAccount.contains("G");
+        startStatusColor = colorPrimaryDark();
+        endStatusColor = colorAccent();
     }
 
     @Override
@@ -112,12 +137,12 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             message.setStatus(Message.STATUS_NO);
         }
         presenter.updateMsg(sendingMsg);
+        presenter.updateRecord(adapter.getLast());
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        presenter.updateRecord(adapter.getLast());
         EventBus.getDefault().post(new EBUpdateView());
     }
 
@@ -129,6 +154,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     /**
      * Use this factory method to create a new app of
      * this fragment using the provided parameters.
+     *
      * @return A new app of fragment ChatFragment.
      */
     public static ChatFragment newInstance(String friendAccount) {
@@ -139,6 +165,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         return fragment;
     }
 
+    @Override
+    public boolean isFriend() {
+        return isFriend;
+    }
 
     @Override
     protected void findViewsById(View view) {
@@ -157,24 +187,25 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     protected void initData() {
         screenWidth = ScreenUtils.getScreenWidth(getContext());
-        onThirdScreenWidth = screenWidth/3;
+        onThirdScreenWidth = screenWidth / 3;
         maxElevation = ScreenUtils.dp2px(getContext(), 20);
 
-        if (account.contains("G")) {
-            group = presenter.getGroup(account);
+        if (withAccount.contains("G")) {
+            group = presenter.getGroup(withAccount);
+            selfMember = presenter.getSelfMember(withAccount);
         } else {
-            friend = presenter.getFriend(account);
+            friend = presenter.getFriend(withAccount);
         }
     }
 
 
     @Override
-    protected void setupViews(){
+    protected void setupViews() {
         hideFabEmotion();
-//        Keyboard.open(getContext(), findInputText());
+        //        Keyboard.open(getContext(), findInputText());
 
-        appbarLayout.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
-        if (account.contains("G")) {
+        appbarLayout.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+        if (withAccount.contains("G")) {
             activity().setTitle(group.getName());
         } else {
             activity().setTitle(friend.getShowName());
@@ -183,10 +214,15 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         // 设置RecyclerView
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        adapter = new ChatRecyclerViewAdapter(presenter.getUserAvatar(), account);
+        adapter = new ChatAdapter(presenter.getUserAvatar(), withAccount);
+        adapter.update(presenter.loadMessages(withAccount));
+        if (!isFriend) {
+            adapter.setGroup(group);
+            adapter.setMembers(presenter.loadMembers(withAccount));
+        }
         recyclerView.setAdapter(adapter);
-        adapter.update(presenter.loadMessages(account));
-        int position = adapter.getItemCount()-1;
+
+        int position = adapter.getItemCount() - 1;
         if (position >= 0) {
             recyclerView.scrollToPosition(position);
         }
@@ -195,16 +231,32 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     @Override
     public void updateView() {
-        int i = linearLayoutManager.findFirstVisibleItemPosition();
-        adapter.update(presenter.loadMessages(account));
-        if (i >= 0 && i < adapter.getItemCount()) {
-            recyclerView.scrollToPosition(i);
-        }
+        int last = linearLayoutManager.findLastVisibleItemPosition();
+        int size = adapter.getItemCount();
+        int scrollY = recyclerView.getScrollY();
+
+        Observable.<List<Message>>create(e -> {
+            e.onNext(presenter.loadNewMessages(withAccount));
+            e.onComplete();
+        })
+                .subscribeOn(Schedulers.io())
+                .map(newMessages -> newMessages.toArray(new Message[newMessages.size()]))
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(newMessages -> {
+                    adapter.add(newMessages);
+                })
+                .doOnComplete(()->{
+                    if (size - last < 5) {
+                        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+                    } else {
+                        recyclerView.scrollBy(0, scrollY);
+                    }
+                })
+                .subscribe();
     }
 
     @Override
     protected void registerEvent() {
-
         fab.setOnClickListener(this::fabAction);
         fabEmotion.setOnClickListener(this::fabAction);
 
@@ -247,10 +299,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     private void onFocusChangeOfInputText(View view, boolean hasFocus) {
         if (hasFocus) {
             hideExtraBottomLayout();
-//            showFabEmotion();
+            //            showFabEmotion();
         } else {
             Keyboard.close(getContext(), findInputText());
-//            hideFabEmotion();
+            //            hideFabEmotion();
         }
     }
 
@@ -265,19 +317,31 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     // 发送按钮的点击事件
     private void onClickOfBtnSend(View view) {
-        switch (friend.getStatus()) {
-            case Friend.status_black_listed:
-                App.showToast("您已被对方拉入黑名单，不能发送消息！", false);
+        if (isFriend) {
+            switch (friend.getStatus()) {
+                case Friend.status_black_listed:
+                    App.showToast("您已被对方拉入黑名单，不能发送消息！", false);
+                    return;
+                case Friend.status_deleted:
+                    App.showToast("对方不是好友，不能发送消息！", false);
+                    return;
+            }
+        } else {
+            if (!group.isMyGroup()) {
+                App.showToast("您非本群成员，不能发送信息！", false);
                 return;
-            case Friend.status_deleted:
-                App.showToast("对方不是好友，不能发送消息！", false);
+            }
+            if (!selfMember.isAllowChat()) {
+                App.showToast("您已被群主禁言，不能发送信息！", false);
                 return;
+            }
         }
-
-        EditText inputText =  findInputText();
+        EditText inputText = findInputText();
         String content = inputText.getText().toString();
         inputText.setText("");
-        presenter.sendTextMsg(account, content, adapter.getItemCount());
+        Message message = Message.makeText(ownerAccount, withAccount, content, isFriend);
+        adapter.add(message);
+        presenter.sendTextMsg(message);
     }
 
     // 更多功能按钮的点击事件
@@ -289,17 +353,18 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     private RecyclerView.OnScrollListener getRecyclerViewListener() {
         return new RecyclerView.OnScrollListener() {
             int total = 0;
+
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 //dy>0时，向上滑动，反之向下
-                total+=dy;
+                total += dy;
                 if (total > 300) {
-                    total=0;
+                    total = 0;
                     showBar(recyclerView);
                 }
                 if (total < -300) {
-                    total=0;
+                    total = 0;
                     hideBar(recyclerView);
                 }
             }
@@ -321,7 +386,8 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             case R.id.fab_emotion:
                 showEmotionLayout();
                 break;
-            default:break;
+            default:
+                break;
         }
 
     }
@@ -353,12 +419,12 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
 
-
     //----------------------------------------------
 
     private View findBtnVoice() {
         return btnVoiceAndKeyboard.findViewById(R.id.voice_View);
     }
+
     private View findBtnKeyboard() {
         return btnVoiceAndKeyboard.findViewById(R.id.keyboard_view);
     }
@@ -382,10 +448,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     private EditText findInputText() {
         return inputTextAndVoice.findViewById(R.id.input_text);
     }
+
     private View findInputVoice() {
         return inputTextAndVoice.findViewById(R.id.input_voice);
     }
-
 
 
     @Override
@@ -394,7 +460,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         EditText inputText = findInputText();
         inputText.setVisibility(View.VISIBLE);
         inputText.requestFocus();
-        Keyboard.open(getContext(),inputText);
+        Keyboard.open(getContext(), inputText);
         int position = adapter.getItemCount();
         if (position >= 0) {
             recyclerView.smoothScrollToPosition(position);
@@ -465,22 +531,24 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     @Override
     public void showFabEmotion() {
-//        scaleFabEmotion(0,1,false);
+        //        scaleFabEmotion(0,1,false);
     }
 
     @Override
     public void hideFabEmotion() {
-        scaleFabEmotion(1,0,true);
+        scaleFabEmotion(1, 0, true);
     }
 
-    private void scaleFabEmotion(float from,float to,final boolean gone) {
+    private void scaleFabEmotion(float from, float to, final boolean gone) {
         AnimUtils.just(fabEmotion)
-                .setScaleX(from,to)
-                .setScaleY(from,to)
+                .setScaleX(from, to)
+                .setScaleY(from, to)
                 .setDuration(IntConst.DURATION_250)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
-                .onStart(a->{if(!gone) fabEmotion.setVisibility(View.VISIBLE);})
-                .onEnd(a->{
+                .onStart(a -> {
+                    if (!gone) fabEmotion.setVisibility(View.VISIBLE);
+                })
+                .onEnd(a -> {
                     if (gone) {
                         fabEmotion.setVisibility(View.GONE);
                     } else {
@@ -505,7 +573,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_chat_fragment,menu);
+        inflater.inflate(R.menu.menu_chat_fragment, menu);
     }
 
     // 菜单点击事件
@@ -513,10 +581,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_friend:
-                if (account.contains("G")) {
-                    ModifyGroupActivity.start(activity(), account);
+                if (withAccount.contains("G")) {
+                    ModifyGroupActivity.start(activity(), withAccount);
                 } else {
-                    ModifyFriendInfoActivity.start(activity(), account);
+                    ModifyFriendInfoActivity.start(activity(), withAccount);
                 }
                 break;
             case android.R.id.home:
@@ -538,13 +606,13 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
      * 显示toolbar和bottomBar，同时隐藏fab
      *
      * @param view 是一个RecyclerView，传该参数的目的是为了在
-     * 移动toolbar和bottomBar时，更新RecyclerView的margin值
-     * */
+     *             移动toolbar和bottomBar时，更新RecyclerView的margin值
+     */
     @Override
     public void showBar(View view) {
         if (!isBarVisible) {
             isBarVisible = true;
-            animateBar(view,1,0,true);
+            animateBar(view, 1, 0, true);
 
         }
 
@@ -555,14 +623,14 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
      * 隐藏toolbar和bottomBar，同时显示fab
      *
      * @param view 是一个RecyclerView，传该参数的目的是为了在
-     * 移动toolbar和bottomBar时，更新RecyclerView的margin值
-     * */
+     *             移动toolbar和bottomBar时，更新RecyclerView的margin值
+     */
     @Override
     public void hideBar(View view) {
         if (isBarVisible) {
             isBarVisible = false;
-//            fabEmotion.setVisibility(View.GONE);
-            animateBar(view,0,1,false);
+            //            fabEmotion.setVisibility(View.GONE);
+            animateBar(view, 0, 1, false);
         }
     }
 
@@ -579,27 +647,27 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
 
         animatorSet = AnimUtils.just()
-                .setFloat(fromValue,toValue)
+                .setFloat(fromValue, toValue)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration(IntConst.DURATION_500)
-                .onStart(animator ->{
+                .onStart(animator -> {
                     if (showBar) {
                         appbarLayout.setVisibility(View.VISIBLE);
                         bottomBar.setVisibility(View.VISIBLE);
                     } else {
                         fab.setVisibility(View.VISIBLE);
                     }
-                } )
+                })
                 .onUpdateFloat(animator -> {
                     float value = (float) animator.getAnimatedValue();
-                    float marginTop = appbarHeight * (1-value);
+                    float marginTop = appbarHeight * (1 - value);
                     float marginBottom = bottomBarHeight * (1 - value);
                     appbarLayout.setTranslationY(value * (-appbarHeight));
                     bottomBar.setTranslationY(value * bottomBarHeight);
-                    ViewUtils.setScaleXY(fab,value);
+                    ViewUtils.setScaleXY(fab, value);
                     // TODO: 2017/8/15 设置statusBar的颜色
-                    //setStatusBarColor(value);
-                    setMargin(view,marginTop,marginBottom);
+                    setStatusBarColor(value);
+                    setMargin(view, marginTop, marginBottom);
                 })
                 .onEnd(animator -> {
                     if (showBar) {
@@ -617,17 +685,17 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     public void setStatusBarColor(float factor) {
         int color = ColorUtils.rgbColorByFactor(startStatusColor, endStatusColor, factor);
-        ScreenUtils.setStatusBarColor(getActivity(),color);
+        ScreenUtils.setStatusBarColor(activity(), color);
     }
 
     //设置View的margin，用在移动toolbar和bottomBar时改变其他View
     //的margin
-    private void setMargin(View view, float marginTop,float marginBottom) {
+    private void setMargin(View view, float marginTop, float marginBottom) {
         if (view == null) {
             return;
         }
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(view.getLayoutParams());
-        lp.setMargins(lp.leftMargin, (int) marginTop,lp.rightMargin, (int) marginBottom);
+        lp.setMargins(lp.leftMargin, (int) marginTop, lp.rightMargin, (int) marginBottom);
         view.setLayoutParams(lp);
         view.requestLayout();
     }
@@ -650,7 +718,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             case MotionEvent.ACTION_MOVE:
                 Log.e(getClass().getSimpleName(), "move");
                 moveOrientation = HORIZONTAL;
-                deltaX = event.getX()-oldX;
+                deltaX = event.getX() - oldX;
                 oldX = event.getX();
                 if (canMoveHorizontal()) {
                     float factor = getHorizontalMoveFactor(deltaX);
@@ -659,11 +727,11 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 return true;
             case MotionEvent.ACTION_UP:
                 if (moveOrientation == HORIZONTAL) {
-                    float factor  = rootView.getTranslationX()/screenWidth;
+                    float factor = rootView.getTranslationX() / screenWidth;
                     if (factor < 1.0f / 3) {
-                        animateHorizontal(factor,0,false);
+                        animateHorizontal(factor, 0, false);
                     } else {
-                        animateHorizontal(factor,1f,true);
+                        animateHorizontal(factor, 1f, true);
                     }
                 }
 
@@ -675,7 +743,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
     private boolean canMoveHorizontal() {
-        return (downX < onThirdScreenWidth) && (rootView.getTranslationX()>=0);
+        return (downX < onThirdScreenWidth) && (rootView.getTranslationX() >= 0);
     }
 
     @Override
@@ -683,19 +751,19 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         float transX = factor * screenWidth;
         rootView.setTranslationX(transX);
         appbarLayout.setTranslationX(transX);
-        recyclerView.setAlpha(1-factor);
-        toolbar.setAlpha((1-factor));
-        bottomBar.setAlpha(1-factor);
+        recyclerView.setAlpha(1 - factor);
+        toolbar.setAlpha((1 - factor));
+        bottomBar.setAlpha(1 - factor);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            rootView.setElevation((float) (maxElevation *(1-factor*0.5)));
+            rootView.setElevation((float) (maxElevation * (1 - factor * 0.5)));
         }
     }
 
     private float getHorizontalMoveFactor(float deltaX) {
         float transX = rootView.getTranslationX();
-        transX +=deltaX;
+        transX += deltaX;
 
-        if (deltaX < 0 && transX<0) {
+        if (deltaX < 0 && transX < 0) {
             // 向左滑动
             transX = 0;
         }
@@ -706,10 +774,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
     @Override
-    public void animateHorizontal(float fromFactor, float toFactor,boolean exit) {
-        float deltaFactor = Math.abs(toFactor-fromFactor);
+    public void animateHorizontal(float fromFactor, float toFactor, boolean exit) {
+        float deltaFactor = Math.abs(toFactor - fromFactor);
         AnimUtils.just()
-                .setFloat(fromFactor,toFactor)
+                .setFloat(fromFactor, toFactor)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration((long) (IntConst.DURATION_500 * deltaFactor))
                 .onUpdateFloat(animator -> {
@@ -718,7 +786,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 })
                 .onEnd(animator -> {
                     if (exit) {
-                        Keyboard.close(getContext(),findInputText());
+                        Keyboard.close(getContext(), findInputText());
                         getActivity().finish();
                     }
                 })
@@ -733,22 +801,21 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             return false;
         }
         exit = true;
-        animateHorizontal(0,1,true);
+        animateHorizontal(0, 1, true);
         return false;
     }
 
 
     @Override
-    public void whenSendStart(Message message) {
-        adapter.add(message);
-        recyclerView.smoothScrollToPosition(adapter.getItemCount());
+    public void whenSendStart() {
+        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
     }
 
     @Override
     public void whenSendFinal() {
-        int i = linearLayoutManager.findFirstVisibleItemPosition();
+        int scrollY = recyclerView.getScrollY();
         adapter.notifyDataSetChanged();
-        recyclerView.scrollToPosition(i);
+        recyclerView.smoothScrollBy(0, scrollY);
     }
 
     /**
@@ -757,7 +824,28 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void receiveMsg(EBUpdateView msg) {
+        if (msg.data != null && msg.data.contains(withAccount)) {
+            if (!isFriend) {
+                group = presenter.getGroup(withAccount);
+                adapter.setGroup(group);
+                adapter.setMembers(presenter.loadMembers(withAccount));
+            } else {
+                friend = presenter.getFriend(withAccount);
+            }
+        }
         updateView();
+
     }
 
+    private int retrySendCount = 0;
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void whenSenderError(EBSendError msg) {
+        if (retrySendCount > 10) {
+            return;
+        }
+        retrySendCount++;
+        Sender.getInstance().shutdown();
+        Sender.getInstance().open();
+    }
 }

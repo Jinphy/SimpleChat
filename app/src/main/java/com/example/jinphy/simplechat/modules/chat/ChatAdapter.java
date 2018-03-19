@@ -6,17 +6,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseAdapter;
+import com.example.jinphy.simplechat.models.api.file_transfer.Progress;
+import com.example.jinphy.simplechat.models.group.Group;
+import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -24,14 +32,20 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jinphy on 2017/8/13.
  */
 
-public class ChatRecyclerViewAdapter extends BaseAdapter<Message, ChatRecyclerViewAdapter.ViewHolder> {
+public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
 
 
     private Bitmap ownerAvatar;
     private Bitmap friendAvatar;
     private String withAccount;
 
-    ChatRecyclerViewAdapter(String ownerAvatar,String withAccount) {
+    private Map<String, Member> memberMap = new HashMap<>();
+    private Map<String, SoftReference<Bitmap>> avatarMap = new HashMap<>();
+    private Group group;
+
+
+
+    ChatAdapter(String ownerAvatar, String withAccount) {
         super();
         this.withAccount = withAccount;
         this.ownerAvatar = StringUtils.base64ToBitmap(ownerAvatar);
@@ -97,29 +111,48 @@ public class ChatRecyclerViewAdapter extends BaseAdapter<Message, ChatRecyclerVi
 
     // 绑定item中公共部分的View
     private void bindCommonView(ViewHolder holder, Message message,int position) {
-        // TODO: 2017/8/13 设置头像 ，时间，
         if (Message.SEND == message.getSourceType()) {
             if (ownerAvatar != null) {
                 holder.avatarView.setImageBitmap(ownerAvatar);
             }
             if (Message.STATUS_NO.equals(message.getStatus())) {
                 holder.statusView.setVisibility(View.VISIBLE);
+                holder.progressBar.setVisibility(View.GONE);
+            } else if (Message.STATUS_OK.equals(message.getStatus())) {
+                holder.statusView.setVisibility(View.GONE);
+                holder.progressBar.setVisibility(View.GONE);
             } else {
                 holder.statusView.setVisibility(View.GONE);
+                holder.progressBar.setVisibility(View.VISIBLE);
             }
 
         } else {
             if (withAccount.contains("G")) {
-                Bitmap bitmap = ImageUtil.loadAvatar(message.getExtra(), 50, 50);
+                // 群聊
+                // 设置头像
+                String sender = message.extra(Message.KEY_SENDER);
+                Bitmap bitmap = getAvatar(sender);
                 if (bitmap != null) {
                     holder.avatarView.setImageBitmap(bitmap);
+                }
+
+                // 设置名字
+                if (group.isShowMemberName() && memberMap != null) {
+                    holder.nameView.setVisibility(View.VISIBLE);
+                    Member member = memberMap.get(sender);
+                    if (member != null) {
+                        holder.nameView.setText(member.getName());
+                    } else {
+                        holder.nameView.setText("");
+                    }
+                } else {
+                    holder.nameView.setVisibility(View.GONE);
                 }
             } else {
                 if (friendAvatar != null) {
                     holder.avatarView.setImageBitmap(friendAvatar);
                 }
             }
-
         }
         if (position == 0) {
             holder.timeView.setVisibility(View.VISIBLE);
@@ -137,19 +170,8 @@ public class ChatRecyclerViewAdapter extends BaseAdapter<Message, ChatRecyclerVi
                 holder.timeView.setVisibility(View.GONE);
             }
         }
-        if (click != null) {
-            holder.avatarView.setOnClickListener(view ->
-                    click.onClick(view,message,holder.type, position));
-            holder.contentView.setOnClickListener(view ->
-                    click.onClick(view, message, holder.type, position));
-        }
-        if (longClick != null) {
-            holder.avatarView.setOnLongClickListener(view ->
-            longClick.onLongClick(view,message,holder.type,position));
-            holder.contentView.setOnLongClickListener(view ->
-            longClick.onLongClick(view,message,holder.type,position));
-        }
-
+        setClick(message, position, holder.type, holder.avatarView, holder.contentView);
+        setLongClick(message, position, holder.type, holder.avatarView, holder.contentView);
     }
 
     private void bindTextMsgView(ViewHolder holder, Message message) {
@@ -216,7 +238,6 @@ public class ChatRecyclerViewAdapter extends BaseAdapter<Message, ChatRecyclerVi
         return data.get(position).getSourceType();
     }
 
-
     //==============================================================\\
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -227,6 +248,8 @@ public class ChatRecyclerViewAdapter extends BaseAdapter<Message, ChatRecyclerVi
         private View itemView;// 整个item，这里暂无点击功能
         private View statusView;
         private int type;// 保存消息类型信息
+        private TextView nameView;
+        private ProgressBar progressBar;
 
         // 以下几种类型的View中，XXX_root 用来设置可见性，默认情况下都不可见
 
@@ -264,6 +287,9 @@ public class ChatRecyclerViewAdapter extends BaseAdapter<Message, ChatRecyclerVi
             this.contentView = itemView.findViewById(R.id.content_layout);
             if (type == Message.SEND) {
                 statusView = itemView.findViewById(R.id.status_view);
+                progressBar = itemView.findViewById(R.id.progress_bar);
+            } else {
+                this.nameView = itemView.findViewById(R.id.name_view);
             }
 
             // 文本消息
@@ -293,9 +319,16 @@ public class ChatRecyclerViewAdapter extends BaseAdapter<Message, ChatRecyclerVi
         notifyDataSetChanged();
     }
 
-    public void add(Message message) {
-        data.add(message);
-        notifyDataSetChanged();
+    public synchronized void add(Message... messages) {
+        if (messages.length > 0) {
+
+            for (Message message : messages) {
+                if (message != null) {
+                    data.add(message);
+                }
+            }
+            notifyDataSetChanged();
+        }
     }
 
     public Message getLast() {
@@ -307,5 +340,31 @@ public class ChatRecyclerViewAdapter extends BaseAdapter<Message, ChatRecyclerVi
         }
     }
 
+
+    public void setMembers(List<Member> members) {
+        if (ObjectHelper.isEmpty(members)) {
+            return;
+        }
+        memberMap.clear();
+        for (Member member : members) {
+            memberMap.put(member.getAccount(), member);
+        }
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public Bitmap getAvatar(String account) {
+        SoftReference<Bitmap> avatar = avatarMap.get(account);
+        if (ObjectHelper.reference(avatar)) {
+            return avatar.get();
+        }
+        Bitmap bitmap = ImageUtil.loadAvatar(account, 30, 30);
+        if (bitmap != null) {
+            avatarMap.put(account, new SoftReference<>(bitmap));
+        }
+        return bitmap;
+    }
 }
 

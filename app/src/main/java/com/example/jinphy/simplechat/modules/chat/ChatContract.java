@@ -4,6 +4,7 @@ import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
+import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 
@@ -60,26 +61,35 @@ public interface ChatContract {
 
         void updateView();
 
-        void whenSendStart(Message message);
+        void whenSendStart();
 
         void whenSendFinal();
+
+        boolean isFriend();
+
     }
 
     interface Presenter extends BasePresenter {
 
         List<Message> loadMessages(String friendAccount);
 
+        List<Member> loadMembers(String groupNo);
+
         Friend getFriend(String friendAccount);
 
         Group getGroup(String groupNo);
 
-        void sendTextMsg(String friendAccount, String content,int position);
+        String getOwner();
+
+        void sendTextMsg(Message message);
 
         void updateRecord(Message message);
 
         String getUserAvatar();
 
         void updateMsg(List<Message> messages);
+
+        Member getSelfMember(String groupNo);
 
     }
 }

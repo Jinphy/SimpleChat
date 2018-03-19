@@ -43,7 +43,7 @@ class SenderSubscriber implements Observer<SendResult<SendTask>> {
         } else {
             result.data.message.setStatus(Message.STATUS_NO);
         }
-        ThreadPoolUtils.threadPool.execute(()-> messageRepository.saveReceive(result.data.message));
+        ThreadPoolUtils.threadPool.execute(()-> messageRepository.update(result.data.message));
 
         if (result.data.onFinal != null) {
             result.data.onFinal.call(new SendResult<>(result.code, result.data.message));

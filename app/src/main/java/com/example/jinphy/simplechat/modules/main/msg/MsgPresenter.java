@@ -43,8 +43,6 @@ public class MsgPresenter implements MsgContract.Presenter {
     public List<MessageRecord> loadMsgRecords() {
         messageRecords = recordRepository.load(userRepository.currentUser().getAccount());
 
-        LogUtils.e(messageRecords.size());
-
         MessageRecord.sort(messageRecords);
 
         return messageRecords;

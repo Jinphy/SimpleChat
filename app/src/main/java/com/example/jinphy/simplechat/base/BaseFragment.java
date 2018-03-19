@@ -87,8 +87,11 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         EventBus.getDefault().register(this);
         activityContentViewBottom = ScreenUtils.getScreenHeight(getContext());
         keyboardHeight = ScreenUtils.dp2px(getContext(), 230);// 实际的键盘高度不一定是这个，取个大概
-
+        if (presenter == null) {
+            presenter = getPresenter();
+        }
     }
+
 
     @Override
     public void onDestroy() {

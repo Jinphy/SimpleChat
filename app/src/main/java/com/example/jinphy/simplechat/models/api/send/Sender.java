@@ -1,12 +1,15 @@
 package com.example.jinphy.simplechat.models.api.send;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.event_bus.EBSendError;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.google.gson.reflect.TypeToken;
 
+import org.greenrobot.eventbus.EventBus;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
@@ -18,11 +21,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -41,13 +47,12 @@ public class Sender extends WebSocketClient implements ObservableOnSubscribe<Sen
     private ObservableEmitter<SendResult<SendTask>> emitter;
 
     private static Sender sender;
+    private Disposable disposable;
+
+    private boolean isShutdown = false;
 
     @Override
     public void onOpen(ServerHandshake handshake) {
-        Observable.create(this)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(SenderSubscriber.getInstance());
     }
 
     /**
@@ -67,12 +72,6 @@ public class Sender extends WebSocketClient implements ObservableOnSubscribe<Sen
         }
     }
 
-    public void fail(SendTask sendTask) {
-        if (emitter != null && !emitter.isDisposed()) {
-            emitter.onNext(new SendResult<>(SendResult.NO, sendTask));
-        }
-    }
-
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
@@ -80,7 +79,17 @@ public class Sender extends WebSocketClient implements ObservableOnSubscribe<Sen
             emitter.onComplete();
             emitter = null;
         }
+        if (!isShutdown) {
+            try {
+                Thread.sleep(3000);
+                EventBus.getDefault().post(new EBSendError());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
+
+
 
     @Override
     public void onError(Exception ex) {
@@ -101,6 +110,11 @@ public class Sender extends WebSocketClient implements ObservableOnSubscribe<Sen
     public void open() {
         if (!this.isOpen()) {
             this.connect();
+            Observable.create(this)
+                    .subscribeOn(Schedulers.io())
+                    .doOnSubscribe(disposable -> this.disposable = disposable)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(SenderSubscriber.getInstance());
         }
     }
 
@@ -109,7 +123,11 @@ public class Sender extends WebSocketClient implements ObservableOnSubscribe<Sen
      * Created by jinphy, on 2018/1/18, at 14:24
      */
     public void shutdown(){
+        isShutdown = true;
         this.close();
+        if (this.disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
     }
 
     private static class InstanceHolder{
@@ -159,5 +177,9 @@ public class Sender extends WebSocketClient implements ObservableOnSubscribe<Sen
     @Override
     public void subscribe(ObservableEmitter<SendResult<SendTask>> e) throws Exception {
         emitter = e;
+    }
+
+    public static boolean isOk() {
+        return sender.isOpen();
     }
 }

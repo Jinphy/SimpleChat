@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
+import com.example.jinphy.simplechat.services.push.PushService;
 
 public class ChatActivity extends BaseActivity {
 
@@ -22,6 +23,9 @@ public class ChatActivity extends BaseActivity {
         Intent intent = new Intent(activity, ChatActivity.class);
         intent.putExtra(ChatFragment.WITH_ACCOUNT, withAccount);
         activity.startActivity(intent);
+
+        // 启动前先检测推送服务是否开启，没有开启时会再次启动推送服务，保证消息及时接收
+        PushService.start(activity, PushService.FLAG_INIT);
     }
 
     @Override
