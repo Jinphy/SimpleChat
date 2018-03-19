@@ -1,66 +1,95 @@
 package com.example.jinphy.simplechat.modules.main.self;
 
 import android.app.Activity;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.models.event_bus.EBUser;
+import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.modules.login.LoginActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
+import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
+import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.example.jinphy.simplechat.utils.ScreenUtils.dp2px;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SelfFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * create an app of this fragment.
  */
 public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfContract.View {
 
     private static final int HORIZONTAL = 0;
     private static final int VERTICAL = 1;
 
+
     private FloatingActionButton fab;
 
-    private RecyclerView recyclerView;
+    private ScrollView scrollView;
     private CardView headView;
     private ImageView avatarView;
     private TextView nameText;
     private TextView dateText;
+    private ImageView sexView;
+    private TextView btnLogout;
 
     private float density;
+    private User user;
+
+    private View root = null;
 
     public SelfFragment() {
         // Required empty public constructor
     }
 
     /**
-     * Use this factory method to create a new instance of
+     * Use this factory method to create a new app of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment FriendsFragment.
+     * @return A new app of fragment FriendsFragment.
      */
     public static SelfFragment newInstance() {
         SelfFragment fragment = new SelfFragment();
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (presenter == null) {
+            presenter = getPresenter();
+        }
+    }
 
     @Override
     public void initFab(Activity activity) {
@@ -75,7 +104,16 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
     @Override
     public void fabAction(View view) {
+        ModifyUserActivity.start(getActivity());
 
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (root == null) {
+            root = super.onCreateView(inflater, container, savedInstanceState);
+        }
+        return root;
     }
 
 
@@ -88,36 +126,65 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     public void initData() {
         density = ScreenUtils.getDensity(getContext());
 
-        distanceVertical = ScreenUtils.dp2px(IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT,density);
+        distanceVertical = dp2px(IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT,density);
         baseTransY = -distanceVertical;
-        avatarViewTransXDistance = ScreenUtils.dp2px(IntConst.NEGATIVE_150, density);
-        avatarViewTransYDistance = ScreenUtils.dp2px(IntConst.POSITIVE_120, density);
-        nameTextTransXDistance = ScreenUtils.dp2px(IntConst.POSITIVE_50, density);
-//        distanceVertical = (IntConst.HEAD_VIEW_HEIGHT - IntConst.TOOLBAR_HEIGHT)*density;
-//        baseTransY = -distanceVertical;
-//        avatarViewTransXDistance = IntConst.NEGATIVE_150 * density;
-//        avatarViewTransYDistance = IntConst.POSITIVE_120 * density;
-//        nameTextTransXDistance = IntConst.POSITIVE_50 * density;
+        avatarViewTransXDistance = dp2px(IntConst.NEGATIVE_150, density);
+        avatarViewTransYDistance = dp2px(IntConst.POSITIVE_120, density);
+        nameTextTransXDistance = dp2px(IntConst.POSITIVE_50, density);
+        sexViewTransXDistance = nameTextTransXDistance;
+        user = presenter.getUser();
     }
 
     @Override
     protected void findViewsById(View view) {
-        recyclerView = view.findViewById(R.id.recycler_view);
+        scrollView = view.findViewById(R.id.scroll_view);
         headView = view.findViewById(R.id.head_view);
         avatarView = headView.findViewById(R.id.avatar);
         nameText = headView.findViewById(R.id.name);
         dateText = headView.findViewById(R.id.date);
+        sexView = headView.findViewById(R.id.sex);
+        btnLogout = view.findViewById(R.id.btn_logout);
     }
 
     @Override
     protected void setupViews() {
-        recyclerView.setAdapter(presenter.getAdapter());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        setupUser();
+    }
+
+    @Override
+    public void setupUser() {
+        nameText.setText(user.getName()==null?"没有昵称":user.getName());
+        sexView.setVisibility(user.getSex() == null ? View.GONE : View.VISIBLE);
+        sexView.setImageResource(getString(R.string.male).equals(user.getSex())
+                ? R.drawable.ic_male : R.drawable.ic_female);
+        dateText.setText(StringUtils.formatDate(user.getDate()));
+        if (user.getAvatar() != null) {
+            avatarView.setImageBitmap(StringUtils.base64ToBitmap(user.getAvatar()));
+        }
     }
 
     @Override
     protected void registerEvent() {
+        btnLogout.setOnClickListener(view->{
+            if (activity() == null) {
+                return;
+            }
+            new MaterialDialog.Builder(activity())
+                    .title("退出登录")
+                    .titleColor(colorPrimary())
+                    .icon(ImageUtil.getDrawable(activity(),R.drawable.ic_account_24dp,colorPrimary()))
+                    .content("退出后将无法再接收到消息\n是否继续？")
+                    .contentGravity(GravityEnum.CENTER)
+                    .positiveText("是的")
+                    .negativeText("不了")
+                    .positiveColor(colorPrimary())
+                    .negativeColorRes(R.color.half_alpha_gray)
+                    .onPositive((dialog, which) -> {
+                        presenter.logout(activity(), user.getAccount(),user.getAccessToken());
+                    })
+                    .show();
 
+        });
     }
 
 
@@ -133,10 +200,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     float avatarViewTransXDistance;
     float avatarViewTransYDistance;
     float nameTextTransXDistance;
+    float sexViewTransXDistance;
     int baseTransY;
     float oldY;
 
-    boolean isHeadViewMoveUp = false;
     boolean hasActionMove = false;
 
     private int moveOrientation;
@@ -173,22 +240,22 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
                         if (factor > 1.0f / 4) {
                             // 收起
                             animateVertical(factor, 1);
-                            isHeadViewMoveUp = true;
+                            presenter.setNeedMoveUp(true);
                         } else {
                             // 展开
                             animateVertical(factor, 0);
-                            isHeadViewMoveUp = false;
+                            presenter.setNeedMoveUp(false);
                         }
                     } else {
                         //向下滑动
                         if (factor < 3.0f / 4) {
                             // 展开
                             animateVertical(factor, 0);
-                            isHeadViewMoveUp = false;
+                            presenter.setNeedMoveUp(false);
                         } else {
                             // 收起
                             animateVertical(factor, 1);
-                            isHeadViewMoveUp = true;
+                            presenter.setNeedMoveUp(true);
                         }
                     }
                 }
@@ -199,6 +266,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     }
 
 
+    /**
+     * DESC: 判断是否可以向上移动
+     * Created by jinphy, on 2018/1/11, at 14:12
+     */
     @Override
     public boolean canMoveUp() {
         float transY = -headView.getTranslationY();
@@ -206,16 +277,17 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         return can;
     }
 
+    /**
+     * DESC: 判断是否可以向下移动
+     * Created by jinphy, on 2018/1/11, at 14:12
+     */
     @Override
     public boolean canMoveDown() {
         float transY = headView.getTranslationY();
         boolean can = transY < 0;
 
-        LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
-        int firstPosition = manager.findFirstCompletelyVisibleItemPosition();
-
-        can = can && (firstPosition == 0);
-        return can;
+        int scrollY = scrollView.getScrollY();
+        return can && scrollY == 0;
     }
 
 
@@ -236,10 +308,13 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
         return true;
     }
 
-    // 手指移动过程中的动画转换
+    /**
+     * DESC: 手指移动过程中的动画转换
+     * Created by jinphy, on 2018/3/12, at 9:08
+     */
     @Override
     public void moveVertical(float faction) {
-        Observable.just("check null")
+        Observable.just("onCheck null")
                 .map(this::checkViewNull)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -253,21 +328,25 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
             // TODO: 2017/8/13 headView和statusBar背景颜色初始值设置为相应头像的Palette颜色，
             // TODO: 2017/8/13 headView的结束颜色设置为R.color.colorPrimary
             // TODO: 2017/8/13 statusBar的结束颜色设置为 R.color.colorPrimaryDark
-            headView.setBackgroundColor(ColorUtils.rgbColorByFactor(
-                    ContextCompat.getColor(getContext(),R.color.colorPrimaryDark),
-                    ContextCompat.getColor(getContext(),R.color.colorPrimary),
+            headView.setCardBackgroundColor(ColorUtils.rgbColorByFactor(
+                    colorPrimaryDark(),
+                    colorPrimary(),
                     faction
             ));
-            recyclerView.setTranslationY(distanceVertical *(1-faction));
+            scrollView.setTranslationY(distanceVertical *(1-faction));
             ViewUtils.setScaleXY(avatarView,1-faction*avatarViewScaleDistance);
             avatarView.setTranslationX(faction*avatarViewTransXDistance);
             avatarView.setTranslationY(faction*avatarViewTransYDistance);
             nameText.setTranslationX(faction*nameTextTransXDistance);
+            sexView.setTranslationX(faction * sexViewTransXDistance);
             dateText.setAlpha(1-faction);
         }
     }
 
-    // 手指松开后的动画
+    /**
+     * DESC: 手指松开后的动画
+     * Created by jinphy, on 2018/1/11, at 14:15
+     */
     @Override
     public void animateVertical(float fromFactor,float toFactor) {
         float deltaFactor = Math.abs(toFactor - fromFactor);
@@ -283,7 +362,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
     }
 
 
-    //获取当前headView应该滑动的百分比
+    /**
+     * DESC: 获取当前headView竖直方向上滑动的百分比
+     * Created by jinphy, on 2018/1/11, at 14:14
+     */
     private float getVerticalMoveFactor(float deltaY) {
         float transY = headView.getTranslationY();
         transY += deltaY;
@@ -309,7 +391,10 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
             case 1:
                 break;
             case 2:
-                if (isHeadViewMoveUp) {
+                if (presenter == null) {
+                    return;
+                }
+                if (presenter.needMoveUp()) {
                     moveVertical(1);
                     ViewUtils.setAlpha(offset,avatarView,nameText);
                 } else {
@@ -323,4 +408,25 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
 
         }
     }
+
+    /**
+     * DESC: 当修改用户信息是该函数将会接收到修改结果
+     * Created by jinphy, on 2018/1/11, at 13:17
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void whenModifyUserInfo(EBUser msg) {
+        if (msg.ok) {
+            user = msg.data;
+            setupUser();
+        }
+    }
+
+    @Override
+    public void whenLogout() {
+        App.showToast("账号已退出！", false);
+        LoginActivity.start(activity());
+        finishActivity();
+    }
+
+
 }

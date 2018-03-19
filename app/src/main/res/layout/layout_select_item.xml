@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_view"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:layout_marginLeft="@dimen/dimen_5dp"
+    android:layout_marginRight="@dimen/dimen_5dp"
+    android:layout_marginTop="@dimen/dimen_5dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardElevation="1dp"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="3dp">
+    <RelativeLayout
+        android:padding="@dimen/dimen_12dp"
+        android:background="@drawable/btn_alpha"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/avatar_view"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_group_chat_white_24dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            app:civ_fill_color="#7f666666"/>
+
+        <TextView
+            android:id="@+id/name_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="170dp"
+            android:layout_toRightOf="@id/avatar_view"
+            android:layout_marginLeft="10dp"
+            android:layout_centerInParent="true"
+            android:textColor="@color/colorAccent"
+            android:textSize="18sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="name of friends"/>
+
+        <CheckBox
+            android:id="@+id/check_box"
+            android:layout_centerInParent="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dimen_5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

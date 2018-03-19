@@ -1,6 +1,6 @@
 package com.example.jinphy.simplechat.modules.active_zoom;
 
-import com.example.jinphy.simplechat.model.blog.Blog;
+import com.example.jinphy.simplechat.models.blog.Blog;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;
@@ -28,19 +28,11 @@ public class ActiveZonePresenter implements ActiveZoneContract.Presenter {
     }
 
     @Override
-    public ActiveZoneRecyclerViewAdapter getAdapter() {
+    public List<Blog> loadBlogs() {
         blogs = new ArrayList<>(50);
         for (int i = 0; i < 50; i++) {
             blogs.add(new Blog());
         }
-        return new ActiveZoneRecyclerViewAdapter(blogs);
-    }
-
-    @Override
-    public int getItemCount() {
-        if (blogs != null) {
-            return blogs.size();
-        }
-        return 0;
+        return blogs;
     }
 }

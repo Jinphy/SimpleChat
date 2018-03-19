@@ -18,13 +18,16 @@ public interface RoutineContract {
         void fabAction(android.view.View view);
 
         void showActiveZoneActivity();
+
+        void showGroupListActivity();
+
+        void handleRecyclerViewEvent(android.view.View view, Object item, int type, int position);
     }
 
     interface Presenter extends BasePresenter {
 
         RoutineRecyclerViewAdapter getAdapter();
 
-        void handleRecyclerViewEvent(android.view.View view, Object item, int type, int position);
     }
 }
 

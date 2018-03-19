@@ -1,65 +1,55 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.model.menu.Routine;
+import com.example.jinphy.simplechat.base.BaseAdapter;
+import com.example.jinphy.simplechat.models.menu.Routine;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jinphy on 2017/8/15.
  */
 
 public class RoutineRecyclerViewAdapter
-        extends BaseRecyclerViewAdapter<RoutineRecyclerViewAdapter.ViewHolder> {
-
-    List<Routine> routines;
+        extends BaseAdapter<Routine, RoutineRecyclerViewAdapter.ViewHolder> {
 
 
     public RoutineRecyclerViewAdapter() {
+        super();
         initRoutines();
     }
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View root = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.main_tab_routine_item, parent, false);
-
-        return new ViewHolder(root);
-    }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Routine routine = routines.get(position);
+    public void onBindViewHolder(ViewHolder holder, Routine routine,  int position) {
         holder.icon.setImageResource(routine.getIconId());
         holder.tag.setText(routine.getTagId());
-        if (click != null) {
-            holder.itemView.setOnClickListener(view -> click.onClick(view,routine,0,position));
-        }
-        if (longClick != null) {
-            holder.itemView.setOnLongClickListener(view -> longClick.onLongClick(view,routine,0,position));
-        }
 
+        setClick(routine, position, 0, holder.itemView);
+
+        setLongClick(routine, position, 0, holder.itemView);
     }
 
     @Override
-    public int getItemCount() {
-        return routines.size();
+    protected int getResourceId(int viewType) {
+        return R.layout.main_tab_routine_item;
+    }
+
+    @Override
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return new ViewHolder(itemView);
     }
 
 
     private void initRoutines() {
-        routines = new ArrayList<>(9);
+        data = new ArrayList<>(9);
         int[] icons = new int[]{
                 R.drawable.ic_active_zoom_24dp,
-                R.drawable.ic_translate_24dp,
+                R.drawable.ic_group_chat_24dp,
                 R.drawable.ic_credit_card_24dp,
                 R.drawable.ic_certificates_24dp,
                 R.drawable.ic_scenic_spot_24dp,
@@ -70,7 +60,7 @@ public class RoutineRecyclerViewAdapter
         };
         int[] tags = new int[]{
                 R.string.routine_active_zoom,
-                R.string.routine_translate,
+                R.string.routine_group_chat,
                 R.string.routine_credit_card_address,
                 R.string.routine_certificates,
                 R.string.routine_scenic_spot,
@@ -80,7 +70,7 @@ public class RoutineRecyclerViewAdapter
                 R.string.routine_weather
         };
         for (int i = 0; i < icons.length; i++) {
-            routines.add(new Routine(icons[i], tags[i]));
+            data.add(new Routine(icons[i], tags[i]));
         }
 
     }

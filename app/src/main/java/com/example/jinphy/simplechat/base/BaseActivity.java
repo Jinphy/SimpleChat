@@ -1,5 +1,9 @@
 package com.example.jinphy.simplechat.base;
 
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -9,23 +13,18 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
-import com.example.jinphy.simplechat.model.event_bus.EBActivity;
-import com.example.jinphy.simplechat.model.event_bus.EBFinishActivity;
+import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.models.event_bus.EBActivity;
+import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static com.example.jinphy.simplechat.utils.Preconditions.checkNotNull;
 
@@ -39,12 +38,44 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected static Snackbar snackbar;
     protected static String TAG;
 
+    public int colorAccent;
+    public int colorPrimary;
+    public int colorPrimaryDark;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         TAG = this.getClass().getSimpleName();
         EventBus.getDefault().register(this);
+
+        initColor();
     }
+
+
+    private void initColor() {
+        TypedArray a = getTheme().obtainStyledAttributes(new int[]{
+                R.attr.colorPrimary,
+                R.attr.colorPrimaryDark,
+                R.attr.colorAccent
+        });
+        colorPrimary = a.getColor(0, ContextCompat.getColor(this, R.color.colorPrimary));
+        colorPrimaryDark = a.getColor(1, ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        colorAccent = a.getColor(2, ContextCompat.getColor(this, R.color.colorAccent));
+    }
+
+    public int colorAccent() {
+        return colorAccent;
+    }
+
+    public int colorPrimary() {
+        return colorPrimary;
+    }
+    public int colorPrimaryDark() {
+        return colorPrimaryDark;
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -68,10 +99,21 @@ public abstract class BaseActivity extends AppCompatActivity {
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void finishMe(EBFinishActivity message) {
-        if (message.which == EBFinishActivity.ALL || message.which == this.getClass()) {
+    public void finishMe(EBFinishActivityMsg message) {
+        if (message.which == EBFinishActivityMsg.ALL) {
             finish();
+            return;
         }
+        if (message.kill) {
+            if (message.which == this.getClass()) {
+                finish();
+            }
+        } else {
+            if (message.which != this.getClass()) {
+                finish();
+            }
+        }
+
     }
 
     /**
@@ -80,7 +122,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * */
     public static void exit() {
-        EventBus.getDefault().post(new EBFinishActivity());
+        EventBus.getDefault().post(new EBFinishActivityMsg());
     }
 
     /**
@@ -274,5 +316,23 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (baseFragment.onBackPressed()) {
             super.onBackPressed();
         }
+    }
+
+
+    /**
+     * DESC: 重写该方法，是的界面显示的字体等属性不随系统配置变化而变化
+     * Created by Jinphy, on 2017/12/8, at 15:30
+     */
+    @Override
+    public Resources getResources() {
+        Resources res = super.getResources();
+        Configuration config = new Configuration();
+        config.setToDefaults();
+        res.updateConfiguration(config, res.getDisplayMetrics());
+        return res;
+    }
+
+    public void setTitle(CharSequence title) {
+        // no-op
     }
 }

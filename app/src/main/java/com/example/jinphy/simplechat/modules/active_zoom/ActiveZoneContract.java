@@ -4,6 +4,9 @@ import android.view.MotionEvent;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.blog.Blog;
+
+import java.util.List;
 
 /**
  * Created by jinphy on 2017/8/15.
@@ -26,9 +29,7 @@ public interface ActiveZoneContract {
 
     interface Presenter extends BasePresenter{
 
-        ActiveZoneRecyclerViewAdapter getAdapter();
-
-        int getItemCount();
+        List<Blog> loadBlogs();
 
     }
 }

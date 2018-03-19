@@ -4,16 +4,23 @@
     <color name="colorPrimaryDark">#311B92</color>
     <color name="colorAccent">#4E342E</color>
     <color name="white">#ffffffff</color>
+    <color name="black">#ff000000</color>
     <color name="half_alpha_gray">#ffaaaaaa</color>
     <color name="transparent">#00ffffff</color>
     <color name="chat_send_msg_normal">#df4E342E</color>
     <color name="chat_send_msg_pressed">#ff4E342E</color>
     <color name="chat_receive_msg_pressed">#9f999999</color>
     <color name="chat_send_btn_normal">#7f4E342E</color>
-    <color name="half_alpha_black">#7f000000</color>
+    <color name="half_alpha_black">#7f444444</color>
     <color name="background">#fff7f7f7</color>
     <color name="color_ffcccccc">#ffcccccc</color>
     <color name="colorAccentLighter">#9f4E342E</color>
     <color name="color_red_D50000">#D50000</color>
     <color name="color_red_light_B71C1C">#B71C1C</color>
+    <color name="green_primary">#ff558B2F</color>
+    <color name="green_primary_dark">#ff33691E</color>
+    <color name="yellow_primary">#FF8F00</color>
+    <color name="yellow_primary_dark">#FF6F00</color>
+    <color name="black_primary">#ff212121</color>
+    <color name="black_primary_dark">#ff111111</color>
 </resources>

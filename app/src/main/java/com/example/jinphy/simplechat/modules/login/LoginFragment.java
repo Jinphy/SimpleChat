@@ -1,43 +1,40 @@
 package com.example.jinphy.simplechat.modules.login;
 
-import android.content.Context;
+import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.api.Response;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.constants.StringConst;
-import com.example.jinphy.simplechat.listener_adapters.TextWatcherAdapter;
-import com.example.jinphy.simplechat.model.event_bus.EBFinishActivity;
-import com.example.jinphy.simplechat.model.event_bus.EBLoginInfo;
-import com.example.jinphy.simplechat.model.user.User;
+import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
+import com.example.jinphy.simplechat.listener_adapters.TextListener;
+import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
+import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.modules.main.MainActivity;
 import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.DeviceUtils;
-import com.example.jinphy.simplechat.utils.Encrypt;
+import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +45,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LoginFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * create an app of this fragment.
  */
 public class LoginFragment extends BaseFragment<LoginPresenter> implements LoginContract.View{
 
@@ -68,28 +65,26 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
     protected TextView loginButton;
 
     protected String verifiedAccount = null;
+    private String deviceId;
+    private User user;
 
-    //------------fragment 的函数-----------------------------------
+    //------------fragment 的函数--------------------------------------------------------------------
 
     public LoginFragment() {
         // Required empty public constructor
     }
 
     /**
-     * Use this factory method to create a new instance of
+     * Use this factory method to create a new app of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment LoginFragment.
+     * @return A new app of fragment LoginFragment.
      */
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
         return fragment;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,13 +92,6 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         if (presenter == null) {
             this.presenter = getPresenter();
         }
-        presenter.registerSMSSDK(getContext());
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenter.unregisterSMSSDK();
     }
 
     @Override
@@ -113,7 +101,8 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
 
     @Override
     public void initData() {
-
+        deviceId = EncryptUtils.md5(DeviceUtils.deviceId());
+        user = presenter.getUser();
     }
 
     @Override
@@ -132,23 +121,34 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
 
     @Override
     protected void setupViews() {
+        if (user != null) {
+            accountLayout.getEditText().setText(user.getAccount());
+            accountLayout.getEditText().setSelection(user.getAccount().length());
+            getVerificationCodeButton.setEnabled(true);
+            passwordLayout.getEditText().setText(EncryptUtils.aesDecrypt(user.getPassword()));
+        }
     }
 
     @Override
     protected void registerEvent() {
-        gotoSignUpView.setOnClickListener(this::onClick);
-        getVerificationCodeButton.setOnClickListener(this::onClick);
-        loginTypeButton.setOnClickListener(this::onClick);
-        loginButton.setOnClickListener(this::onClick);
-        rememberPasswordView.setOnClickListener(this::onClick);
+        View.OnClickListener onclick = this::onClick;
+
+        gotoSignUpView.setOnClickListener(onclick);
+        getVerificationCodeButton.setOnClickListener(onclick);
+        loginTypeButton.setOnClickListener(onclick);
+        loginButton.setOnClickListener(onclick);
+        rememberPasswordView.setOnClickListener(onclick);
 
         TextInputEditText editText = accountLayout.findViewById(R.id.account_text);
-        editText.addTextChangedListener(onTextChanged());
+        editText.addTextChangedListener((TextListener.After) editable -> {
+            String text = editable.toString();
+            this.checkAccount(text, text.length());
+        });
     }
 
-    //------------私有函数------------------------------------------
+    //------------私有函数---------------------------------------------------------------------------
 
-    //==================事件listener函数========================
+    //==================事件listener函数=============================================================
     private void onClick(View view) {
         switch (view.getId()) {
             case R.id.goto_sign_up_text:
@@ -178,174 +178,96 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
     }
 
 
-    private TextWatcherAdapter onTextChanged() {
-        return new TextWatcherAdapter() {
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String text = editable.toString();
-                checkAccount(text, text.length());
-            }
-        };
-    }
-
     //==============普通函数=====================================
 
+    /**
+     * DESC: 从服务器请求发送验证码
+     * Created by Jinphy, on 2017/12/6, at 16:29
+     */
     private synchronized void getVerificationCode(){
         String account = getAccount();
         if (StringUtils.equal(verifiedAccount, account)) {
             BaseApplication.showToast("该账号已经验证过，无需再验证！", false);
             return;
         }
-        getVerificationCodeButton.setEnabled(false);
-        presenter.findUser(account, findResponse -> {
-            // 查询用户是否存在
-            handleResponse(findResponse,
-                    null,
-                    "当前账号不存在，请重新输入！",
-                    "服务异常，请稍后重试！",
-                    false
-            );
-            if (Response.yes.equals(findResponse.message)) {
-                // 用户存在，则为当前用户获取验证码
-                Flowable.just("正在获取验证码，请稍等！")
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext(msg -> BaseApplication.showToast(msg, false))
-                        .subscribe();
-                presenter.getVerificationCode(account, getResponse->{
-                    handleResponse(
-                            getResponse,
-                            "验证码已发送，请正确输入！",
-                            "获取验证码失败!",
-                            null,
-                            true);
-                    if (Response.yes.equals(getResponse.message)) {
-                        verifiedAccount = account;
-                        String origin = getVerificationCodeButton.getText().toString();
-                        String text = BaseApplication.instance().getString(R.string.re_get);
-                        Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
-                                .map(value -> {
-                                    value = 60 - value;
-                                    return text.replace(" ", value + "");
-                                })
-                                .subscribeOn(Schedulers.newThread())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .doOnNext(value -> getVerificationCodeButton.setText(value))
-                                .doOnComplete(() -> {
-                                    getVerificationCodeButton.setEnabled(true);
-                                    getVerificationCodeButton.setText(origin);
-                                })
-                                .subscribe();
-                    } else {
-                        getActivity().runOnUiThread(()-> getVerificationCodeButton.setEnabled(true));
-                    }
-                });
-            }else {
-                getActivity().runOnUiThread(()-> getVerificationCodeButton.setEnabled(true));
-            }
-        });
-
+        // 获取验证码
+        presenter.getVerificationCode(account);
     }
 
+    /**
+     * DESC: 登录
+     * Created by Jinphy, on 2017/12/6, at 16:29
+     */
     private synchronized void doLogin() {
         String account = getText(accountLayout,R.id.account_text);
-        String verificationCode = getText(verificationCodeLayout, R.id.verification_code_text);
-        String password = getText(passwordLayout,R.id.password_text);
-        String deviceId = Encrypt.md5(DeviceUtils.devceId());
-
 //        判断账号格式是否合法
         if (!checkAccount(account, account.length())) {
             BaseApplication.showToast("请输入有效的账户！", false);
             return;
         }
-
 //        判断登录方式
         if (isLoginByPassword()) {
-            doLoginByPassword(account,password,deviceId);
+            doLoginByPassword();
         } else {
 //            验证码方式登录
-            doLoginByVerificationCode(account, verificationCode,deviceId);
+            doLoginByVerificationCode();
         }
     }
 
-    //            密码方式登录
-    private void doLoginByPassword(String account, String password,String deviceId) {
+    /**
+     * DESC: 通过密码方式登录
+     * Created by Jinphy, on 2017/12/6, at 16:28
+     */
+    private void doLoginByPassword() {
+        String account = getAccount();
+        String password = getPassword();
         if (password.length() == 0) {
             BaseApplication.showToast("请输入密码！",true);
             return;
         }
-
-        String encryptedPassword = Encrypt.md5(password);
-        presenter.findUser(account,findResponse -> {
-            handleResponse(
-                    findResponse,
-                    null,
-                    "用户不存在！",
-                    "服务器异常，请稍后再试！",
-                    false
-            );
-            if (Response.yes.equals(findResponse.message)) {
-                presenter.login(account,encryptedPassword,deviceId,loginResponse -> {
-                    handleResponse(
-                            loginResponse,
-                            "登录成功！",
-                            "密码错误，请重新输入",
-                            "服务器错误，请稍后再试！",
-                            false
-                    );
-                    doAfterLogin(loginResponse, account, password);
-                });
-            }
-        });
+        if (!checkDeviceId()) {
+            return;
+        }
+        presenter.loginWithPassword(account, password, deviceId);
     }
 
-    private void doLoginByVerificationCode(String account, String verificationCode,String deviceId) {
-        if (StringUtils.equal(account, verifiedAccount)) {
-            presenter.submitVerificationCode(account,verificationCode,submitResponse -> {
-                handleResponse(
-                        submitResponse,
-                        "已验证，正在登录...",
-                        "验证码不正确，请重新输入！",
-                        "服务器异常，请稍后再试！",
-                        false
-                );
-                if (Response.yes.equals(submitResponse.message)) {
-                    presenter.login(account,"null",deviceId,loginResponse -> {
-                        handleResponse(
-                                loginResponse,
-                                "登录成功！",
-                                "密码错误，请重新输入",
-                                "服务器错误，请稍后再试！",
-                                false
-                        );
-                        doAfterLogin(loginResponse, account, null);
-                    });
-                }
+    private boolean checkDeviceId() {
+        if (deviceId == null) {
+            App.showToast("您拒绝了访问手机状态的权限，请到系统设置手动开启以继续当前操作！", false);
+            return false;
+        }
+        return true;
+    }
 
-            });
+    /**
+     * DESC: 通过验证码方式登录
+     * Created by Jinphy, on 2017/12/6, at 16:28
+     */
+    private void doLoginByVerificationCode() {
+        if (!checkDeviceId()) {
+            return;
+        }
+
+        String account = getAccount();
+        String code = getCode();
+        if (StringUtils.equal(account, verifiedAccount)) {
+            presenter.loginWithCode(account, code, deviceId);
         } else {
             BaseApplication.showToast("请先验证账号！", false);
         }
     }
 
-    private void doAfterLogin(Response response,String account,String password) {
-        if (Response.yes.equals(response.message)) {
-            // 登录成功
-            // 发送给MainActivity
-            boolean rememberPassword = rememberMeBox.isChecked();
-            User user = new User();
-            user.setAccount(account);
-            user.setPassword(password);
-            MainActivity.start(getActivity(),user, rememberPassword);
-            EventBus.getDefault().post(new EBFinishActivity(WelcomeActivity.class));
-            finishActivity();
-        }
-    }
-
+    /**
+     * DESC: 获取文本框中的文本
+     * Created by Jinphy, on 2017/12/6, at 16:28
+     */
     private String getText(View container, @IdRes int id) {
+        if (container == null) {
+            return "";
+        }
         EditText editText = container.findViewById(id);
         return editText.getText().toString();
     }
-
 
     //-----------------EventBus---------------------------------
 
@@ -353,6 +275,23 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
 
     //----------mvp中View的函数--------------------------------------
 
+    /**
+     * DESC: 登录成功后
+     * Created by jinphy, on 2018/1/6, at 17:06
+     */
+    @Override
+    public void whenLoginSucceed() {
+        // 登录成功
+        MainActivity.startFromLogin(getActivity());
+        EventBus.getDefault().post(new EBFinishActivityMsg(WelcomeActivity.class));
+        finishActivity();
+    }
+
+
+    @Override
+    public boolean remenberPassword() {
+        return rememberMeBox.isChecked();
+    }
 
     @Override
     public void showPasswordView() {
@@ -385,6 +324,10 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
                 }).animate();
     }
 
+    /**
+     * DESC: 判断账号是否合法
+     * Created by Jinphy, on 2017/12/6, at 16:27
+     */
     private boolean checkAccount(String text, int length) {
         if (StringUtils.isPhoneNumber(text)) {
             accountLayout.setErrorEnabled(false);
@@ -412,20 +355,31 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         }
     }
 
+    /**
+     * DESC: 获取文本框中的账号
+     * Created by Jinphy, on 2017/12/6, at 15:48
+     */
     @Override
     public String getAccount() {
-        if (accountLayout == null) {
-            return "";
-        }
-        return ((TextView) accountLayout.findViewById(R.id.account_text)).getText().toString();
+        return getText(accountLayout, R.id.account_text);
     }
 
+    /**
+     * DESC: 获取文本框中的账号密码
+     * Created by Jinphy, on 2017/12/6, at 15:48
+     */
     @Override
     public String getPassword() {
-        if (passwordLayout == null) {
-            return "";
-        }
-        return ((TextView) passwordLayout.findViewById(R.id.password_text)).getText().toString();
+        return getText(passwordLayout, R.id.password_text);
+    }
+
+    /**
+     * DESC: 从文本框中获取验证码
+     * Created by Jinphy, on 2017/12/6, at 15:42
+     */
+    @Override
+    public String getCode() {
+        return getText(verificationCodeLayout, R.id.verification_code_text);
     }
 
     @Override
@@ -440,6 +394,33 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
         } else {
             showPasswordView();
         }
+    }
+
+    @Override
+    public void enableCodeButton(boolean enable) {
+        this.getVerificationCodeButton.setEnabled(enable);
+    }
+
+    @Override
+    public void countDownCodeButton() {
+        // 倒计时获取验证码按钮
+        String origin = getVerificationCodeButton.getText().toString();
+        String text = BaseApplication.app().getString(R.string.re_get);
+        Flowable.intervalRange(1, 60, 0, 1, TimeUnit.SECONDS)
+                .map(value -> text.replace(" ", (60 - value) + ""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(value -> getVerificationCodeButton.setText(value))
+                .doOnComplete(() -> {
+                    getVerificationCodeButton.setEnabled(true);
+                    getVerificationCodeButton.setText(origin);
+                })
+                .subscribe();
+    }
+
+    @Override
+    public void updateVerifiedAccount(String verifiedAccount) {
+        this.verifiedAccount = verifiedAccount;
     }
 
     @Override

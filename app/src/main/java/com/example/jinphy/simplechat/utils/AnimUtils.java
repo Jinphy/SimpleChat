@@ -49,7 +49,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Utility methods for working with animations.
+ * Utility methods for working create animations.
  */
 public class AnimUtils {
 
@@ -205,7 +205,7 @@ public class AnimUtils {
 
         /**
          * Builder创建器
-         * 调用该方法，如果没有调用 {@code setTarget(View)}来设置目标对象，需要为动画添加
+         * 调用该方法，如果没有调用 {@code setParentWidth(View)}来设置目标对象，需要为动画添加
          * 更新监听器{@code onUpdate(UpdateListener) } 手动设置动画的对应属性值，
          * 需要注意的是，更新监听器只对{@code setInt（int）}、
          * {@code setFloat(float)}\{@code setColor(int)} 函数所设置的值有限
@@ -1027,11 +1027,11 @@ public class AnimUtils {
     }
 
     /**
-     * An implementation of {@link Property} to be used specifically with fields of
-     * type
-     * <code>float</code>. This type-specific subclass enables performance benefit by allowing
+     * An implementation of {@link Property} to be used specifically create fields of
+     * dataType
+     * <code>float</code>. This dataType-specific subclass enables performance benefit by allowing
      * calls to a {@link #set(Object, Float) set()} function that takes the primitive
-     * <code>float</code> type and avoids autoboxing and other overhead associated with the
+     * <code>float</code> dataType and avoids autoboxing and other overhead associated create the
      * <code>Float</code> class.
      *
      * @param <T> The class on which the Property is declared.
@@ -1042,8 +1042,8 @@ public class AnimUtils {
         }
 
         /**
-         * A type-specific override of the {@link #set(Object, Float)} that is faster when dealing
-         * with fields of type <code>float</code>.
+         * A dataType-specific override of the {@link #set(Object, Float)} that is faster when dealing
+         * create fields of dataType <code>float</code>.
          */
         public abstract void setValue(T object, float value);
 
@@ -1055,11 +1055,11 @@ public class AnimUtils {
 
 
     /**
-     * An implementation of {@link Property} to be used specifically with fields of
-     * type
-     * <code>int</code>. This type-specific subclass enables performance benefit by allowing
+     * An implementation of {@link Property} to be used specifically create fields of
+     * dataType
+     * <code>int</code>. This dataType-specific subclass enables performance benefit by allowing
      * calls to a {@link #set(Object, Integer) set()} function that takes the primitive
-     * <code>int</code> type and avoids autoboxing and other overhead associated with the
+     * <code>int</code> dataType and avoids autoboxing and other overhead associated create the
      * <code>Integer</code> class.
      *
      * @param <T> The class on which the Property is declared.
@@ -1071,8 +1071,8 @@ public class AnimUtils {
         }
 
         /**
-         * A type-specific override of the {@link #set(Object, Integer)} that is faster when dealing
-         * with fields of type <code>int</code>.
+         * A dataType-specific override of the {@link #set(Object, Integer)} that is faster when dealing
+         * create fields of dataType <code>int</code>.
          */
         public abstract void setValue(T object, int value);
 

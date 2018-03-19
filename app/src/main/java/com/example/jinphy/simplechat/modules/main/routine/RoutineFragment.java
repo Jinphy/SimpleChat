@@ -2,15 +2,20 @@ package com.example.jinphy.simplechat.modules.main.routine;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.menu.Routine;
 import com.example.jinphy.simplechat.modules.active_zoom.ActiveZoneActivity;
+import com.example.jinphy.simplechat.modules.group.group_list.GroupListActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
@@ -27,6 +32,8 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
 
     private int density;
     private RoutineRecyclerViewAdapter adapter;
+
+    private View root = null;
 
 
     public RoutineFragment() {
@@ -67,6 +74,14 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     public void fabAction(View view) {
 
     }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (root == null) {
+            root = super.onCreateView(inflater, container, savedInstanceState);
+        }
+        return root;
+    }
+
 
     @Override
     public void initData() {
@@ -75,7 +90,7 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
 
     @Override
     protected void findViewsById(View view) {
-        //        GridLayout container = view.findViewById(R.id.grid_layout);
+        //        GridLayout container = item.findViewById(R.id.grid_layout);
         recyclerView = view.findViewById(R.id.recycler_view);
     }
 
@@ -86,14 +101,13 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
         recyclerView.setAdapter(adapter);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
-
     }
 
 
     @Override
     protected void registerEvent() {
 
-        adapter.onClick(presenter::handleRecyclerViewEvent);
+        adapter.onClick(this::handleRecyclerViewEvent);
     }
 
 
@@ -117,7 +131,42 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
 
     @Override
     public void showActiveZoneActivity() {
-        Intent intent = new Intent(getActivity(), ActiveZoneActivity.class);
-        startActivity(intent);
+        ActiveZoneActivity.start(activity());
     }
+
+    @Override
+    public void showGroupListActivity() {
+        GroupListActivity.start(activity(),false);
+    }
+
+    @Override
+    public void handleRecyclerViewEvent(View view, Object item, int type, int position) {
+
+        Routine routine = (Routine) item;
+
+        switch (routine.getTagId()) {
+            case R.string.routine_active_zoom:
+                showActiveZoneActivity();
+                break;
+            case R.string.routine_group_chat:
+                showGroupListActivity();
+                break;
+            case R.string.routine_credit_card_address:
+                break;
+            case R.string.routine_certificates:
+                break;
+            case R.string.routine_scenic_spot:
+                break;
+            case R.string.routine_bus_route:
+                break;
+            case R.string.routine_food_menu:
+                break;
+            case R.string.routine_express:
+                break;
+            case R.string.routine_weather:
+                break;
+
+        }
+    }
+
 }

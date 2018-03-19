@@ -1,13 +1,20 @@
 package com.example.jinphy.simplechat.modules.main.msg;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.model.message_record.MessageRecord;
+import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.message_record.MessageRecord;
+import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
+import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.modules.system_msg.SystemMsgActivity;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -16,12 +23,14 @@ import java.util.List;
 
 public class MsgPresenter implements MsgContract.Presenter {
     MsgContract.View view;
-
+    MessageRecordRepository recordRepository;
+    UserRepository userRepository;
     private List<MessageRecord> messageRecords;
 
     public MsgPresenter(@NonNull MsgContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-
+        this.recordRepository = MessageRecordRepository.getInstance();
+        this.userRepository = UserRepository.getInstance();
     }
 
     @Override
@@ -31,27 +40,11 @@ public class MsgPresenter implements MsgContract.Presenter {
 
 
     @Override
-    public <T>void handleItemEvent(View view, T item,int type,int position) {
-        switch (view.getId()) {
-            case R.id.item_view:
-                MsgPresenter.this.view.showChatWindow((MessageRecord) item);
-                break;
-        }
-    }
+    public List<MessageRecord> loadMsgRecords() {
+        messageRecords = recordRepository.load(userRepository.currentUser().getAccount());
 
-    @Override
-    public List<MessageRecord> loadMsgRecord() {
-        messageRecords = new ArrayList<>(30);
-        for (int i = 0; i < 30; i++) {
-            messageRecords.add(new MessageRecord());
-        }
+        MessageRecord.sort(messageRecords);
+
         return messageRecords;
-    }
-
-    @Override
-    public MsgRecyclerViewAdapter getAdapter() {
-        MsgRecyclerViewAdapter adapter = new MsgRecyclerViewAdapter(loadMsgRecord());
-        adapter.onClick(this::handleItemEvent);
-        return adapter;
     }
 }

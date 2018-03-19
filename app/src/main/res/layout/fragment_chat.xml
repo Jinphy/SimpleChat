@@ -8,11 +8,14 @@
     tools:context="com.example.jinphy.simplechat.modules.chat.ChatFragment">
 
     <android.support.v7.widget.RecyclerView
+        android:overScrollMode="never"
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="94dp"
+        android:layout_marginBottom="54dp"
         android:layout_marginTop="?attr/actionBarSize">
+
+        <!--android:layout_marginBottom="94dp"-->
 
     </android.support.v7.widget.RecyclerView>
 
@@ -50,6 +53,7 @@
                         android:id="@+id/fab_emotion"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         android:layout_marginBottom="@dimen/dimen_8dp"
                         android:layout_marginTop="@dimen/dimen_5dp"
                         android:layout_marginLeft="@dimen/dimen_5dp"

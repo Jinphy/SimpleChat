@@ -21,11 +21,36 @@
     </style>
 
     <style name="LoginActivityTheme" parent="AppTheme">
-        <item name="colorPrimary">#FF8F00</item>
-        <item name="colorPrimaryDark">#FF6F00</item>
+        <item name="colorPrimary">@color/yellow_primary</item>
+        <item name="colorPrimaryDark">@color/yellow_primary_dark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
     </style>
+
+
+    <style name="ModifyUserActivityTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryDark">@color/green_primary_dark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
+
+
+    <style name="PickPhotoActivityTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/black_primary</item>
+        <item name="colorPrimaryDark">@color/black_primary_dark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
+
+
+    <style name="AddFriendActivityTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryDark">@color/green_primary_dark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
+
 
     <style name="AppTheme" parent="Base.AppTheme" >
         <item name="md_dark_theme">false</item>
@@ -48,4 +73,59 @@
 
 
     <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    
+    
+    
+    
+    <!--自定义View的属性-->
+    <declare-styleable name="MenuItemView">
+
+        <attr name="color" format="color"/>
+        <attr name="icon_color" format="color"/>
+        <attr name="title_text_color" format="color"/>
+        <attr name="content_text_color" format="color"/>
+        <attr name="arrow_color" format="color"/>
+        <attr name="icon_drawable" format="reference"/>
+
+        <attr name="title" format="string"/>
+        <attr name="content" format="string"/>
+        <attr name="content_hint" format="string"/>
+        <attr name="content_type" format="enum">
+            <enum name="text" value="0"/>
+            <enum name="password" value="1"/>
+        </attr>
+
+        <attr name="icon_size" format="dimension"/>
+        <attr name="title_text_size" format="dimension"/>
+        <attr name="content_text_size" format="dimension"/>
+
+        <attr name="show_right_layout" format="boolean"/>
+        <attr name="show_arrow" format="boolean"/>
+        <attr name="show_content" format="boolean"/>
+        <attr name="show_input" format="boolean"/>
+        <attr name="auto_animate" format="boolean"/>
+
+        <attr name="item_backgroundColor" format="color|reference"/>
+        <attr name="item_corner_radius" format="dimension"/>
+        <attr name="item_normal_elevation" format="dimension"/>
+        <attr name="item_input_elevation" format="dimension"/>
+    </declare-styleable>
+    
+    
+    
+    <!--popupWindow 的动画-->
+    <style name="main_menu_animate" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/main_menu_enter</item>
+        <item name="android:windowExitAnimation">@anim/main_menu_exit</item>
+    </style>
+
+
+
+
+
+
+
+
+
 </resources>

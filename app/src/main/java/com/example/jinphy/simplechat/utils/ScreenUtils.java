@@ -40,6 +40,19 @@ public class ScreenUtils {
 		return (int) (pxValue / scale + 0.5f);
 
 	}
+
+
+	/**
+	 * @param context 上下文
+	 * @param spValue dp数值
+	 * @return dp to  px
+	 */
+	public static int sp2px(Context context, float spValue) {
+		final float scale = context.getResources().getDisplayMetrics().scaledDensity;
+		return (int) (spValue * scale + 0.5f);
+	}
+
+
 	/**
 	 * 获取状态来的高度，单位为像素
 	 * @param context 上下文

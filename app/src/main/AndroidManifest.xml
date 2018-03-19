@@ -19,9 +19,10 @@
     <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.GET_TASKS"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
-        android:name=".application.DBApplication"
+        android:name=".application.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -41,25 +42,84 @@
         </activity>
         <activity
             android:name=".modules.login.LoginActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"
-            android:theme="@style/LoginActivityTheme">
+            android:theme="@style/LoginActivityTheme"
+            android:windowSoftInputMode="stateHidden|adjustResize">
         </activity>
         <activity android:name=".modules.main.MainActivity">
         </activity>
         <activity
             android:name=".modules.chat.ChatActivity"
+            android:launchMode="singleTask"
             android:theme="@style/translucentBackgroundTheme">
         </activity>
         <activity
             android:name=".modules.active_zoom.ActiveZoneActivity"
             android:theme="@style/TranslucentTheme">
         </activity>
+        <activity
+            android:name=".modules.modify_user_info.ModifyUserActivity"
+            android:theme="@style/ModifyUserActivityTheme">
+        </activity>
+        <activity
+            android:name=".modules.pick_photo.PickPhotoActivity"
+            android:theme="@style/PickPhotoActivityTheme">
+        </activity>
+        <activity
+            android:name=".modules.add_friend.AddFriendActivity"
+            android:theme="@style/AddFriendActivityTheme">
+        </activity>
+        <activity android:name=".modules.system_msg.SystemMsgActivity">
+        </activity>
+        <activity android:name=".modules.system_msg.new_friend.NewFriendsActivity">
+        </activity>
+        <activity android:name=".modules.system_msg.notice.NoticeActivity">
+        </activity>
+        <activity
+            android:name=".modules.modify_friend_info.ModifyFriendInfoActivity"
+            android:theme="@style/ModifyUserActivityTheme">
+        </activity>
+        <activity
+            android:name=".modules.group.create_group.CreateGroupActivity"
+            android:theme="@style/ModifyUserActivityTheme">
+        </activity>
+        <activity android:name=".modules.group.group_list.GroupListActivity">
+        </activity>
+        <activity
+            android:name=".modules.group.group_detail.ModifyGroupActivity"
+            android:theme="@style/ModifyUserActivityTheme">
+        </activity>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.jinphy.simplechat.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths">
+            </meta-data>
+        </provider>
 
         <service
-            android:name=".services.PushService"
+            android:name=".services.push.PushService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":push">
+        </service>
+
+        <receiver
+            android:name=".broadcasts.AppBroadcastReceiver"
             android:enabled="true"
             android:exported="true">
-        </service>
+            <intent-filter>
+                <action android:name="com.example.jinphy.simplechat.AppReceiver"/>
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".modules.system_msg.new_member.NewMemberActivity">
+        </activity>
+        <activity android:name=".modules.group.member_list.MemberListActivity">
+        </activity>
     </application>
 
 </manifest>

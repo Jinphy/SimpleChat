@@ -1,20 +1,17 @@
 package com.example.jinphy.simplechat.modules.main;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
-import android.view.MotionEvent;
-import android.view.View;
 
+import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.base.BasePresenter;
+import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.base.BaseView;
-import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
+import com.example.jinphy.simplechat.models.group.Group;
+import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsPresenter;
-import com.example.jinphy.simplechat.modules.main.msg.MsgContract;
-import com.example.jinphy.simplechat.modules.main.msg.MsgFragment;
 import com.example.jinphy.simplechat.modules.main.msg.MsgPresenter;
-import com.example.jinphy.simplechat.modules.main.routine.RoutineContract;
 import com.example.jinphy.simplechat.modules.main.routine.RoutinePresenter;
-import com.example.jinphy.simplechat.modules.main.self.SelfContract;
 import com.example.jinphy.simplechat.modules.main.self.SelfPresenter;
 
 import java.util.List;
@@ -57,10 +54,23 @@ public interface MainContract {
 
         int currentItemPosition();
 
+        void showMenu();
+
+        void showUserInfo();
+
+        void showFriendInfo(String account);
+
     }
 
 
     interface Presenter extends BasePresenter{
 
+        void findUser(String account, BaseRepository.OnDataOk<Response<User>> callback);
+
+        void findGroups(String text, Runnable whenDataOk);
+
+        void checkAccount(Context context);
+
+        void loadDataAfterLogin();
     }
 }

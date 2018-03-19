@@ -1,11 +1,12 @@
 package com.example.jinphy.simplechat.modules.main.friends;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
-import com.example.jinphy.simplechat.model.friend.Friend;
+import com.example.jinphy.simplechat.models.friend.Friend;
 
 import java.util.List;
 
@@ -22,13 +23,14 @@ public interface FriendsContract {
         void fabAction(android.view.View view);
 
         RecyclerView getRecyclerView();
+
+        void updateView();
     }
 
     interface Presenter extends BasePresenter {
 
         List<Friend> loadFriends();
 
-        FriendsRecyclerViewAdapter getAdapter();
     }
 }
 

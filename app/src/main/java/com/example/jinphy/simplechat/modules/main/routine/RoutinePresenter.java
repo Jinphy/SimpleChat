@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.model.menu.Routine;
+import com.example.jinphy.simplechat.models.menu.Routine;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
@@ -30,36 +30,7 @@ public class RoutinePresenter implements RoutineContract.Presenter {
 
     @Override
     public RoutineRecyclerViewAdapter getAdapter() {
-        Log.e("Main", "getAdapter");
         return new RoutineRecyclerViewAdapter();
     }
 
-    @Override
-    public void handleRecyclerViewEvent(View view, Object item, int type, int position) {
-
-        Routine routine = (Routine) item;
-
-        switch (routine.getTagId()) {
-            case R.string.routine_active_zoom:
-                this.view.showActiveZoneActivity();
-                break;
-            case R.string.routine_translate:
-                break;
-            case R.string.routine_credit_card_address:
-                break;
-            case R.string.routine_certificates:
-                break;
-            case R.string.routine_scenic_spot:
-                break;
-            case R.string.routine_bus_route:
-                break;
-            case R.string.routine_food_menu:
-                break;
-            case R.string.routine_express:
-                break;
-            case R.string.routine_weather:
-                break;
-
-        }
-    }
 }

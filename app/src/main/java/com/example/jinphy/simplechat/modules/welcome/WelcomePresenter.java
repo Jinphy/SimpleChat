@@ -5,7 +5,8 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.example.jinphy.simplechat.constants.StringConst;
-import com.example.jinphy.simplechat.model.user.User;
+import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 /**
@@ -15,10 +16,11 @@ import com.example.jinphy.simplechat.utils.Preconditions;
 public class WelcomePresenter implements WelcomeContract.Presenter {
 
     WelcomeContract.View view;
+    UserRepository userRepository;
 
     public WelcomePresenter(@NonNull WelcomeContract.View view) {
         this.view = Preconditions.checkNotNull(view);
-
+        this.userRepository = UserRepository.getInstance();
     }
 
     @Override
@@ -28,17 +30,10 @@ public class WelcomePresenter implements WelcomeContract.Presenter {
 
     @Override
     public void doAfterWelcome(Context context) {
-        SharedPreferences preferences =
-                context.getSharedPreferences(StringConst.PREFERENCES_NAME_USER, Context.MODE_PRIVATE);
-        boolean hasLogin = preferences.getBoolean(StringConst.PREFERENCES_KEY_HAS_LOGIN, false);
-        boolean rememberPassword = preferences.getBoolean(StringConst.PREFERENCES_KEY_REMEMBER_PASSWORD, false);
-        String account = preferences.getString(StringConst.PREFERENCES_KEY_CURRENT_ACCOUNT, null);
-        String password = preferences.getString(StringConst.PREFERENCES_KEY_PASSWORD, null);
-        rememberPassword = false;
-        if (hasLogin && rememberPassword) {
-            view.showMainActivity(account,password);
-        } else {
+        if (userRepository.needToLogin()) {
             view.showBtn();
+        } else {
+            view.showMainActivity();
         }
     }
 

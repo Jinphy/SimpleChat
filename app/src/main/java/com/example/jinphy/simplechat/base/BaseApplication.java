@@ -1,18 +1,26 @@
 package com.example.jinphy.simplechat.base;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
-import android.support.design.widget.Snackbar;
+import android.content.Context;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.jinphy.simplechat.model.event_bus.EBActivity;
+import com.apkfuns.logutils.LogUtils;
+import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
+import com.example.jinphy.simplechat.listener_adapters.ActivityLiftcycle;
+import com.example.jinphy.simplechat.secret.Secret;
+import com.example.jinphy.simplechat.services.push.PushService;
+import com.example.jinphy.simplechat.utils.AppUtils;
+import com.example.jinphy.simplechat.utils.EncryptUtils;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
+import com.mob.MobSDK;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 
 import io.reactivex.annotations.NonNull;
 
@@ -21,62 +29,57 @@ import io.reactivex.annotations.NonNull;
  * Created by jinphy on 2017/8/18.
  */
 
-public class BaseApplication extends Application {
+@SuppressLint("Registered")
+public class BaseApplication extends Application implements ActivityLiftcycle {
 
     private static final String TAG = "BaseApplication";
 
     private static BaseApplication INSTANCE;
     private static Toast toast;
-    private static boolean DEBUG = true;
-    private static SoftReference<Activity> currentActivity;
+    private static boolean DEBUG;
+    private static WeakReference<Activity> currentActivity=null;
 
 
-    public static BaseApplication instance(){
+    public static BaseApplication app(){
         return INSTANCE;
+    }
+
+
+    /**
+     * 获取当前正在前台的Activity
+     * */
+    public static BaseActivity activity(){
+        if (ObjectHelper.reference(currentActivity)) {
+            return (BaseActivity) currentActivity.get();
+        }
+        return null;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         INSTANCE = this;
+        DEBUG = AppUtils.debug();
         initToast();
-        EventBus.getDefault().register(this);
+        registerActivityLifecycleCallbacks(this);
+//        EventBus.getDefault().register(this);
+        String appKey = EncryptUtils.aesDecrypt(Secret.APP_KEY);
+        String appSecret = EncryptUtils.aesDecrypt(Secret.APP_SECRET);
+        MobSDK.init(this, appKey, appSecret);
+        LogUtils.getLogConfig()
+                .configAllowLog(AppUtils.debug())
+                .configTagPrefix("Jinphy");
+
+        PushService.start(this, PushService.FLAG_INIT);
+//        EventBus.getDefault().register(this);
+
     }
 
-    @Subscribe(priority = 100, threadMode = ThreadMode.BACKGROUND)
-    public synchronized void onActivityResumed(EBActivity event) {
-        if (!event.resume) {
-            return;
-        }
-        if (currentActivity == null || currentActivity.get() != event.activity) {
-            currentActivity = new SoftReference<>(event.activity);
-        }
-        BaseApplication.e(TAG, "onActivityResumed: resumed activity = "+
-                event.activity.getClass().getSimpleName());
+    @Override
+    public void onTerminate() {
+//        EventBus.getDefault().unregister(this);
+        super.onTerminate();
     }
-
-    @Subscribe(priority = 100, threadMode = ThreadMode.BACKGROUND)
-    public synchronized void onActivityPaused(EBActivity event) {
-        if (event.resume) {
-            return;
-        }
-        if (currentActivity != null && currentActivity.get() == event.activity) {
-            currentActivity = null;
-        }
-        BaseApplication.e(TAG, "onActivityResumed: paused activity = "+
-                event.activity.getClass().getSimpleName());
-    }
-
-    /**
-     * 获取当前正在前台的Activity
-     * */
-    public static Activity currentActivity() {
-        if (currentActivity != null) {
-            return currentActivity.get();
-        }
-        return null;
-    }
-
 
     public static void showToast(@NonNull  Object msg, boolean isLong){
         if (toast == null) {
@@ -88,7 +91,11 @@ public class BaseApplication extends Application {
         } else {
             toast.setDuration(Toast.LENGTH_SHORT);
         }
-        toast.setText(msg.toString());
+        if (msg instanceof CharSequence) {
+            toast.setText((CharSequence) msg);
+        } else {
+            toast.setText(msg.toString());
+        }
         toast.show();
     }
 
@@ -116,7 +123,7 @@ public class BaseApplication extends Application {
     /**
      * log日志，等级为I
      * */
-    public static   void i(String tag, @NonNull Object msg) {
+    public static void i(String tag, @NonNull Object msg) {
         if (DEBUG) {
             Log.i(tag, msg.toString());
         }
@@ -142,9 +149,18 @@ public class BaseApplication extends Application {
 
     //------------private--------------------------------
 
+    @SuppressLint("ShowToast")
     private static void initToast() {
-
         toast = Toast.makeText(INSTANCE, "", Toast.LENGTH_SHORT);
     }
 
+    @Override
+    public void onActivityResumed(Activity activity) {
+        currentActivity = new WeakReference<>(activity);
+    }
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 }

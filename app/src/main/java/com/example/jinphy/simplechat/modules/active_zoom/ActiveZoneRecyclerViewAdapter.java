@@ -1,59 +1,44 @@
 package com.example.jinphy.simplechat.modules.active_zoom;
 
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseRecyclerViewAdapter;
-import com.example.jinphy.simplechat.model.blog.Blog;
-import com.example.jinphy.simplechat.utils.Preconditions;
-
-import java.util.List;
+import com.example.jinphy.simplechat.base.BaseAdapter;
+import com.example.jinphy.simplechat.models.blog.Blog;
 
 /**
  * Created by jinphy on 2017/8/15.
  */
 
-public class ActiveZoneRecyclerViewAdapter extends BaseRecyclerViewAdapter<ActiveZoneRecyclerViewAdapter.ViewHolder> {
-
-    List<Blog> blogs;
-
-    public ActiveZoneRecyclerViewAdapter(List<Blog> blogs) {
-        this.blogs = Preconditions.checkNotNull(blogs);
-    }
+public class ActiveZoneRecyclerViewAdapter extends BaseAdapter<Blog, ActiveZoneRecyclerViewAdapter.ViewHolder> {
 
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View root = LayoutInflater
-                .from(parent.getContext())
-                .inflate(R.layout.blog_item, parent, false);
-        return new ViewHolder(root);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Blog blog = blogs.get(position);
+    public void onBindViewHolder(ViewHolder holder, Blog item, int position) {
         // TODO: 2017/8/16 设置头像，昵称，内容等信息
 
-        if (click != null) {
-            // TODO: 2017/8/16
-        }
 
-        if (longClick != null) {
-            // TODO: 2017/8/16
-        }
+        // TODO: 2018/3/14 添加具体的View的点击事件
+        setClick(item, position, 0);
+
+        // TODO: 2018/3/14 添加具体的View的长按点击事件
+        setLongClick(item, position, 0);
     }
 
     @Override
-    public int getItemCount() {
-        return blogs.size();
+    protected int getResourceId(int viewType) {
+        return R.layout.blog_item;
     }
+
+    @Override
+    protected ViewHolder onCreateViewHolder(View itemView) {
+        return new ViewHolder(itemView);
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 

@@ -128,13 +128,13 @@
 
                 </RelativeLayout>
 
-                <!--goto sign up view and checkbox layout-->
+                <!--gsignaturesign up view and checkbox layout-->
                 <RelativeLayout
                     android:layout_marginBottom="@dimen/dimen_10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <!--go to sign up view -->
+                    <!--gosignaturesign up view -->
                     <TextView
                         android:id="@+id/goto_sign_up_text"
                         android:layout_width="wrap_content"
@@ -173,7 +173,7 @@
 
             </LinearLayout>
 
-            <!--the bottom layout with two button-->
+            <!--the bottom laywithFriendwith two button-->
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_marginTop="@dimen/dimen_10dp"
@@ -181,7 +181,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/tool_bar_height">
 
-                <!--button type of login-->
+                <!--butdataTypetype of login-->
                 <android.support.v7.widget.CardView
                     app:cardCornerRadius="@dimen/dimen_3dp"
                     app:cardUseCompatPadding="true"

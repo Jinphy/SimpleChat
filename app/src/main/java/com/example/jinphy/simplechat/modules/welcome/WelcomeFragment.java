@@ -1,19 +1,13 @@
 package com.example.jinphy.simplechat.modules.welcome;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.base.BasePresenter;
-import com.example.jinphy.simplechat.model.event_bus.EBLoginInfo;
-import com.example.jinphy.simplechat.model.user.User;
+import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.modules.main.MainActivity;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.constants.IntConst;
@@ -22,14 +16,10 @@ import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
-import org.greenrobot.eventbus.EventBus;
-
-import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
-
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link WelcomeFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * create an app of this fragment.
  */
 public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements WelcomeContract.View {
 
@@ -51,14 +41,13 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
     }
 
     /**
-     * Use this factory method to create a new instance of
+     * Use this factory method to create a new app of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment WelcomeFragment.
+     * @return A new app of fragment WelcomeFragment.
      */
     public static WelcomeFragment newInstance() {
-        WelcomeFragment fragment = new WelcomeFragment();
-        return fragment;
+        return new WelcomeFragment();
     }
 
     @Override
@@ -84,12 +73,12 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
     protected void setupViews() {
 
         showAnimator();
-        //        ViewTreeObserver observer = view.getViewTreeObserver();
+        //        ViewTreeObserver observer = item.getViewTreeObserver();
         //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
         //            observer.addOnGlobalLayoutListener( () -> {
         //                if (!hasLoaded) {
         //                    ImageUtil.from(activity)
-        //                            .with(R.drawable.pic_start)
+        //                            .create(R.drawable.pic_start)
         //                            .into(startView);
         //                    hasLoaded = true;
         //                }
@@ -105,24 +94,17 @@ public class WelcomeFragment extends BaseFragment<WelcomePresenter> implements W
 
     @Override
     public void showLoginView(View view) {
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
+        LoginActivity.start(activity());
     }
 
     @Override
     public void showSignUpView(View view) {
-        Intent intent = new Intent(getActivity(), SignUpActivity.class);
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
+        SignUpActivity.start(activity());
     }
 
     @Override
-    public void showMainActivity(String account,String password) {
-        User user = new User();
-        user.setAccount(account);
-        user.setPassword(password);
-        MainActivity.start(getActivity(),user,true);
+    public void showMainActivity() {
+        MainActivity.start(getActivity());
         finishActivity();
     }
 

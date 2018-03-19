@@ -1,5 +1,7 @@
 package com.example.jinphy.simplechat.modules.signup;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -13,20 +15,25 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
 public class SignUpActivity extends BaseActivity {
 
 
+    public static void start(Activity activity) {
+        Intent intent = new Intent(activity, SignUpActivity.class);
+        activity.startActivity(intent);
+        activity.overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        SignUpFragment fragment = SignUpFragment.newInstance();
+        getPresenter(addFragment(SignUpFragment.newInstance(),R.id.fragment));
 
-        SignUpFragment returnFragment = (SignUpFragment) addFragment(fragment, R.id.fragment);
-        getPresenter(returnFragment);
     }
 
     @Override
     public SignUpPresenter getPresenter(Fragment fragment) {
-        return new SignUpPresenter((SignUpContract.View) fragment);
+        return new SignUpPresenter(this, (SignUpContract.View) fragment);
     }
 
     @Override

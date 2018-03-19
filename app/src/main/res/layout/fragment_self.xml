@@ -6,15 +6,47 @@
     android:layout_height="match_parent"
     tools:context="com.example.jinphy.simplechat.modules.main.self.SelfFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <ScrollView
+        android:id="@+id/scroll_view"
         android:layout_marginTop="@dimen/tool_bar_height"
         android:layout_marginBottom="@dimen/tool_bar_height"
         android:translationY="244dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    </android.support.v7.widget.RecyclerView>
+            <!--empty view-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="440dp"/>
+
+            <android.support.v7.widget.CardView
+                android:layout_gravity="center_horizontal"
+                app:cardCornerRadius="@dimen/dimen_5dp"
+                app:cardElevation="@dimen/dimen_1dp"
+                app:cardBackgroundColor="@color/white"
+                android:layout_marginBottom="@dimen/dimen_20dp"
+                android:layout_width="200dp"
+                android:layout_height="@dimen/dimen_50dp">
+
+                <TextView
+                    android:id="@+id/btn_logout"
+                    android:textSize="@dimen/dimen_15dp"
+                    android:textColor="@color/color_red_D50000"
+                    android:gravity="center"
+                    android:text="退出当前账号"
+                    android:clickable="true"
+                    android:background="@drawable/btn_alpha"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
 
 
     <android.support.v7.widget.CardView
@@ -23,7 +55,7 @@
         android:layout_height="300dp"
         app:cardBackgroundColor="@color/colorPrimaryDark"
         app:cardCornerRadius="0dp"
-        app:cardElevation="@dimen/dimen_4dp">
+        app:cardElevation="@dimen/dimen_6dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -50,9 +82,19 @@
                 android:layout_marginBottom="@dimen/dimen_12dp"
                 android:layout_marginLeft="@dimen/dimen_12dp"
                 android:gravity="center"
-                android:text="Jinphy"
+                android:text="未登录"
                 android:textColor="#9fffffff"
                 android:textSize="@dimen/size_18sp"/>
+
+            <ImageView
+                android:id="@+id/sex"
+                android:layout_toRightOf="@id/name"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="@dimen/dimen_5dp"
+                android:layout_marginBottom="19dp"
+                android:src="@drawable/ic_female"
+                android:layout_width="18dp"
+                android:layout_height="18dp"/>
 
             <TextView
                 android:id="@+id/date"

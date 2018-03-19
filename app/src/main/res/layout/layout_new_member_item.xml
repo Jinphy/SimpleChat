@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/dimen_10dp"
+    android:layout_marginRight="@dimen/dimen_10dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardElevation="1dp"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="3dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="@dimen/dimen_12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/btn_head"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_50dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/avatar_view"
+                    tools:src = "@drawable/ic_group_chat_white_24dp"
+                    app:civ_fill_color="@color/half_alpha_gray"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_width="@dimen/dimen_45dp"
+                    android:layout_height="@dimen/dimen_45dp"/>
+
+                <TextView
+                    android:id="@+id/name_view"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/avatar_view"
+                    android:layout_alignTop="@id/avatar_view"
+                    android:layout_marginLeft="@dimen/dimen_10dp"
+                    android:layout_marginTop="@dimen/dimen_5dp"
+                    android:textColor="@color/colorAccent"
+                    android:ellipsize="end"
+                    android:textSize="15sp"
+                    android:maxLines="1"
+                    tools:text="群名"/>
+
+                <TextView
+                    android:id="@+id/group_no_view"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/avatar_view"
+                    android:layout_alignBottom="@id/avatar_view"
+                    android:layout_marginLeft="@dimen/dimen_10dp"
+                    android:layout_marginBottom="@dimen/dimen_2dp"
+                    android:textColor="@color/colorAccent"
+                    android:ellipsize="end"
+                    android:textSize="10sp"
+                    android:maxLines="1"
+                    tools:text="G_234"/>
+
+
+                <TextView
+                    android:id="@+id/time_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="@dimen/dimen_3dp"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="11sp"
+                    tools:text="2017-8-10"/>
+
+
+            </RelativeLayout>
+
+            <View
+                android:background="@color/half_alpha_gray"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_1dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:textSize="15sp"
+                android:text="新成员申请加入该群聊，等待您的验证！"/>
+
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/dimen_10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="申请账号："
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/account_view"
+                    android:maxLines="1"
+                    android:layout_weight="1"
+                    tools:text="15889622379"
+                    android:ellipsize="end"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/dimen_10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="验证信息："
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/extra_msg_view"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    tools:text="群主你好，我是XXX，我希望能够加入该群和大家一起聊聊人生！"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.CardView
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="@dimen/dimen_3dp"
+                    app:cardElevation="0dp"
+                    app:cardUseCompatPadding="true"
+                    android:layout_width="@dimen/dimen_70dp"
+                    android:layout_height="@dimen/dimen_45dp">
+
+                    <TextView
+                        android:id="@+id/btn_reject"
+                        android:text="拒绝"
+                        android:clickable="true"
+                        android:background="@drawable/btn_alpha"
+                        android:textColor="@color/color_red_D50000"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="@dimen/dimen_3dp"
+                    app:cardElevation="0dp"
+                    app:cardUseCompatPadding="true"
+                    android:layout_marginLeft="@dimen/dimen_10dp"
+                    android:layout_width="@dimen/dimen_70dp"
+                    android:layout_height="@dimen/dimen_45dp">
+
+                    <TextView
+                        android:id="@+id/btn_agree"
+                        android:text="同意"
+                        android:background="@drawable/btn_alpha"
+                        android:clickable="true"
+                        android:textColor="@color/green_primary"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </android.support.v7.widget.CardView>
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/new_msg_view"
+            android:background="#8f4E342E"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="NEW"
+            android:textSize="8sp"
+            android:rotation="45"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/dimen_10dp"
+            android:layout_marginRight="-15dp"
+            android:padding="@dimen/dimen_1dp"
+            android:textColor="@color/white"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"/>
+
+
+        <TextView
+            android:id="@+id/status_ok_view"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="70dp"
+            android:text="已通过"
+            android:gravity="center"
+            android:textSize="23sp"
+            android:textColor="@color/white"
+            android:rotation="-45"
+            android:background="@drawable/ic_stroke_green_circle_background"
+            android:layout_marginRight="@dimen/dimen_40dp"
+            android:layout_width="@dimen/dimen_100dp"
+            android:layout_height="@dimen/dimen_100dp"/>
+
+
+        <TextView
+            android:id="@+id/status_no_view"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="70dp"
+            android:text="已拒绝"
+            android:gravity="center"
+            android:textSize="23sp"
+            android:textColor="@color/white"
+            android:rotation="-45"
+            android:background="@drawable/ic_stroke_red_circle_background"
+            android:layout_marginRight="@dimen/dimen_40dp"
+            android:layout_width="@dimen/dimen_100dp"
+            android:layout_height="@dimen/dimen_100dp"/>
+
+        <TextView
+            android:id="@+id/status_invalidate_view"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="70dp"
+            android:text="已无效"
+            android:gravity="center"
+            android:textSize="23sp"
+            android:textColor="@color/white"
+            android:rotation="-45"
+            android:background="@drawable/ic_stroke_gray_circle_background"
+            android:layout_marginRight="@dimen/dimen_40dp"
+            android:layout_width="@dimen/dimen_100dp"
+            android:layout_height="@dimen/dimen_100dp"/>
+
+
+    </RelativeLayout>
+
+
+
+</android.support.v7.widget.CardView>
