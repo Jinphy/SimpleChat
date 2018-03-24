@@ -1,8 +1,9 @@
 package com.example.jinphy.simplechat.modules.chat;
 
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 
-import com.example.jinphy.simplechat.models.api.send.SendResult;
+import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
 import com.example.jinphy.simplechat.models.api.send.Sender;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
@@ -16,9 +17,18 @@ import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.services.common_service.aidl.BinderFactory;
+import com.example.jinphy.simplechat.services.common_service.aidl.service.IUploadFileBinder;
+import com.example.jinphy.simplechat.services.common_service.aidl.service.UploadFileBinder;
 import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by jinphy on 2017/8/13.
@@ -34,6 +44,9 @@ public class ChatPresenter implements ChatContract.Presenter {
     private GroupRepository groupRepository;
     private MemberRepository memberRepository;
 
+    private IUploadFileBinder uploadFileBinder;
+    private MyUploadListener myUploadListener;
+
     public ChatPresenter(@NonNull ChatContract.View view) {
         this.view = Preconditions.checkNotNull(view);
         userRepository = UserRepository.getInstance();
@@ -42,8 +55,17 @@ public class ChatPresenter implements ChatContract.Presenter {
         recordRepository = MessageRecordRepository.getInstance();
         groupRepository = GroupRepository.getInstance();
         memberRepository = MemberRepository.getInstance();
+        initBind();
     }
 
+    private void initBind() {
+        while (BinderFactory.getBinder(BinderFactory.TYPE_UPLOAD_FILE) == null) {
+            continue;
+        }
+        IBinder uploadFileIBinder = BinderFactory.getBinder(BinderFactory.TYPE_UPLOAD_FILE);
+        myUploadListener = new MyUploadListener(this);
+        uploadFileBinder =UploadFileBinder.asInterface(uploadFileIBinder);
+    }
 
 
     @Override
@@ -84,13 +106,6 @@ public class ChatPresenter implements ChatContract.Presenter {
         return userRepository.currentUser().getAccount();
     }
 
-    @Override
-    public void sendTextMsg(Message message) {
-        Sender.newTask(message)
-                .whenStart(() -> view.whenSendStart())
-                .whenFinal(result -> view.whenSendFinal())
-                .send();
-    }
 
     @Override
     public void updateRecord(Message message) {
@@ -137,6 +152,74 @@ public class ChatPresenter implements ChatContract.Presenter {
     @Override
     public void updateMsg(List<Message> messages) {
         messageRepository.update(messages);
+    }
 
+
+    @Override
+    public void sendMsg(Message message) {
+        Sender.newTask(message)
+                .whenStart(() -> view.whenSendStart())
+                .whenFinal(result -> view.whenSendFinal())
+                .send();
+    }
+
+    @Override
+    public void sendPhotoMsg(Message message) {
+        myUploadListener.addMsg(message);
+        messageRepository.saveSend(message);
+        Observable.just(message.extra(Message.KEY_FILE_TASK_ID))
+                .subscribeOn(Schedulers.io())
+                .map(Long::valueOf)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(uploadFileBinder::upload)
+                .subscribe();
+    }
+
+    @Override
+    public void registerUploadFileListener() {
+        AppBroadcastReceiver.registerUploadFileListener(myUploadListener);
+    }
+
+    @Override
+    public void unregisterUploadFileListener() {
+        AppBroadcastReceiver.unregisterUploadFileListener();
+    }
+
+    public static class MyUploadListener implements FileListener {
+        private final ChatPresenter presenter;
+        Map<Long, Message> msgMap = new ConcurrentHashMap<>();
+
+
+        public MyUploadListener(ChatPresenter presenter) {
+            this.presenter = presenter;
+        }
+
+
+        public void addMsg(Message message) {
+            msgMap.put(Long.valueOf(message.extra(Message.KEY_FILE_TASK_ID)), message);
+        }
+
+
+        @Override
+        public void onStart(long fileTaskId)  {
+            presenter.view.whenSendStart();
+        }
+
+        @Override
+        public void onUpdate(long fileTaskId, long finishedLength, long totalLength) {
+        }
+
+        @Override
+        public void onError(long fileTaskId) {
+            Message message = msgMap.remove(fileTaskId);
+            message.setStatus(Message.STATUS_NO);
+            presenter.messageRepository.update(message);
+            presenter.view.whenSendFinal();
+        }
+
+        @Override
+        public void onFinish(long fileTaskId) {
+            presenter.sendMsg(msgMap.remove(fileTaskId));
+        }
     }
 }

@@ -66,7 +66,7 @@ public class MessageRecordRepository implements MessageRecordDataSource {
     public List<MessageRecord> load(String owner) {
         List<MessageRecord> messageRecords = messageRecordBox.query()
                 .filter(record -> {
-                    if (record.getWith() == null || record.getMessage() == null) {
+                    if (record.getWith() == null) {
                         return false;
                     }
                     return StringUtils.equal(record.getOwner(), owner);
@@ -151,5 +151,12 @@ public class MessageRecordRepository implements MessageRecordDataSource {
             }
         }
         messageRecordBox.put(record);
+    }
+
+    @Override
+    public void update(MessageRecord record) {
+        if (record != null) {
+            messageRecordBox.put(record);
+        }
     }
 }

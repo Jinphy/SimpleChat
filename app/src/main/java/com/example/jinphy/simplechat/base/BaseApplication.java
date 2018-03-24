@@ -12,6 +12,8 @@ import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
 import com.example.jinphy.simplechat.listener_adapters.ActivityLiftcycle;
 import com.example.jinphy.simplechat.secret.Secret;
+import com.example.jinphy.simplechat.services.common_service.aidl.BinderFactory;
+import com.example.jinphy.simplechat.services.common_service.aidl.service.BinderPool;
 import com.example.jinphy.simplechat.services.push.PushService;
 import com.example.jinphy.simplechat.utils.AppUtils;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
@@ -71,6 +73,7 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
                 .configTagPrefix("Jinphy");
 
         PushService.start(this, PushService.FLAG_INIT);
+        BinderFactory.init(this);
 //        EventBus.getDefault().register(this);
 
     }

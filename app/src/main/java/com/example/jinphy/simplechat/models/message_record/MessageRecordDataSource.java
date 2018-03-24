@@ -31,4 +31,6 @@ public interface MessageRecordDataSource {
     void delete(String owner, Group group);
 
     void update(Message msg, boolean resetNewMsgCount);
+
+    void update(MessageRecord record);
 }

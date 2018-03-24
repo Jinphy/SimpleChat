@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseApplication;
 
 /**
@@ -23,7 +24,7 @@ public class DeviceUtils {
     @SuppressLint("MissingPermission")
     public static String deviceId(){
         String IMEI = null;
-        Activity activity = BaseApplication.activity();
+        Activity activity = App.activity();
         if (activity != null) {
             TelephonyManager telephonyManager=(TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
             IMEI=telephonyManager.getDeviceId();

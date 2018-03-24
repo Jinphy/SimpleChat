@@ -10,14 +10,24 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.services.push.PushService;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import me.iwf.photopicker.PhotoPicker;
 
 public class ChatActivity extends BaseActivity {
 
 
     private ActionBar actionBar;
+    private ChatFragment fragment;
 
     public static void start(Activity activity, String withAccount) {
         Intent intent = new Intent(activity, ChatActivity.class);
@@ -40,8 +50,9 @@ public class ChatActivity extends BaseActivity {
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left_24dp);
 
-        getPresenter(addFragment(ChatFragment.newInstance(
-                getIntent().getStringExtra(ChatFragment.WITH_ACCOUNT)), R.id.fragment));
+        fragment = (ChatFragment) addFragment(ChatFragment.newInstance(
+                getIntent().getStringExtra(ChatFragment.WITH_ACCOUNT)), R.id.fragment);
+        getPresenter(fragment);
     }
 
     @Override
@@ -53,6 +64,19 @@ public class ChatActivity extends BaseActivity {
     public void setTitle(CharSequence title) {
         if (!TextUtils.isEmpty(title)) {
             actionBar.setTitle(title);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PhotoPicker.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            List<String> photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
+            Observable.timer(500, TimeUnit.MICROSECONDS)
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnComplete(() -> fragment.onPickPhoto(photos))
+                    .subscribe();
         }
     }
 }

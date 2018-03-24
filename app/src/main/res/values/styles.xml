@@ -32,7 +32,6 @@
         <item name="colorPrimary">@color/green_primary</item>
         <item name="colorPrimaryDark">@color/green_primary_dark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
     </style>
 
 
@@ -41,6 +40,20 @@
         <item name="colorPrimaryDark">@color/black_primary_dark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
+    </style>
+
+    <!--定制actionBar的样式-->
+    <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <!--设置字体图标的颜色-->
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
+
+    <style name="PickPhotoActivityTheme1" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="actionBarTheme">@style/ActionBarTheme</item>
+        <item name="colorPrimary">@color/black_primary</item>
+        <item name="colorPrimaryDark">@color/black_primary_dark</item>
+        <item name="colorAccent">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
     </style>
 
 

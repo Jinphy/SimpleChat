@@ -3,7 +3,10 @@ package com.example.jinphy.simplechat.modules.main.self;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.base.BaseRepository;
 import com.example.jinphy.simplechat.models.api.common.Api;
+import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.services.push.PushService;
@@ -45,11 +48,19 @@ public class SelfPresenter implements SelfContract.Presenter {
         userRepository.<Map<String, String>>newTask()
                 .param(Api.Key.account, account)
                 .param(Api.Key.accessToken, accessToken)
+                .autoShowNo(false)
                 .doOnDataOk(response -> {
                     userRepository.updateUser(response.getData());
                     view.whenLogout();
                     // 关闭推送服务
                     PushService.start(context,PushService.FLAG_CLOSE);
+                })
+                .doOnDataNo(noData -> {
+                    if (Response.NO_ACCESS_TOKEN.equals(noData.getCode())) {
+                        UserRepository.getInstance().logoutLocal();
+                    } else {
+                        App.showToast(noData.getMsg(), false);
+                    }
                 })
                 .submit(task -> userRepository.logout(context, task));
     }

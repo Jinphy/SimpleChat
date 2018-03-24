@@ -73,7 +73,6 @@ public class MessageRepository implements MessageDataSource {
         if (message == null) {
             return;
         }
-        message.setId(0);
         messageBox.put(message);
     }
 
@@ -150,6 +149,11 @@ public class MessageRepository implements MessageDataSource {
                 .find()
         );
 
+    }
+
+    @Override
+    public Message get(long id) {
+        return messageBox.get(id);
     }
 
     /**

@@ -2,7 +2,6 @@ package com.example.jinphy.simplechat.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.icu.text.RelativeDateTimeFormatter;
 import android.support.annotation.IntRange;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -11,16 +10,10 @@ import com.example.jinphy.simplechat.custom_libs.SChain;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.example.jinphy.simplechat.constants.StringConst.UTF_8;
 
 /**
  * Created by jinphy on 2017/11/4.
@@ -207,4 +200,29 @@ public class StringUtils {
         byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
+
+
+    public static String bytesToStr(byte[] source) {
+        if (source == null) {
+            return "";
+        }
+        return org.java_websocket.util.Base64.encodeBytes(source);
+    }
+
+    public static String bytesToStr(byte[] source, int offset, int len) {
+        if (source == null) {
+            return "";
+        }
+        return org.java_websocket.util.Base64.encodeBytes(source, offset, len);
+    }
+
+    public static byte[] strToBytes(String source) {
+        try {
+            return org.java_websocket.util.Base64.decode(source);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
+    }
+
 }

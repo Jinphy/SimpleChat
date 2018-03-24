@@ -88,6 +88,19 @@
             android:name=".modules.group.group_detail.ModifyGroupActivity"
             android:theme="@style/ModifyUserActivityTheme">
         </activity>
+        <activity
+            android:name="me.iwf.photopicker.PhotoPickerActivity"
+            android:theme="@style/PickPhotoActivityTheme1">
+        </activity>
+
+
+        <activity android:name=".modules.system_msg.new_member.NewMemberActivity">
+        </activity>
+        <activity android:name=".modules.group.member_list.MemberListActivity">
+        </activity>
+        <activity android:name=".modules.show_photo.ShowPhotoActivity"
+            android:theme="@style/PickPhotoActivityTheme">
+        </activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -106,6 +119,12 @@
             android:exported="true"
             android:process=":push">
         </service>
+        <service
+            android:name=".services.common_service.CommonService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":common">
+        </service>
 
         <receiver
             android:name=".broadcasts.AppBroadcastReceiver"
@@ -116,10 +135,6 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".modules.system_msg.new_member.NewMemberActivity">
-        </activity>
-        <activity android:name=".modules.group.member_list.MemberListActivity">
-        </activity>
     </application>
 
 </manifest>

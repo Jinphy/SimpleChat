@@ -1,7 +1,9 @@
 package com.example.jinphy.simplechat.models.api.file_transfer.upload;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.api.file_transfer.OnProgress;
 import com.example.jinphy.simplechat.utils.DeviceUtils;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
@@ -18,7 +20,7 @@ import okio.Okio;
  * Created by jinphy on 2018/1/19.
  */
 
-public class UploadTask {
+public class UploadTask implements Comparable<UploadTask>{
 
     private final static Uploader uploader = Uploader.getInstance();
 
@@ -42,7 +44,7 @@ public class UploadTask {
     long fileLength;
 
     /**
-     * DESC: 要上传的文件名，改文件名是用来保存在服务器中的文件的文件名，必传
+     * DESC: 要上传的文件名，该文件名是用来保存在服务器中的文件的文件名，必传
      * Created by jinphy, on 2018/1/19, at 13:09
      */
     String fileName;
@@ -65,9 +67,12 @@ public class UploadTask {
      */
     OnUpload onUpload;
 
+    private long createTime;
+
     UploadTask(String filePath) {
         this.filePath = filePath;
         this.init();
+        this.createTime = System.currentTimeMillis();
     }
 
     UploadTask() {
@@ -137,5 +142,13 @@ public class UploadTask {
             }
         }
         uploader.submit(this);
+    }
+
+    @Override
+    public int compareTo(@NonNull UploadTask other) {
+        if (this.createTime < other.createTime) {
+            return 1;
+        }
+        return -1;
     }
 }

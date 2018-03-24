@@ -358,7 +358,7 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void showItemMoreDialog(CheckableMember member, int position) {
         MyDialog.Holder holder = MyDialog.create(activity())
-                .view(R.layout.menu_member_item)
+                .view(R.layout.dialog_member_item)
                 .width(200)
                 .display();
         TextView allowToChatView = holder.view.findViewById(R.id.allow_to_chat_view);
@@ -443,7 +443,7 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void showMoreDialog() {
         MyDialog.Holder holder = MyDialog.create(activity())
-                .view(R.layout.menu_member_more)
+                .view(R.layout.dialog_member_more)
                 .width(200)
                 .display();
         Group group = presenter.getGroup(groupNo);

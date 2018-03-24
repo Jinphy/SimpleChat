@@ -2,6 +2,7 @@ package com.example.jinphy.simplechat.modules.main.msg;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -10,18 +11,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
+import com.example.jinphy.simplechat.custom_view.dialog.my_dialog.MyDialog;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
-import com.example.jinphy.simplechat.models.event_bus.EBUpdateFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 import com.example.jinphy.simplechat.modules.chat.ChatFragment;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.modules.system_msg.SystemMsgActivity;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -37,7 +42,7 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     private View emptyView;
 
     private FloatingActionButton fab;
-    private MsgRecyclerViewAdapter adapter;
+    private MyAdapter<MessageRecord> adapter;
 
     private View root = null;
     private LinearLayoutManager linearLayoutManager;
@@ -126,9 +131,113 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        adapter = new MsgRecyclerViewAdapter();
-        recyclerView.setAdapter(adapter);
-        adapter.update(presenter.loadMsgRecords());
+        adapter = MyAdapter.<MessageRecord>newInstance()
+                .onInflate(viewType -> R.layout.main_tab_msg_item)
+                .data(presenter.loadMsgRecords())
+                .onCreateView(holder -> {
+                    // avatar 头像
+                    holder.circleImageView[0] = holder.item.findViewById(R.id.avatar);
+                    // name 昵称
+                    holder.textView[0] = holder.item.findViewById(R.id.name);
+                    // lastMsg 最新消息
+                    holder.textView[1] = holder.item.findViewById(R.id.last_msg);
+                    // time 最新消息的时间
+                    holder.textView[2] = holder.item.findViewById(R.id.time);
+                    // count 未读消息数
+                    holder.textView[3] = holder.item.findViewById(R.id.new_count);
+                    // to top 置顶
+                    holder.view[0] = holder.item.findViewById(R.id.top);
+                })
+                .onBindView((holder, item, position) -> {
+                    // 设置头像
+                    if (Friend.system.equals(item.getWith())) {
+                        holder.circleImageView[0].setImageResource(R.drawable.ic_system_24dp);
+                    } else {
+                        Bitmap bitmap = ImageUtil.loadAvatar(item.getWith(), 30, 30);
+                        if (bitmap != null) {
+                            holder.circleImageView[0].setImageBitmap(bitmap);
+                        } else if (item.getWith().contains("G")) {
+                            holder.circleImageView[0].setImageResource(R.drawable
+                                    .ic_group_chat_white_24dp);
+                        } else {
+                            holder.circleImageView[0].setImageResource(R.drawable.ic_person_48dp);
+                        }
+                    }
+                    // 设置昵称
+                    holder.textView[0].setText(item.getName());
+                    // 设置最新消息
+                    holder.textView[1].setText(item.getContent());
+                    // 设置时间
+                    holder.textView[2].setText(item.getTime());
+                    // 设置未读消息数
+                    int count = item.getNewMsgCount();
+                    if (count == 0) {
+                        holder.textView[3].setVisibility(View.GONE);
+                    } else {
+                        holder.textView[3].setVisibility(View.VISIBLE);
+                        if (count < 100) {
+                            holder.textView[3].setText(count + "");
+                        } else {
+                            holder.textView[3].setText("99+");
+                        }
+                    }
+                    // 设置是否有置顶
+                    holder.view[0].setVisibility(item.getToTop() == 1 ? View.VISIBLE : View.GONE);
+
+                    // 设置需要监听点击的view
+                    holder.setClickedViews(holder.item);
+
+                    // 设置需要监听长按的view
+                    holder.setLongClickedViews(holder.item);
+                })
+                .onClick((v, item, holder, type, position) -> {
+                    String with = item.getWith();
+                    if (Friend.system.equals(with)) {
+                        SystemMsgActivity.start(activity());
+                    } else {
+                        showChatWindow(item);
+                    }
+                })
+                .onLongClick((v, item, holder, type, position) -> {
+                    MyDialog.Holder myHolder = MyDialog.create(activity())
+                            .width(200)
+                            .view(R.layout.dialog_msg_record)
+                            .display();
+                    TextView topItem = myHolder.view.findViewById(R.id.item_top);
+                    TextView deleteItem = myHolder.view.findViewById(R.id.item_delete);
+                    TextView clearItem = myHolder.view.findViewById(R.id.item_clear);
+
+                    topItem.setText(item.isToTop() ? "取消置顶" : "置顶");
+                    topItem.setOnClickListener(v1->{
+                        myHolder.dialog.dismiss();
+                        int scrollY = recyclerView.getScrollY();
+                        item.updateToTop();
+                        presenter.updateRecord(item);
+                        MessageRecord.sort(adapter.getData());
+                        adapter.notifyDataSetChanged();
+                        recyclerView.scrollBy(0, scrollY);
+                        App.showToast(item.isToTop() ? "已置顶该聊天！" : "置顶已取消！", false);
+                    });
+                    deleteItem.setOnClickListener(v1->{
+                        myHolder.dialog.dismiss();
+                        presenter.deleteMsgRecord(item);
+                        int scrollY = recyclerView.getScrollY();
+                        adapter.remove(position);
+                        recyclerView.scrollBy(0, scrollY);
+                        App.showToast("已删除该聊天！", false);
+                    });
+
+                    clearItem.setOnClickListener(v1->{
+                        myHolder.dialog.dismiss();
+                        presenter.clearMsg(item);
+                        adapter.update(presenter.loadMsgRecords());
+                        int scrollY = recyclerView.getScrollY();
+                        recyclerView.scrollBy(0, scrollY);
+                        App.showToast("已清空该聊天！", false);
+                    });
+                    return true;
+                })
+                .into(recyclerView);
         setupEmptyView();
     }
 
@@ -143,7 +252,6 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
     @Override
     protected void registerEvent() {
         recyclerView.addOnScrollListener(getOnScrollListener());
-        adapter.onClick(this::handleItemEvent);
     }
 
     @Override
@@ -168,19 +276,5 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
             recyclerView.scrollToPosition(i);
         }
         setupEmptyView();
-    }
-
-    public <T>void handleItemEvent(View view, T item,int type,int position) {
-        MessageRecord record = (MessageRecord) item;
-        switch (view.getId()) {
-            case R.id.item_view:
-                String with = record.getWith();
-                if (Friend.system.equals(with)) {
-                    SystemMsgActivity.start(activity());
-                } else {
-                    showChatWindow(record);
-                }
-                break;
-        }
     }
 }

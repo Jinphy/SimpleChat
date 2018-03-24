@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.chat;
 
 import android.graphics.Bitmap;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +42,9 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
 
     private Map<String, Member> memberMap = new HashMap<>();
     private Map<String, SoftReference<Bitmap>> avatarMap = new HashMap<>();
+
+    private Map<String, SoftReference<Bitmap>> thumbnailMap = new HashMap<>();
+
     private Group group;
 
 
@@ -192,6 +196,12 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
         holder.videoMsg_root.setVisibility(View.GONE);
         holder.fileMsg_root.setVisibility(View.GONE);
         // TODO: 2017/8/13
+        Bitmap bitmap = getThumbnail(message);
+        if (bitmap != null) {
+            holder.photoMsg_picture.setImageBitmap(bitmap);
+        } else {
+            holder.photoMsg_picture.setImageResource(R.drawable.ic_photo_24dp);
+        }
     }
 
     private void bindVoiceMsgView(ViewHolder holder, Message message) {
@@ -236,6 +246,14 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
     @Override
     public int getItemViewType(int position) {
         return data.get(position).getSourceType();
+    }
+
+
+    public void update(int position, Message message) {
+        thumbnailMap.remove(message.extra(Message.KEY_THUMBNAIL_ID));
+        getThumbnail(message);
+        data.set(position, message);
+        notifyDataSetChanged();
     }
 
     //==============================================================\\
@@ -365,6 +383,37 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
             avatarMap.put(account, new SoftReference<>(bitmap));
         }
         return bitmap;
+    }
+
+    public Bitmap getThumbnail(Message message) {
+        String thumbnailId = message.extra(Message.KEY_THUMBNAIL_ID);
+        SoftReference<Bitmap> bitmapSoft = thumbnailMap.get(thumbnailId);
+        if (ObjectHelper.reference(bitmapSoft)) {
+            return bitmapSoft.get();
+        }
+        Bitmap bitmap = ImageUtil.getBitmap(message.extra(Message.KEY_FILE_PATH), 200, 200);
+        if (bitmap != null) {
+            thumbnailMap.put(thumbnailId, new SoftReference<>(bitmap));
+            return bitmap;
+        }
+
+        String thumbnail = message.extra(Message.KEY_THUMBNAIL);
+        if (thumbnail != null) {
+            bitmap = StringUtils.base64ToBitmap(thumbnail);
+            if (bitmap != null) {
+                thumbnailMap.put(thumbnailId, new SoftReference<>(bitmap));
+            }
+        }
+        return bitmap;
+    }
+
+    /**
+     * DESC: 判断是否有图片，如果图片之前下载过，但是被删除了则返回false
+     * Created by jinphy, on 2018/3/24, at 15:29
+     */
+    public boolean hasPhoto(Message message) {
+        String thumbnailId = message.extra(Message.KEY_THUMBNAIL_ID);
+        return thumbnailMap.get(thumbnailId) != null;
     }
 }
 

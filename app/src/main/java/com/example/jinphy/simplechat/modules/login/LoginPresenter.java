@@ -14,6 +14,7 @@ import com.example.jinphy.simplechat.services.push.PushService;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.Preconditions;
+import com.example.jinphy.simplechat.utils.ThreadPoolUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -109,8 +110,16 @@ public class LoginPresenter implements LoginContract.Presenter {
                         userRepository.saveUser(user);
                         friendRepository.addSystemFriendLocal(user.getAccount());
 
-                        PushService.start(context,PushService.FLAG_CLOSE);
-                        PushService.start(context, PushService.FLAG_INIT);
+                        ThreadPoolUtils.threadPool.execute(()->{
+                            PushService.start(context,PushService.FLAG_CLOSE);
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            PushService.start(context, PushService.FLAG_INIT);
+
+                        });
                     })
                     // 提交设置并执行登录操作
                     .submit(task -> userRepository.login(context, task));

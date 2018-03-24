@@ -3,9 +3,12 @@ package com.example.jinphy.simplechat.models.message;
 import android.support.annotation.NonNull;
 
 import com.apkfuns.logutils.LogUtils;
+import com.example.jinphy.simplechat.models.file_task.FileTask;
+import com.example.jinphy.simplechat.models.file_task.FileTaskRepository;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.google.gson.reflect.TypeToken;
@@ -159,6 +162,28 @@ public class Message implements Comparable<Message>{
     public static final String KEY_GROUP_NO = "KEY_GROUP_NO";
 
     public static final String KEY_CHAT_GROUP = "KEY_CHAT_GROUP";
+
+    public static final String KEY_FILE_PATH = "KEY_FILE_PATH";
+
+    public static final String KEY_THUMBNAIL = "KEY_THUMBNAIL";
+
+    public static final String KEY_FILE_TASK_ID = "KEY_FILE_TASK_ID";
+
+    public static final String KEY_URL = "KEY_URL";
+
+    /**
+     * DESC: 缩略图在map中缓存时的key
+     * Created by jinphy, on 2018/3/22, at 8:29
+     */
+    public static final String KEY_THUMBNAIL_ID = "KEY_THUMBNAIL_ID";
+
+    /**
+     * DESC: 文件名
+     * Created by jinphy, on 2018/3/22, at 13:42
+     */
+    public static final String KEY_FILE_NAME = "KEY_FILE_NAME";
+
+    public static final String KEY_TOTAL_LENGTH = "KEY_TOTAL_LENGTH";
 
     /**
      * DESC: 聊天的文件消息
@@ -440,8 +465,7 @@ public class Message implements Comparable<Message>{
      * 如果是群聊，则把发送者的账号保存在extra中
      * Created by jinphy, on 2018/3/18, at 18:35
      */
-    public static Message makeText(String owner, String with, String content, boolean isFriend) {
-
+    public static Message makeTextMsg(String owner, String with, String content, boolean isFriend) {
         Message message = new Message();
         message.setOwner(owner);
         message.setWith(with);
@@ -457,6 +481,36 @@ public class Message implements Comparable<Message>{
         }
         return message;
     }
+
+    /**
+     * DESC: 生成一条图片消息
+     * Created by jinphy, on 2018/3/20, at 18:39
+     */
+    public static Message makePhotoMsg(String owner, String with,String filePath, boolean isFriend) {
+        FileTask task = FileTask.create(filePath);
+        if (task == null) {
+            return null;
+        }
+        FileTaskRepository.getInstance().save(task);
+        LogUtils.e("task id:" + task.getId());
+
+        Message msg = makeTextMsg(owner, with, "[图片]", isFriend);
+        msg.setContentType(Message.TYPE_CHAT_IMAGE);
+        // 图片保存的路径，文件的保存路径，接收者要删除该字段并重新设置自己的文件路径
+        msg.extra(KEY_FILE_PATH, filePath);
+        // 保存的缩略图，用来给接收者显示的缩略图
+        msg.extra(KEY_THUMBNAIL,
+                StringUtils.bitmapToBase64(
+                        ImageUtil.getBitmap(filePath,30,30)));
+        // 用来和上传任务绑定的FileTaskId，接收者要删掉该字段并重新设置自己的taskId
+        msg.extra(KEY_FILE_TASK_ID, task.getId());
+        // 用来在显示时保存在map中的图片的key
+        msg.extra(KEY_THUMBNAIL_ID, owner + "_" + System.currentTimeMillis());
+        msg.extra(KEY_FILE_NAME, task.getGeneratedFileName());
+        msg.extra(KEY_TOTAL_LENGTH, task.getTotalFileLength());
+        return msg;
+    }
+
 
     public static void sort(List<Message> messages) {
         if (messages == null || messages.size() < 2) {

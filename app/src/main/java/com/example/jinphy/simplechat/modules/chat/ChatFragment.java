@@ -24,12 +24,13 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
+import com.example.jinphy.simplechat.models.api.file_transfer.upload.Uploader;
 import com.example.jinphy.simplechat.models.api.send.Sender;
 import com.example.jinphy.simplechat.models.event_bus.EBSendError;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
@@ -39,6 +40,8 @@ import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
+import com.example.jinphy.simplechat.modules.show_photo.EBMessage;
+import com.example.jinphy.simplechat.modules.show_photo.ShowPhotoActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
@@ -84,6 +87,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     private Friend friend;
     private Group group;
     private Member selfMember;// 群聊成员自己
+    private BottomMoreMenu bottomMoreMenu;
 
     int startStatusColor;
     // 隐藏 appBar 后的statusBar的 最终颜色，为colorAccent
@@ -122,8 +126,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
-            savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Sender.getInstance().open();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -144,6 +147,8 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().post(new EBUpdateView());
+        bottomMoreMenu.clearFragment();
+        presenter.unregisterUploadFileListener();
     }
 
     @Override
@@ -182,6 +187,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         inputTextAndVoice = view.findViewById(R.id.input_text_and_voice);
         btnMoreAndSend = view.findViewById(R.id.btn_more_and_send);
         extraBottomLayout = view.findViewById(R.id.extra_bottom_layout);
+        bottomMoreMenu = new BottomMoreMenu(this, extraBottomLayout.findViewById(R.id.more_layout));
     }
 
     @Override
@@ -196,6 +202,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         } else {
             friend = presenter.getFriend(withAccount);
         }
+        presenter.registerUploadFileListener();
     }
 
 
@@ -281,6 +288,21 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         findBtnSend().setOnClickListener(this::onClickOfBtnSend);
         findBtnMore().setOnClickListener(this::onClickOfBtnMore);
 
+        adapter.onClick((view, item, type, position) -> {
+            switch (item.getContentType()) {
+                case Message.TYPE_CHAT_IMAGE:
+                    if (!adapter.hasPhoto(item)) {
+                        App.showToast("图片不存在！", false);
+                        return;
+                    }
+                    ShowPhotoActivity.start(activity(), item.getId(), position);
+                    break;
+                default:
+                    break;
+
+            }
+        });
+
     }
 
     // 声音按钮的点击事件
@@ -339,9 +361,9 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         EditText inputText = findInputText();
         String content = inputText.getText().toString();
         inputText.setText("");
-        Message message = Message.makeText(ownerAccount, withAccount, content, isFriend);
+        Message message = Message.makeTextMsg(ownerAccount, withAccount, content, isFriend);
         adapter.add(message);
-        presenter.sendTextMsg(message);
+        presenter.sendMsg(message);
     }
 
     // 更多功能按钮的点击事件
@@ -847,5 +869,22 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         retrySendCount++;
         Sender.getInstance().shutdown();
         Sender.getInstance().open();
+    }
+
+
+    public void onPickPhoto(List<String> photoPaths) {
+        Message message;
+        for (String photoPath : photoPaths) {
+            message = Message.makePhotoMsg(ownerAccount, withAccount, photoPath, isFriend);
+            adapter.add(message);
+            presenter.sendPhotoMsg(message);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUpdateMsg(EBMessage msg) {
+        int scrollY = recyclerView.getScrollY();
+        adapter.update(msg.position, msg.data);
+        recyclerView.scrollBy(0, scrollY);
     }
 }

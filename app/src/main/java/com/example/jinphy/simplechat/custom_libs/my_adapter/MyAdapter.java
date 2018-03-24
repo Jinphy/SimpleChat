@@ -74,7 +74,6 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
      */
     protected List<T> data;
 
-
     /**
      * DESC: 获取一个adapter实例
      * Created by jinphy, on 2018/3/17, at 19:12
@@ -321,7 +320,7 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
 
         public ImageView[] imageView = new ImageView[1];
 
-        public TextView[] textView = new TextView[3];
+        public TextView[] textView = new TextView[4];
 
         public CheckBox[] checkBox = new CheckBox[1];
 

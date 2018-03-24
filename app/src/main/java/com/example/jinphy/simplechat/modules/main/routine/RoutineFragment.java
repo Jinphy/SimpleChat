@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
 import com.example.jinphy.simplechat.models.menu.Routine;
 import com.example.jinphy.simplechat.modules.active_zoom.ActiveZoneActivity;
 import com.example.jinphy.simplechat.modules.group.group_list.GroupListActivity;
@@ -31,9 +32,9 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     private RecyclerView recyclerView;
 
     private int density;
-    private RoutineRecyclerViewAdapter adapter;
 
     private View root = null;
+    private MyAdapter<Routine> adapter;
 
 
     public RoutineFragment() {
@@ -97,17 +98,51 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     @Override
     protected void setupViews() {
         // TODO: 2017/8/11 设置图片，设置文字，设置点击监听,设置宽高
-        adapter = presenter.getAdapter();
-        recyclerView.setAdapter(adapter);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
+        adapter = MyAdapter.<Routine>newInstance()
+                .onInflate(viewType -> R.layout.main_tab_routine_item)
+                .data(presenter.loadRoutines())
+                .onCreateView(holder -> {
+                    holder.imageView[0] = holder.item.findViewById(R.id.icon_view);
+                    holder.textView[0] = holder.item.findViewById(R.id.tag_view);
+                })
+                .onBindView((holder, item, position) -> {
+                    holder.imageView[0].setImageResource(item.getIconId());
+                    holder.textView[0].setText(item.getTagId());
+                    holder.setClickedViews(holder.item);
+                    holder.setLongClickedViews(holder.item);
+                })
+                .onClick((v, item, holder, type, position) -> {
+                    switch (item.getTagId()) {
+                        case R.string.routine_active_zoom:
+                            showActiveZoneActivity();
+                            break;
+                        case R.string.routine_group_chat:
+                            showGroupListActivity();
+                            break;
+                        case R.string.routine_credit_card_address:
+                            break;
+                        case R.string.routine_certificates:
+                            break;
+                        case R.string.routine_scenic_spot:
+                            break;
+                        case R.string.routine_bus_route:
+                            break;
+                        case R.string.routine_food_menu:
+                            break;
+                        case R.string.routine_express:
+                            break;
+                        case R.string.routine_weather:
+                            break;
+                    }
+                })
+                .into(recyclerView);
     }
 
 
     @Override
     protected void registerEvent() {
-
-        adapter.onClick(this::handleRecyclerViewEvent);
     }
 
 
@@ -116,17 +151,6 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
         MainFragment parentFragment = (MainFragment) getParentFragment();
         return parentFragment.getRoutinePresenter(this);
     }
-
-    //    private List<CardView> getAllCardView(GridLayout parent) {
-    //        if (parent.getChildCount() == 0) {
-    //            return null;
-    //        }
-    //        List<CardView> result = new ArrayList<>(parent.getChildCount());
-    //        for (int i = 0; i < parent.getChildCount(); i++) {
-    //            result.add((CardView) parent.getChildAt(i));
-    //        }
-    //        return result;
-    //    }
 
 
     @Override
@@ -137,36 +161,6 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     @Override
     public void showGroupListActivity() {
         GroupListActivity.start(activity(),false);
-    }
-
-    @Override
-    public void handleRecyclerViewEvent(View view, Object item, int type, int position) {
-
-        Routine routine = (Routine) item;
-
-        switch (routine.getTagId()) {
-            case R.string.routine_active_zoom:
-                showActiveZoneActivity();
-                break;
-            case R.string.routine_group_chat:
-                showGroupListActivity();
-                break;
-            case R.string.routine_credit_card_address:
-                break;
-            case R.string.routine_certificates:
-                break;
-            case R.string.routine_scenic_spot:
-                break;
-            case R.string.routine_bus_route:
-                break;
-            case R.string.routine_food_menu:
-                break;
-            case R.string.routine_express:
-                break;
-            case R.string.routine_weather:
-                break;
-
-        }
     }
 
 }
