@@ -61,6 +61,8 @@ public interface MessageDataSource {
      */
     void delete(String owner, String with);
 
+    Message get(long id);
+
     /**
      * DESC: 加载消息
      *
@@ -71,13 +73,11 @@ public interface MessageDataSource {
      */
     List<Message> load(String owner, String with);
 
-
     /**
      * DESC: 加载新消息
      * Created by jinphy, on 2018/3/19, at 10:06
      */
     List<Message> loadNew(String owner, String with);
-
 
     List<Message> loadSystemMsg(String owner, String contentType);
 }

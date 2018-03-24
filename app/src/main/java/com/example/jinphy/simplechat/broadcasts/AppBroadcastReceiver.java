@@ -7,13 +7,12 @@ import android.text.TextUtils;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
-import com.example.jinphy.simplechat.models.event_bus.EBUpdateFriend;
 import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.modules.chat.FileListener;
 import com.example.jinphy.simplechat.modules.login.LoginActivity;
 import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;
@@ -33,6 +32,13 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
     public static final String MSG = "MSG";
     public static final String MESSAGE = "MESSAGE";
     public static final String LOGOUT = "LOGOUT";
+    public static final String TAG_UPLOAD_FILE = "TAG_UPLOAD_FILE";
+    public static final String TAG_DOWNLOAD_FILE = "TAG_DOWNLOAD_FILE";
+
+
+    private static FileListener uploadFileListener;
+
+    private static FileListener downloadFileListener;
 
 
     public static void send(Context context, String tag) {
@@ -46,6 +52,23 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
         intent.putExtra(MSG, msg);
         context.sendBroadcast(intent);
     }
+
+    public static void registerUploadFileListener(FileListener listener) {
+        uploadFileListener = listener;
+    }
+
+    public static void unregisterUploadFileListener() {
+        uploadFileListener = null;
+    }
+
+    public static void registerDownloadFileListener(FileListener listener) {
+        downloadFileListener = listener;
+    }
+
+    public static void unregisterDownloadFileListener() {
+        downloadFileListener = null;
+    }
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -83,7 +106,36 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
                         })
                         .show();
                 break;
+            case TAG_UPLOAD_FILE:
+                onFileEvent(msg, uploadFileListener);
+                break;
+            case TAG_DOWNLOAD_FILE:
+                onFileEvent(msg, downloadFileListener);
             default:
+                break;
+        }
+    }
+
+    private void onFileEvent(String msg, FileListener listener) {
+        String[] split = msg.split(":");
+        if (uploadFileListener == null) {
+            return;
+        }
+        switch (split[0]) {
+            case "onStart":
+                listener.onStart(Long.valueOf(split[1]));
+                break;
+            case "onError":
+                listener.onError(Long.valueOf(split[1]));
+                break;
+            case "onUpdate":
+                listener.onUpdate(
+                        Long.valueOf(split[1]),
+                        Long.valueOf(split[2]),
+                        Long.valueOf(split[3]));
+                break;
+            case "onFinish":
+                listener.onFinish(Long.valueOf(split[1]));
                 break;
         }
     }

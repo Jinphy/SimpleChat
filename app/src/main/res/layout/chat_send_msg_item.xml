@@ -68,7 +68,6 @@
                     android:maxWidth="248dp"
                     android:minHeight="@dimen/dimen_43dp"
                     android:gravity="center_vertical"
-                    tools:visibility="visible"
                     android:padding="@dimen/dimen_5dp"
                     android:textSize="@dimen/size_15sp"
                     android:textColor="#dfffffff"
@@ -77,8 +76,9 @@
                 <!--图片类型的消息-->
                 <ImageView
                     android:id="@+id/image_view"
-                    android:layout_width="248dp"
-                    android:layout_height="187dp"
+                    android:layout_width="160dp"
+                    android:layout_height="90dp"
+                    tools:visibility="visible"
                     android:visibility="gone"
                     android:scaleType="centerCrop"
                     android:src="@drawable/pic_1"/>

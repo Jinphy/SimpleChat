@@ -93,7 +93,7 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
 
     private void initView() {
         View view = LayoutInflater.from(getContext())
-                .inflate(R.layout.menu_select_friend_dialog, null, false);
+                .inflate(R.layout.dialog_select_friend_dialog, null, false);
         setView(view);
 
         btnCancel = view.findViewById(R.id.btn_cancel);

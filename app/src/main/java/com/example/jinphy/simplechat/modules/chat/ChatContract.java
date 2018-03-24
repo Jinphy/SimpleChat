@@ -81,7 +81,9 @@ public interface ChatContract {
 
         String getOwner();
 
-        void sendTextMsg(Message message);
+        void sendMsg(Message message);
+
+        void sendPhotoMsg(Message message);
 
         void updateRecord(Message message);
 
@@ -90,6 +92,11 @@ public interface ChatContract {
         void updateMsg(List<Message> messages);
 
         Member getSelfMember(String groupNo);
+
+
+        void registerUploadFileListener();
+
+        void unregisterUploadFileListener();
 
     }
 }

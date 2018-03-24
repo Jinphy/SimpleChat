@@ -1,11 +1,13 @@
 package com.example.jinphy.simplechat.modules.main.friends;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
 import com.example.jinphy.simplechat.models.event_bus.EBFriend;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateFriend;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
@@ -21,6 +24,8 @@ import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
 import com.example.jinphy.simplechat.modules.system_msg.SystemMsgActivity;
+import com.example.jinphy.simplechat.utils.ImageUtil;
+import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -38,8 +43,8 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     View emptyView;
 
     FloatingActionButton fab;
-    private FriendsRecyclerViewAdapter adapter;
     private LinearLayoutManager linearLayoutManager;
+    private MyAdapter<Friend> adapter;
 
     private View root = null;
 
@@ -123,9 +128,51 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     protected void setupViews() {
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        adapter = new FriendsRecyclerViewAdapter();
-        recyclerView.setAdapter(adapter);
-        adapter.update(presenter.loadFriends());
+        adapter = MyAdapter.<Friend>newInstance()
+                .onInflate(viewType -> R.layout.main_tab_friends_item)
+                .data(presenter.loadFriends())
+                .onCreateView(holder -> {
+                    // avatar
+                    holder.circleImageView[0] = holder.item.findViewById(R.id.avatar);
+                    // remark
+                    holder.textView[0] = holder.item.findViewById(R.id.remark);
+                    // account
+                    holder.textView[1] = holder.item.findViewById(R.id.account);
+                    // address
+                    holder.textView[2] = holder.item.findViewById(R.id.address);
+                    // date
+                    holder.textView[3] = holder.item.findViewById(R.id.date);
+                })
+                .onBindView((holder, item, position) -> {
+                    // 设置头像
+                    Bitmap bitmap = ImageUtil.loadAvatar(item.getAccount(), 50, 50);
+                    if (bitmap != null) {
+                        holder.circleImageView[0].setImageBitmap(bitmap);
+                    }
+                    // 设置备注
+                    holder.textView[0].setText(item.getRemark());
+                    // 设置账号
+                    holder.textView[1].setText(item.getAccount());
+                    // 设置地址
+                    holder.textView[2].setText(item.getAddress());
+                    // 设置时间
+                    if (!TextUtils.isEmpty(item.getDate())) {
+                        holder.textView[3].setText(StringUtils.formatDate(Long.valueOf(item
+                                .getDate())));
+                    }
+
+                    // 设置需要监听点击事件的view
+                    holder.setClickedViews(holder.item);
+
+                    // 设置需要监听长按事件的view
+                    holder.setLongClickedViews(holder.item);
+                })
+                .onClick((v, item, holder, type, position) -> {
+                    ModifyFriendInfoActivity.start(activity(), item.getAccount());
+                })
+                .onLongClick((v, item, holder, type, position) -> false)
+                .into(recyclerView);
+
         setupEmptyView();
     }
     private void setupEmptyView() {
@@ -140,16 +187,6 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     @Override
     protected void registerEvent() {
         recyclerView.addOnScrollListener(getOnScrollListener());
-        adapter.onClick(this::handleItemEvent);
-    }
-
-    public <T>void handleItemEvent(View view, T item,int type,int position) {
-        Friend friend = (Friend) item;
-        switch (view.getId()) {
-            case R.id.item_view:
-                ModifyFriendInfoActivity.start(activity(), friend.getAccount());
-                break;
-        }
     }
 
 

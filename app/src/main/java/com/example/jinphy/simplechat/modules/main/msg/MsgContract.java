@@ -8,6 +8,7 @@ import com.example.jinphy.simplechat.base.BaseView;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 
 import java.util.List;
+import java.util.PrimitiveIterator;
 
 /**
  * Created by jinphy on 2017/8/10.
@@ -33,6 +34,13 @@ public interface MsgContract {
 
         List<MessageRecord> loadMsgRecords();
 
+        void deleteMsgRecord(MessageRecord record);
+
+        void clearMsg(MessageRecord record);
+
+        void updateRecord(MessageRecord record);
+
+        String getName(String account);
     }
 }
 

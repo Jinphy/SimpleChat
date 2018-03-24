@@ -61,5 +61,4 @@ public interface ModifyUserContract {
         void modifyUserInfo(Context context, Map<String, Object> params);
     }
 
-
 }

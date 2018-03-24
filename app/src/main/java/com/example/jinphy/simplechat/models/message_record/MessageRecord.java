@@ -168,6 +168,19 @@ public class MessageRecord implements Comparable<MessageRecord>{
         return toTop;
     }
 
+
+    public boolean isToTop() {
+        return toTop == 1;
+    }
+
+    /**
+     * DESC: 改变是否置顶
+     * Created by jinphy, on 2018/3/19, at 19:12
+     */
+    public void updateToTop() {
+        toTop = (++toTop) % 2;
+    }
+
     public void setToTop(int toTop) {
         if (toTop < 0 || toTop > 1) {
             toTop = 0;
@@ -186,8 +199,18 @@ public class MessageRecord implements Comparable<MessageRecord>{
         if (withFriend.getTarget() != null) {
             return withFriend.getTarget().getAccount();
         }
-        return null;
+        return "";
     }
+
+
+    public String getMsgType() {
+        Message message = getMessage();
+        if (message == null) {
+            return "";
+        }
+        return message.getContentType();
+    }
+
 
     public String getName() {
         if (withGroup.getTarget() != null) {
@@ -202,7 +225,7 @@ public class MessageRecord implements Comparable<MessageRecord>{
      * DESC: 获取消息
      * Created by Jinphy, on 2018/3/6, at 14:35
      */
-    public String getMsg() {
+    public String getContent() {
         if (lastMsg.getTarget() != null) {
             return lastMsg.getTarget().getContent();
         }
@@ -216,6 +239,24 @@ public class MessageRecord implements Comparable<MessageRecord>{
         return "";
     }
 
+    public boolean isSystem() {
+        return StringUtils.equal(Friend.system, getWith());
+    }
+
+    public boolean isGroup() {
+        return getWith().contains("G");
+    }
+
+    public String extra(String key) {
+        Message message = getMessage();
+        if (message == null) {
+            return null;
+        }
+        return message.extra(key);
+    }
+
+
+
     /**
      * DESC: 倒序排列
      * Created by jinphy, on 2018/3/1, at 19:36
@@ -226,6 +267,16 @@ public class MessageRecord implements Comparable<MessageRecord>{
             return -1;
         } else if (toTop < other.toTop) {
             return 1;
+        }
+
+        Message m1 = getMessage();
+        Message m2 = other.getMessage();
+        if (m1 == null && m2 == null) {
+            return 0;
+        } else if (m1 == null) {
+            return 1;
+        } else if (m2 == null) {
+            return -1;
         }
         Long t1 = Long.valueOf(getMessage().getCreateTime());
         Long t2 = Long.valueOf(other.getMessage().getCreateTime());

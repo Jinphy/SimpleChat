@@ -1,0 +1,55 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#ff333333"
+    tools:context="com.example.jinphy.simplechat.modules.group.group_list.GroupListFragment">
+
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:id="@+id/image_view"
+        app:panEnabled="true"
+        app:quickScaleEnabled="true"
+        app:zoomEnabled="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.daimajia.numberprogressbar.NumberProgressBar
+        android:id="@+id/progress_bar"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:progress_unreached_color="#00000000"
+        app:progress_reached_color="#ffffffff"
+
+        app:progress_unreached_bar_height="0.75dp"
+        app:progress_reached_bar_height="1.5dp"
+
+        app:progress_text_size="10sp"
+        app:progress_text_color="#ffffffff"
+        app:progress_text_offset="1dp"
+        app:progress_text_visibility="invisible"
+
+        app:progress_max="100"
+        app:progress_current="0"
+        />
+
+    <TextView
+        android:id="@+id/btn_download"
+        android:background="@drawable/ic_stroke_white_rectangle"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        tools:text="下载原图（0.9 MB）"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:textColor="#aaffffff"
+        android:paddingLeft="@dimen/dimen_10dp"
+        android:paddingRight="@dimen/dimen_10dp"
+        android:layout_marginBottom="@dimen/dimen_20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dimen_35dp"/>
+</RelativeLayout>

@@ -8,12 +8,12 @@
     tools:context="com.example.jinphy.simplechat.modules.chat.ChatFragment">
 
     <android.support.v7.widget.RecyclerView
-        android:overScrollMode="never"
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="54dp"
-        android:layout_marginTop="?attr/actionBarSize">
+        android:layout_marginTop="?attr/actionBarSize"
+        android:overScrollMode="never">
 
         <!--android:layout_marginBottom="94dp"-->
 
@@ -39,6 +39,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:elevation="@dimen/dimen_2dp"
                 android:minHeight="?attr/actionBarSize"
                 android:orientation="horizontal">
 
@@ -53,16 +55,16 @@
                         android:id="@+id/fab_emotion"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
                         android:layout_marginBottom="@dimen/dimen_8dp"
-                        android:layout_marginTop="@dimen/dimen_5dp"
                         android:layout_marginLeft="@dimen/dimen_5dp"
                         android:layout_marginRight="@dimen/dimen_5dp"
+                        android:layout_marginTop="@dimen/dimen_5dp"
                         android:src="@drawable/ic_smile_24dp"
                         android:tint="@color/colorAccent"
+                        android:visibility="gone"
                         app:backgroundTint="@color/white"
-                        app:rippleColor="@color/colorAccent"
-                        app:fabSize="mini"/>
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorAccent"/>
 
 
                     <FrameLayout
@@ -86,8 +88,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginLeft="@dimen/dimen_5dp"
-                            android:visibility="gone"
-                            android:src="@drawable/ic_keyboard_24dp"/>
+                            android:src="@drawable/ic_keyboard_24dp"
+                            android:visibility="gone"/>
 
                     </FrameLayout>
 
@@ -98,8 +100,8 @@
                     android:id="@+id/input_text_and_voice"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="bottom">
+                    android:layout_gravity="bottom"
+                    android:layout_weight="1">
 
                     <EditText
                         android:id="@+id/input_text"
@@ -113,14 +115,14 @@
 
                     <android.support.v7.widget.CardView
                         android:id="@+id/input_voice"
-                        app:cardBackgroundColor="@color/colorAccent"
-                        app:cardElevation="@dimen/dimen_2dp"
-                        app:cardCornerRadius="@dimen/dimen_3dp"
-                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dimen_40dp"
                         android:layout_marginBottom="@dimen/dimen_5dp"
                         android:layout_marginLeft="@dimen/dimen_5dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/dimen_40dp">
+                        android:visibility="gone"
+                        app:cardBackgroundColor="@color/colorAccent"
+                        app:cardCornerRadius="@dimen/dimen_3dp"
+                        app:cardElevation="@dimen/dimen_2dp">
 
                         <TextView
                             android:layout_width="match_parent"
@@ -139,29 +141,29 @@
 
                 <FrameLayout
                     android:id="@+id/btn_more_and_send"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:layout_marginBottom="@dimen/dimen_5dp"
                     android:layout_marginLeft="@dimen/dimen_5dp"
-                    android:layout_marginRight="@dimen/dimen_5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_marginRight="@dimen/dimen_5dp">
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/more_view"
                         android:layout_width="@dimen/dimen_40dp"
                         android:layout_height="40dp"
-                        android:clickable="true"
                         android:layout_marginRight="@dimen/dimen_5dp"
+                        android:clickable="true"
                         android:src="@drawable/ic_add_24dp"
-                        app:civ_border_width="1dp"
-                        app:civ_border_color="@color/colorAccent"/>
+                        app:civ_border_color="@color/colorAccent"
+                        app:civ_border_width="1dp"/>
 
                     <android.support.v7.widget.CardView
                         android:id="@+id/send_view_parent"
                         android:layout_width="60dp"
                         android:layout_height="43dp"
-                        android:visibility="gone"
                         android:clickable="true"
+                        android:visibility="gone"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="@dimen/dimen_3dp"
                         app:cardElevation="@dimen/dimen_2dp">
@@ -191,18 +193,284 @@
                 <!--更多功能的布局-->
                 <LinearLayout
                     android:id="@+id/more_layout"
-                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="250dp"
-                    android:orientation="vertical">
+                    android:background="@color/background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:columnCount="4"
+                    android:orientation="vertical"
+                    android:padding="@dimen/dimen_10dp"
+                    android:rowCount="2"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+                    <!--第一行-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dimen_0dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="@dimen/dimen_5dp"
+                            android:layout_marginRight="@dimen/dimen_5dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/item_photo"
+                                android:background="@drawable/ic_rectangle_white_background"
+                                android:elevation="@dimen/dimen_1dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/ic_photo_24dp"
+                                android:padding="@dimen/dimen_15dp"
+                                android:layout_width="@dimen/dimen_60dp"
+                                android:layout_height="@dimen/dimen_60dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/dimen_10dp"
+                                android:text="图片"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="@dimen/dimen_5dp"
+                            android:layout_marginRight="@dimen/dimen_5dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:background="@drawable/ic_rectangle_white_background"
+                                android:elevation="@dimen/dimen_1dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/ic_photo_24dp"
+                                android:padding="@dimen/dimen_15dp"
+                                android:layout_width="@dimen/dimen_60dp"
+                                android:layout_height="@dimen/dimen_60dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/dimen_10dp"
+                                android:text="图片"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="@dimen/dimen_5dp"
+                            android:layout_marginRight="@dimen/dimen_5dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:background="@drawable/ic_rectangle_white_background"
+                                android:elevation="@dimen/dimen_1dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/ic_photo_24dp"
+                                android:padding="@dimen/dimen_15dp"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_width="@dimen/dimen_60dp"
+                                android:layout_height="@dimen/dimen_60dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_marginTop="@dimen/dimen_10dp"
+                                android:text="图片"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="@dimen/dimen_5dp"
+                            android:layout_marginRight="@dimen/dimen_5dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:background="@drawable/ic_rectangle_white_background"
+                                android:elevation="@dimen/dimen_1dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/ic_photo_24dp"
+                                android:padding="@dimen/dimen_15dp"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_width="@dimen/dimen_60dp"
+                                android:layout_height="@dimen/dimen_60dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_marginTop="@dimen/dimen_10dp"
+                                android:text="图片"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!--第二行-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dimen_0dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="@dimen/dimen_5dp"
+                            android:layout_marginRight="@dimen/dimen_5dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:background="@drawable/ic_rectangle_white_background"
+                                android:elevation="@dimen/dimen_1dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/ic_photo_24dp"
+                                android:padding="@dimen/dimen_15dp"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_width="@dimen/dimen_60dp"
+                                android:layout_height="@dimen/dimen_60dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_marginTop="@dimen/dimen_10dp"
+                                android:text="图片"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="@dimen/dimen_5dp"
+                            android:layout_marginRight="@dimen/dimen_5dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:background="@drawable/ic_rectangle_white_background"
+                                android:elevation="@dimen/dimen_1dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/ic_photo_24dp"
+                                android:padding="@dimen/dimen_15dp"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_width="@dimen/dimen_60dp"
+                                android:layout_height="@dimen/dimen_60dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_marginTop="@dimen/dimen_10dp"
+                                android:text="图片"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="@dimen/dimen_5dp"
+                            android:layout_marginRight="@dimen/dimen_5dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:background="@drawable/ic_rectangle_white_background"
+                                android:elevation="@dimen/dimen_1dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/ic_photo_24dp"
+                                android:padding="@dimen/dimen_15dp"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_width="@dimen/dimen_60dp"
+                                android:layout_height="@dimen/dimen_60dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_marginTop="@dimen/dimen_10dp"
+                                android:text="图片"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="@dimen/dimen_5dp"
+                            android:layout_marginRight="@dimen/dimen_5dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:background="@drawable/ic_rectangle_white_background"
+                                android:elevation="@dimen/dimen_1dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:src="@drawable/ic_photo_24dp"
+                                android:padding="@dimen/dimen_15dp"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_width="@dimen/dimen_60dp"
+                                android:layout_height="@dimen/dimen_60dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_marginTop="@dimen/dimen_10dp"
+                                android:text="图片"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/emotion_layout"
-                    android:visibility="gone"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp">
+                    android:layout_height="250dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                 </LinearLayout>
             </FrameLayout>

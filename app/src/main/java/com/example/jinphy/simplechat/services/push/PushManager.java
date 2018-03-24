@@ -6,6 +6,8 @@ import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
 import com.example.jinphy.simplechat.models.event_bus.EBService;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
+import com.example.jinphy.simplechat.models.file_task.FileTask;
+import com.example.jinphy.simplechat.models.file_task.FileTaskRepository;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.group.Group;
@@ -28,6 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import me.iwf.photopicker.utils.FileUtils;
+
 /**
  * DESC:
  * Created by jinphy on 2018/1/18.
@@ -45,6 +49,8 @@ public class PushManager {
     private GroupRepository groupRepository;
 
     private MemberRepository memberRepository;
+
+    private FileTaskRepository fileTaskRepository;
 
     private WeakReference<PushService> pushService;
 
@@ -64,6 +70,7 @@ public class PushManager {
         messageRecordRepository = MessageRecordRepository.getInstance();
         groupRepository = GroupRepository.getInstance();
         memberRepository = MemberRepository.getInstance();
+        fileTaskRepository = FileTaskRepository.getInstance();
     }
 
 
@@ -135,6 +142,8 @@ public class PushManager {
                 case Message.TYPE_CHAT_TEXT:
                     handleChatTextMsg(message);
                     break;
+                case Message.TYPE_CHAT_IMAGE:
+                    handleChatImageMsg(message);
                 default:
                     break;
             }
@@ -440,7 +449,25 @@ public class PushManager {
             // 群聊
             String groupNo = message.removeExtra(Message.KEY_GROUP_NO);
             message.setWith(groupNo);
+
+            // 设置成null时，在保存到数据库时，通过调用getExtra更新extra
             message.setExtra(null);
         }
+    }
+
+    private void handleChatImageMsg(Message message) {
+        LogUtils.e("photo msg");
+        handleChatTextMsg(message);
+        FileTask task = FileTask.parse(message);
+        fileTaskRepository.save(task);
+
+
+        message.extra(Message.KEY_FILE_PATH, task.getFilePath());
+        message.extra(Message.KEY_FILE_TASK_ID, task.getId());
+
+
+        // 必须调用该方法，否则extra字段不更新
+        message.setExtra(null);
+
     }
 }

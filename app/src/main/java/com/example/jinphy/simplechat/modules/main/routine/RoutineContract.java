@@ -4,6 +4,9 @@ import android.app.Activity;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.menu.Routine;
+
+import java.util.List;
 
 /**
  * Created by jinphy on 2017/8/10.
@@ -21,12 +24,11 @@ public interface RoutineContract {
 
         void showGroupListActivity();
 
-        void handleRecyclerViewEvent(android.view.View view, Object item, int type, int position);
     }
 
     interface Presenter extends BasePresenter {
 
-        RoutineRecyclerViewAdapter getAdapter();
+        List<Routine> loadRoutines();
 
     }
 }

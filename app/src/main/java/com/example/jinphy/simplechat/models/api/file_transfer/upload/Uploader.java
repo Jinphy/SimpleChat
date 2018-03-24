@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.models.api.file_transfer.upload;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.api.file_transfer.Progress;
 import com.example.jinphy.simplechat.models.api.file_transfer.Result;
@@ -7,14 +8,13 @@ import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ThreadPoolUtils;
-import com.google.gson.reflect.TypeToken;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -27,6 +27,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okio.BufferedSource;
 
@@ -48,12 +49,16 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
     private ObservableEmitter<Result<UploadTask>> emitter;
     private UploadTask currentTask;
     BufferedSource source;
+    private Disposable disposable;
 
     private static class InstanceHolder{
-        static final Uploader DEFAULT = init();
+        static Uploader DEFAULT = init();
     }
 
     public static Uploader getInstance() {
+        if (!InstanceHolder.DEFAULT.isOpen()) {
+            InstanceHolder.DEFAULT = init();
+        }
         return InstanceHolder.DEFAULT;
     }
 
@@ -64,7 +69,7 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
     private static Uploader init() {
 
         // url = ws:196.168.0.1/file
-        String url = StringUtils.generateURI(baseUrl, port, "file", "");
+        String url = StringUtils.generateURI(baseUrl, port, "/file", "");
         Map<String, String> headers = new HashMap<>();
 
         try {
@@ -76,17 +81,14 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
     }
 
 
-    public Uploader(String url, Map<String, String> headers) throws URISyntaxException {
+    private Uploader(String url, Map<String, String> headers) throws URISyntaxException {
         super(new URI(url), new Draft_6455(), headers, connectTimeout);
         taskQueue = new PriorityQueue<>();
     }
 
     @Override
     public void onOpen(ServerHandshake handshake) {
-        Observable.create(this)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(UploadSubscriber.getInstance());
+
     }
 
     @Override
@@ -106,19 +108,33 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        if (emitter != null && !emitter.isDisposed()) {
-            emitter.onComplete();
+        synchronized (this) {
+            if (emitter != null && !emitter.isDisposed()) {
+                while (!taskQueue.isEmpty()) {
+                    UploadTask task = taskQueue.poll();
+                    emitter.onNext(new Result<>(Progress.error(), task));
+                }
+                if (disposable != null && !disposable.isDisposed()) {
+                    disposable.dispose();
+                }
+            }
         }
     }
 
     @Override
     public void onError(Exception ex) {
-        if (emitter != null && !emitter.isDisposed()) {
-            while (!taskQueue.isEmpty()) {
-                UploadTask task = taskQueue.poll();
-                emitter.onNext(new Result<>(Progress.error(), task));
+        LogUtils.e("e: " + ex.getMessage());
+        synchronized (this) {
+            if (emitter != null && !emitter.isDisposed()) {
+                while (!taskQueue.isEmpty()) {
+                    UploadTask task = taskQueue.poll();
+                    emitter.onNext(new Result<>(Progress.error(), task));
+                }
+                emitter.onError(ex);
+                if (disposable != null && !disposable.isDisposed()) {
+                    disposable.dispose();
+                }
             }
-            emitter.onError(ex);
         }
     }
 
@@ -130,7 +146,13 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
     public void open() {
         if (!this.isOpen()) {
             this.connect();
+            Observable.create(this)
+                    .subscribeOn(Schedulers.io())
+                    .doOnSubscribe(disposable -> this.disposable = disposable)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(UploadSubscriber.getInstance());
         }
+
     }
 
     /**
@@ -139,6 +161,12 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
      */
     public void shutdown(){
         this.close();
+        if (isOpen()) {
+            close();
+        }
+        if (this.disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
     }
 
 
@@ -176,13 +204,13 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
      * DESC: 执行上传任务
      * Created by jinphy, on 2018/1/19, at 14:49
      */
-    void execute() {
+    synchronized void execute() {
         if (currentTask != null || taskQueue.size() == 0) {
             return;
         }
         synchronized (this) {
-            if (taskQueue.size()>0
-                    &&emitter != null
+            if (taskQueue.size() > 0
+                    && emitter != null
                     && !emitter.isDisposed()
                     && currentTask == null) {
                 currentTask = taskQueue.poll();
@@ -208,20 +236,26 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
 
             int byteCount = 102400; // 100KB
             byte[] buffer = new byte[byteCount];
+            LogUtils.e("fileName: " + currentTask.fileName);
+            LogUtils.e("taskId: " + currentTask.taskId);
 
             // 上传文件体
             if (source != null) {
                 try {
                     map.put("taskId", currentTask.taskId);
                     while (source.read(buffer) != -1) {
-                        map.put("content", new String(buffer, "utf8"));
+                        String content = new String(buffer, "utf8");
+                        LogUtils.e("content: "+content);
+                        map.put("content", content);
                         this.send(EncryptUtils.encodeThenEncrypt(GsonUtils.toJson(map)));
                     }
                     map.remove("content");
                     map.put("status", "end");
                     source.close();
-                } catch (IOException e) {
+                    LogUtils.e("upload end!");
+                } catch (Exception e) {
                     e.printStackTrace();
+                    onError(e);
                 }
             } else {
                 currentTask.onUpload.call(this, currentTask.taskId);

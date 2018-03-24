@@ -170,12 +170,8 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
             presenter.loadDataAfterLogin();
         }
         Observable.timer(3, TimeUnit.SECONDS)
-                .doOnNext(aLong -> {
-                    presenter.checkAccount(activity());
-                })
-                .doOnSubscribe(disposable -> {
-                    this.disposable = disposable;
-                })
+                .doOnSubscribe(disposable -> this.disposable = disposable)
+                .doOnNext(aLong -> presenter.checkAccount(activity()))
                 .subscribe();
     }
 
