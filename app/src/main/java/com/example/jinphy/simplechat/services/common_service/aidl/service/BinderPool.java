@@ -29,15 +29,15 @@ public class BinderPool extends IBinderPool.Stub {
         switch (type) {
             case TYPE_UPLOAD_FILE:
                 // 创建文件上传服务
-                binder = new UploadFileBinder(context);
+                binder = UploadFileBinder.getInstance(context);
                 break;
             case TYPE_DOWNLOAD_FILE:
                 // 创建文件下载服务
-                binder = new DownloadFileBinder(context);
+                binder = DownloadFileBinder.getInstance(context);
                 break;
             case TYPE_SEND_MSG:
                 // 创建发送信息服务
-                binder = new SendMsgBinder(context);
+                binder = SendMsgBinder.getInstance(context);
                 break;
         }
         return binder;

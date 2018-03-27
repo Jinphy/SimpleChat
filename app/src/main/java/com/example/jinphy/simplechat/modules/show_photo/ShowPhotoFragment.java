@@ -1,24 +1,19 @@
 package com.example.jinphy.simplechat.modules.show_photo;
 
 import android.graphics.Bitmap;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.GravityEnum;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.apkfuns.logutils.LogUtils;
 import com.daimajia.numberprogressbar.NumberProgressBar;
-import com.daimajia.numberprogressbar.OnProgressBarListener;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
@@ -105,6 +100,14 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
             presenter.downloadPhoto(message);
             btnDownload.setEnabled(false);
         });
+        imageView.setOnClickListener(v->{
+            float scale = imageView.getScale();
+            if (scale - 1f > 0.01) {
+                imageView.animateScale(1f);
+            } else {
+                finishActivity();
+            }
+        });
     }
 
     public static ShowPhotoFragment newInstance(long msgId, int position) {
@@ -155,7 +158,7 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
         App.showToast("原图下载成功！", false);
         presenter.removeThumbnail(message);
 
-        EventBus.getDefault().post(new EBMessage(message, msgPosition));
+        EventBus.getDefault().post(EBMessage.updateMsg(message, msgPosition));
     }
 
     @Override

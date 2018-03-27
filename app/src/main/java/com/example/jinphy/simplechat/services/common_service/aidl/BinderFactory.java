@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.services.common_service.CommonService;
 import com.example.jinphy.simplechat.services.common_service.aidl.service.IBinderPool;
 import com.example.jinphy.simplechat.utils.ThreadPoolUtils;
@@ -30,38 +31,39 @@ public class BinderFactory implements ServiceConnection{
     private Context context;
     private IBinderPool binderPool;
 
-    // 该变量可以将异步执行的代码转成同步执行
-    CountDownLatch countDownLatch;
+    private static BinderFactory instance;
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         binderPool = IBinderPool.Stub.asInterface(service);
-        countDownLatch.countDown();
+        LogUtils.e("connect");
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
         context.unbindService(this);
         bindService();
+        LogUtils.e("disconnect");
     }
 
     @Override
     public void onBindingDied(ComponentName name) {
         context.unbindService(this);
         bindService();
+        LogUtils.e("bindingDied");
     }
 
 
-    private static class InstanceHolder{
-        static final BinderFactory DEFAULT = new BinderFactory();
+    private BinderFactory(Context context) {
+        this.context = context;
+        bindService();
     }
 
-    private BinderFactory() {
-        ThreadPoolUtils.threadPool.execute(this::bindService);
-    }
-
-    public static void init(Context context) {
-        InstanceHolder.DEFAULT.context = context.getApplicationContext();
+    public static synchronized void init(Context context) {
+        if (instance != null) {
+            return;
+        }
+        instance = new BinderFactory(context);
     }
 
 
@@ -69,24 +71,18 @@ public class BinderFactory implements ServiceConnection{
      * DESC: 绑定服务
      * Created by jinphy, on 2018/3/21, at 16:04
      */
-    private synchronized void bindService() {
-        countDownLatch = new CountDownLatch(1);
+    private void bindService() {
         Intent intent = new Intent(context, CommonService.class);
         context.bindService(intent, this, Context.BIND_AUTO_CREATE);
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 
     public static IBinder getBinder(int type) {
         try {
-            if (InstanceHolder.DEFAULT.binderPool == null) {
+            if (instance.binderPool == null) {
                 return null;
             }
-            return InstanceHolder.DEFAULT.binderPool.getBinder(type);
+            return instance.binderPool.getBinder(type);
         } catch (RemoteException e) {
             e.printStackTrace();
             return null;

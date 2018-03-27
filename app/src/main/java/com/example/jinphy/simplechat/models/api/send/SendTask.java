@@ -1,6 +1,5 @@
 package com.example.jinphy.simplechat.models.api.send;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.models.message.Message;

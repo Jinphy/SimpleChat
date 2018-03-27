@@ -11,5 +11,5 @@ interface ISendMsgBinder {
 //    void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
 //            double aDouble, String aString);
 
-        void setMessage(long id);
+        void sendMessage(long id);
 }

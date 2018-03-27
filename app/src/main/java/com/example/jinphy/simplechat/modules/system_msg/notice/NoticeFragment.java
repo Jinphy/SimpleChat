@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.models.event_bus.EBInteger;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
@@ -18,10 +17,6 @@ import com.example.jinphy.simplechat.models.message.Message;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
-
-import io.reactivex.Observable;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * DESC:

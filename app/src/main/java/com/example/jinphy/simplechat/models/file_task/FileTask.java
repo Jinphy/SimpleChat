@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.DeviceUtils;
-import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
@@ -150,11 +149,11 @@ public class FileTask implements Parcelable{
         return task;
     }
 
-    public static FileTask parse(Message message) {
+    public static FileTask parse(Message message,String baseFilePath) {
         FileTask task = new FileTask();
         task.totalFileLength = Long.valueOf(message.extra(Message.KEY_TOTAL_LENGTH));
         task.generatedFileName = message.extra(Message.KEY_FILE_NAME);
-        task.filePath = ImageUtil.PHOTO_PATH + "/" + task.generatedFileName;
+        task.filePath = baseFilePath + "/" + task.generatedFileName;
         task.url = StringUtils.generateURI(Api.BASE_URL, Api.FILE_PORT, "/" + System.currentTimeMillis(), "");
         return task;
     }

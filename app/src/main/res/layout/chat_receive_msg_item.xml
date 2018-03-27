@@ -93,14 +93,14 @@
                         android:id="@+id/image_view"
                         android:layout_width="160dp"
                         android:layout_height="90dp"
-                        tools:visibility="visible"
                         android:visibility="gone"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/pic_1"/>
+                        tools:src="@drawable/pic_1"/>
 
                     <!--声音类型的消息-->
                     <LinearLayout
                         android:id="@+id/voice_View"
+                        tools:visibility="visible"
                         android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
                         <ImageView
                             android:id="@+id/icon_view"
                             android:padding="@dimen/dimen_7dp"
-                            android:src="@drawable/ic_phone_no_talk_48dp"
+                            android:src="@drawable/ic_voice_on_1_24dp"
                             android:layout_width="@dimen/dimen_48dp"
                             android:layout_height="@dimen/dimen_48dp"/>
 
@@ -118,8 +118,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:textSize="@dimen/size_18sp"
-                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/size_15sp"
+                            android:textColor="#7f4E342E"
                             android:padding="@dimen/dimen_5dp"
                             android:text="10''"/>
 

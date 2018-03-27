@@ -1,16 +1,10 @@
 package com.example.jinphy.simplechat.models.message_record;
 
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
-import com.apkfuns.logutils.LogUtils;
-import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.message.Message;
-import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.Arrays;

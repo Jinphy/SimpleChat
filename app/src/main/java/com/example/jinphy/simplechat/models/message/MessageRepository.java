@@ -1,21 +1,12 @@
 package com.example.jinphy.simplechat.models.message;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
-import com.example.jinphy.simplechat.models.event_bus.EBInteger;
-import com.example.jinphy.simplechat.models.event_bus.EBService;
-import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.base.BaseRepository;
+import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
-import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.group.GroupRepository;
-import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.member.MemberRepository;
-import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
-import com.example.jinphy.simplechat.utils.GsonUtils;
-import com.example.jinphy.simplechat.utils.ThreadPoolUtils;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -28,7 +19,7 @@ import io.objectbox.Box;
  * Created by jinphy on 2018/1/18.
  */
 
-public class MessageRepository implements MessageDataSource {
+public class MessageRepository extends BaseRepository implements MessageDataSource {
 
     private Box<Message> messageBox;
 
@@ -61,6 +52,13 @@ public class MessageRepository implements MessageDataSource {
      */
     public void saveReceive(Message... messages) {
         if (messages.length > 0) {
+            messageBox.put(messages);
+        }
+    }
+
+    @Override
+    public void saveReceive(List<Message> messages) {
+        if (messages != null && messages.size() > 0) {
             messageBox.put(messages);
         }
     }
@@ -240,5 +238,17 @@ public class MessageRepository implements MessageDataSource {
                 .equal(Message_.contentType, contentType)
                 .build()
                 .find();
+    }
+
+
+    @Override
+    public void sendMsg(BaseRepository.Task<String> task) {
+        Api.<String>common(null)
+                .setup(api -> handleBuilder(api, task))
+                .autoShowNo(false)
+                .dataType(Api.Data.MODEL,String.class)
+                .showProgress(false)
+                .path(Api.Path.sendMsg)
+                .request();
     }
 }

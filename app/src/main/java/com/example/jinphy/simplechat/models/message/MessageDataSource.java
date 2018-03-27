@@ -1,5 +1,7 @@
 package com.example.jinphy.simplechat.models.message;
 
+import com.example.jinphy.simplechat.base.BaseRepository;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -16,6 +18,13 @@ public interface MessageDataSource {
      * Created by jinphy, on 2018/1/18, at 9:01
      */
     void saveReceive(Message... messages);
+
+
+    /**
+     * DESC: 保存接收的信息
+     * Created by jinphy, on 2018/1/18, at 9:01
+     */
+    void saveReceive(List<Message> messages);
 
     /**
      * DESC: 保存发送的信息
@@ -80,4 +89,6 @@ public interface MessageDataSource {
     List<Message> loadNew(String owner, String with);
 
     List<Message> loadSystemMsg(String owner, String contentType);
+
+    void sendMsg(BaseRepository.Task<String> task);
 }

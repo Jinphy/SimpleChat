@@ -229,7 +229,7 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
             map.put("fileLength", currentTask.fileLength);
             map.put("taskId", currentTask.taskId);
             map.put("status", "start");
-            map.put("taskType", "upload");
+            map.put("taskType", "uploadFileAndSendMsg");
             String start = GsonUtils.toJson(map);
             this.send(EncryptUtils.encodeThenEncrypt(start));
             map.clear();
@@ -252,7 +252,7 @@ public class Uploader extends WebSocketClient implements ObservableOnSubscribe<R
                     map.remove("content");
                     map.put("status", "end");
                     source.close();
-                    LogUtils.e("upload end!");
+                    LogUtils.e("uploadFileAndSendMsg end!");
                 } catch (Exception e) {
                     e.printStackTrace();
                     onError(e);

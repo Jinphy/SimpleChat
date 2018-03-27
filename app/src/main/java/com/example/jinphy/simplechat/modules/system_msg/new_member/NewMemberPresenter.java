@@ -3,10 +3,7 @@ package com.example.jinphy.simplechat.modules.system_msg.new_member;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.example.jinphy.simplechat.base.BaseRepository;
-import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.models.api.common.Api;
-import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.group.Group;

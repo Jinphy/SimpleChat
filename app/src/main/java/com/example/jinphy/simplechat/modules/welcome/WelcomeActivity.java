@@ -32,6 +32,7 @@ public class WelcomeActivity extends BaseActivity {
                 .permission(Manifest.permission.READ_PHONE_STATE)
                 .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .permission(Manifest.permission.CAMERA)
+                .permission(Manifest.permission.RECORD_AUDIO)
                 .onReject(this::showDialog)
                 .onDialog(this::showDialog)
                 .execute();

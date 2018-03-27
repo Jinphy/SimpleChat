@@ -63,6 +63,8 @@ public class MsgPresenter implements MsgContract.Presenter {
     @Override
     public void clearMsg(MessageRecord record) {
         messageRepository.delete(record.getOwner(), record.getWith());
+        record.setNewMsgCount(0);
+        recordRepository.update(record);
     }
 
     @Override
