@@ -312,9 +312,45 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "9:1999643448270600421",
+      "lastPropertyId": "7:7491941374532865642",
+      "name": "FileTask",
+      "properties": [
+        {
+          "id": "1:3320866967980271404",
+          "name": "id"
+        },
+        {
+          "id": "2:3864919588703540912",
+          "name": "filePath"
+        },
+        {
+          "id": "3:91337072125764662",
+          "name": "generatedFileName"
+        },
+        {
+          "id": "4:4684327900850720187",
+          "name": "hasFinished"
+        },
+        {
+          "id": "5:4423664108124522155",
+          "name": "totalFileLength"
+        },
+        {
+          "id": "6:6724192294530193637",
+          "name": "finishedLength"
+        },
+        {
+          "id": "7:7491941374532865642",
+          "name": "url"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "8:8827880786674548943",
+  "lastEntityId": "9:1999643448270600421",
   "lastIndexId": "8:7617689702166036105",
   "lastRelationId": "3:4317772929812875936",
   "lastSequenceId": "0:0",

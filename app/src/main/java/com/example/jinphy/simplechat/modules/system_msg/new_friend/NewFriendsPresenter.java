@@ -10,9 +10,7 @@ import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.modules.system_msg.new_friend.NewFriendRecyclerViewAdapter
         .NewFriend;
-import com.example.jinphy.simplechat.utils.ObjectHelper;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 

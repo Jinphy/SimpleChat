@@ -2,11 +2,11 @@ package com.example.jinphy.simplechat.modules.chat;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.event_bus.EBSendMsg;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
-import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 
 import java.util.List;
 
@@ -47,9 +47,6 @@ public interface ChatContract {
 
         void hideMoreLayout();
 
-        void showFabEmotion();
-
-        void hideFabEmotion();
 
         void setStatusBarColor(float factor);
 
@@ -61,11 +58,13 @@ public interface ChatContract {
 
         void updateView();
 
-        void whenSendStart();
+        void whenSendStart(Message message);
 
-        void whenSendFinal();
+        void whenSendFinal(EBSendMsg msg);
 
         boolean isFriend();
+
+        void cacheMsg(Message message);
 
     }
 
@@ -81,9 +80,9 @@ public interface ChatContract {
 
         String getOwner();
 
-        void sendMsg(Message message);
+        void sendTextMsg(Message message);
 
-        void sendPhotoMsg(Message message);
+        void sendFileMsg(Message message);
 
         void updateRecord(Message message);
 
@@ -91,13 +90,11 @@ public interface ChatContract {
 
         void updateMsg(List<Message> messages);
 
+        void updateMsg(Message... messages);
+
         Member getSelfMember(String groupNo);
 
-
-        void registerUploadFileListener();
-
-        void unregisterUploadFileListener();
-
+        void downloadVoice(Message message);
     }
 }
 

@@ -12,4 +12,6 @@ interface IDownloadFileBinder {
 //            double aDouble, String aString);
 
         void download(long fileTaskId);
+
+        void downloadVoice(long fileTaskId,long msgId);
 }

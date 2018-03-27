@@ -40,6 +40,8 @@ public class ImageUtil {
             .getAbsolutePath() + "/simple_chat/avatar" ;
     public static final String PHOTO_PATH = Environment.getExternalStorageDirectory()
             .getAbsolutePath() + "/simple_chat/photo" ;
+    public static final String AUDIO_PATH = Environment.getExternalStorageDirectory()
+            .getAbsolutePath() + "/simple_chat/audio";
 
 
     public static Builder from(@NonNull Context context) {

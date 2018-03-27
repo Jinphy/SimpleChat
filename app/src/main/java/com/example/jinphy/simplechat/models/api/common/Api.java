@@ -136,6 +136,8 @@ public abstract class Api {
         String modifyAllowChat = "/member/modifyAllowChat";
         @Post
         String addMembers = "/group/addMembers";
+        @Post
+        String sendMsg = "/message/sendMsg";
     }
 
     //===================参数key==========================================================
@@ -178,6 +180,12 @@ public abstract class Api {
         String extraMsg = "extraMsg";
         String operator = "operator";
         String allowChat = "allowChat";
+        String fromAccount = "fromAccount";
+        String toAccount = "toAccount";
+        String createTime = "createTime";
+        String content = "content";
+        String contentType = "contentType";
+        String extra = "extra";
     }
 
 

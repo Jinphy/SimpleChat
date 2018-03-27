@@ -15,11 +15,19 @@ public interface MyDialogInterface {
 
     MyDialogInterface height(int valueDp);
 
+    MyDialogInterface x(int valueDp);
+
+    MyDialogInterface y(int valueDp);
+
+    MyDialogInterface gravity(int gravity);
+
     MyDialogInterface view(View view);
 
     MyDialogInterface view(int resourceId);
 
     MyDialogInterface cancelable(boolean cancelable);
+
+    MyDialogInterface hasFocus(boolean hasFocus);
 
     MyDialog.Holder display();
 

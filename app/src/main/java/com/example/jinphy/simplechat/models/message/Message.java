@@ -13,16 +13,15 @@ import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
-import io.objectbox.annotation.Transient;
 
 /**
  * DESC: 消息类
@@ -156,6 +155,31 @@ public class Message implements Comparable<Message>{
      */
     public static final String TYPE_SYSTEM_NOTICE = "system_notice";
 
+    /**
+     * DESC: 语音消息的状态：正在下载
+     * Created by jinphy, on 2018/3/27, at 15:26
+     */
+    public static final String AUDIO_STATUS_DOWNLOADING = "0";
+
+    /**
+     * DESC: 语音消息的状态：下载失败或者还未下载
+     * Created by jinphy, on 2018/3/27, at 15:27
+     */
+    public static final String AUDIO_STATUS_NO = "1";
+
+    /**
+     * DESC: 语音消息的状态：新消息，还没有听
+     * Created by jinphy, on 2018/3/27, at 15:27
+     */
+    public static final String AUDIO_STATUS_NEW = "2";
+
+
+    /**
+     * DESC: 语音消息的状态：消息已读
+     * Created by jinphy, on 2018/3/27, at 15:28
+     */
+    public static final String AUDIO_STATUS_OLD = "3";
+
 
     public static final String KEY_SENDER = "KEY_SENDER";
 
@@ -183,7 +207,21 @@ public class Message implements Comparable<Message>{
      */
     public static final String KEY_FILE_NAME = "KEY_FILE_NAME";
 
+    /**
+     * DESC: 文件总大小
+     * Created by jinphy, on 2018/3/27, at 15:02
+     */
     public static final String KEY_TOTAL_LENGTH = "KEY_TOTAL_LENGTH";
+
+
+    public static final String KEY_DURATION = "KEY_DURATION";
+
+    /**
+     * DESC: 语音的状态
+     * Created by jinphy, on 2018/3/27, at 15:23
+     */
+    public static final String KEY_AUDIO_STATUS = "KEY_AUDIO_STATUS";
+
 
     /**
      * DESC: 聊天的文件消息
@@ -422,6 +460,29 @@ public class Message implements Comparable<Message>{
     }
 
 
+    public String getFilePath() {
+        String filePath = extra(Message.KEY_FILE_PATH);
+        File file = new File(filePath);
+        if (file.exists()) {
+            return filePath;
+        }
+        return null;
+    }
+
+    /**
+     * DESC: 获取语音的状态
+     * Created by jinphy, on 2018/3/27, at 18:33
+     */
+    public String getAudioStatus() {
+        return extra(Message.KEY_AUDIO_STATUS);
+    }
+
+    public void updateAudioStatus(String status) {
+        extra(Message.KEY_AUDIO_STATUS, status);
+        setExtra(null);
+        getExtra();
+    }
+
 
 
     //------------------------------------------------------------
@@ -510,6 +571,38 @@ public class Message implements Comparable<Message>{
         msg.extra(KEY_TOTAL_LENGTH, task.getTotalFileLength());
         return msg;
     }
+
+
+    /**
+     * DESC: 创建语音信息
+     *
+     *
+     * @param filePath 语音的文件路径
+     * @param duration 语音的时长
+     * Created by jinphy, on 2018/3/27, at 14:56
+     */
+    public static Message makeVoiceMsg(String owner, String with,String filePath,String duration,  boolean isFriend) {
+        FileTask task = FileTask.create(filePath);
+        if (task == null) {
+            return null;
+        }
+        FileTaskRepository.getInstance().save(task);
+
+        Message msg = makeTextMsg(owner, with, "[语音]", isFriend);
+        msg.setContentType(Message.TYPE_CHAT_VOICE);
+        // 语音保存的路径，文件的保存路径，接收者要删除该字段并重新设置自己的文件路径
+        msg.extra(KEY_FILE_PATH, filePath);
+        // 用来和上传任务绑定的FileTaskId，接收者要删掉该字段并重新设置自己的taskId
+        msg.extra(KEY_FILE_TASK_ID, task.getId());
+        // 用来在显示时保存在map中的图片的key
+        msg.extra(KEY_FILE_NAME, task.getGeneratedFileName());
+        // 文件的大小
+        msg.extra(KEY_TOTAL_LENGTH, task.getTotalFileLength());
+        // 语音的时长
+        msg.extra(KEY_DURATION, duration);
+        return msg;
+    }
+
 
 
     public static void sort(List<Message> messages) {

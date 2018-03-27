@@ -1,11 +1,11 @@
 package com.example.jinphy.simplechat.services.push;
 
+import android.os.IBinder;
 import android.text.TextUtils;
 
 import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
 import com.example.jinphy.simplechat.models.event_bus.EBService;
-import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.file_task.FileTask;
 import com.example.jinphy.simplechat.models.file_task.FileTaskRepository;
 import com.example.jinphy.simplechat.models.friend.Friend;
@@ -19,8 +19,12 @@ import com.example.jinphy.simplechat.models.message.MessageRepository;
 import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.services.common_service.aidl.BinderFactory;
+import com.example.jinphy.simplechat.services.common_service.aidl.service.DownloadFileBinder;
+import com.example.jinphy.simplechat.services.common_service.aidl.service.IDownloadFileBinder;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -29,8 +33,6 @@ import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import me.iwf.photopicker.utils.FileUtils;
 
 /**
  * DESC:
@@ -54,6 +56,8 @@ public class PushManager {
 
     private WeakReference<PushService> pushService;
 
+    private IDownloadFileBinder downloader;
+
     private static class InstanceHolder{
         static final PushManager DEFAULT = new PushManager();
     }
@@ -71,6 +75,13 @@ public class PushManager {
         groupRepository = GroupRepository.getInstance();
         memberRepository = MemberRepository.getInstance();
         fileTaskRepository = FileTaskRepository.getInstance();
+        initBinder();
+    }
+
+
+    private void initBinder() {
+        IBinder binder = BinderFactory.getBinder(BinderFactory.TYPE_DOWNLOAD_FILE);
+        downloader = DownloadFileBinder.asInterface(binder);
     }
 
 
@@ -144,6 +155,9 @@ public class PushManager {
                     break;
                 case Message.TYPE_CHAT_IMAGE:
                     handleChatImageMsg(message);
+                    break;
+                case Message.TYPE_CHAT_VOICE:
+                    handleChatVoiceMsg(message);
                 default:
                     break;
             }
@@ -456,9 +470,8 @@ public class PushManager {
     }
 
     private void handleChatImageMsg(Message message) {
-        LogUtils.e("photo msg");
         handleChatTextMsg(message);
-        FileTask task = FileTask.parse(message);
+        FileTask task = FileTask.parse(message, ImageUtil.PHOTO_PATH);
         fileTaskRepository.save(task);
 
 
@@ -469,5 +482,18 @@ public class PushManager {
         // 必须调用该方法，否则extra字段不更新
         message.setExtra(null);
 
+    }
+
+    private void handleChatVoiceMsg(Message message) {
+        handleChatTextMsg(message);
+        FileTask task = FileTask.parse(message, ImageUtil.AUDIO_PATH);
+        fileTaskRepository.save(task);
+
+        message.extra(Message.KEY_FILE_PATH, task.getFilePath());
+        message.extra(Message.KEY_FILE_TASK_ID, task.getId());
+        message.extra(Message.KEY_AUDIO_STATUS, Message.AUDIO_STATUS_NO);
+
+        // 必须调用该方法，否则extra字段不更新
+        message.setExtra(null);
     }
 }

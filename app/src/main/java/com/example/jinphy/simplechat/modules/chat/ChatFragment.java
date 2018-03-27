@@ -7,32 +7,30 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
-import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.custom_libs.AudioPlayer;
+import com.example.jinphy.simplechat.custom_libs.AudioRecorder;
+import com.example.jinphy.simplechat.custom_view.AudioRecordButton;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
-import com.example.jinphy.simplechat.models.api.file_transfer.upload.Uploader;
-import com.example.jinphy.simplechat.models.api.send.Sender;
-import com.example.jinphy.simplechat.models.event_bus.EBSendError;
+import com.example.jinphy.simplechat.models.event_bus.EBSendMsg;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
@@ -40,7 +38,7 @@ import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
-import com.example.jinphy.simplechat.modules.show_photo.EBMessage;
+import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.modules.show_photo.ShowPhotoActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
@@ -54,6 +52,8 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -77,11 +77,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     private Toolbar toolbar;
 
     private FloatingActionButton fab;
-    private FloatingActionButton fabEmotion;
 
-    private FrameLayout btnVoiceAndKeyboard;
-    private FrameLayout inputTextAndVoice;
-    private FrameLayout btnMoreAndSend;
+    private RelativeLayout btnVoiceAndKeyboard;
+    private RelativeLayout inputTextAndVoice;
+    private RelativeLayout btnMoreAndSend;
     private FrameLayout extraBottomLayout;
 
     private Friend friend;
@@ -98,6 +97,13 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     private LinearLayoutManager linearLayoutManager;
 
     private boolean isFriend;
+
+
+    /**
+     * DESC: 缓存正在发送的或者正在下载语音信息的消息
+     * Created by jinphy, on 2018/3/26, at 9:29
+     */
+    private Map<Long,Message> msgMap;
 
 
     public ChatFragment() {
@@ -126,29 +132,12 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Sender.getInstance().open();
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Sender.getInstance().shutdown();
-        List<Message> sendingMsg = adapter.getSendingMsg();
-        for (Message message : sendingMsg) {
-            message.setStatus(Message.STATUS_NO);
-        }
-        presenter.updateMsg(sendingMsg);
-        presenter.updateRecord(adapter.getLast());
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
+        presenter.updateRecord(adapter.getLast());
         EventBus.getDefault().post(new EBUpdateView());
         bottomMoreMenu.clearFragment();
-        presenter.unregisterUploadFileListener();
+        AudioRecorder.getInstance().release();
     }
 
     @Override
@@ -180,7 +169,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         toolbar = getActivity().findViewById(R.id.toolbar);
         appbarLayout = getActivity().findViewById(R.id.appbar_layout);
         fab = getActivity().findViewById(R.id.fab);
-        fabEmotion = view.findViewById(R.id.fab_emotion);
         bottomBar = view.findViewById(R.id.bottom_bar);
         recyclerView = view.findViewById(R.id.recycler_view);
         btnVoiceAndKeyboard = view.findViewById(R.id.btn_voice_and_keyboard);
@@ -195,6 +183,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         screenWidth = ScreenUtils.getScreenWidth(getContext());
         onThirdScreenWidth = screenWidth / 3;
         maxElevation = ScreenUtils.dp2px(getContext(), 20);
+        msgMap = new ConcurrentHashMap<>();
 
         if (withAccount.contains("G")) {
             group = presenter.getGroup(withAccount);
@@ -202,15 +191,11 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         } else {
             friend = presenter.getFriend(withAccount);
         }
-        presenter.registerUploadFileListener();
     }
 
 
     @Override
     protected void setupViews() {
-        hideFabEmotion();
-        //        Keyboard.open(getContext(), findInputText());
-
         appbarLayout.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
         if (withAccount.contains("G")) {
             activity().setTitle(group.getName());
@@ -222,17 +207,25 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
         adapter = new ChatAdapter(presenter.getUserAvatar(), withAccount);
-        adapter.update(presenter.loadMessages(withAccount));
-        if (!isFriend) {
-            adapter.setGroup(group);
-            adapter.setMembers(presenter.loadMembers(withAccount));
-        }
         recyclerView.setAdapter(adapter);
 
-        int position = adapter.getItemCount() - 1;
-        if (position >= 0) {
-            recyclerView.scrollToPosition(position);
-        }
+        Observable.just(withAccount)
+                .subscribeOn(Schedulers.io())
+                .map(with -> presenter.loadMessages(with))
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(messages -> {
+                    adapter.update(messages);
+                    if (!isFriend) {
+                        adapter.setGroup(group);
+                        adapter.setMembers(presenter.loadMembers(withAccount));
+                    }
+
+                    int position = adapter.getItemCount() - 1;
+                    if (position >= 0) {
+                        recyclerView.scrollToPosition(position);
+                    }
+                })
+                .subscribe();
     }
 
 
@@ -265,7 +258,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     protected void registerEvent() {
         fab.setOnClickListener(this::fabAction);
-        fabEmotion.setOnClickListener(this::fabAction);
 
         recyclerView.addOnScrollListener(getRecyclerViewListener());
         // 底部栏左边的按钮
@@ -282,27 +274,55 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 showSendBtn();
             }
         });
-        findInputVoice().setOnTouchListener(this::onTouchOfInputVoice);
 
         // 底部栏右边的按钮
-        findBtnSend().setOnClickListener(this::onClickOfBtnSend);
-        findBtnMore().setOnClickListener(this::onClickOfBtnMore);
+        findSendBtn().setOnClickListener(this::onClickOfBtnSend);
+        findMoreBtn().setOnClickListener(this::onClickOfBtnMore);
+
+        // 录音按键的录音事件
+        ((AudioRecordButton) findInputVoice()).onRecordFinished((filePath, duration) -> {
+            // 发送语音消息
+            Message message = Message.makeVoiceMsg(ownerAccount, withAccount, filePath, duration,isFriend);
+            presenter.sendFileMsg(message);
+            adapter.add(message);
+        });
 
         adapter.onClick((view, item, type, position) -> {
             switch (item.getContentType()) {
-                case Message.TYPE_CHAT_IMAGE:
+                case Message.TYPE_CHAT_IMAGE:{
                     if (!adapter.hasPhoto(item)) {
                         App.showToast("图片不存在！", false);
                         return;
                     }
                     ShowPhotoActivity.start(activity(), item.getId(), position);
                     break;
+                }
+                case Message.TYPE_CHAT_VOICE:{
+                    String filePath = item.getFilePath();
+                    String audioStatus = item.getAudioStatus();
+                    if (Message.AUDIO_STATUS_NO.equals(audioStatus)) {
+                        App.showToast("语音不存在！", false);
+                        return;
+                    }
+                    if (Message.AUDIO_STATUS_DOWNLOADING.equals(audioStatus)) {
+                        App.showToast("正在加载！", false);
+                        return;
+                    }
+                    if (Message.AUDIO_STATUS_NEW.equals(audioStatus)) {
+                        item.updateAudioStatus(Message.AUDIO_STATUS_OLD);
+                        presenter.updateMsg(item);
+                        updateRecyclerView();
+                    }
+                    if (filePath != null) {
+                        AudioPlayer.playOrStop(filePath);
+                    }
+                    break;
+                }
                 default:
                     break;
 
             }
         });
-
     }
 
     // 声音按钮的点击事件
@@ -321,21 +341,11 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     private void onFocusChangeOfInputText(View view, boolean hasFocus) {
         if (hasFocus) {
             hideExtraBottomLayout();
-            //            showFabEmotion();
         } else {
             Keyboard.close(getContext(), findInputText());
-            //            hideFabEmotion();
         }
     }
 
-
-    // 语音输入的触摸事件
-    private boolean onTouchOfInputVoice(View view, MotionEvent motionEvent) {
-        // TODO: 2017/8/14 录音功能
-
-
-        return false;
-    }
 
     // 发送按钮的点击事件
     private void onClickOfBtnSend(View view) {
@@ -363,7 +373,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         inputText.setText("");
         Message message = Message.makeTextMsg(ownerAccount, withAccount, content, isFriend);
         adapter.add(message);
-        presenter.sendMsg(message);
+        presenter.sendTextMsg(message);
     }
 
     // 更多功能按钮的点击事件
@@ -405,9 +415,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 }
                 showBar(recyclerView);
                 break;
-            case R.id.fab_emotion:
-                showEmotionLayout();
-                break;
             default:
                 break;
         }
@@ -415,29 +422,25 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
     //----------------------------------------------
-    private View findParentOfBtnSend() {
-        return btnMoreAndSend.findViewById(R.id.send_view_parent);
+    private View findSendBtn() {
+        return btnMoreAndSend.findViewById(R.id.send_view);
     }
 
-    private View findBtnSend() {
-        return ((CardView) findParentOfBtnSend()).getChildAt(0);
-    }
 
-    private View findBtnMore() {
+    private View findMoreBtn() {
         return btnMoreAndSend.findViewById(R.id.more_view);
     }
 
     @Override
     public void showSendBtn() {
-        findParentOfBtnSend().setVisibility(View.VISIBLE);
-        findBtnMore().setVisibility(View.GONE);
-
+        findSendBtn().setVisibility(View.VISIBLE);
+        findMoreBtn().setVisibility(View.GONE);
     }
 
     @Override
     public void showMoreBtn() {
-        findParentOfBtnSend().setVisibility(View.GONE);
-        findBtnMore().setVisibility(View.VISIBLE);
+        findSendBtn().setVisibility(View.GONE);
+        findMoreBtn().setVisibility(View.VISIBLE);
     }
 
 
@@ -512,7 +515,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     protected void onKeyboardEvent(boolean open) {
         if (!open) {
-            hideFabEmotion();
+
         }
     }
 
@@ -548,44 +551,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         }
     }
 
-
-    //----------------------------------------------
-
-    @Override
-    public void showFabEmotion() {
-        //        scaleFabEmotion(0,1,false);
-    }
-
-    @Override
-    public void hideFabEmotion() {
-        scaleFabEmotion(1, 0, true);
-    }
-
-    private void scaleFabEmotion(float from, float to, final boolean gone) {
-        AnimUtils.just(fabEmotion)
-                .setScaleX(from, to)
-                .setScaleY(from, to)
-                .setDuration(IntConst.DURATION_250)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
-                .onStart(a -> {
-                    if (!gone) fabEmotion.setVisibility(View.VISIBLE);
-                })
-                .onEnd(a -> {
-                    if (gone) {
-                        fabEmotion.setVisibility(View.GONE);
-                    } else {
-                        setMargin(
-                                recyclerView,
-                                appbarLayout.getMeasuredHeight(),
-                                bottomBar.getMeasuredHeight());
-                        int position = adapter.getItemCount();
-                        if (position >= 0) {
-                            recyclerView.smoothScrollToPosition(position);
-                        }
-                    }
-                })
-                .animate();
-    }
 
     //----------------------------------------------
 
@@ -651,7 +616,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     public void hideBar(View view) {
         if (isBarVisible) {
             isBarVisible = false;
-            //            fabEmotion.setVisibility(View.GONE);
             animateBar(view, 0, 1, false);
         }
     }
@@ -828,17 +792,29 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
 
+    /**
+     * DESC: 消息发送开始时回调
+     * Created by jinphy, on 2018/3/26, at 10:03
+     */
     @Override
-    public void whenSendStart() {
+    public void whenSendStart(Message message) {
         recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+        msgMap.put(message.getId(), message);
     }
 
+    /**
+     * DESC: 消息发送结束时回调
+     * Created by jinphy, on 2018/3/26, at 10:03
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
     @Override
-    public void whenSendFinal() {
-        int scrollY = recyclerView.getScrollY();
-        adapter.notifyDataSetChanged();
-        recyclerView.smoothScrollBy(0, scrollY);
+    public void whenSendFinal(EBSendMsg msg) {
+        Message finishedMsg = msgMap.remove(msg.data);
+        finishedMsg.setStatus(msg.ok ? Message.STATUS_OK : Message.STATUS_NO);
+        updateRecyclerView();
     }
+
+
 
     /**
      * DESC: 当在该聊天有新消息时更新界面
@@ -859,32 +835,50 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     }
 
-    private int retrySendCount = 0;
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void whenSenderError(EBSendError msg) {
-        if (retrySendCount > 10) {
-            return;
-        }
-        retrySendCount++;
-        Sender.getInstance().shutdown();
-        Sender.getInstance().open();
-    }
-
-
     public void onPickPhoto(List<String> photoPaths) {
-        Message message;
-        for (String photoPath : photoPaths) {
-            message = Message.makePhotoMsg(ownerAccount, withAccount, photoPath, isFriend);
-            adapter.add(message);
-            presenter.sendPhotoMsg(message);
-        }
+        Observable.fromIterable(photoPaths)
+                .subscribeOn(Schedulers.io())
+                .map(photoPath -> Message.makePhotoMsg(ownerAccount, withAccount, photoPath, isFriend))
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(msg -> {
+                    presenter.sendFileMsg(msg);
+                    adapter.add(msg);
+                })
+                .subscribe();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUpdateMsg(EBMessage msg) {
+        switch (msg.what) {
+            case EBMessage.what_updateMsg:
+                int scrollY = recyclerView.getScrollY();
+                adapter.update(msg.position, msg.data);
+                recyclerView.scrollBy(0, scrollY);
+                break;
+            case EBMessage.what_downloadVoice:
+                presenter.downloadVoice(msg.data);
+                break;
+            case EBMessage.what_downloadVoiceResult:
+                Message message = msgMap.remove(msg.msgId);
+                if (message != null) {
+                    message.extra(Message.KEY_AUDIO_STATUS, msg.voiceStatus);
+                    message.setExtra(null);
+                    presenter.updateMsg(message);
+                    updateRecyclerView();
+                }
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void cacheMsg(Message message) {
+        msgMap.put(message.getId(), message);
+    }
+
+    private void updateRecyclerView() {
         int scrollY = recyclerView.getScrollY();
-        adapter.update(msg.position, msg.data);
-        recyclerView.scrollBy(0, scrollY);
+        adapter.notifyDataSetChanged();
+        recyclerView.smoothScrollBy(0, scrollY);
     }
 }

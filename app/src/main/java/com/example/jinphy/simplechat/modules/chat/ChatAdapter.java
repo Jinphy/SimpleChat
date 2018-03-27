@@ -1,7 +1,7 @@
 package com.example.jinphy.simplechat.modules.chat;
 
 import android.graphics.Bitmap;
-import android.support.v4.content.ContextCompat;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,16 +10,17 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseAdapter;
-import com.example.jinphy.simplechat.models.api.file_transfer.Progress;
+import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
@@ -211,6 +212,26 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
         holder.videoMsg_root.setVisibility(View.GONE);
         holder.fileMsg_root.setVisibility(View.GONE);
         // TODO: 2017/8/13
+        holder.voiceMsg_seconds.setText(message.extra(Message.KEY_DURATION));
+        if (Message.RECEIVE == message.getSourceType()) {
+            String extra = message.extra(Message.KEY_AUDIO_STATUS);
+            switch (extra) {
+                case Message.AUDIO_STATUS_NO:
+                    EventBus.getDefault().post(EBMessage.downloadVoice(message));
+                    holder.voiceMsg_root.setBackgroundColor(0x7FC2AC19);
+                    break;
+                case Message.AUDIO_STATUS_DOWNLOADING:
+                    holder.voiceMsg_root.setBackgroundColor(0x7FC2AC19);
+                    break;
+                case Message.AUDIO_STATUS_NEW:
+                    holder.voiceMsg_root.setBackgroundColor(0x7F3F921B);
+                    break;
+                case Message.AUDIO_STATUS_OLD:
+                    holder.voiceMsg_root.setBackgroundColor(Color.TRANSPARENT);
+                    break;
+            }
+        }
+
     }
 
     private void bindVideoMsgView(ViewHolder holder, Message message) {

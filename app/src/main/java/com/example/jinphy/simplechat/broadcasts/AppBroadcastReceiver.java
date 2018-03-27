@@ -7,9 +7,12 @@ import android.text.TextUtils;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseActivity;
+import com.example.jinphy.simplechat.models.event_bus.EBMessage;
+import com.example.jinphy.simplechat.models.event_bus.EBSendMsg;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 import com.example.jinphy.simplechat.modules.chat.FileListener;
@@ -34,6 +37,8 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
     public static final String LOGOUT = "LOGOUT";
     public static final String TAG_UPLOAD_FILE = "TAG_UPLOAD_FILE";
     public static final String TAG_DOWNLOAD_FILE = "TAG_DOWNLOAD_FILE";
+    public static final String TAG_SEND_MSG = "TAG_SEND_MSG";
+    public static final String TAG_DOWNLOAD_VOICE = "TAG_DOWNLOAD_VOICE";
 
 
     private static FileListener uploadFileListener;
@@ -42,11 +47,17 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
 
 
     public static void send(Context context, String tag) {
+        if (context == null) {
+            return;
+        }
         Intent intent = new Intent(ACTION);
         intent.putExtra(TAG, tag);
         context.sendBroadcast(intent);
     }
     public static void send(Context context, String tag, String msg) {
+        if (context == null) {
+            return;
+        }
         Intent intent = new Intent(ACTION);
         intent.putExtra(TAG, tag);
         intent.putExtra(MSG, msg);
@@ -111,6 +122,18 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
                 break;
             case TAG_DOWNLOAD_FILE:
                 onFileEvent(msg, downloadFileListener);
+                break;
+            case TAG_SEND_MSG:{
+                String[] split = msg.split(":");
+                EventBus.getDefault().post(EBSendMsg.make(split[0], split[1]));
+                break;
+            }
+            case TAG_DOWNLOAD_VOICE:{
+                String[] split = msg.split(":");
+                EventBus.getDefault().post(
+                        EBMessage.downloadVoiceResult(split[0], Long.valueOf(split[1])));
+                break;
+            }
             default:
                 break;
         }
@@ -118,7 +141,7 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
 
     private void onFileEvent(String msg, FileListener listener) {
         String[] split = msg.split(":");
-        if (uploadFileListener == null) {
+        if (listener == null) {
             return;
         }
         switch (split[0]) {

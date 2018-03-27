@@ -1,10 +1,8 @@
 package com.example.jinphy.simplechat.modules.system_msg;
 
 import com.example.jinphy.simplechat.models.friend.Friend;
-import com.example.jinphy.simplechat.models.member.MemberRepository;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message.MessageRepository;
-import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 

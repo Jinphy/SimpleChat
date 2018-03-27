@@ -2,7 +2,6 @@ package com.example.jinphy.simplechat.modules.show_photo;
 
 import android.os.IBinder;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
 import com.example.jinphy.simplechat.models.file_task.FileTaskRepository;
 import com.example.jinphy.simplechat.models.message.Message;
