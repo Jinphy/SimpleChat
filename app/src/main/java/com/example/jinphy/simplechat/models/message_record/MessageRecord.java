@@ -209,9 +209,11 @@ public class MessageRecord implements Comparable<MessageRecord>{
     public String getName() {
         if (withGroup.getTarget() != null) {
             return withGroup.getTarget().getName();
-        } else {
+        }
+        if (withFriend.getTarget() != null) {
             return withFriend.getTarget().getShowName();
         }
+        return "";
     }
 
 

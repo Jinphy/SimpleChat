@@ -6,6 +6,7 @@ import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.group.GroupRepository;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.List;
@@ -72,6 +73,12 @@ public class MessageRecordRepository implements MessageRecordDataSource {
                 })
                 .build().find();
 
+        for (int i = 0; i < messageRecords.size(); i++) {
+            if (ObjectHelper.isEmpty(messageRecords.get(i).getWith())) {
+                messageRecordBox.remove(messageRecords.remove(i--));
+            }
+        }
+
         return messageRecords;
     }
 
@@ -90,7 +97,7 @@ public class MessageRecordRepository implements MessageRecordDataSource {
     public void delete(String owner, Group with) {
         List<MessageRecord> messageRecords = messageRecordBox.query()
                 .equal(MessageRecord_.owner, owner)
-                .equal(MessageRecord_.withFriendId, with.getId())
+                .equal(MessageRecord_.withGroupId, with.getId())
                 .build().find();
         if (messageRecords != null && messageRecords.size() > 0) {
             messageRecordBox.remove(messageRecords);
