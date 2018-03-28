@@ -23,6 +23,7 @@ import com.example.jinphy.simplechat.services.common_service.aidl.BinderFactory;
 import com.example.jinphy.simplechat.services.common_service.aidl.service.DownloadFileBinder;
 import com.example.jinphy.simplechat.services.common_service.aidl.service.IDownloadFileBinder;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
+import com.example.jinphy.simplechat.utils.FileUtils;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
@@ -89,7 +90,7 @@ public class PushManager {
      * DESC: 处理PushClient发送过来的消息
      * Created by jinphy, on 2018/3/16, at 14:56
      */
-    public void handleMessage(List<Map<String, String>> messagesList) {
+    public synchronized void handleMessage(List<Map<String, String>> messagesList) {
         LogUtils.e(messagesList);
         // 解析消息
         Message[] messages = Message.parse(messagesList);
@@ -158,6 +159,10 @@ public class PushManager {
                     break;
                 case Message.TYPE_CHAT_VOICE:
                     handleChatVoiceMsg(message);
+                    break;
+                case Message.TYPE_CHAT_FILE:
+                    handleChatFileMsg(message);
+                    break;
                 default:
                     break;
             }
@@ -492,6 +497,23 @@ public class PushManager {
         message.extra(Message.KEY_FILE_PATH, task.getFilePath());
         message.extra(Message.KEY_FILE_TASK_ID, task.getId());
         message.extra(Message.KEY_AUDIO_STATUS, Message.AUDIO_STATUS_NO);
+
+        // 必须调用该方法，否则extra字段不更新
+        message.setExtra(null);
+    }
+
+    private void handleChatFileMsg(Message message) {
+        handleChatTextMsg(message);
+        FileTask task = FileTask.parse(message, ImageUtil.FILE_PATH);
+
+        String filePath = ImageUtil.FILE_PATH + "/" + message.extra(Message.KEY_ORIGINAL_FILE_NAME);
+        filePath = FileUtils.createUniqueFileName(filePath);
+
+        task.setFilePath(filePath);
+        fileTaskRepository.save(task);
+        message.extra(Message.KEY_FILE_PATH, task.getFilePath());
+        message.extra(Message.KEY_FILE_TASK_ID, task.getId());
+        message.extra(Message.KEY_FILE_STATUS, Message.FILE_STATUS_NO_DOWNLOAD);
 
         // 必须调用该方法，否则extra字段不更新
         message.setExtra(null);

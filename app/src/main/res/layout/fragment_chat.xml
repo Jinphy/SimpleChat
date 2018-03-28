@@ -216,11 +216,12 @@
                             android:orientation="vertical">
 
                             <ImageView
+                                android:id="@+id/item_file"
                                 android:background="@drawable/ic_rectangle_white_background"
                                 android:elevation="@dimen/dimen_1dp"
                                 android:clickable="true"
                                 android:focusable="true"
-                                android:src="@drawable/ic_photo_24dp"
+                                android:src="@drawable/ic_folder_2_24dp"
                                 android:padding="@dimen/dimen_15dp"
                                 android:layout_width="@dimen/dimen_60dp"
                                 android:layout_height="@dimen/dimen_60dp"/>
@@ -229,7 +230,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="@dimen/dimen_10dp"
-                                android:text="图片"/>
+                                android:text="文件"/>
 
                         </LinearLayout>
 

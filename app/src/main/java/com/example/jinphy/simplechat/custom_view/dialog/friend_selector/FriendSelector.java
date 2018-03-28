@@ -44,19 +44,15 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
 
     private int confirmColor = 0xff558B2F;
 
-    private View btnCancel;
+    private ImageView btnCancel;
 
-    private View btnConfirm;
+    private TextView btnConfirm;
 
     private RecyclerView recyclerView;
 
     private View emptyView;
 
     private TextView titleView;
-
-    private ImageView cancelView;
-
-    private TextView confirmView;
 
     private MyAdapter<CheckedFriend> adapter;
 
@@ -100,15 +96,13 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
         btnConfirm = view.findViewById(R.id.btn_confirm);
         titleView = view.findViewById(R.id.title_view);
         recyclerView = view.findViewById(R.id.recycler_view);
-        cancelView = view.findViewById(R.id.cancel_view);
-        confirmView = view.findViewById(R.id.confirm_view);
         emptyView = view.findViewById(R.id.empty_view);
 
         titleView.setText(title);
         titleView.setTextColor(titleColor);
-        cancelView.setImageDrawable(
+        btnCancel.setImageDrawable(
                 ImageUtil.getDrawable(getContext(),R.drawable.ic_arrow_left_24dp, cancelColor));
-        confirmView.setTextColor(confirmColor);
+        btnConfirm.setTextColor(confirmColor);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -138,15 +132,12 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
                     holder.checkBox[0].setChecked(item.isChecked());
 
                     holder.setClickedViews(holder.item);
-                    holder.setCheckedBoxes(holder.checkBox[0]);
                     //                    holder.setLongClickedViews(holder.textView[0]);
                 })
                 .data(presenter.loadFriends(excludeAccounts))
                 .onClick((v, item, holder, type, position) -> {
-                    holder.checkBox[0].setChecked(!item.isChecked());
-                })
-                .onCheck((checkBox, item, holder, type, position) -> {
-                    item.setChecked(checkBox.isChecked());
+                    item.setChecked(!item.isChecked());
+                    holder.checkBox[0].setChecked(item.isChecked());
                 })
                 .into(recyclerView);
     }

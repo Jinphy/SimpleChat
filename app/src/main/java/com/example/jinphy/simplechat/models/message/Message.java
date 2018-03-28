@@ -173,6 +173,13 @@ public class Message implements Comparable<Message>{
      */
     public static final String AUDIO_STATUS_NEW = "2";
 
+    public static final String FILE_STATUS_DOWNLOADING = "0";
+
+    public static final String FILE_STATUS_DOWNLOADED = "1";
+
+    public static final String FILE_STATUS_NO_DOWNLOAD = "2";
+
+
 
     /**
      * DESC: 语音消息的状态：消息已读
@@ -222,6 +229,10 @@ public class Message implements Comparable<Message>{
      */
     public static final String KEY_AUDIO_STATUS = "KEY_AUDIO_STATUS";
 
+
+    public static final String KEY_ORIGINAL_FILE_NAME = "KEY_ORIGINAL_FILE_NAME";
+
+    public static final String KEY_FILE_STATUS = "KEY_FILE_STATUS";
 
     /**
      * DESC: 聊天的文件消息
@@ -382,6 +393,7 @@ public class Message implements Comparable<Message>{
                     }
                 }
             } catch (Exception e) {
+                LogUtils.e("parse extra error");
                 e.printStackTrace();
             }
         }
@@ -428,6 +440,7 @@ public class Message implements Comparable<Message>{
      * Created by jinphy, on 2018/3/18, at 19:20
      */
     public void extra(String key, Object value) {
+        LogUtils.e(extraMap.size());
         if (value != null) {
             extraMap.put(key, EncryptUtils.aesEncrypt(value.toString()));
         }
@@ -553,7 +566,6 @@ public class Message implements Comparable<Message>{
             return null;
         }
         FileTaskRepository.getInstance().save(task);
-        LogUtils.e("task id:" + task.getId());
 
         Message msg = makeTextMsg(owner, with, "[图片]", isFriend);
         msg.setContentType(Message.TYPE_CHAT_IMAGE);
@@ -568,6 +580,33 @@ public class Message implements Comparable<Message>{
         // 用来在显示时保存在map中的图片的key
         msg.extra(KEY_THUMBNAIL_ID, owner + "_" + System.currentTimeMillis());
         msg.extra(KEY_FILE_NAME, task.getGeneratedFileName());
+        msg.extra(KEY_TOTAL_LENGTH, task.getTotalFileLength());
+        return msg;
+    }
+
+    /**
+     * DESC: 生成一条文件信息
+     * Created by jinphy, on 2018/3/28, at 14:45
+     */
+    public static Message makeFileMsg(String owner, String with, String filePath, boolean isFriend) {
+        FileTask task = FileTask.create(filePath);
+        if (task == null) {
+            return null;
+        }
+        FileTaskRepository.getInstance().save(task);
+        String originalName = new File(filePath).getName();
+
+        Message msg = makeTextMsg(owner, with, "[文件]", isFriend);
+
+        msg.setContentType(Message.TYPE_CHAT_FILE);
+        //文件的保存路径，接收者要删除该字段并重新设置自己的文件路径
+        msg.extra(KEY_FILE_PATH, filePath);
+        // 用来和上传任务绑定的FileTaskId，接收者要删掉该字段并重新设置自己的taskId
+        msg.extra(KEY_FILE_TASK_ID, task.getId());
+        // 保存到服务器中的文件名
+        msg.extra(KEY_FILE_NAME, task.getGeneratedFileName());
+        // 原始文件名
+        msg.extra(KEY_ORIGINAL_FILE_NAME, originalName);
         msg.extra(KEY_TOTAL_LENGTH, task.getTotalFileLength());
         return msg;
     }

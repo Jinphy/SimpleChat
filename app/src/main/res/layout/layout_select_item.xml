@@ -46,6 +46,7 @@
 
         <CheckBox
             android:id="@+id/check_box"
+            android:clickable="false"
             android:layout_centerInParent="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="@dimen/dimen_5dp"

@@ -12,6 +12,7 @@ public class EBMessage extends EBBase<Message> {
     public static final int what_updateMsg = 1;
     public static final int what_downloadVoice = 2;
     public static final int what_downloadVoiceResult = 3;
+    public static final int what_reloadMsg = 4;
 
 
 
@@ -27,6 +28,13 @@ public class EBMessage extends EBBase<Message> {
         result.position = position;
         return result;
     }
+
+    public static EBMessage reloadMsg(long msgId) {
+        EBMessage result = new EBMessage(null, what_reloadMsg);
+        result.msgId = msgId;
+        return result;
+    }
+
 
     public static EBMessage downloadVoice(Message data) {
         return new EBMessage(data, what_downloadVoice);

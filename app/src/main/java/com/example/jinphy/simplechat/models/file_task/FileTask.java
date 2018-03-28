@@ -149,6 +149,7 @@ public class FileTask implements Parcelable{
         return task;
     }
 
+
     public static FileTask parse(Message message,String baseFilePath) {
         FileTask task = new FileTask();
         task.totalFileLength = Long.valueOf(message.extra(Message.KEY_TOTAL_LENGTH));

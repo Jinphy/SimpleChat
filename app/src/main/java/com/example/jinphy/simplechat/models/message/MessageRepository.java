@@ -151,7 +151,9 @@ public class MessageRepository extends BaseRepository implements MessageDataSour
 
     @Override
     public Message get(long id) {
-        return messageBox.get(id);
+        Message message = messageBox.get(id);
+        message.setExtra(message.getExtra());
+        return message;
     }
 
     /**
