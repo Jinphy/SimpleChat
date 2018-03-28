@@ -12,16 +12,19 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseAdapter;
+import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.utils.FileUtils;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -250,6 +253,12 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
         holder.videoMsg_root.setVisibility(View.GONE);
         holder.fileMsg_root.setVisibility(View.VISIBLE);
         // TODO: 2017/8/13
+        holder.fileMsg_fileName.setText(message.extra(Message.KEY_ORIGINAL_FILE_NAME));
+        String fileSize = message.extra(Message.KEY_TOTAL_LENGTH);
+        if (ObjectHelper.isEmpty(fileSize)) {
+            fileSize = "0";
+        }
+        holder.fileMsg_fileSize.setText(FileUtils.formatSize(Long.valueOf(fileSize)));
     }
 
 
@@ -311,6 +320,7 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
         // File msg
         View fileMsg_root;
         TextView fileMsg_fileName;
+        TextView fileMsg_fileSize;
 
 
 
@@ -349,6 +359,7 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
             // 文件消息
             this.fileMsg_root = itemView.findViewById(R.id.file_view);
             this.fileMsg_fileName = itemView.findViewById(R.id.file_name_text);
+            this.fileMsg_fileSize = itemView.findViewById(R.id.file_size_text);
 
         }
     }
@@ -435,6 +446,43 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
     public boolean hasPhoto(Message message) {
         String thumbnailId = message.extra(Message.KEY_THUMBNAIL_ID);
         return thumbnailMap.get(thumbnailId) != null;
+    }
+
+    /**
+     * DESC: 判断文件是否存在
+     * Created by jinphy, on 2018/3/28, at 17:20
+     */
+    public boolean hasFile(Message message) {
+        File file = new File(message.extra(Message.KEY_FILE_PATH));
+        if (Message.SEND == message.getSourceType()) {
+            return file.exists();
+        }
+        if (Message.FILE_STATUS_DOWNLOADED.equals(message.extra(Message.KEY_FILE_STATUS))
+                && !file.exists()) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public List<Message> getData() {
+        return data;
+    }
+
+    public void forEach(SChain.Consumer<Message> each) {
+        for (Message message : data) {
+            each.accept(message);
+        }
+    }
+
+    public void update(Message newMsg) {
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).getId() == newMsg.getId()) {
+                data.set(i, newMsg);
+                notifyDataSetChanged();
+                break;
+            }
+        }
     }
 }
 

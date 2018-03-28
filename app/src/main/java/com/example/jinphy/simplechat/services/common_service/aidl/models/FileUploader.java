@@ -66,7 +66,7 @@ public class FileUploader extends WebSocketClient {
         this.headers = headers;
         this.fileTask = task;
         File file = new File(fileTask.getFilePath());
-        if (!file.exists() || file.isDirectory()) {
+        if (!file.exists() || file.isDirectory() || file.length() == 0) {
             return;
         }
         try {

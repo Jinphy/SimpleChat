@@ -66,6 +66,7 @@ public interface ChatContract {
 
         void cacheMsg(Message message);
 
+        void onSelectFilesResult(List<String> filePaths);
     }
 
     interface Presenter extends BasePresenter {
@@ -95,6 +96,8 @@ public interface ChatContract {
         Member getSelfMember(String groupNo);
 
         void downloadVoice(Message message);
+
+        Message getMessage(long msgId);
     }
 }
 

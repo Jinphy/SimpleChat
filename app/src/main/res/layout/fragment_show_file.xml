@@ -1,0 +1,86 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/background"
+    tools:context="com.example.jinphy.simplechat.modules.group.group_list.GroupListFragment">
+
+
+    <com.daimajia.numberprogressbar.NumberProgressBar
+        android:id="@+id/progress_bar"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:progress_unreached_color="#00000000"
+        app:progress_reached_color="#FF449C0E"
+
+        app:progress_unreached_bar_height="0.75dp"
+        app:progress_reached_bar_height="1.5dp"
+
+        app:progress_text_size="10sp"
+        app:progress_text_color="#ffffffff"
+        app:progress_text_offset="1dp"
+        app:progress_text_visibility="invisible"
+
+        app:progress_max="100"
+        app:progress_current="0"
+        />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:background="@drawable/ic_rectangle_white_background"
+        android:elevation="@dimen/dimen_1dp"
+        android:paddingLeft="@dimen/dimen_10dp"
+        android:paddingRight="@dimen/dimen_10dp"
+        android:paddingTop="@dimen/dimen_70dp"
+        android:paddingBottom="@dimen/dimen_10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_file_24dp"
+            android:layout_marginBottom="@dimen/dimen_25dp"
+            android:layout_width="@dimen/dimen_70dp"
+            android:layout_height="@dimen/dimen_70dp"/>
+
+        <HorizontalScrollView
+            android:scrollbars="none"
+            android:overScrollMode="never"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/file_path_view"
+                android:layout_gravity="center_horizontal"
+                tools:text="/storage/emulated/0/Download/test.txt"
+                android:layout_margin="@dimen/dimen_10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </HorizontalScrollView>
+
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/btn_download"
+        android:background="@drawable/ic_stroke_alpha_gray_rectangle"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        tools:text="下载文件（0.9 MB）"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:textColor="#7f777777"
+        android:paddingLeft="@dimen/dimen_10dp"
+        android:paddingRight="@dimen/dimen_10dp"
+        android:layout_marginBottom="@dimen/dimen_20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dimen_35dp"/>
+</RelativeLayout>

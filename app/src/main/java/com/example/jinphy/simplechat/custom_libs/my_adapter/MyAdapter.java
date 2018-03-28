@@ -62,13 +62,6 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
 
 
     /**
-     * DESC: 设置checkBox的监听
-     * Created by jinphy, on 2018/3/17, at 19:33
-     */
-    protected OnCheckChangedListener<T> onCheck;
-
-
-    /**
      * DESC: 数据集
      * Created by jinphy, on 2018/3/17, at 19:11
      */
@@ -123,14 +116,6 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
             for (View view : holder.longClickedViews) {
                 view.setOnLongClickListener(v ->
                         onLongClick.onLongClick(v, item, holder, viewType, position));
-            }
-        }
-
-        if (onCheck != null && holder.checkedBoxes != null) {
-            for (CheckBox checkedBox : holder.checkedBoxes) {
-                checkedBox.setOnCheckedChangeListener((view, isChecked) -> {
-                    onCheck.onCheck(checkedBox, item, holder, viewType, position);
-                });
             }
         }
     }
@@ -219,12 +204,6 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
     @Override
     public MyAdapterInterface<T> onLongClick(OnLongClickListener<T> onLongClick) {
         this.onLongClick = onLongClick;
-        return this;
-    }
-
-    @Override
-    public MyAdapterInterface<T> onCheck(OnCheckChangedListener<T> onCheck) {
-        this.onCheck = onCheck;
         return this;
     }
 
@@ -342,12 +321,6 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
          */
         private View[] longClickedViews;
 
-        /**
-         * DESC: 设置的监听器的CheckBox
-         * Created by jinphy, on 2018/3/17, at 19:33
-         */
-        private CheckBox[] checkedBoxes;
-
         public ViewHolder(View itemView) {
             super(itemView);
             this.item = itemView;
@@ -369,13 +342,6 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
             this.longClickedViews = longClickViews;
         }
 
-        /**
-         * DESC: 调用该方法添加需要设置check监听的CheckBox
-         * Created by jinphy, on 2018/3/17, at 19:36
-         */
-        public void setCheckedBoxes(CheckBox... checkedBoxs) {
-            this.checkedBoxes = checkedBoxs;
-        }
     }
 
     //------------------------------------------------------------------------

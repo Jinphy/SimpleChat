@@ -44,4 +44,5 @@
     <dimen name="dimen_35dp">35dp</dimen>
     <dimen name="dimen_43dp">43dp</dimen>
     <dimen name="dimen_56dp">56dp</dimen>
+    <dimen name="dimen_25dp">25dp</dimen>
 </resources>

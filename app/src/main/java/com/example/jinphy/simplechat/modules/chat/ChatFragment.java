@@ -39,6 +39,7 @@ import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
 import com.example.jinphy.simplechat.models.event_bus.EBMessage;
+import com.example.jinphy.simplechat.modules.show_file.ShowFileActivity;
 import com.example.jinphy.simplechat.modules.show_photo.ShowPhotoActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
@@ -287,6 +288,9 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             adapter.add(message);
         });
 
+        // 底部更多功能的点击事件
+        bottomMoreMenu.registerEvent();
+
         adapter.onClick((view, item, type, position) -> {
             switch (item.getContentType()) {
                 case Message.TYPE_CHAT_IMAGE:{
@@ -316,6 +320,14 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                     if (filePath != null) {
                         AudioPlayer.playOrStop(filePath);
                     }
+                    break;
+                }
+                case Message.TYPE_CHAT_FILE:{
+                    if (!adapter.hasFile(item)) {
+                        App.showToast("文件不存在！", false);
+                        return;
+                    }
+                    ShowFileActivity.start(activity(), item.getId(), position);
                     break;
                 }
                 default:
@@ -866,6 +878,12 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                     presenter.updateMsg(message);
                     updateRecyclerView();
                 }
+                break;
+            case EBMessage.what_reloadMsg:
+                Message newMsg = presenter.getMessage(msg.msgId);
+                int scrollY1 = recyclerView.getScrollY();
+                adapter.update(newMsg);
+                recyclerView.scrollBy(0, scrollY1);
             default:
                 break;
         }
@@ -880,5 +898,19 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         int scrollY = recyclerView.getScrollY();
         adapter.notifyDataSetChanged();
         recyclerView.smoothScrollBy(0, scrollY);
+    }
+
+    @Override
+    public void onSelectFilesResult(List<String> filePaths) {
+        Observable.fromIterable(filePaths)
+                .subscribeOn(Schedulers.io())
+                .map(photoPath -> Message.makeFileMsg(ownerAccount, withAccount, photoPath, isFriend))
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(msg -> {
+                    presenter.sendFileMsg(msg);
+                    adapter.add(msg);
+                })
+                .subscribe();
+
     }
 }

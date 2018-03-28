@@ -66,7 +66,7 @@ public class ShowPhotoPresenter implements ShowPhotoContract.Presenter {
         Observable.just(msg.extra(Message.KEY_FILE_TASK_ID))
                 .map(Long::valueOf)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(downloadFileBinder::download)
+                .doOnNext(downloadFileBinder::downloadPhoto)
                 .subscribe();
     }
 

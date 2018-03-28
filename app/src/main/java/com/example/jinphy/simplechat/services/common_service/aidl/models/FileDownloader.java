@@ -117,7 +117,7 @@ public class FileDownloader extends WebSocketClient {
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put(FILE_NAME, task.getGeneratedFileName());
-            headers.put(TASK_TYPE, "download");
+            headers.put(TASK_TYPE, "downloadPhoto");
             FileDownloader fileDownloader = new FileDownloader(
                     new URI(task.getUrl()), new Draft_6455(), headers, connectTimeout,task);
             return fileDownloader;

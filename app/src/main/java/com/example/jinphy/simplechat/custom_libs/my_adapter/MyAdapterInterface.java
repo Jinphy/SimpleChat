@@ -25,8 +25,6 @@ public interface MyAdapterInterface<T> {
 
     MyAdapterInterface<T> onLongClick(MyAdapter.OnLongClickListener<T> onLongClick);
 
-    MyAdapterInterface<T> onCheck(MyAdapter.OnCheckChangedListener<T> onCheck);
-
 
     MyAdapterInterface<T> data(List<T> data);
 

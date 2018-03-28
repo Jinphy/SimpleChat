@@ -199,7 +199,7 @@ public class Downloader extends WebSocketClient implements ObservableOnSubscribe
             Map<String, Object> map = new HashMap<>();
             map.put("url", currentTask.url);
             map.put("taskId", currentTask.taskId);
-            map.put("taskType", "download");
+            map.put("taskType", "downloadPhoto");
             String start = GsonUtils.toJson(map);
             this.send(EncryptUtils.encodeThenEncrypt(start));
             map.clear();

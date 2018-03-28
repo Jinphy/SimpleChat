@@ -3,6 +3,9 @@ package com.example.jinphy.simplechat.modules.chat;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.custom_view.dialog.file_selector.FileSelector;
+
+import java.util.List;
 
 import me.iwf.photopicker.PhotoPicker;
 
@@ -26,13 +29,15 @@ public class BottomMoreMenu {
      */
     public View photoItem;
 
+    public View fileItem;
+
 
     public BottomMoreMenu(ChatFragment fragment, View bottomMore) {
         this.fragment = fragment;
         this.bottomMore = bottomMore;
         photoItem = bottomMore.findViewById(R.id.item_photo);
+        fileItem = bottomMore.findViewById(R.id.item_file);
 
-        registerEvent();
     }
 
 
@@ -45,7 +50,7 @@ public class BottomMoreMenu {
      *
      * Created by jinphy, on 2018/3/20, at 10:49
      */
-    private void registerEvent() {
+    public void registerEvent() {
         photoItem.setOnClickListener(v -> {
             PhotoPicker.builder()
                     .setPhotoCount(9)
@@ -53,6 +58,11 @@ public class BottomMoreMenu {
                     .setShowGif(true)
                     .setPreviewEnabled(true)
                     .start(fragment.activity(), PhotoPicker.REQUEST_CODE);
+        });
+        fileItem.setOnClickListener(v -> {
+            FileSelector.from(fragment.getContext())
+                    .onSelect(fragment::onSelectFilesResult)
+                    .make();
         });
     }
 

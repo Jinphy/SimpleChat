@@ -108,6 +108,7 @@ public class PushService extends Service {
      * Created by jinphy, on 2018/1/16, at 13:01
      */
     public void handleMsg(String messageStr) {
+        LogUtils.e("message: " + messageStr);
         threadPool.execute(()->{
             List<Map<String, String>> messages = GsonUtils.toBean(messageStr, messageType);
             pushManager.handleMessage(messages);

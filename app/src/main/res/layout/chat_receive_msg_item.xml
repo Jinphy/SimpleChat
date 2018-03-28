@@ -100,7 +100,6 @@
                     <!--声音类型的消息-->
                     <LinearLayout
                         android:id="@+id/voice_View"
-                        tools:visibility="visible"
                         android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -157,33 +156,48 @@
                     </RelativeLayout>
 
                     <!--文件类型的消息-->
-                    <LinearLayout
+                    <RelativeLayout
                         android:id="@+id/file_view"
-                        android:gravity="end"
                         android:visibility="gone"
-                        android:orientation="horizontal"
+                        tools:visibility="visible"
                         android:layout_width="248dp"
                         android:layout_height="80dp">
 
+                        <HorizontalScrollView
+                            android:id="@+id/file_name_scroll_view"
+                            android:scrollbars="none"
+                            android:overScrollMode="never"
+                            android:layout_width="160dp"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:id="@+id/file_name_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="@dimen/dimen_10dp"
+                                tools:text="Simple_Chat.apk"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="@dimen/size_15sp"/>
+                        </HorizontalScrollView>
+
                         <TextView
-                            android:id="@+id/file_name_text"
-                            android:layout_width="0dp"
-                            android:layout_gravity="center_vertical"
-                            android:padding="@dimen/dimen_10dp"
-                            android:layout_height="match_parent"
-                            android:text="Simple_Chat.apk"
-                            android:textColor="@color/colorAccent"
-                            android:textSize="@dimen/size_18sp"
-                            android:layout_weight="1"/>
+                            android:id="@+id/file_size_text"
+                            android:layout_alignParentBottom="true"
+                            android:layout_marginLeft="@dimen/dimen_10dp"
+                            android:layout_marginBottom="@dimen/dimen_10dp"
+                            tools:text="3.54 MB"
+                            android:textSize="13sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
 
                         <ImageView
-                            android:layout_gravity="center_vertical"
+                            android:layout_alignParentRight="true"
                             android:padding="@dimen/dimen_5dp"
                             android:src="@drawable/ic_folder_24dp"
                             android:layout_width="80dp"
                             android:layout_height="80dp"/>
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
                 </LinearLayout>
 

@@ -179,12 +179,8 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
                     }
 
                     // 设置需要注册事件的view
-                    holder.setCheckedBoxes(holder.checkBox[0]);
                     holder.setClickedViews(holder.item, holder.view[0]);
                     holder.setLongClickedViews(holder.item);
-                })
-                .onCheck((checkBox, item, holder, type, position) -> {
-                    item.setChecked(checkBox.isChecked());
                 })
                 .onClick((v, item, holder, type, position) -> {
                     switch (v.getId()) {
@@ -193,7 +189,8 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
                             break;
                         default:
                             if (showCheckbox) {
-                                holder.checkBox[0].setChecked(!item.isChecked());
+                                item.setChecked(!item.isChecked());
+                                holder.checkBox[0].setChecked(item.isChecked());
                             } else {
                                 if (StringUtils.equal(item.getAccount(), item.getOwner())) {
                                     ModifyUserActivity.start(activity());

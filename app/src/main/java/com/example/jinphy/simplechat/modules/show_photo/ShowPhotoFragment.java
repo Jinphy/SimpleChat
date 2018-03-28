@@ -15,6 +15,7 @@ import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.utils.FileUtils;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
@@ -42,7 +43,7 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
      * DESC: 图片总大小
      * Created by jinphy, on 2018/3/23, at 10:16
      */
-    private double totalLength;
+    private long totalLength;
 
 
     public ShowPhotoFragment() {
@@ -67,7 +68,6 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
         message = presenter.getMessage(msgId);
         screenWidth = ScreenUtils.getScreenWidth(activity());
         totalLength = Long.valueOf(message.extra(Message.KEY_TOTAL_LENGTH));
-        totalLength = totalLength / 1024.0 / 1024.0;// B->MB
     }
 
     @Override
@@ -80,7 +80,6 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
     @Override
     protected void setupViews() {
         Bitmap bitmap = ImageUtil.getBitmap(message.extra(Message.KEY_FILE_PATH), 1500, 1500);
-        LogUtils.e(message.extra(Message.KEY_FILE_PATH));
         if (bitmap != null) {
             imageView.setImage(ImageSource.bitmap(bitmap));
             btnDownload.setVisibility(View.GONE);
@@ -91,7 +90,7 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
         }
 
         imageView.setMaxScale(5.0f);
-        btnDownload.setText(String.format("下载原图（%.2f MB）", totalLength));
+        btnDownload.setText("下载原图（" + FileUtils.formatSize(totalLength) + "）");
     }
 
     @Override

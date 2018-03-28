@@ -7,10 +7,10 @@ import android.text.TextUtils;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseActivity;
+import com.example.jinphy.simplechat.models.event_bus.EBFileTask;
 import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.models.event_bus.EBSendMsg;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
@@ -36,9 +36,10 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
     public static final String MESSAGE = "MESSAGE";
     public static final String LOGOUT = "LOGOUT";
     public static final String TAG_UPLOAD_FILE = "TAG_UPLOAD_FILE";
-    public static final String TAG_DOWNLOAD_FILE = "TAG_DOWNLOAD_FILE";
+    public static final String TAG_DOWNLOAD_PHOTO = "TAG_DOWNLOAD_PHOTO";
     public static final String TAG_SEND_MSG = "TAG_SEND_MSG";
     public static final String TAG_DOWNLOAD_VOICE = "TAG_DOWNLOAD_VOICE";
+    public static final String TAG_DOWNLOAD_FILE = "TAG_DOWNLOAD_FILE";
 
 
     private static FileListener uploadFileListener;
@@ -120,7 +121,7 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
             case TAG_UPLOAD_FILE:
                 onFileEvent(msg, uploadFileListener);
                 break;
-            case TAG_DOWNLOAD_FILE:
+            case TAG_DOWNLOAD_PHOTO:
                 onFileEvent(msg, downloadFileListener);
                 break;
             case TAG_SEND_MSG:{
@@ -132,6 +133,19 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
                 String[] split = msg.split(":");
                 EventBus.getDefault().post(
                         EBMessage.downloadVoiceResult(split[0], Long.valueOf(split[1])));
+                break;
+            }
+            case TAG_DOWNLOAD_FILE:{
+                String[] split = msg.split(":");
+                EBFileTask ebMsg = new EBFileTask(split[0]);
+                ebMsg.msgId = Long.valueOf(split[1]);
+                if ("onUpdate".equals(ebMsg.data)) {
+                    ebMsg.percent = (int) (Double.valueOf(split[2]) / Double.valueOf(split[3]) *
+                            100);
+                } else {
+                    EventBus.getDefault().post(EBMessage.reloadMsg(ebMsg.msgId));
+                }
+                EventBus.getDefault().post(ebMsg);
                 break;
             }
             default:

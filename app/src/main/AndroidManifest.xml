@@ -93,13 +93,12 @@
             android:name="me.iwf.photopicker.PhotoPickerActivity"
             android:theme="@style/PickPhotoActivityTheme1">
         </activity>
-
-
         <activity android:name=".modules.system_msg.new_member.NewMemberActivity">
         </activity>
         <activity android:name=".modules.group.member_list.MemberListActivity">
         </activity>
-        <activity android:name=".modules.show_photo.ShowPhotoActivity"
+        <activity
+            android:name=".modules.show_photo.ShowPhotoActivity"
             android:theme="@style/PickPhotoActivityTheme">
         </activity>
 
@@ -136,6 +135,8 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".modules.show_file.ShowFileActivity">
+        </activity>
     </application>
 
 </manifest>
