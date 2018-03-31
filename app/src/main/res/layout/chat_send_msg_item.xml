@@ -71,7 +71,7 @@
                     android:padding="@dimen/dimen_5dp"
                     android:textSize="@dimen/size_15sp"
                     android:textColor="#dfffffff"
-                    tools:text="content here"/>
+                    tools:text="text here"/>
 
                 <!--图片类型的消息-->
                 <ImageView

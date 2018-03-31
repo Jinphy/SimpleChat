@@ -1,20 +1,27 @@
 package com.example.jinphy.simplechat.modules.show_photo;
 
 import android.graphics.Bitmap;
-import android.view.MenuItem;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 
-import com.apkfuns.logutils.LogUtils;
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.custom_libs.qr_code.QRCode;
+import com.example.jinphy.simplechat.custom_view.menu.MyMenu;
 import com.example.jinphy.simplechat.models.event_bus.EBMessage;
+import com.example.jinphy.simplechat.models.event_bus.EBQRCodeContent;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.FileUtils;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
@@ -22,14 +29,17 @@ import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * DESC:
  * Created by jinphy, on 2018/3/22, at 19:35
  */
 public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implements ShowPhotoContract.View {
 
-    public static final String TAG_MSG_ID = "MSG_ID";
-    public static final String TAG_MSG_POSITION = "POSITION";
+    public static final String SAVE_KEY_MSG_ID = "SAVE_KEY_MSG_ID";
+    public static final String SAVE_KEY_MSG_POSITION = "SAVE_KEY_MSG_POSITION";
 
     private long msgId;
 
@@ -45,9 +55,33 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
      */
     private long totalLength;
 
+    private QRCode.Content qrCodeContent = new QRCode.Content();
 
     public ShowPhotoFragment() {
         // Required empty public constructor
+    }
+
+    public static ShowPhotoFragment newInstance(long msgId, int position) {
+        ShowPhotoFragment fragment = new ShowPhotoFragment();
+        fragment.msgId = msgId;
+        fragment.msgPosition = position;
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            msgId = savedInstanceState.getLong(SAVE_KEY_MSG_ID);
+            msgPosition = savedInstanceState.getInt(SAVE_KEY_MSG_POSITION);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(SAVE_KEY_MSG_ID, msgId);
+        outState.putInt(SAVE_KEY_MSG_POSITION, msgPosition);
     }
 
     @Override
@@ -83,6 +117,7 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
         if (bitmap != null) {
             imageView.setImage(ImageSource.bitmap(bitmap));
             btnDownload.setVisibility(View.GONE);
+            parseQRCode(bitmap);
         } else {
             btnDownload.setVisibility(View.VISIBLE);
             bitmap = StringUtils.base64ToBitmap(message.extra(Message.KEY_THUMBNAIL));
@@ -99,36 +134,48 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
             presenter.downloadPhoto(message);
             btnDownload.setEnabled(false);
         });
-        imageView.setOnClickListener(v->{
-            float scale = imageView.getScale();
-            if (scale - 1f > 0.01) {
-                imageView.animateScale(1f);
-            } else {
-                finishActivity();
-            }
+        imageView.setOnLongClickListener(v -> {
+            showMenu();
+            return true;
         });
     }
 
-    public static ShowPhotoFragment newInstance(long msgId, int position) {
-        ShowPhotoFragment fragment = new ShowPhotoFragment();
-        fragment.msgId = msgId;
-        fragment.msgPosition = position;
-        return fragment;
+    /**
+     * DESC: 显示菜单
+     * Created by jinphy, on 2018/3/31, at 21:00
+     */
+    private void showMenu() {
+        MyMenu.create(activity())
+                .width(ScreenUtils.px2dp(activity(), ScreenUtils.getScreenWidth(activity())))
+                .gravity(Gravity.BOTTOM)
+                .item("删除图片", (menu, item) -> {
+                    FileUtils.deleteFile(message.extra(Message.KEY_FILE_PATH));
+                    EventBus.getDefault().post(EBMessage.updateMsg(message, msgPosition));
+                    App.showToast("图片已删除！", false);
+                    finishActivity();
+                })
+                .item("识别图中二维码", (menu, item) -> {
+                    EventBus.getDefault().postSticky(new EBQRCodeContent(qrCodeContent));
+                })
+                .onDisplay(menu -> {
+                    menu.item(1).setVisibility(qrCodeContent.isMyApp() ? View.VISIBLE : View.GONE);
+                })
+                .display();
+
     }
 
-
-    // 菜单点击事件
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                break;
-            default:
-                break;
-        }
-        return true;
+    /**
+     * DESC: 解析二维码
+     * Created by jinphy, on 2018/3/31, at 17:02
+     */
+    private void parseQRCode(Bitmap bitmap) {
+        Observable.just(bitmap)
+                .subscribeOn(Schedulers.computation())
+                .map(QRCode::parse)
+                .doOnNext(content -> qrCodeContent = content)
+                .subscribe();
     }
+
 
     @Override
     public boolean onBackPressed() {
@@ -153,7 +200,11 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
     public void whenDownloadFinish() {
         btnDownload.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
-        imageView.setImage(ImageSource.uri(message.extra(Message.KEY_FILE_PATH)));
+
+        Bitmap bitmap = ImageUtil.getBitmap(message.extra(Message.KEY_FILE_PATH), 1500, 1500);
+        imageView.setImage(ImageSource.bitmap(bitmap));
+        parseQRCode(bitmap);
+
         App.showToast("原图下载成功！", false);
         presenter.removeThumbnail(message);
 
@@ -173,7 +224,6 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
     long downTime;
     long upTime;
     int screenWidth;
-
     @Override
     public boolean handleHorizontalTouchEvent(MotionEvent event) {
         switch (event.getAction()) {

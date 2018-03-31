@@ -31,7 +31,7 @@ public class ChatActivity extends BaseActivity {
 
     public static void start(Activity activity, String withAccount) {
         Intent intent = new Intent(activity, ChatActivity.class);
-        intent.putExtra(ChatFragment.WITH_ACCOUNT, withAccount);
+        intent.putExtra(ChatFragment.SAVE_KEY_WITH_ACCOUNT, withAccount);
         activity.startActivity(intent);
 
         // 启动前先检测推送服务是否开启，没有开启时会再次启动推送服务，保证消息及时接收
@@ -51,7 +51,7 @@ public class ChatActivity extends BaseActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left_24dp);
 
         fragment = (ChatFragment) addFragment(ChatFragment.newInstance(
-                getIntent().getStringExtra(ChatFragment.WITH_ACCOUNT)), R.id.fragment);
+                getIntent().getStringExtra(ChatFragment.SAVE_KEY_WITH_ACCOUNT)), R.id.fragment);
         getPresenter(fragment);
     }
 

@@ -58,4 +58,15 @@ public class FileUtils {
         }
         return filePath;
     }
+
+    /**
+     * DESC: 删除文件
+     * Created by jinphy, on 2018/3/31, at 17:09
+     */
+    public static void deleteFile(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
 }

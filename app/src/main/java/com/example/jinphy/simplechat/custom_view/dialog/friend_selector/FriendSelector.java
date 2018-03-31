@@ -119,9 +119,12 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
                 .onGetItemViewType(item -> 0)
                 .onInflate(viewType -> R.layout.layout_select_item)
                 .onCreateView(holder -> {
-                    holder.circleImageView[0] = holder.item.findViewById(R.id.avatar_view);
-                    holder.checkBox[0] = holder.item.findViewById(R.id.check_box);
-                    holder.textView[0] = holder.item.findViewById(R.id.name_view);
+                    // 头像
+                    holder.circleImageViews(R.id.avatar_view);
+                    // checkbox
+                    holder.checkBoxes(R.id.check_box);
+                    // 昵称
+                    holder.textViews(R.id.name_view);
                 })
                 .onBindView((holder, item, position) -> {
                     Bitmap bitmap = ImageUtil.loadAvatar(item.getAccount(), 100, 100);

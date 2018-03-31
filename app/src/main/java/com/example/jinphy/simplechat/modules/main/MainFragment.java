@@ -2,9 +2,10 @@ package com.example.jinphy.simplechat.modules.main;
 
 import android.animation.AnimatorSet;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -21,7 +22,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -29,18 +29,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.custom_libs.qr_code.QRCode;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseApplication;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
-import com.example.jinphy.simplechat.models.event_bus.EBInitDataAfterLogin;
 import com.example.jinphy.simplechat.models.event_bus.EBLoginInfo;
+import com.example.jinphy.simplechat.models.event_bus.EBQRCodeContent;
+import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.modules.add_friend.AddFriendActivity;
 import com.example.jinphy.simplechat.modules.group.create_group.CreateGroupActivity;
+import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
 import com.example.jinphy.simplechat.modules.group.group_list.GroupListActivity;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsContract;
 import com.example.jinphy.simplechat.modules.main.friends.FriendsFragment;
@@ -63,6 +65,7 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -72,7 +75,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -88,6 +90,8 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     public static final int FRIEND_FRAGMENT = 1;
     public static final int ROUTINE_FRAGMENT = 2;
     public static final int SELF_FRAGMENT = 3;
+
+    public static final String SAVE_KEY_FROM_LOGIN = "SAVE_KEY_FROM_LOGIN";
 
     private ViewPager viewPager;
 
@@ -107,9 +111,8 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     private MenuItemView addFriendItem;
     private MenuItemView groupChatItem;
     private MenuItemView searchGroupItem;
-
-
     private MenuItemView scanItem;
+
     private LinearLayout btnMsg;
     private LinearLayout btnFriends;
     private LinearLayout btnRoutine;
@@ -175,6 +178,19 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                 .subscribe();
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            fromLogin = savedInstanceState.getBoolean(SAVE_KEY_FROM_LOGIN);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVE_KEY_FROM_LOGIN, fromLogin);
+    }
 
     @Override
     public void onDestroy() {
@@ -236,6 +252,10 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
         viewPager.addOnPageChangeListener(getPageChangeListener());
 
+        /**
+         * DESC: 添加好友
+         * Created by jinphy, on 2018/3/31, at 14:19
+         */
         addFriendItem.onClick((menuItemView, hasFocus) -> {
             new MaterialDialog.Builder(activity())
                     .title("添加好友")
@@ -268,6 +288,10 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
             mainMenu.dismiss();
         });
 
+        /**
+         * DESC: 查找群聊
+         * Created by jinphy, on 2018/3/31, at 14:18
+         */
         searchGroupItem.onClick((menuItemView, hasFocus) -> {
             new MaterialDialog.Builder(activity())
                     .title("查找群聊")
@@ -299,15 +323,24 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
             mainMenu.dismiss();
         });
 
+        /**
+         * DESC: 发起群聊
+         * Created by jinphy, on 2018/3/31, at 14:18
+         */
         groupChatItem.onClick((menuItemView, hasFocus) -> {
-            // TODO: 2018/1/15 增加群聊功能
             CreateGroupActivity.start(activity());
             mainMenu.dismiss();
         });
 
+        /**
+         * DESC: 扫一扫
+         * Created by jinphy, on 2018/3/31, at 14:19
+         */
         scanItem.onClick((menuItemView, hasFocus) -> {
-            // TODO: 2018/1/15 增加扫一扫功能
             mainMenu.dismiss();
+            QRCode.scan(activity(),content -> {
+                EventBus.getDefault().post(new EBQRCodeContent(content));
+            });
         });
 
         menuView.setOnClickListener(v -> {
@@ -823,4 +856,32 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     }
 
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleQRCodeContent(EBQRCodeContent msg) {
+        QRCode.Content content = msg.data;
+        if (content.isMyApp()) {
+            switch (content.getType()) {
+                case QRCode.Content.TYPE_GROUP:
+                    Group group = presenter.getGroup(content.getText());
+                    if (group != null) {
+                        ModifyGroupActivity.start(activity(), group.getGroupNo());
+                        return;
+                    }
+                    presenter.findGroups(content.getText(), ()->{
+                        GroupListActivity.start(activity(), true);
+                    });
+                    break;
+                case QRCode.Content.TYPE_USER:
+                    presenter.findUser(content.getText(),response->{
+                        if (response != null && Response.YES.equals(response.getCode())) {
+                            AddFriendActivity.start(activity(), response.getData());
+                        }
+                    });
+                    break;
+                default:
+            }
+        } else {
+            App.showToast("暂无法处理：" + content, false);
+        }
+    }
 }

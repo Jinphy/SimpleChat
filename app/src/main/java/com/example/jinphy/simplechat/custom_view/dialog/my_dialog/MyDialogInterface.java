@@ -15,6 +15,8 @@ public interface MyDialogInterface {
 
     MyDialogInterface height(int valueDp);
 
+    MyDialogInterface alpha(float alpha);
+
     MyDialogInterface x(int valueDp);
 
     MyDialogInterface y(int valueDp);
@@ -29,7 +31,12 @@ public interface MyDialogInterface {
 
     MyDialogInterface hasFocus(boolean hasFocus);
 
+    MyDialogInterface onDismiss(MyDialog.Callback onDismiss);
+
+    MyDialogInterface onDisplay(MyDialog.Callback onDisplay);
+
     MyDialog.Holder display();
+
 
     void dismiss();
 

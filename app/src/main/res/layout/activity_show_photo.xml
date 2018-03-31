@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
-    android:id="@+id/root_view"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="com.example.jinphy.simplechat.modules.show_photo.ShowPhotoActivity"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <FrameLayout
+        android:id="@+id/fragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <include layout="@layout/layout_appbar"/>
-
-        <FrameLayout
-            android:id="@+id/fragment"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp"/>
-
-    </LinearLayout>
+        android:layout_height="match_parent"/>
 
 </android.support.design.widget.CoordinatorLayout>

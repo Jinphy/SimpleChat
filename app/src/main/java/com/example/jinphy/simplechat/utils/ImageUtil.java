@@ -7,6 +7,12 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -68,7 +74,7 @@ public class ImageUtil {
             return this;
         }
 
-        public Builder width(@NonNull String filePath) {
+        public Builder with(@NonNull String filePath) {
             this.filePath = checkNotNull(filePath);
             return this;
         }
@@ -379,4 +385,90 @@ public class ImageUtil {
         return getBitmap(file.getAbsolutePath(), w, h);
     }
 
+
+
+    /**
+     * DESC: 裁剪图片
+     *
+     * @param cornerRadius 当裁剪形状是圆角矩形时的圆角半径
+     * Created by jinphy, on 2018/3/29, at 21:49
+     */
+    public static Bitmap cropBitmap(Bitmap source,Shape shape,int cornerRadius) {
+        if (source == null) {
+            return null;
+        }
+
+        int width = source.getWidth();
+        int height = source.getHeight();
+        Rect bitmapRect = new Rect(0, 0, width, height);
+        RectF targetRectF = new RectF(0, 0, width, height);
+
+        Bitmap resultBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(resultBitmap);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+
+        // 绘制bitmap需要裁剪成的目标形状，destination
+        if (shape == null || shape == Shape.RECTANGLE) {
+            canvas.drawRoundRect(targetRectF, cornerRadius, cornerRadius, paint);
+        } else {
+            canvas.drawOval(targetRectF, paint);
+        }
+        // 设置mode
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+
+        // 绘制需要裁剪的bitmap
+        canvas.drawBitmap(source, bitmapRect, targetRectF, paint);
+
+        return resultBitmap;
+    }
+
+    /**
+     * DESC: 为位图添加边框
+     *
+     * @param source 需要添加边框的位图
+     * @param shape 形状
+     * @param cornerRadius 当形状为矩形时的圆角半径
+     * @param borderWidth 边框的宽度
+     * @param borderColor 边框颜色
+     * Created by jinphy, on 2018/3/30, at 9:42
+     */
+    public static Bitmap addBorder(Bitmap source, Shape shape, int cornerRadius, int borderWidth, int borderColor) {
+        if (source == null) {
+            return null;
+        }
+        int width = source.getWidth();
+        int height = source.getHeight();
+        Bitmap resultBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(resultBitmap);
+
+        Rect sourceRect = new Rect(0, 0, width, height);
+        RectF targetRectF = new RectF(0, 0, width, height);
+
+        canvas.drawBitmap(source, sourceRect, targetRectF, null);
+
+
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(borderWidth);
+        paint.setColor(borderColor);
+
+        // 绘制bitmap需要裁剪成的目标形状，destination
+        if (shape == null || shape == Shape.RECTANGLE) {
+            canvas.drawRoundRect(targetRectF, cornerRadius, cornerRadius, paint);
+        } else {
+            canvas.drawOval(targetRectF, paint);
+        }
+        return resultBitmap;
+    }
+
+    /**
+     * DESC: 形状枚举
+     * Created by jinphy, on 2018/3/29, at 17:27
+     */
+    public enum Shape {
+        OVAL,
+
+        RECTANGLE,
+
+    }
 }

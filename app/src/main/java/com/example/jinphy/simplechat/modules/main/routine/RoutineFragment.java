@@ -104,8 +104,10 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
                 .onInflate(viewType -> R.layout.main_tab_routine_item)
                 .data(presenter.loadRoutines())
                 .onCreateView(holder -> {
-                    holder.imageView[0] = holder.item.findViewById(R.id.icon_view);
-                    holder.textView[0] = holder.item.findViewById(R.id.tag_view);
+                    // icon
+                    holder.imageViews(R.id.icon_view);
+                    // tag
+                    holder.textViews(R.id.tag_view);
                 })
                 .onBindView((holder, item, position) -> {
                     holder.imageView[0].setImageResource(item.getIconId());

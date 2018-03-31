@@ -1,6 +1,8 @@
 package com.example.jinphy.simplechat.modules.group.group_list;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -11,9 +13,13 @@ import android.view.View;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.custom_libs.qr_code.QRCode;
+import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
+import com.example.jinphy.simplechat.utils.DialogUtils;
+import com.example.jinphy.simplechat.utils.ImageUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -24,14 +30,14 @@ import org.greenrobot.eventbus.ThreadMode;
  */
 public class GroupListFragment extends BaseFragment<GroupListPresenter> implements GroupListContract.View {
 
-    public static final String SHOW_SEARCH_RESULT = "SHOW_SEARCH_RESULT";
+    public static final String SAVE_KEY_SHOW_SEARCH_RESULT = "SAVE_KEY_SHOW_SEARCH_RESULT";
 
 
 
     private RecyclerView recyclerView;
     private View emptyView;
     private LinearLayoutManager linearLayoutManager;
-    private GroupListAdapter adapter;
+    private MyAdapter<Group> adapter;
     private boolean showSearchResult = false;
 
     public GroupListFragment() {
@@ -47,9 +53,15 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (presenter == null) {
-            this.presenter = getPresenter();
+        if (savedInstanceState != null) {
+            showSearchResult = savedInstanceState.getBoolean(SAVE_KEY_SHOW_SEARCH_RESULT);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVE_KEY_SHOW_SEARCH_RESULT, showSearchResult);
     }
 
     @Override
@@ -80,9 +92,55 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
     protected void setupViews() {
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        adapter = new GroupListAdapter();
-        recyclerView.setAdapter(adapter);
-        adapter.update(presenter.loadGroups(showSearchResult));
+        adapter = MyAdapter.<Group>newInstance()
+                .onGetItemViewType(item -> 0)
+                .onInflate(viewType -> R.layout.layout_group_list_item)
+                .data(presenter.loadGroups(showSearchResult))
+                .onCreateView(holder -> {
+                    // 头像
+                    holder.circleImageViews(R.id.avatar_view);
+                    // 群名、群号
+                    holder.textViews(R.id.name_view, R.id.group_no_view);
+                    // 二维码
+                    holder.views(R.id.qr_code_view);
+                })
+                .onBindView((holder, item, position) -> {
+                    Bitmap bitmap = ImageUtil.loadAvatar(item.getGroupNo(), 50, 50);
+                    if (bitmap != null) {
+                        holder.circleImageView[0].setImageBitmap(bitmap);
+                    } else {
+                        holder.circleImageView[0].setImageResource(R.drawable.ic_group_chat_white_24dp);
+                    }
+                    holder.textView[0].setText(item.getName());
+                    holder.textView[1].setText(item.getGroupNo());
+
+                    holder.setClickedViews(holder.item, holder.view[0]);
+                    holder.setLongClickedViews(holder.item);
+                })
+                .onClick((v, item, holder, type, position) -> {
+                    switch (v.getId()) {
+                        case R.id.qr_code_view:// qRCodeView
+                            DialogUtils.showQRCode(
+                                    activity(),
+                                    QRCode.content()
+                                            .setType(QRCode.Content.TYPE_GROUP)
+                                            .setText(item.getGroupNo())
+                                            .toString(),
+                                    item.getGroupNo(),
+                                    item.getName(),
+                                    "扫一扫，加入群聊"
+                            );
+                            break;
+                        default:// itemView
+                            ModifyGroupActivity.start(activity(), item.getGroupNo());
+                            break;
+                    }
+                })
+                .onLongClick((v, item, holder, type, position) -> {
+                    // no-op
+                    return false;
+                })
+                .into(recyclerView);
         setupEmptyView();
     }
 
@@ -97,19 +155,6 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
 
     @Override
     protected void registerEvent() {
-        adapter.onClick((view, item, type, position) -> {
-            Group group = (Group) item;
-            switch (view.getId()) {
-                case R.id.qr_code_view:// qRCodeView
-
-                    // TODO: 2018/3/11 展示二维码
-                    break;
-                default:// itemView
-                    ModifyGroupActivity.start(activity(), group.getGroupNo());
-                    break;
-
-            }
-        });
     }
 
 
@@ -149,6 +194,5 @@ public class GroupListFragment extends BaseFragment<GroupListPresenter> implemen
         }
         setupEmptyView();
     }
-
 
 }

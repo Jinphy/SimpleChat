@@ -63,5 +63,4 @@ public class DeviceUtils {
         return phone;
     }
 
-
 }

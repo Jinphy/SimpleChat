@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorAccent"
                 android:textSize="@dimen/size_16sp"
-                android:text="动态内容： This is the blog content,the user write some text to show here"/>
+                android:text="动态内容： This is the blog text,the user write some text to show here"/>
             <GridLayout
                 android:id="@+id/picture_or_video_layout"
                 android:columnCount="3"

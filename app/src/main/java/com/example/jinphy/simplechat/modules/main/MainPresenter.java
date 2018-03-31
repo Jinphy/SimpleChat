@@ -277,4 +277,8 @@ public class MainPresenter implements MainContract.Presenter {
         }
     }
 
+    @Override
+    public Group getGroup(String groupNo) {
+        return groupRepository.get(groupNo, userRepository.currentUser().getAccount());
+    }
 }

@@ -1,5 +1,11 @@
 package com.example.jinphy.simplechat.modules.show_file;
 
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -21,8 +27,8 @@ import org.w3c.dom.Text;
  */
 public class ShowFileFragment extends BaseFragment<ShowFilePresenter> implements ShowFileContract.View {
 
-    public static final String TAG_MSG_ID = "MSG_ID";
-    public static final String TAG_MSG_POSITION = "POSITION";
+    public static final String SAVE_KEY_MSG_ID = "SAVE_KEY_MSG_ID";
+    public static final String SAVE_KEY_MSG_POSITION = "SAVE_KEY_MSG_POSITION";
 
     private long msgId;
     private int msgPosition;
@@ -35,6 +41,29 @@ public class ShowFileFragment extends BaseFragment<ShowFilePresenter> implements
 
     public ShowFileFragment() {
         // Required empty public constructor
+    }
+
+    public static ShowFileFragment newInstance(long msgId, int msgPosition) {
+        ShowFileFragment fragment = new ShowFileFragment();
+        fragment.msgId = msgId;
+        fragment.msgPosition = msgPosition;
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            msgId = savedInstanceState.getLong(SAVE_KEY_MSG_ID);
+            msgPosition = savedInstanceState.getInt(SAVE_KEY_MSG_ID);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(SAVE_KEY_MSG_ID, msgId);
+        outState.putInt(SAVE_KEY_MSG_POSITION, msgPosition);
     }
 
     @Override
@@ -90,12 +119,6 @@ public class ShowFileFragment extends BaseFragment<ShowFilePresenter> implements
         });
     }
 
-    public static ShowFileFragment newInstance(long msgId, int msgPosition) {
-        ShowFileFragment fragment = new ShowFileFragment();
-        fragment.msgId = msgId;
-        fragment.msgPosition = msgPosition;
-        return fragment;
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDownload(EBFileTask msg) {
@@ -127,4 +150,38 @@ public class ShowFileFragment extends BaseFragment<ShowFilePresenter> implements
         }
     }
 
+
+
+
+    /**
+     * DESC: 创建菜单
+     * Created by jinphy, on 2018/1/8, at 20:52
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main_fragment, menu);
+    }
+
+    // 菜单点击事件
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.menu_more:
+                App.showToast("菜单", false);
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        finishActivity();
+        // 返回false，则activity将会不回调onBackPressed
+        return false;
+    }
 }

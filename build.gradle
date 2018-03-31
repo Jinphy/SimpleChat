@@ -3,7 +3,9 @@ buildscript {
     repositories {
         jcenter()
         google()
-        maven { url "http://objectbox.net/beta-repo/" }
+        maven {
+            url "http://objectbox.net/beta-repo/"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -22,6 +24,8 @@ allprojects {
         //maven { url "https://raw.github.com/bmob/bmob-android-sdk/master" }
         google()
         maven { url "http://objectbox.net/beta-repo/" }
+        maven { url 'https://jitpack.io' }
+        
 
     }
 }

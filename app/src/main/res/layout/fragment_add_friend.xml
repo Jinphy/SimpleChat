@@ -13,7 +13,7 @@
         app:show_input="false"
         app:auto_animate="false"
         app:icon_drawable="@drawable/pic_1"
-        tools:content="昵称"
+        tools:text="昵称"
         app:icon_color="#00000000"
         app:icon_size="90dp"
         android:layout_marginLeft="@dimen/dimen_10dp"

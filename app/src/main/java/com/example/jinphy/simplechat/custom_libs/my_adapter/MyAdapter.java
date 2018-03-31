@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -297,15 +298,17 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        public ImageView[] imageView = new ImageView[1];
+        public ImageView[] imageView;
 
-        public TextView[] textView = new TextView[4];
+        public TextView[] textView;
 
-        public CheckBox[] checkBox = new CheckBox[1];
+        public CheckBox[] checkBox ;
 
-        public CircleImageView[] circleImageView = new CircleImageView[5];
+        public CircleImageView[] circleImageView;
 
-        public View[] view = new View[3];
+        public Button[] button;
+
+        public View[] view;
 
         public final View item;
 
@@ -340,6 +343,66 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
          */
         public void setLongClickedViews(View... longClickViews) {
             this.longClickedViews = longClickViews;
+        }
+
+        public ViewHolder textViews(int... ids) {
+            if (ids.length > 0) {
+                this.textView = new TextView[ids.length];
+                for (int i = 0; i < ids.length; i++) {
+                    this.textView[i] = this.item.findViewById(ids[i]);
+                }
+            }
+            return this;
+        }
+
+        public ViewHolder imageViews(int... ids) {
+            if (ids.length > 0) {
+                this.imageView = new ImageView[ids.length];
+                for (int i = 0; i < ids.length; i++) {
+                    this.imageView[i] = this.item.findViewById(ids[i]);
+                }
+            }
+            return this;
+        }
+
+        public ViewHolder checkBoxes(int... ids) {
+            if (ids.length > 0) {
+                this.checkBox = new CheckBox[ids.length];
+                for (int i = 0; i < ids.length; i++) {
+                    this.checkBox[i] = this.item.findViewById(ids[i]);
+                }
+            }
+            return this;
+        }
+
+        public ViewHolder circleImageViews(int... ids) {
+            if (ids.length>0) {
+                this.circleImageView = new CircleImageView[ids.length];
+                for (int i = 0; i < ids.length; i++) {
+                    this.circleImageView[i] = this.item.findViewById(ids[i]);
+                }
+            }
+            return this;
+        }
+
+        public ViewHolder buttons(int... ids) {
+            if (ids.length>0) {
+                this.button = new Button[ids.length];
+                for (int i = 0; i < ids.length; i++) {
+                    this.button[i] = this.item.findViewById(ids[i]);
+                }
+            }
+            return this;
+        }
+
+        public ViewHolder views(int... ids) {
+            if (ids.length>0) {
+                this.view = new View[ids.length];
+                for (int i = 0; i < ids.length; i++) {
+                    this.view[i] = this.item.findViewById(ids[i]);
+                }
+            }
+            return this;
         }
 
     }

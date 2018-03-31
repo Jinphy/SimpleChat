@@ -43,9 +43,10 @@ import org.greenrobot.eventbus.ThreadMode;
 public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> implements ModifyGroupContract.View {
 
     public static final String TAG = "ModifyGroupFragment";
-    public static final String GROUP_NO = "GROUP_NO";
+    public static final String GROUP_NO = "SAVE_KEY_GROUP_NO";
     public static final String AUTO = "自动加入";
     public static final String NO_AUTO = "群主验证";
+    public static final String SAVE_KEY_GROUP_NO = "SAVE_KEY_GROUP_NO";
 
     private String groupNo;
 
@@ -88,10 +89,15 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (presenter == null) {
-            this.presenter = getPresenter();
+        if (savedInstanceState != null) {
+            groupNo = savedInstanceState.getString(SAVE_KEY_GROUP_NO);
         }
+    }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SAVE_KEY_GROUP_NO, groupNo);
     }
 
     @Override

@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="@dimen/dimen_5dp"
-    app:cardElevation="@dimen/dimen_10dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <LinearLayout
@@ -14,9 +13,9 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/remove_member_view"
+            android:id="@+id/delete_photo"
             android:textSize="@dimen/size_15sp"
-            android:text="移出该群"
+            android:text="删除图片"
             android:clickable="true"
             android:paddingLeft="@dimen/dimen_10dp"
             android:background="@drawable/btn_click"
@@ -25,20 +24,9 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
         <TextView
-            android:id="@+id/allow_to_chat_view"
+            android:id="@+id/parse_qr_code"
             android:textSize="@dimen/size_15sp"
-            android:text="禁止发言"
-            android:clickable="true"
-            android:paddingLeft="@dimen/dimen_10dp"
-            android:background="@drawable/btn_click"
-            android:layout_marginBottom="@dimen/dimen_1dp"
-            android:gravity="center_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"/>
-        <TextView
-            android:id="@+id/modify_remark_view"
-            android:textSize="@dimen/size_15sp"
-            android:text="修改备注"
+            android:text="识别图中二维码"
             android:clickable="true"
             android:paddingLeft="@dimen/dimen_10dp"
             android:background="@drawable/btn_click"
@@ -47,6 +35,46 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
 
+        <TextView
+            android:textSize="@dimen/size_15sp"
+            android:text="识别图中二维码"
+            android:clickable="true"
+            android:paddingLeft="@dimen/dimen_10dp"
+            android:background="@drawable/btn_click"
+            android:layout_marginBottom="@dimen/dimen_1dp"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+        <TextView
+            android:textSize="@dimen/size_15sp"
+            android:text="识别图中二维码"
+            android:clickable="true"
+            android:paddingLeft="@dimen/dimen_10dp"
+            android:background="@drawable/btn_click"
+            android:layout_marginBottom="@dimen/dimen_1dp"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+        <TextView
+            android:textSize="@dimen/size_15sp"
+            android:text="识别图中二维码"
+            android:clickable="true"
+            android:paddingLeft="@dimen/dimen_10dp"
+            android:background="@drawable/btn_click"
+            android:layout_marginBottom="@dimen/dimen_1dp"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+        <TextView
+            android:textSize="@dimen/size_15sp"
+            android:text="识别图中二维码"
+            android:clickable="true"
+            android:paddingLeft="@dimen/dimen_10dp"
+            android:background="@drawable/btn_click"
+            android:layout_marginBottom="@dimen/dimen_1dp"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
 
 
     </LinearLayout>

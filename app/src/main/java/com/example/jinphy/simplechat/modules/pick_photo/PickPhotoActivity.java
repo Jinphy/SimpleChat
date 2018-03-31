@@ -19,8 +19,6 @@ import io.reactivex.annotations.NonNull;
 
 public class PickPhotoActivity extends BaseActivity {
 
-    public static final String OPTION = "OPTION";
-
     /**
      * DESC: 启动获取图片并裁剪图片的任务
      *
@@ -34,8 +32,8 @@ public class PickPhotoActivity extends BaseActivity {
         }
         if (activity != null) {
             Intent intent = new Intent(activity, PickPhotoActivity.class);
-            intent.putExtra(OPTION, option.get());
-            intent.putExtra(PickPhotoFragment.TAG, tag);
+            intent.putExtra(PickPhotoFragment.SAVE_KEY_OPTION, option.get());
+            intent.putExtra(PickPhotoFragment.SAVE_KEY_TAG, tag);
             activity.startActivity(intent);
         }
     }
@@ -55,8 +53,8 @@ public class PickPhotoActivity extends BaseActivity {
         actionBar.setTitle("图片裁剪");
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left_24dp);
 
-        String option = getIntent().getStringExtra(OPTION);
-        String tag = getIntent().getStringExtra(PickPhotoFragment.TAG);
+        String option = getIntent().getStringExtra(PickPhotoFragment.SAVE_KEY_OPTION);
+        String tag = getIntent().getStringExtra(PickPhotoFragment.SAVE_KEY_TAG);
         getPresenter(addFragment(PickPhotoFragment.newInstance(option, tag), R.id.fragment));
 
     }

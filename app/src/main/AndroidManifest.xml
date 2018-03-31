@@ -99,7 +99,7 @@
         </activity>
         <activity
             android:name=".modules.show_photo.ShowPhotoActivity"
-            android:theme="@style/PickPhotoActivityTheme">
+            android:theme="@style/TranslucentTheme">
         </activity>
 
         <provider
