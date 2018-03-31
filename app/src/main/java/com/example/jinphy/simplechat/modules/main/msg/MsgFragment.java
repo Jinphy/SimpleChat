@@ -18,6 +18,7 @@ import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
 import com.example.jinphy.simplechat.custom_view.dialog.my_dialog.MyDialog;
+import com.example.jinphy.simplechat.custom_view.menu.MyMenu;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message_record.MessageRecord;
@@ -135,17 +136,11 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
                 .data(presenter.loadMsgRecords())
                 .onCreateView(holder -> {
                     // avatar 头像
-                    holder.circleImageView[0] = holder.item.findViewById(R.id.avatar);
-                    // name 昵称
-                    holder.textView[0] = holder.item.findViewById(R.id.name);
-                    // lastMsg 最新消息
-                    holder.textView[1] = holder.item.findViewById(R.id.last_msg);
-                    // time 最新消息的时间
-                    holder.textView[2] = holder.item.findViewById(R.id.time);
-                    // count 未读消息数
-                    holder.textView[3] = holder.item.findViewById(R.id.new_count);
+                    holder.circleImageViews(R.id.avatar);
+                    // name 昵称、lastMsg 最新消息、time 最新消息的时间、count 未读消息数
+                    holder.textViews(R.id.name, R.id.last_msg, R.id.time, R.id.new_count);
                     // to top 置顶
-                    holder.view[0] = holder.item.findViewById(R.id.top);
+                    holder.views(R.id.top);
                 })
                 .onBindView((holder, item, position) -> {
                     // 设置头像
@@ -198,42 +193,32 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
                     }
                 })
                 .onLongClick((v, item, holder, type, position) -> {
-                    MyDialog.Holder myHolder = MyDialog.create(activity())
+                    MyMenu.create(activity())
                             .width(200)
-                            .view(R.layout.dialog_msg_record)
+                            .item(item.isToTop() ? "取消置顶" : "置顶", (menu, item1) -> {
+                                int scrollY = recyclerView.getScrollY();
+                                item.updateToTop();
+                                presenter.updateRecord(item);
+                                MessageRecord.sort(adapter.getData());
+                                adapter.notifyDataSetChanged();
+                                recyclerView.scrollBy(0, scrollY);
+                                App.showToast(item.isToTop() ? "已置顶该聊天！" : "置顶已取消！", false);
+                            })
+                            .item("删除", (menu, item12) -> {
+                                presenter.deleteMsgRecord(item);
+                                int scrollY = recyclerView.getScrollY();
+                                adapter.remove(position);
+                                recyclerView.scrollBy(0, scrollY);
+                                App.showToast("已删除该聊天！", false);
+                            })
+                            .item("清空", (menu, item13) -> {
+                                presenter.clearMsg(item);
+                                adapter.update(presenter.loadMsgRecords());
+                                int scrollY = recyclerView.getScrollY();
+                                recyclerView.scrollBy(0, scrollY);
+                                App.showToast("已清空该聊天！", false);
+                            })
                             .display();
-                    TextView topItem = myHolder.view.findViewById(R.id.item_top);
-                    TextView deleteItem = myHolder.view.findViewById(R.id.item_delete);
-                    TextView clearItem = myHolder.view.findViewById(R.id.item_clear);
-
-                    topItem.setText(item.isToTop() ? "取消置顶" : "置顶");
-                    topItem.setOnClickListener(v1->{
-                        myHolder.dialog.dismiss();
-                        int scrollY = recyclerView.getScrollY();
-                        item.updateToTop();
-                        presenter.updateRecord(item);
-                        MessageRecord.sort(adapter.getData());
-                        adapter.notifyDataSetChanged();
-                        recyclerView.scrollBy(0, scrollY);
-                        App.showToast(item.isToTop() ? "已置顶该聊天！" : "置顶已取消！", false);
-                    });
-                    deleteItem.setOnClickListener(v1->{
-                        myHolder.dialog.dismiss();
-                        presenter.deleteMsgRecord(item);
-                        int scrollY = recyclerView.getScrollY();
-                        adapter.remove(position);
-                        recyclerView.scrollBy(0, scrollY);
-                        App.showToast("已删除该聊天！", false);
-                    });
-
-                    clearItem.setOnClickListener(v1->{
-                        myHolder.dialog.dismiss();
-                        presenter.clearMsg(item);
-                        adapter.update(presenter.loadMsgRecords());
-                        int scrollY = recyclerView.getScrollY();
-                        recyclerView.scrollBy(0, scrollY);
-                        App.showToast("已清空该聊天！", false);
-                    });
                     return true;
                 })
                 .into(recyclerView);
@@ -260,9 +245,7 @@ public class MsgFragment extends BaseFragment<MsgPresenter> implements MsgContra
 
     @Override
     public void showChatWindow(MessageRecord record) {
-        Intent intent = new Intent(getActivity(), ChatActivity.class);
-        intent.putExtra(ChatFragment.WITH_ACCOUNT, record.getWith());
-        startActivity(intent);
+        ChatActivity.start(activity(), record.getWith());
     }
 
 

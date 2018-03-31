@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.modules.chat;
 import android.animation.AnimatorSet;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -41,6 +42,7 @@ import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfo
 import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.modules.show_file.ShowFileActivity;
 import com.example.jinphy.simplechat.modules.show_photo.ShowPhotoActivity;
+import com.example.jinphy.simplechat.services.common_service.aidl.models.OnUpdate;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
@@ -67,7 +69,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatContract.View {
 
-    public static final String WITH_ACCOUNT = "with";
+    public static final String SAVE_KEY_WITH_ACCOUNT = "SAVE_KEY_WITH_ACCOUNT";
 
     private static final int HORIZONTAL = 0;
     private static final int VERTICAL = 1;
@@ -114,22 +116,15 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
-        if (args == null) {
-            App.showToast("启动异常！", false);
-            finishActivity();
-            return;
+        if (savedInstanceState != null) {
+            withAccount = savedInstanceState.getString(SAVE_KEY_WITH_ACCOUNT);
         }
-        withAccount = args.getString(ChatFragment.WITH_ACCOUNT);
-        ownerAccount = presenter.getOwner();
-        if (ObjectHelper.isTrimEmpty(withAccount)) {
-            App.showToast("数据异常！", false);
-            finishActivity();
-            return;
-        }
-        isFriend = !withAccount.contains("G");
-        startStatusColor = colorPrimaryDark();
-        endStatusColor = colorAccent();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SAVE_KEY_WITH_ACCOUNT, withAccount);
     }
 
     @Override
@@ -139,6 +134,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         EventBus.getDefault().post(new EBUpdateView());
         bottomMoreMenu.clearFragment();
         AudioRecorder.getInstance().release();
+        AudioPlayer.getInstance().release();
     }
 
     @Override
@@ -152,11 +148,9 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
      *
      * @return A new app of fragment ChatFragment.
      */
-    public static ChatFragment newInstance(String friendAccount) {
+    public static ChatFragment newInstance(String withAccount) {
         ChatFragment fragment = new ChatFragment();
-        Bundle args = new Bundle();
-        args.putString(ChatFragment.WITH_ACCOUNT, friendAccount);
-        fragment.setArguments(args);
+        fragment.withAccount = withAccount;
         return fragment;
     }
 
@@ -181,6 +175,16 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     @Override
     protected void initData() {
+        ownerAccount = presenter.getOwner();
+        if (ObjectHelper.isTrimEmpty(withAccount)) {
+            App.showToast("数据异常！", false);
+            finishActivity();
+            return;
+        }
+        isFriend = !withAccount.contains("G");
+        startStatusColor = colorPrimaryDark();
+        endStatusColor = colorAccent();
+
         screenWidth = ScreenUtils.getScreenWidth(getContext());
         onThirdScreenWidth = screenWidth / 3;
         maxElevation = ScreenUtils.dp2px(getContext(), 20);
@@ -731,8 +735,8 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                     } else {
                         animateHorizontal(factor, 1f, true);
                     }
+                    return true;
                 }
-
                 return false;
             default:
                 return false;

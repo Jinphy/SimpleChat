@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.view.MenuItem;
@@ -12,13 +13,11 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.custom_libs.SChain;
-import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.models.event_bus.EBBitmap;
 import com.example.jinphy.simplechat.models.event_bus.EBIntent;
+import com.example.jinphy.simplechat.modules.pick_photo.PickPhotoActivity.Option;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
@@ -27,11 +26,13 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.w3c.dom.Text;
+
+import java.io.FileReader;
 
 public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
         implements PickPhotoContract.View{
-    public static final String OPTION = "OPTION";
+    public static final String SAVE_KEY_OPTION = "SAVE_KEY_OPTION";
+    public static final String SAVE_KEY_TAG = "SAVE_KEY_TAG";
     public static final int TAKE_PHOTO = 1;
     public static final int CHOOSE_PHOTO = 2;
 
@@ -39,7 +40,7 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
     private final String IMG_FILE_NAME_PREFIX = "user_avatar";
     private final String IMG_FILE_NAME_SUFFIX = ".png";
 
-    private PickPhotoActivity.Option option;
+    private Option option;
     private String filePath;
 
     private TextView btnRecapture;
@@ -48,7 +49,7 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
     private TextView rotateDegreeView;
     private FloatingActionButton fab;
 
-    public static final String TAG = "TAG";
+    public static final String TAG = "tag";
 
     private String tag = "";
 
@@ -70,28 +71,33 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
 
     public static PickPhotoFragment newInstance(String option,String tag) {
         PickPhotoFragment fragment = new PickPhotoFragment();
-        Bundle args = new Bundle();
-        args.putString(OPTION,option);
-        args.putString(TAG, tag);
-        fragment.setArguments(args);
+        fragment.option = fragment.getOption(option);
+        fragment.tag = tag;
         return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            this.option = getOption(savedInstanceState.getString(SAVE_KEY_OPTION));
+            this.tag = savedInstanceState.getString(SAVE_KEY_TAG);
+        }
+    }
 
-        Bundle arguments = getArguments();
-        if (arguments == null) {
-            ObjectHelper.throwRuntime("arguments cannot be null!");
-        }
-        String option = arguments.getString(OPTION);
-        if (PickPhotoActivity.Option.TAKE_PHOTO.get().equals(option)) {
-            this.option = PickPhotoActivity.Option.TAKE_PHOTO;
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SAVE_KEY_OPTION, option.get());
+        outState.putString(SAVE_KEY_TAG, tag);
+    }
+
+    private Option getOption(String option) {
+        if (Option.TAKE_PHOTO.get().equals(option)) {
+            return Option.TAKE_PHOTO;
         } else {
-            this.option = PickPhotoActivity.Option.CHOOSE_PHOTO;
+            return Option.CHOOSE_PHOTO;
         }
-        tag = arguments.getString(TAG);
     }
 
     @Override
@@ -105,7 +111,7 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
      */
     @Override
     protected void initData() {
-        if (option == PickPhotoActivity.Option.TAKE_PHOTO) {
+        if (option == Option.TAKE_PHOTO) {
             // 相机
             filePath = ImageUtil.takePhotoFullSize(
                     activity(),
@@ -130,7 +136,7 @@ public class PickPhotoFragment extends BaseFragment<PickPhotoPresenter>
 
     @Override
     protected void setupViews() {
-        if (option == PickPhotoActivity.Option.TAKE_PHOTO) {
+        if (option == Option.TAKE_PHOTO) {
             btnRecapture.setText("重拍");
         } else {
             btnRecapture.setText("重选");

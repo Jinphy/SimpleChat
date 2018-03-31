@@ -16,8 +16,8 @@ public class ShowFileActivity extends BaseActivity {
 
     public static void start(Activity activity, long msgId, int position) {
         Intent intent = new Intent(activity, ShowFileActivity.class);
-        intent.putExtra(ShowFileFragment.TAG_MSG_ID, msgId);
-        intent.putExtra(ShowFileFragment.TAG_MSG_POSITION, position);
+        intent.putExtra(ShowFileFragment.SAVE_KEY_MSG_ID, msgId);
+        intent.putExtra(ShowFileFragment.SAVE_KEY_MSG_POSITION, position);
         activity.startActivity(intent);
     }
 
@@ -37,8 +37,8 @@ public class ShowFileActivity extends BaseActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left_24dp);
 
         Intent intent = getIntent();
-        long msgId = intent.getLongExtra(ShowPhotoFragment.TAG_MSG_ID, -1);
-        int position = intent.getIntExtra(ShowPhotoFragment.TAG_MSG_POSITION, -1);
+        long msgId = intent.getLongExtra(ShowPhotoFragment.SAVE_KEY_MSG_ID, -1);
+        int position = intent.getIntExtra(ShowPhotoFragment.SAVE_KEY_MSG_POSITION, -1);
         if (msgId == -1) {
             finish();
             return;

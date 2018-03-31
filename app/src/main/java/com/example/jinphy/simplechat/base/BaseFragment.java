@@ -54,8 +54,7 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     protected int colorPrimaryDark;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 
         this.presenter = getPresenter();
 

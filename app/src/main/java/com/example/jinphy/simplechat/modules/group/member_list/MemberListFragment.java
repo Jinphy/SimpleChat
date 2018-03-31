@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -25,6 +26,7 @@ import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.custom_view.dialog.friend_selector.FriendSelector;
 import com.example.jinphy.simplechat.custom_view.dialog.my_dialog.MyDialog;
+import com.example.jinphy.simplechat.custom_view.menu.MyMenu;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.event_bus.EBBitmap;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
@@ -56,7 +58,7 @@ import java.util.Map;
 public class MemberListFragment extends BaseFragment<MemberListPresenter> implements
         MemberListContract.View {
 
-    public static final String GROUP_NO = "GROUP_NO";
+    public static final String SAVE_KEY_GROUP_NO = "SAVE_KEY_GROUP_NO";
 
     public static final String TAG = "MemberListFragment";
 
@@ -105,10 +107,15 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (presenter == null) {
-            this.presenter = getPresenter();
+        if (savedInstanceState != null) {
+            groupNo = savedInstanceState.getString(SAVE_KEY_GROUP_NO);
         }
+    }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SAVE_KEY_GROUP_NO, groupNo);
     }
 
     @Override
@@ -140,12 +147,14 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
                 .data(presenter.loadMembers(groupNo))
                 .onInflate(viewType -> R.layout.layout_member_list_item)
                 .onCreateView(holder -> {
-                    holder.circleImageView[0] = holder.item.findViewById(R.id.avatar_view);
-                    holder.textView[0] = holder.item.findViewById(R.id.name_view);
-                    holder.textView[1] = holder.item.findViewById(R.id.account_view);
-                    holder.view[0] = holder.item.findViewById(R.id.more_view);
-                    holder.view[1] = holder.item.findViewById(R.id.not_allow_chat_view);
-                    holder.checkBox[0] = holder.item.findViewById(R.id.check_box);
+                    // avatar
+                    holder.circleImageViews(R.id.avatar_view);
+                    // name、account
+                    holder.textViews(R.id.name_view, R.id.account_view);
+                    // more、not_allow_chat
+                    holder.views(R.id.more_view, R.id.not_allow_chat_view);
+                    // checkbox
+                    holder.checkBoxes(R.id.check_box);
                 })
                 .onBindView((holder, item, position) -> {
                     // 设置头像
@@ -354,83 +363,68 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
      */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void showItemMoreDialog(CheckableMember member, int position) {
-        MyDialog.Holder holder = MyDialog.create(activity())
-                .view(R.layout.dialog_member_item)
-                .width(200)
-                .display();
-        TextView allowToChatView = holder.view.findViewById(R.id.allow_to_chat_view);
-        View modifyRemarkView = holder.view.findViewById(R.id.modify_remark_view);
-        View removeMemberView = holder.view.findViewById(R.id.remove_member_view);
-        if (member.isAllowChat()) {
-            allowToChatView.setText("禁止发言");
-        } else {
-            allowToChatView.setText("允许发言");
-        }
         if (StringUtils.equal(member.getAccount(), member.getOwner())) {
-            holder.dialog.dismiss();
             App.showToast("该成员是本人，无需操作！", false);
             return;
-        } else if (!presenter.isCreator(groupNo)) {
-            removeMemberView.setVisibility(View.GONE);
-            allowToChatView.setVisibility(View.GONE);
         }
-
-        if (removeMemberView.getVisibility() == View.VISIBLE) {
-            removeMemberView.setOnClickListener(v -> {
-                holder.dialog.dismiss();
-                new MaterialDialog.Builder(activity())
-                        .title("移除成员")
-                        .titleColor(colorPrimary())
-                        .content("您将移出该成员，并且操作不可恢复，是否继续？")
-                        .contentGravity(GravityEnum.CENTER)
-                        .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_warning_24dp, colorPrimary()))
-                        .positiveText("确定")
-                        .negativeText("不了")
-                        .positiveColor(colorPrimary())
-                        .negativeColorRes(R.color.color_red_D50000)
-                        .onPositive((dialog, which) -> {
-                            presenter.removeMember(activity(), member);
-                        })
-                        .show();
-
-            });
-        }
-        if (allowToChatView.getVisibility() == View.VISIBLE) {
-            allowToChatView.setOnClickListener(v -> {
-                holder.dialog.dismiss();
-                presenter.modifyAllowChat(activity(), member);
-            });
-        }
-        if (modifyRemarkView.getVisibility() == View.VISIBLE) {
-            modifyRemarkView.setOnClickListener(v -> {
-                holder.dialog.dismiss();
-                new MaterialDialog.Builder(activity())
-                        .title("成员信息")
-                        .titleColor(colorPrimary())
-                        .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_person_48dp,
-                                colorPrimary()))
-                        .content("修改备注")
-                        .autoDismiss(false)
-                        .cancelable(false)
-                        .widgetColor(colorPrimary())
-                        .negativeText("取消")
-                        .input("请输入备注信息", "", false,
-                                (dialog, input) -> {
-                                    if (ObjectHelper.isTrimEmpty(input.toString().trim())) {
-                                        App.showToast("备注信息不能为空格等！", false);
+        MyMenu.create(activity())
+                .width(200)
+                .item("移出该群", (menu, item) -> {
+                    // index = 0
+                    new MaterialDialog.Builder(activity())
+                            .title("移除成员")
+                            .titleColor(colorPrimary())
+                            .content("您将移出该成员，并且操作不可恢复，是否继续？")
+                            .contentGravity(GravityEnum.CENTER)
+                            .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_warning_24dp,
+                                    colorPrimary()))
+                            .positiveText("确定")
+                            .negativeText("不了")
+                            .positiveColor(colorPrimary())
+                            .negativeColorRes(R.color.color_red_D50000)
+                            .onPositive((dialog, which) -> {
+                                presenter.removeMember(activity(), member);
+                            })
+                            .show();
+                })
+                .item(member.isAllowChat() ? "禁止发言" : "允许发言", (menu, item) -> {
+                    // index = 1
+                    presenter.modifyAllowChat(activity(), member);
+                })
+                .item("修改备注", (menu, item) -> {
+                    // index = 2
+                    new MaterialDialog.Builder(activity())
+                            .title("成员信息")
+                            .titleColor(colorPrimary())
+                            .icon(ImageUtil.getDrawable(activity(), R.drawable.ic_person_48dp,
+                                    colorPrimary()))
+                            .content("修改备注")
+                            .autoDismiss(false)
+                            .cancelable(false)
+                            .widgetColor(colorPrimary())
+                            .negativeText("取消")
+                            .input("请输入备注信息", "", false,
+                                    (dialog, input) -> {
+                                        if (ObjectHelper.isTrimEmpty(input.toString().trim())) {
+                                            App.showToast("备注信息不能为空格等！", false);
+                                        }
+                                        dialog.dismiss();
+                                        String remark = input.toString();
+                                        presenter.modifyRemark(activity(), member, remark);
                                     }
-                                    dialog.dismiss();
-                                    String remark = input.toString();
-                                    presenter.modifyRemark(activity(), member, remark);
-                                }
-                        )
-                        .positiveColor(colorPrimary())
-                        .negativeColorRes(R.color.color_red_D50000)
-                        .onNegative((dialog, which) -> dialog.dismiss())
-                        .show();
-
-            });
-        }
+                            )
+                            .positiveColor(colorPrimary())
+                            .negativeColorRes(R.color.color_red_D50000)
+                            .onNegative((dialog, which) -> dialog.dismiss())
+                            .show();
+                })
+                .onDisplay(menu -> {
+                    if (!presenter.isCreator(groupNo)) {
+                        menu.item(0).setVisibility(View.GONE);
+                        menu.item(1).setVisibility(View.GONE);
+                    }
+                })
+                .display();
     }
 
     /**
@@ -439,30 +433,25 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
      */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void showMoreDialog() {
-        MyDialog.Holder holder = MyDialog.create(activity())
-                .view(R.layout.dialog_member_more)
+        MyMenu.create(activity())
                 .width(200)
-                .display();
-        Group group = presenter.getGroup(groupNo);
-        View addMemberView = holder.view.findViewById(R.id.add_member_view);
-        if (group.isMyGroup()) {
-            addMemberView.setVisibility(View.VISIBLE);
-            addMemberView.setOnClickListener(v -> {
-                holder.dialog.dismiss();
-                showSelectFriendsDialog();
-            });
-        } else {
-            addMemberView.setVisibility(View.GONE);
-        }
-
-
-        holder.view.findViewById(R.id.select_view)
-                .setOnClickListener(v -> {
-                    holder.dialog.dismiss();
+                .item("添加成员", (menu, item) -> {
+                    showSelectFriendsDialog();
+                })
+                .item("选择", (menu, item) -> {
                     if (!showCheckbox) {
                         setShowCheckBoxStatus();
                     }
-                });
+                })
+                .onDisplay(menu -> {
+                    View item = menu.item(0);
+                    if (presenter.getGroup(groupNo).isMyGroup()) {
+                        item.setVisibility(View.VISIBLE);
+                    } else {
+                        item.setVisibility(View.GONE);
+                    }
+                })
+                .display();
     }
 
     /**
@@ -624,7 +613,6 @@ public class MemberListFragment extends BaseFragment<MemberListPresenter> implem
             // no-op
         }
     }
-
 
 
     /**

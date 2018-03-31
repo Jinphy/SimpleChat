@@ -18,7 +18,7 @@ public class GroupListActivity extends BaseActivity {
 
     public static void start(Activity activity,boolean showSearchResult) {
         Intent intent = new Intent(activity, GroupListActivity.class);
-        intent.putExtra(GroupListFragment.SHOW_SEARCH_RESULT, showSearchResult);
+        intent.putExtra(GroupListFragment.SAVE_KEY_SHOW_SEARCH_RESULT, showSearchResult);
         activity.startActivity(intent);
     }
 
@@ -36,12 +36,10 @@ public class GroupListActivity extends BaseActivity {
         actionBar.setTitle("群聊");
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left_24dp);
 
+        boolean showSearchResult = getIntent().getBooleanExtra(
+                GroupListFragment.SAVE_KEY_SHOW_SEARCH_RESULT, false);
         getPresenter(addFragment(
-                GroupListFragment.newInstance(
-                        getIntent().getBooleanExtra(
-                                GroupListFragment.SHOW_SEARCH_RESULT,
-                                false)),
-                R.id.fragment));
+                GroupListFragment.newInstance(showSearchResult),R.id.fragment));
     }
 
     @Override

@@ -72,5 +72,7 @@ public interface MainContract {
         void checkAccount(Context context);
 
         void loadDataAfterLogin();
+
+        Group getGroup(String groupNo);
     }
 }

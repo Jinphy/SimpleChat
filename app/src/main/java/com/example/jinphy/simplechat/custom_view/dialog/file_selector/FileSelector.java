@@ -143,16 +143,13 @@ public class FileSelector {
                 .onInflate(viewType -> R.layout.layout_file_selector_item)
                 .onCreateView(holder -> {
                     // 图标
-                    holder.imageView[0] = holder.item.findViewById(R.id.icon_view);
-                    // 文件名
-                    holder.textView[0] = holder.item.findViewById(R.id.name_view);
-                    // 文件大小
-                    holder.textView[1] = holder.item.findViewById(R.id.size_view);
+                    holder.imageViews(R.id.icon_view);
+                    // 文件名、文件大小
+                    holder.textViews(R.id.name_view, R.id.size_view);
                     // 选择框
-                    holder.checkBox[0] = holder.item.findViewById(R.id.check_box);
+                    holder.checkBoxes(R.id.check_box);
                 })
                 .onBindView((holder, item, position) -> {
-                    LogUtils.e("onBindView: " + position);
                     holder.textView[0].setText(item.getName());
                     holder.checkBox[0].setChecked(item.isSelect());
                     if (item.isDir()) {

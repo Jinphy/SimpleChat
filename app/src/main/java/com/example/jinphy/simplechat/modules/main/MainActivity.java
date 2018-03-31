@@ -21,6 +21,8 @@ public class MainActivity extends BaseActivity {
 
 
 
+
+
     public static void start(Activity activity) {
         if (activity == null) {
             return;
@@ -30,6 +32,7 @@ public class MainActivity extends BaseActivity {
         activity.startActivity(intent);
         activity.overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
     }
+
 
     public static void startFromLogin(Activity activity) {
         if (activity == null) {

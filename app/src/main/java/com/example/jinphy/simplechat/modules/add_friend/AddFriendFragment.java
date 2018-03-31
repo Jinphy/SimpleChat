@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.modules.add_friend;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
@@ -23,8 +24,9 @@ import java.util.Map;
  */
 public class AddFriendFragment extends BaseFragment<AddFriendPresenter> implements AddFriendContract.View {
 
-    public static final String USER_JSON = "USER_JSON";
+    public static final String SAVE_KEY_USER_JSON = "SAVE_KEY_USER_JSON";
 
+    private String userJson;
     private Friend friend;
 
     private MenuItemView friendItem;
@@ -38,22 +40,22 @@ public class AddFriendFragment extends BaseFragment<AddFriendPresenter> implemen
 
     public static AddFriendFragment newInstance(String userJson) {
         AddFriendFragment fragment = new AddFriendFragment();
-        Bundle args = new Bundle();
-        args.putString(USER_JSON, userJson);
-        fragment.setArguments(args);
+        fragment.userJson = userJson;
         return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            friend = GsonUtils.toBean(arguments.getString(USER_JSON), Friend.class);
+        if (savedInstanceState != null) {
+            userJson = savedInstanceState.getString(SAVE_KEY_USER_JSON);
         }
-        if (presenter == null) {
-            this.presenter = getPresenter();
-        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SAVE_KEY_USER_JSON, userJson);
     }
 
     @Override
@@ -63,7 +65,7 @@ public class AddFriendFragment extends BaseFragment<AddFriendPresenter> implemen
 
     @Override
     protected void initData() {
-
+        friend = GsonUtils.toBean(userJson, Friend.class);
     }
 
     @Override

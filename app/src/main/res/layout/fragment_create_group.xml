@@ -21,7 +21,7 @@
                 android:id="@+id/item_avatar"
                 app:show_input="false"
                 app:icon_drawable="@drawable/ic_group_chat_24dp"
-                tools:content="设置群头像"
+                tools:text="设置群头像"
                 app:icon_color="#00000000"
                 app:icon_size="90dp"
                 android:layout_marginLeft="@dimen/dimen_10dp"

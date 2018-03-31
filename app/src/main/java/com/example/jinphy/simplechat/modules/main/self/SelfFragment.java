@@ -21,6 +21,7 @@ import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.custom_libs.qr_code.QRCode;
 import com.example.jinphy.simplechat.models.event_bus.EBUser;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.modules.login.LoginActivity;
@@ -28,6 +29,7 @@ import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.modules.modify_user_info.ModifyUserActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
+import com.example.jinphy.simplechat.utils.DialogUtils;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.StringUtils;
@@ -184,6 +186,18 @@ public class SelfFragment extends BaseFragment<SelfPresenter> implements SelfCon
                     })
                     .show();
 
+        });
+        avatarView.setOnClickListener(v -> {
+            DialogUtils.showQRCode(
+                    activity(),
+                    QRCode.content()
+                            .setType(QRCode.Content.TYPE_USER)
+                            .setText(user.getAccount())
+                            .toString(),
+                    user.getAccount(),
+                    user.getName(),
+                    "扫一扫，加我简聊"
+            );
         });
     }
 

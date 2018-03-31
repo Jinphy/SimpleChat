@@ -133,15 +133,9 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
                 .data(presenter.loadFriends())
                 .onCreateView(holder -> {
                     // avatar
-                    holder.circleImageView[0] = holder.item.findViewById(R.id.avatar);
-                    // remark
-                    holder.textView[0] = holder.item.findViewById(R.id.remark);
-                    // account
-                    holder.textView[1] = holder.item.findViewById(R.id.account);
-                    // address
-                    holder.textView[2] = holder.item.findViewById(R.id.address);
-                    // date
-                    holder.textView[3] = holder.item.findViewById(R.id.date);
+                    holder.circleImageViews(R.id.avatar);
+                    // remark、account、address、date
+                    holder.textViews(R.id.remark, R.id.account, R.id.address, R.id.date);
                 })
                 .onBindView((holder, item, position) -> {
                     // 设置头像

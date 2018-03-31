@@ -31,7 +31,7 @@ import org.greenrobot.eventbus.EventBus;
 public class AppBroadcastReceiver extends BroadcastReceiver {
 
     public static final String ACTION = "com.example.jinphy.simplechat.AppReceiver";
-    public static final String TAG = "TAG";
+    public static final String TAG = "tag";
     public static final String MSG = "MSG";
     public static final String MESSAGE = "MESSAGE";
     public static final String LOGOUT = "LOGOUT";

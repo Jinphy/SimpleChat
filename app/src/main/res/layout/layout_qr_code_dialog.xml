@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:cardElevation="@dimen/dimen_10dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/dimen_5dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_margin="@dimen/dimen_20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/avatar_view"
+                tools:src="@drawable/pic_1"
+                android:scaleType="centerCrop"
+                android:layout_marginRight="@dimen/dimen_10dp"
+                android:layout_width="@dimen/dimen_60dp"
+                android:layout_height="@dimen/dimen_60dp"/>
+
+            <TextView
+                android:id="@+id/name_view"
+                android:maxLines="1"
+                android:layout_toRightOf="@id/avatar_view"
+                android:ellipsize="end"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                android:text="跨☆时代"
+                android:textColor="#9f000000"
+                android:textSize="17sp"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/account_view"
+                android:maxLines="1"
+                android:layout_toRightOf="@id/avatar_view"
+                android:layout_below="@id/name_view"
+                android:ellipsize="end"
+                android:layout_marginTop="@dimen/dimen_5dp"
+                android:text="15889622346"
+                android:textColor="#5f000000"
+                android:textSize="@dimen/size_15sp"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/qr_code_view"
+            tools:src="@drawable/pic_qr_code"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dimen_30dp"
+            android:layout_width="260dp"
+            android:layout_height="260dp"/>
+
+        <TextView
+            android:id="@+id/hint_view"
+            android:layout_marginLeft="@dimen/dimen_30dp"
+            android:layout_marginRight="@dimen/dimen_30dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dimen_10dp"
+            tools:text="扫一扫，加我简聊"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

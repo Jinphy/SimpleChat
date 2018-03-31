@@ -1,5 +1,6 @@
 package com.example.jinphy.simplechat.base;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -19,8 +20,10 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.custom_libs.qr_code.QRCode;
 import com.example.jinphy.simplechat.models.event_bus.EBActivity;
 import com.example.jinphy.simplechat.models.event_bus.EBFinishActivityMsg;
+import com.yzq.zxinglibrary.common.Constant;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -36,23 +39,32 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected BaseFragment baseFragment;
     protected static Snackbar snackbar;
-    protected static String TAG;
+    protected static String tag;
 
     public int colorAccent;
     public int colorPrimary;
     public int colorPrimaryDark;
+
+    private QRCode.OnScanFinish qrCodeCallback;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        TAG = this.getClass().getSimpleName();
+        tag = this.getClass().getSimpleName();
         EventBus.getDefault().register(this);
 
         initColor();
     }
 
+    public String getTag() {
+        return tag;
+    }
+
+    public void addQRCodeCallback(QRCode.OnScanFinish onScanFinish) {
+        this.qrCodeCallback = onScanFinish;
+    }
 
     private void initColor() {
         TypedArray a = getTheme().obtainStyledAttributes(new int[]{
@@ -334,5 +346,22 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public void setTitle(CharSequence title) {
         // no-op
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case QRCode.REQUEST_CODE_SCAN_QR_CODE:
+                if (resultCode == RESULT_OK && qrCodeCallback != null) {
+                    String contentStr = data.getStringExtra(Constant.CODED_CONTENT);
+                    qrCodeCallback.call(QRCode.Content.parse(contentStr));
+                    qrCodeCallback = null;
+                }
+                break;
+            default:
+                break;
+
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.modules.modify_friend_info;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +27,7 @@ import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.FileReader;
 import java.util.Map;
 
 /**
@@ -34,7 +36,7 @@ import java.util.Map;
  */
 public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPresenter> implements ModifyFriendInfoContract.View {
 
-
+    public static final String SAVE_KEY_ACCOUNT = "SAVE_KEY_ACCOUNT";
 
     private String account;
     private Friend friend;
@@ -64,20 +66,22 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
 
     public static ModifyFriendInfoFragment newInstance(String account) {
         ModifyFriendInfoFragment fragment = new ModifyFriendInfoFragment();
-        Bundle args = new Bundle();
-        args.putString(Friend_.account.name, account);
-        fragment.setArguments(args);
+        fragment.account = account;
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (presenter == null) {
-            this.presenter = getPresenter();
+        if (savedInstanceState != null) {
+            account = savedInstanceState.getString(SAVE_KEY_ACCOUNT);
         }
+    }
 
-        account = getArguments().getString(Friend_.account.name);
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SAVE_KEY_ACCOUNT, account);
     }
 
     @Override

@@ -52,7 +52,10 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
      * */
     public static BaseActivity activity(){
         if (ObjectHelper.reference(currentActivity)) {
-            return (BaseActivity) currentActivity.get();
+            Activity activity = currentActivity.get();
+            if (activity instanceof BaseActivity) {
+                return (BaseActivity) activity;
+            }
         }
         return null;
     }
@@ -159,7 +162,9 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
 
     @Override
     public void onActivityResumed(Activity activity) {
-        currentActivity = new WeakReference<>(activity);
+        if (activity instanceof BaseActivity) {
+            currentActivity = new WeakReference<>(activity);
+        }
     }
     @Override
     protected void attachBaseContext(Context base) {

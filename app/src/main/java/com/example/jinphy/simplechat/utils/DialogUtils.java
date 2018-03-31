@@ -1,15 +1,24 @@
 package com.example.jinphy.simplechat.utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.custom_libs.qr_code.QRCode;
+import com.example.jinphy.simplechat.custom_view.dialog.my_dialog.MyDialog;
 import com.example.jinphy.simplechat.models.api.common.Response;
 import com.example.jinphy.simplechat.custom_libs.SChain;
-import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * DESC:
@@ -54,5 +63,70 @@ public class DialogUtils {
                     }
                 })
                 .show();
+    }
+
+    /**
+     * DESC: 显示提示对话框
+     * Created by jinphy, on 2018/3/30, at 18:22
+     */
+    public static MyDialog.Holder showHint(Context context, String hint) {
+        MyDialog.Holder holder = MyDialog.create(context)
+                .view(R.layout.layout_hint_dialog)
+                .cancelable(false)
+                .y(-30)
+                .display();
+        if (hint != null) {
+            ((TextView) holder.view.findViewById(R.id.hint_view)).setText(hint);
+        }
+        return holder;
+    }
+
+    /**
+     * DESC: 显示二维码对话框
+     * Created by jinphy, on 2018/3/30, at 18:22
+     */
+    public static void showQRCode(Context context,
+                           String content,
+                           String account,
+                           String name,
+                           String hint) {
+
+        MyDialog.Holder hintDialogHolder = DialogUtils.showHint(context, null);
+
+        Bitmap logo = ImageUtil.loadAvatar(account, 100, 100);
+
+        Observable.just("")
+                .subscribeOn(Schedulers.computation())
+                .map(v -> QRCode.from(content).logo(logo).make())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(qrCode -> {
+                    hintDialogHolder.dialog.dismiss();
+                    MyDialog.Holder dialogHolder = MyDialog.create(context)
+                            .width(330)
+                            .view(R.layout.layout_qr_code_dialog)
+                            .display();
+                    dialogHolder.view.setOnClickListener(v -> {
+                        dialogHolder.dialog.dismiss();
+                    });
+                    TextView nameView = dialogHolder.view.findViewById(R.id.name_view);
+                    TextView accountView = dialogHolder.view.findViewById(R.id.account_view);
+                    ImageView avatarView = dialogHolder.view.findViewById(R.id.avatar_view);
+                    ImageView qrCodeView = dialogHolder.view.findViewById(R.id.qr_code_view);
+                    TextView hintView = dialogHolder.view.findViewById(R.id.hint_view);
+                    if (name != null) {
+                        nameView.setText(name);
+                    }
+                    if (account != null) {
+                        accountView.setText(account);
+                    }
+                    if (hint != null) {
+                        hintView.setText(hint);
+                    }
+                    if (logo != null) {
+                        avatarView.setImageBitmap(logo);
+                    }
+                    qrCodeView.setImageBitmap(qrCode);
+                })
+                .subscribe();
     }
 }

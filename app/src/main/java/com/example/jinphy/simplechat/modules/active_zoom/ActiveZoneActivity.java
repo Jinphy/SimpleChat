@@ -30,11 +30,7 @@ public class ActiveZoneActivity extends BaseActivity {
 
 //        ScreenUtils.setStatusBarColor(this,0xff000000);
 
-        ActiveZoneFragment fragment = ActiveZoneFragment.newInstance();
-
-        ActiveZoneFragment returnFragment = (ActiveZoneFragment) addFragment(fragment, R.id.fragment);
-
-        presenter = getPresenter(returnFragment);
+        presenter = getPresenter(addFragment(ActiveZoneFragment.newInstance(), R.id.fragment));
 
     }
 

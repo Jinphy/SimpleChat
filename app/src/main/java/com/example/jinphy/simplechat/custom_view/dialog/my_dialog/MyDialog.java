@@ -2,18 +2,19 @@ package com.example.jinphy.simplechat.custom_view.dialog.my_dialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
+
+import static android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN;
+import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 
 /**
  * DESC:
@@ -45,6 +46,9 @@ public class MyDialog extends AlertDialog implements MyDialogInterface {
     private int y;
 
     private int gravity = Gravity.CENTER;
+    private Holder holder;
+    private float alpha = 1;
+
 
     protected MyDialog(Context context) {
         super(context);
@@ -60,10 +64,10 @@ public class MyDialog extends AlertDialog implements MyDialogInterface {
         //        getWindow().setLayout(600,300);
         Window window = getWindow();
 
+        window.setFlags(FLAG_FULLSCREEN,FLAG_FULLSCREEN);
+
         if (!hasFocus) {
-            window.setFlags(
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+            window.setFlags(FLAG_NOT_FOCUSABLE,FLAG_NOT_FOCUSABLE);
         }
 
         final WindowManager.LayoutParams attrs = window.getAttributes();
@@ -79,6 +83,7 @@ public class MyDialog extends AlertDialog implements MyDialogInterface {
         attrs.x = ScreenUtils.dp2px(getContext(), x);
         attrs.y = ScreenUtils.dp2px(getContext(), y);
         attrs.gravity = gravity;
+        attrs.alpha = alpha;
         window.setAttributes(attrs);
     }
 
@@ -91,6 +96,12 @@ public class MyDialog extends AlertDialog implements MyDialogInterface {
     @Override
     public MyDialogInterface height(int valueDp) {
         this.height = valueDp;
+        return this;
+    }
+
+    @Override
+    public MyDialogInterface alpha(float alpha) {
+        this.alpha = alpha;
         return this;
     }
 
@@ -116,6 +127,7 @@ public class MyDialog extends AlertDialog implements MyDialogInterface {
     public MyDialogInterface view(View view) {
         this.view = view;
         setView(view);
+        holder = new Holder(view, this);
         return this;
     }
 
@@ -124,6 +136,7 @@ public class MyDialog extends AlertDialog implements MyDialogInterface {
         view =LayoutInflater.from(getContext())
                 .inflate(resourceId, null, false);
         setView(view);
+        holder = new Holder(view, this);
         return this;
     }
 
@@ -140,10 +153,23 @@ public class MyDialog extends AlertDialog implements MyDialogInterface {
     }
 
     @Override
+    public MyDialogInterface onDismiss(Callback onDismiss) {
+        this.setOnDismissListener(dialog -> onDismiss.call(holder));
+        return this;
+    }
+
+    @Override
+    public MyDialogInterface onDisplay(Callback onDisplay) {
+        this.setOnShowListener(dialog -> onDisplay.call(holder));
+        return this;
+    }
+
+    @Override
     public Holder display() {
         show();
-        return new Holder(view, this);
+        return holder;
     }
+
 
     @Override
     public void dismiss() {
@@ -159,5 +185,9 @@ public class MyDialog extends AlertDialog implements MyDialogInterface {
             this.view = view;
             this.dialog = dialog;
         }
+    }
+
+    public interface Callback {
+        void call(Holder holder);
     }
 }

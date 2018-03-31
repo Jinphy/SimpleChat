@@ -49,6 +49,17 @@ public class AudioPlayer {
         }
     }
 
+    public synchronized void release() {
+        if (player == null) {
+            return;
+        }
+        if (player.isPlaying()) {
+            this.player.stop();
+        }
+        this.player.release();
+        this.player = null;
+    }
+
     /**
      * DESC: 停止播放
      * Created by jinphy, on 2018/3/27, at 18:01
