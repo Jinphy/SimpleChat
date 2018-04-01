@@ -29,5 +29,7 @@ public interface SystemMsgContract {
         int countNotices();
 
         int countNewNotices();
+
+        void updateSystemMsgRecord();
     }
 }

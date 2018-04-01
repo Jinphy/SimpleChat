@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.chat;
 
 import android.animation.AnimatorSet;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -45,6 +46,7 @@ import com.example.jinphy.simplechat.modules.show_photo.ShowPhotoActivity;
 import com.example.jinphy.simplechat.services.common_service.aidl.models.OnUpdate;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
+import com.example.jinphy.simplechat.utils.DeviceUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
@@ -339,6 +341,14 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
             }
         });
+
+        appbarLayout.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int
+                    oldLeft, int oldTop, int oldRight, int oldBottom) {
+                App.showToast("top:" + top, false);
+            }
+        });
     }
 
     // 声音按钮的点击事件
@@ -419,7 +429,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         };
 
     }
-
 
     @Override
     public void fabAction(View view) {
@@ -507,7 +516,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             recyclerView.smoothScrollToPosition(position);
         }
         findInputVoice().setVisibility(View.GONE);
-
     }
 
     @Override
@@ -550,8 +558,8 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     public void showMoreLayout() {
         hideExtraBottomLayout();
-        findMoreLayout().setVisibility(View.VISIBLE);
         findInputText().clearFocus();
+        findMoreLayout().setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -828,6 +836,11 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         Message finishedMsg = msgMap.remove(msg.data);
         finishedMsg.setStatus(msg.ok ? Message.STATUS_OK : Message.STATUS_NO);
         updateRecyclerView();
+        if (Message.TYPE_CHAT_VOICE.equals(finishedMsg.getContentType())) {
+            if (!AudioRecorder.isRecording()) {
+                DeviceUtils.playRing(R.raw.ring_sent);
+            }
+        }
     }
 
 

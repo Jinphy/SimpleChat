@@ -10,10 +10,12 @@ import android.widget.TextView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.models.event_bus.EBInteger;
+import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.modules.system_msg.new_friend.NewFriendsActivity;
 import com.example.jinphy.simplechat.modules.system_msg.new_member.NewMemberActivity;
 import com.example.jinphy.simplechat.modules.system_msg.notice.NoticeActivity;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -113,7 +115,6 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
     }
 
 
-
     /**
      * DESC: 创建菜单
      * Created by jinphy, on 2018/1/8, at 20:52
@@ -158,5 +159,7 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
             default:
                 break;
         }
+        presenter.updateSystemMsgRecord();
+        EventBus.getDefault().post(new EBUpdateView());
     }
 }

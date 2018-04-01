@@ -64,7 +64,7 @@ public class AudioPlayer {
      * DESC: 停止播放
      * Created by jinphy, on 2018/3/27, at 18:01
      */
-    private synchronized void stop() {
+    public synchronized void stop() {
         try {
             filePath = null;
             player.stop();

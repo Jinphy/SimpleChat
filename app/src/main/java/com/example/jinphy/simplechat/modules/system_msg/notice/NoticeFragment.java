@@ -50,7 +50,6 @@ public class NoticeFragment extends BaseFragment<NoticePresenter> implements Not
         List<Message> msg = adapter.getNewMsgAndSetOld();
         if (msg.size() > 0) {
             presenter.updateMsg(msg);
-            EventBus.getDefault().post(new EBUpdateView());
         }
         EventBus.getDefault().post(new EBInteger(3));
     }

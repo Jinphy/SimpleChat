@@ -9,8 +9,10 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.custom_libs.AudioPlayer;
 import com.example.jinphy.simplechat.custom_libs.AudioRecorder;
 import com.example.jinphy.simplechat.custom_view.dialog.my_dialog.MyDialog;
+import com.example.jinphy.simplechat.utils.DeviceUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -65,10 +67,15 @@ public class AudioRecordButton extends android.support.v7.widget.AppCompatTextVi
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                initDialog();
                 downY = event.getY();
-                startTime = System.currentTimeMillis();
-                startRecord();
+                initDialog();
+                DeviceUtils.stopRing();
+                AudioPlayer.getInstance().stop();
+                DeviceUtils.playRing(R.raw.ring_record,()->{
+                    startTime = System.currentTimeMillis();
+                    startRecord();
+                });
+                DeviceUtils.vibrate(100, 200);
                 break;
             case MotionEvent.ACTION_MOVE:
                 changeAlpha(event.getY());

@@ -56,7 +56,6 @@ public class NewFriendsFragment extends BaseFragment<NewFriendsPresenter> implem
         List<Message> msg = adapter.getNewMsgAndSetOld();
         if (msg.size() > 0) {
             presenter.updateMsg(msg);
-            EventBus.getDefault().post(new EBUpdateView());
         }
         EventBus.getDefault().post(new EBInteger(1));
     }

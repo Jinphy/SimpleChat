@@ -61,7 +61,6 @@ public class NewMemberFragment extends BaseFragment<NewMemberPresenter> implemen
         List<Message> msg = adapter.getNewMsgAndSetOld();
         if (msg.size() > 0) {
             presenter.updateMsg(msg);
-            EventBus.getDefault().post(new EBUpdateView());
         }
         EventBus.getDefault().post(new EBInteger(2));
     }
