@@ -29,6 +29,7 @@ public class ChatActivity extends BaseActivity {
     private ActionBar actionBar;
     private ChatFragment fragment;
 
+
     public static void start(Activity activity, String withAccount) {
         Intent intent = new Intent(activity, ChatActivity.class);
         intent.putExtra(ChatFragment.SAVE_KEY_WITH_ACCOUNT, withAccount);

@@ -261,7 +261,7 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
         switch (dataType) {
             case MODEL:// 例如：返回类型为Response<GSUser>
                 if (dataClass.length == 0) {
-                    ObjectHelper.throwRuntime("You must pass in a class when specifying Data.MODEL");
+                    ObjectHelper.throwRuntime("You must pass in a class when specifying MyData.MODEL");
                 }
 
                 responseType = GsonUtils.getType(Response.class, dataClass[0]);
@@ -274,10 +274,10 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
                 break;
             case MODEL_ARRAY:// 例如：返回类型为Response<GSUser[]>
                 if (dataClass.length == 0) {
-                    ObjectHelper.throwRuntime("You must pass in a class when specifying Data.MODEL_ARRAY");
+                    ObjectHelper.throwRuntime("You must pass in a class when specifying MyData.MODEL_ARRAY");
                 }
                 if (!dataClass[0].isArray()) {
-                    ObjectHelper.throwRuntime("The class must be array then specifying Data.MODEL_ARRAY");
+                    ObjectHelper.throwRuntime("The class must be array then specifying MyData.MODEL_ARRAY");
                 }
                 responseType = GsonUtils.getType(Response.class, dataClass[0]);
                 break;
@@ -302,7 +302,7 @@ abstract class BaseApi<T> implements ApiCallback<T>, ApiInterface<T> {
                 break;
             case MODEL_LIST:// 例如：返回类型为Response<List<GSUser>>
                 if (dataClass.length == 0) {
-                    ObjectHelper.throwRuntime("You must pass in a class when specifying Data.MODEL_LIST");
+                    ObjectHelper.throwRuntime("You must pass in a class when specifying MyData.MODEL_LIST");
                 }
                 responseType = GsonUtils.getType(
                         Response.class,

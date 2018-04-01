@@ -3,11 +3,6 @@ package com.example.jinphy.simplechat.modules.chat;
 import android.view.View;
 
 import com.example.jinphy.simplechat.R;
-import com.example.jinphy.simplechat.custom_view.dialog.file_selector.FileSelector;
-
-import java.util.List;
-
-import me.iwf.photopicker.PhotoPicker;
 
 /**
  * DESC:
@@ -16,54 +11,28 @@ import me.iwf.photopicker.PhotoPicker;
 
 public class BottomMoreMenu {
 
-    private ChatFragment fragment;
     /**
      * DESC: 底部更多菜单的布局
      * Created by jinphy, on 2018/3/20, at 10:35
      */
-    public View bottomMore;
+    public final View rootView;
 
     /**
      * DESC: 菜单项：图片
      * Created by jinphy, on 2018/3/20, at 10:36
      */
-    public View photoItem;
+    public final View photoItem;
 
-    public View fileItem;
+    public final View fileItem;
+
+    public static BottomMoreMenu init(View bottomMore) {
+        return new BottomMoreMenu(bottomMore);
+    }
 
 
-    public BottomMoreMenu(ChatFragment fragment, View bottomMore) {
-        this.fragment = fragment;
-        this.bottomMore = bottomMore;
+    private BottomMoreMenu(View bottomMore) {
+        this.rootView = bottomMore;
         photoItem = bottomMore.findViewById(R.id.item_photo);
         fileItem = bottomMore.findViewById(R.id.item_file);
-
     }
-
-
-    public void clearFragment() {
-        this.fragment = null;
-    }
-
-    /**
-     * DESC: 注册监听器
-     *
-     * Created by jinphy, on 2018/3/20, at 10:49
-     */
-    public void registerEvent() {
-        photoItem.setOnClickListener(v -> {
-            PhotoPicker.builder()
-                    .setPhotoCount(9)
-                    .setShowCamera(true)
-                    .setShowGif(true)
-                    .setPreviewEnabled(true)
-                    .start(fragment.activity(), PhotoPicker.REQUEST_CODE);
-        });
-        fileItem.setOnClickListener(v -> {
-            FileSelector.from(fragment.getContext())
-                    .onSelect(fragment::onSelectFilesResult)
-                    .make();
-        });
-    }
-
 }

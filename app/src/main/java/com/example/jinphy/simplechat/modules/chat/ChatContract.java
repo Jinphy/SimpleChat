@@ -25,32 +25,7 @@ public interface ChatContract {
 
         void animateBar(android.view.View view, float fromValue, float toValue, boolean showBar);
 
-        void fabAction(android.view.View view);
-
-        void showSendBtn();
-
-        void showMoreBtn();
-
-        void showVoiceBtn();
-
-        void showKeyboardBtn();
-
-        void showTextInput();
-
-        void showVoiceInput();
-
-        void showEmotionLayout();
-
-        void hideEmotionLayout();
-
-        void showMoreLayout();
-
-        void hideMoreLayout();
-
-
         void setStatusBarColor(float factor);
-
-        void hideExtraBottomLayout();
 
         void moveHorizontal(float factor);
 
@@ -61,8 +36,6 @@ public interface ChatContract {
         void whenSendStart(Message message);
 
         void whenSendFinal(EBSendMsg msg);
-
-        boolean isFriend();
 
         void cacheMsg(Message message);
 

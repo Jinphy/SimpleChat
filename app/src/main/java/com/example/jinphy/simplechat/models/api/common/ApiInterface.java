@@ -109,7 +109,7 @@ public interface ApiInterface<T> {
      *      否则将会出错
      *
      *  @see Response#data
-     *  @see Api.Data ，该函数的详细用法请参考{@code Data} 枚举
+     *  @see Api.Data ，该函数的详细用法请参考{@code MyData} 枚举
      * Created by jinphy, on 2018/1/5, at 13:52
      */
     ApiInterface<T> dataType(Api.Data dataType, Class<?>...dataClass);
