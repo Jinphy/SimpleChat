@@ -31,6 +31,7 @@ public class MyData {
 
     public final boolean isChatWithFriend;
 
+    public boolean exit;
 
     /**
      * DESC: 缓存正在发送的或者正在下载语音信息的消息

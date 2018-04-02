@@ -323,8 +323,6 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
         TextView fileMsg_fileSize;
 
 
-
-
         public ViewHolder(View itemView,int type) {
             super(itemView);
 
@@ -483,6 +481,13 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
                 break;
             }
         }
+    }
+
+    public void remove(Message message) {
+        if (message != null) {
+            data.remove(message);
+        }
+        notifyDataSetChanged();
     }
 }
 

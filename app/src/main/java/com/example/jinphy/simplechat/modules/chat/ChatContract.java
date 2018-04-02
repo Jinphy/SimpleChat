@@ -19,18 +19,6 @@ public interface ChatContract {
 
     interface View extends BaseView<Presenter> {
 
-        void showBar(android.view.View view);
-
-        void hideBar(android.view.View view);
-
-        void animateBar(android.view.View view, float fromValue, float toValue, boolean showBar);
-
-        void setStatusBarColor(float factor);
-
-        void moveHorizontal(float factor);
-
-        void animateHorizontal(float fromFactor, float toFactor, boolean exit);
-
         void updateView();
 
         void whenSendStart(Message message);
@@ -71,6 +59,8 @@ public interface ChatContract {
         void downloadVoice(Message message);
 
         Message getMessage(long msgId);
+
+        void removeMsg(Message message);
     }
 }
 

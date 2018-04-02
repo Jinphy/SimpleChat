@@ -117,6 +117,11 @@ public class ChatPresenter implements ChatContract.Presenter {
     }
 
     @Override
+    public void removeMsg(Message message) {
+        messageRepository.delete(message);
+    }
+
+    @Override
     public void updateRecord(Message message) {
         if (message == null) {
             return;

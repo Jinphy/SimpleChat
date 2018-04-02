@@ -113,7 +113,7 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
 
     @Override
     protected void setupViews() {
-        Bitmap bitmap = ImageUtil.getBitmap(message.extra(Message.KEY_FILE_PATH), 1500, 1500);
+        Bitmap bitmap = ImageUtil.getBitmap(message.extra(Message.KEY_FILE_PATH), 1000, 1000);
         if (bitmap != null) {
             imageView.setImage(ImageSource.bitmap(bitmap));
             btnDownload.setVisibility(View.GONE);

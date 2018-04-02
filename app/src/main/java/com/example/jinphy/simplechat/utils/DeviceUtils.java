@@ -2,6 +2,8 @@ package com.example.jinphy.simplechat.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -196,6 +198,23 @@ public class DeviceUtils {
      */
     public static Vibrator getVibrator() {
         return (Vibrator) App.app().getSystemService(Context.VIBRATOR_SERVICE);
+    }
+
+
+    /**
+     * DESC: 复制文本到剪贴板
+     * Created by jinphy, on 2018/4/2, at 15:02
+     */
+    public static void copyText(CharSequence text) {
+        ClipboardManager clipboard =
+                (ClipboardManager) App.app().getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard == null) {
+            App.showToast("文本复制失败！", false);
+            return;
+        }
+        ClipData clipData = ClipData.newPlainText("text", text);
+        clipboard.setPrimaryClip(clipData);
+        App.showToast("文本已复制!", false);
     }
 
 }

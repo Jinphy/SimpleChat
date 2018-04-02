@@ -1,45 +1,45 @@
 package com.example.jinphy.simplechat.modules.chat;
 
-import android.animation.AnimatorSet;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.base.BaseFragment;
-import com.example.jinphy.simplechat.constants.IntConst;
 import com.example.jinphy.simplechat.custom_libs.AudioPlayer;
 import com.example.jinphy.simplechat.custom_libs.AudioRecorder;
+import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.custom_view.dialog.file_selector.FileSelector;
+import com.example.jinphy.simplechat.custom_view.dialog.friend_selector.FriendSelector;
+import com.example.jinphy.simplechat.custom_view.menu.MyMenu;
 import com.example.jinphy.simplechat.listener_adapters.TextListener;
 import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.models.event_bus.EBSendMsg;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
+import com.example.jinphy.simplechat.models.friend.CheckedFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
 import com.example.jinphy.simplechat.modules.show_file.ShowFileActivity;
 import com.example.jinphy.simplechat.modules.show_photo.ShowPhotoActivity;
-import com.example.jinphy.simplechat.utils.AnimUtils;
-import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.DeviceUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
-import com.example.jinphy.simplechat.utils.ViewUtils;
+import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -61,16 +61,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     public static final String SAVE_KEY_WITH_ACCOUNT = "SAVE_KEY_WITH_ACCOUNT";
 
-    private static final int HORIZONTAL = 0;
-    private static final int VERTICAL = 1;
 
     private MyView myView;
 
     private MyData myData;
-
-    int startStatusColor;
-    // 隐藏 appBar 后的statusBar的 最终颜色，为colorAccent
-    int endStatusColor;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -129,7 +123,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
     @Override
     protected void setupViews() {
-        myView.toolbar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+        myView.appBar.setBackgroundColor(colorPrimary());
         if (myData.isChatWithFriend) {
             activity().setTitle(myData.withFriend.getShowName());
         } else {
@@ -156,7 +150,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 })
                 .subscribe();
     }
-
 
     @Override
     public void updateView() {
@@ -187,17 +180,18 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     protected void registerEvent() {
         myView.fab.setOnClickListener(v -> {
+            myView.showBar();
             int position = myData.adapter.getItemCount();
             if (position >= 0) {
                 myView.recyclerView.smoothScrollToPosition(position);
             }
-            showBar(myView.recyclerView);
         });
 
         myView.bottomBar.btnKeyboard.setOnClickListener(v -> {
             myView.showVoiceBtn();
             myView.showTextInput(myData);
         });
+
         myView.bottomBar.btnVoice.setOnClickListener(v -> {
             myView.showKeyboardBtn();
             myView.showVoiceInput();
@@ -205,11 +199,16 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
         myView.bottomBar.btnMore.setOnClickListener(v -> myView.showMoreLayout());
 
-        myView.bottomBar.btnSend.setOnClickListener(this::sendTextMsg);
-
-        myView.bottomBar.btnDown.setOnClickListener(v -> {
-            myView.hideMoreLayout();
+        myView.bottomBar.btnSend.setOnClickListener(v -> {
+            EditText inputText = myView.bottomBar.textInput;
+            String content = inputText.getText().toString();
+            inputText.setText("");
+            Message message = Message.makeTextMsg(myData.owner, myData.with, content, myData.isChatWithFriend);
+            myData.adapter.add(message);
+            sendTextMsg(message);
         });
+
+        myView.bottomBar.btnDown.setOnClickListener(v -> myView.hideExtraBottomLayout());
 
         myView.bottomBar.voiceInput.onRecordFinished((filePath, duration) -> {
             // 发送语音消息
@@ -257,6 +256,20 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
         });
 
+        myView.recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
+            @Override
+            public boolean onFling(int velocityX, int velocityY) {
+                // velocityY < 0 时，手指向下滑动
+                if (velocityY < 0 && myView.isBarShowing()) {
+                    int velocityYDp = ScreenUtils.px2dp(activity(), velocityY);
+                    if (velocityYDp < -1000 && myData.adapter.getItemCount() > 20) {
+                        myView.hideBar();
+                    }
+                }
+                return false;
+            }
+        });
+
         myData.adapter.onClick((view, item, type, position) -> {
             switch (item.getContentType()) {
                 case Message.TYPE_CHAT_IMAGE:{
@@ -298,18 +311,94 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 }
                 default:
                     break;
-
             }
         });
 
+        myData.adapter.onLongClick((view, item, type, position) -> {
+            MyMenu.create(activity())
+                    .width(200)
+                    .item("复制文本", (menu, menuItem) -> {
+                        DeviceUtils.copyText(item.getContent());
+                    })
+                    .item("重新发送", (menu, menuItem) -> {
+                        myData.adapter.remove(item);
+                        item.setStatus(Message.STATUS_SENDING);
+                        item.setCreateTime(System.currentTimeMillis() + "");
+                        switch (item.getContentType()) {
+                            case Message.TYPE_CHAT_TEXT:
+                                sendTextMsg(item);
+                                break;
+                            default:
+                                presenter.sendFileMsg(item);
+                                break;
+                        }
+                        myData.adapter.add(item);
+                    })
+                    .item("转发", (menu, menuItem) -> {
+                        if (Message.TYPE_CHAT_IMAGE.equals(item.getContentType())
+                                && !myData.adapter.hasPhoto(item)) {
+                            App.showToast("图片不存在！", false);
+                            return;
+                        }
+                        FriendSelector.create(activity())
+                                .title("选择转发好友")
+                                .exclude(myData.with)
+                                .titleColor(colorPrimary())
+                                .onSelect(friends -> {
+                                    for (CheckedFriend friend : friends) {
+                                        Message newMsg = item.copyToSend();
+                                        newMsg.setStatus(Message.STATUS_SENDING);
+                                        newMsg.setCreateTime(System.currentTimeMillis() + "");
+                                        newMsg.setWith(friend.getAccount());
+                                        newMsg.extra(Message.KEY_SENDER, myData.owner);
+                                        // 只有发送成功的消息或者接收的消息才能转发，所有只需简单的将
+                                        // 消息发送即可，图片、语音等消息资源在服务器上已经有了
+                                        sendTextMsg(newMsg);
+                                        presenter.updateRecord(newMsg);
+                                    }
+                                })
+                                .display();
+                    })
+                    .item("删除", (menu, item14) -> {
+                        int scrollY = myView.recyclerView.getScrollY();
+                        myData.adapter.remove(item);
+                        presenter.removeMsg(item);
+                        myView.recyclerView.scrollBy(0, scrollY);
+                        App.showToast("已删除！", false);
+                    })
+                    .onDisplay(menu -> {
+                        if (Message.TYPE_CHAT_TEXT.equals(item.getContentType())) {
+                            menu.item(0).setVisibility(View.VISIBLE);
+                        } else {
+                            menu.item(0).setVisibility(View.GONE);
+                        }
+
+                        if (StringUtils.notEqual(Message.STATUS_OK, item.getStatus())
+                                || Message.TYPE_CHAT_VOICE.equals(item.getContentType())) {
+                            menu.item(2).setVisibility(View.GONE);
+                        } else {
+                            menu.item(2).setVisibility(View.VISIBLE);
+                        }
+
+                        if (Message.SEND == item.getSourceType()
+                                && Message.STATUS_NO.equals(item.getStatus())) {
+                            menu.item(1).setVisibility(View.VISIBLE);
+                        } else {
+                            menu.item(1).setVisibility(View.GONE);
+                        }
+                    })
+                    .display();
+            return true;
+        });
     }
 
 
     /**
      * DESC: 发送文本信息
+     * <p>
      * Created by jinphy, on 2018/4/1, at 21:24
      */
-    private void sendTextMsg(View view) {
+    private void sendTextMsg(Message msg) {
         if (myData.isChatWithFriend) {
             switch (myData.withFriend.getStatus()) {
                 case Friend.status_black_listed:
@@ -329,22 +418,16 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 return;
             }
         }
-        EditText inputText = myView.bottomBar.textInput;
-        String content = inputText.getText().toString();
-        inputText.setText("");
-        Message message = Message.makeTextMsg(myData.owner, myData.with, content, myData.isChatWithFriend);
-        myData.adapter.add(message);
-        presenter.sendTextMsg(message);
+        presenter.sendTextMsg(msg);
     }
-
 
 
     //----------------------------------------------
 
     @Override
     protected void onKeyboardEvent(boolean open) {
-        if (!open) {
-
+        if (open) {
+            myView.showMoreBtn();
         }
     }
 
@@ -358,9 +441,15 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_chat_fragment, menu);
+        if (!myData.isChatWithFriend) {
+            menu.getItem(0).setIcon(R.drawable.ic_person_48dp);
+        }
     }
 
-    // 菜单点击事件
+    /**
+     * DESC: 菜单点击事件
+     * Created by jinphy, on 2018/4/2, at 8:23
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -382,204 +471,19 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
 
-    private boolean isBarVisible = true;
-
-    private AnimatorSet animatorSet = null;
-
-    /**
-     * 显示toolbar和bottomBar，同时隐藏fab
-     *
-     * @param view 是一个RecyclerView，传该参数的目的是为了在
-     *             移动toolbar和bottomBar时，更新RecyclerView的margin值
-     */
-    @Override
-    public void showBar(View view) {
-        if (!isBarVisible) {
-            isBarVisible = true;
-            animateBar(view, 1, 0, true);
-        }
-    }
-
-
-    /**
-     * 隐藏toolbar和bottomBar，同时显示fab
-     *
-     * @param view 是一个RecyclerView，传该参数的目的是为了在
-     *             移动toolbar和bottomBar时，更新RecyclerView的margin值
-     */
-    @Override
-    public void hideBar(View view) {
-        if (isBarVisible) {
-            isBarVisible = false;
-            animateBar(view, 0, 1, false);
-        }
-    }
-
-    @Override
-    public void animateBar(View view, float fromValue, float toValue, boolean showBar) {
-        if (animatorSet != null && animatorSet.isRunning()) {
-            animatorSet.end();
-        }
-
-        int appbarHeight = myView.toolbar.getHeight();
-        int bottomBarHeight = myView.bottomBar.rootView.getMeasuredHeight();
-
-        animatorSet = AnimUtils.just()
-                .setFloat(fromValue, toValue)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
-                .setDuration(IntConst.DURATION_500)
-                .onStart(animator -> {
-                    if (showBar) {
-                        myView.toolbar.setVisibility(View.VISIBLE);
-                        myView.bottomBar.rootView.setVisibility(View.VISIBLE);
-                    } else {
-                        myView.fab.setVisibility(View.VISIBLE);
-                    }
-                })
-                .onUpdateFloat(animator -> {
-                    float value = (float) animator.getAnimatedValue();
-                    float marginTop = appbarHeight * (1 - value);
-                    float marginBottom = bottomBarHeight * (1 - value);
-                    myView.toolbar.setTranslationY(value * (-appbarHeight));
-                    myView.bottomBar.rootView.setTranslationY(value * bottomBarHeight);
-                    ViewUtils.setScaleXY(myView.fab, value);
-                    // TODO: 2017/8/15 设置statusBar的颜色
-                    setStatusBarColor(value);
-                    setMargin(view, marginTop, marginBottom);
-                })
-                .onEnd(animator -> {
-                    if (showBar) {
-                        myView.fab.setVisibility(View.GONE);
-                    } else {
-                        myView.toolbar.setVisibility(View.GONE);
-                        myView.bottomBar.rootView.setVisibility(View.GONE);
-                    }
-                })
-                .build();
-        animatorSet.start();
-    }
-
-
-    @Override
-    public void setStatusBarColor(float factor) {
-        int color = ColorUtils.rgbColorByFactor(startStatusColor, endStatusColor, factor);
-        ScreenUtils.setStatusBarColor(activity(), color);
-    }
-
-    //设置View的margin，用在移动toolbar和bottomBar时改变其他View
-    //的margin
-    private void setMargin(View view, float marginTop, float marginBottom) {
-        if (view == null) {
-            return;
-        }
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(view.getLayoutParams());
-        lp.setMargins(lp.leftMargin, (int) marginTop, lp.rightMargin, (int) marginBottom);
-        view.setLayoutParams(lp);
-        view.requestLayout();
-    }
-
-    private int moveOrientation;
-    private float oldX;
-    private float deltaX;
-    private float downX;
-    private float onThirdScreenWidth;
-    private float screenWidth;
-    private int maxElevation;
-
     @Override
     public boolean handleHorizontalTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                downX = event.getX();
-                oldX = downX;
-                return false;
-            case MotionEvent.ACTION_MOVE:
-                Log.e(getClass().getSimpleName(), "move");
-                moveOrientation = HORIZONTAL;
-                deltaX = event.getX() - oldX;
-                oldX = event.getX();
-                if (canMoveHorizontal()) {
-                    float factor = getHorizontalMoveFactor(deltaX);
-                    moveHorizontal(factor);
-                }
-                return true;
-            case MotionEvent.ACTION_UP:
-                if (moveOrientation == HORIZONTAL) {
-                    float factor = rootView.getTranslationX() / screenWidth;
-                    if (factor < 1.0f / 3) {
-                        animateHorizontal(factor, 0, false);
-                    } else {
-                        animateHorizontal(factor, 1f, true);
-                    }
-                    return true;
-                }
-                return false;
-            default:
-                return false;
-        }
-
+        return myView.handleHorizontalEvent(event);
     }
 
-    private boolean canMoveHorizontal() {
-        return (downX < onThirdScreenWidth) && (rootView.getTranslationX() >= 0);
-    }
-
-    @Override
-    public void moveHorizontal(float factor) {
-        float transX = factor * screenWidth;
-        rootView.setTranslationX(transX);
-        myView.toolbar.setTranslationX(transX);
-        myView.recyclerView.setAlpha(1 - factor);
-        myView.toolbar.setAlpha((1 - factor));
-        myView.bottomBar.rootView.setAlpha(1 - factor);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            rootView.setElevation((float) (maxElevation * (1 - factor * 0.5)));
-        }
-    }
-
-    private float getHorizontalMoveFactor(float deltaX) {
-        float transX = rootView.getTranslationX();
-        transX += deltaX;
-
-        if (deltaX < 0 && transX < 0) {
-            // 向左滑动
-            transX = 0;
-        }
-
-        float factor = transX / screenWidth;
-
-        return factor;
-    }
-
-    @Override
-    public void animateHorizontal(float fromFactor, float toFactor, boolean exit) {
-        float deltaFactor = Math.abs(toFactor - fromFactor);
-        AnimUtils.just()
-                .setFloat(fromFactor, toFactor)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
-                .setDuration((long) (IntConst.DURATION_500 * deltaFactor))
-                .onUpdateFloat(animator -> {
-                    float factor = (float) animator.getAnimatedValue();
-                    moveHorizontal(factor);
-                })
-                .onEnd(animator -> {
-                    if (exit) {
-                        Keyboard.close(getContext(), myView.bottomBar.textInput);
-                        activity().finish();
-                    }
-                })
-                .animate();
-    }
-
-    private boolean exit = false;
 
     @Override
     public boolean onBackPressed() {
-        if (exit) {
+        if (myData.exit) {
             return false;
         }
-        exit = true;
-        animateHorizontal(0, 1, true);
+        myData.exit = true;
+        myView.exit();
         return false;
     }
 
@@ -590,8 +494,13 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
      */
     @Override
     public void whenSendStart(Message message) {
+        cacheMsg(message);
+
+        if (StringUtils.notEqual(myData.with, message.getWith())) {
+            // 这种消息时转发的消息
+            return;
+        }
         myView.recyclerView.smoothScrollToPosition(myData.adapter.getItemCount() - 1);
-        myData.msgMap.put(message.getId(), message);
     }
 
     /**
@@ -602,6 +511,11 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     @Override
     public void whenSendFinal(EBSendMsg msg) {
         Message finishedMsg = myData.msgMap.remove(msg.data);
+        if (StringUtils.notEqual(myData.with, finishedMsg.getWith())) {
+            // 这种消息为转发的消息
+            App.showToast("消息已转发！", false);
+            return;
+        }
         finishedMsg.setStatus(msg.ok ? Message.STATUS_OK : Message.STATUS_NO);
         updateRecyclerView();
         if (Message.TYPE_CHAT_VOICE.equals(finishedMsg.getContentType())) {
@@ -627,9 +541,12 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             }
         }
         updateView();
-
     }
 
+    /**
+     * DESC: 获取图片后的回调
+     * Created by jinphy, on 2018/4/2, at 8:31
+     */
     public void onPickPhoto(List<String> photoPaths) {
         Observable.fromIterable(photoPaths)
                 .subscribeOn(Schedulers.io())
@@ -677,17 +594,29 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         }
     }
 
+    /**
+     * DESC: 缓存需要进一步处理的信息
+     * Created by jinphy, on 2018/4/2, at 8:30
+     */
     @Override
     public void cacheMsg(Message message) {
         myData.msgMap.put(message.getId(), message);
     }
 
+    /**
+     * DESC: 跟新recyclerView界面
+     * Created by jinphy, on 2018/4/2, at 8:30
+     */
     private void updateRecyclerView() {
         int scrollY = myView.recyclerView.getScrollY();
         myData.adapter.notifyDataSetChanged();
         myView.recyclerView.smoothScrollBy(0, scrollY);
     }
 
+    /**
+     * DESC: 选择文件回调
+     * Created by jinphy, on 2018/4/2, at 8:29
+     */
     @Override
     public void onSelectFilesResult(List<String> filePaths) {
         Observable.fromIterable(filePaths)
