@@ -167,7 +167,7 @@
                             android:id="@+id/file_name_scroll_view"
                             android:scrollbars="none"
                             android:overScrollMode="never"
-                            android:layout_width="140dp"
+                            android:layout_width="130dp"
                             android:layout_height="wrap_content">
                             <TextView
                                 android:id="@+id/file_name_text"

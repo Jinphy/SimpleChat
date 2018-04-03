@@ -223,6 +223,11 @@ public class MyAdapter<T> extends RecyclerView.Adapter<MyAdapter.ViewHolder> imp
         return this;
     }
 
+    @Override
+    public MyAdapter<T> make() {
+        return this;
+    }
+
     public void update(List<T> data) {
         data(data);
         notifyDataSetChanged();

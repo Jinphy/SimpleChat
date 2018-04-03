@@ -18,18 +18,20 @@ public interface NewMemberContract {
 
     interface View extends BaseView<Presenter> {
 
-        void whenAgreeOk(NewMemberAdapter.NewMember newMember);
+        void whenAgreeOk(NewMember newMember);
     }
 
 
     interface Presenter extends BasePresenter{
 
-        List<NewMemberAdapter.NewMember> loadNewMembers();
+        List<NewMember> loadNewMembers();
 
         void updateMsg(List<Message> messages);
 
         void updateMsg(Message message);
 
-        void agreeJoinGroup(Context context, NewMemberAdapter.NewMember newMember);
+        void deleteMsg(Message message);
+
+        void agreeJoinGroup(Context context, NewMember newMember);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.modules.chat;
+package com.example.jinphy.simplechat.modules.chat.models;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 import com.example.jinphy.simplechat.utils.Keyboard;
-import com.example.jinphy.simplechat.utils.ScreenUtils;
 
 /**
  * DESC:
@@ -78,10 +78,11 @@ public class MyView {
         rootView = view;
         appBar = activity.findViewById(R.id.appbar_layout);
         toolbar = activity.findViewById(R.id.toolbar);
-        recyclerView = view.findViewById(R.id.recycler_view);
-        bottomBar = BottomBar.init(view.findViewById(R.id.bottom_bar));
+        bottomBar = BottomBar.init(activity, view.findViewById(R.id.bottom_bar));
         fab = activity.findViewById(R.id.fab);
+        recyclerView = view.findViewById(R.id.recycler_view);
         layoutManager = new LinearLayoutManager(activity);
+        recyclerView.setLayoutManager(layoutManager);
         animator = Animator.init(activity, this);
     }
 
@@ -169,7 +170,7 @@ public class MyView {
     public void showMoreLayout() {
         hideExtraBottomLayout();
         bottomBar.textInput.clearFocus();
-        bottomBar.moreMenu.rootView.setVisibility(View.VISIBLE);
+        bottomBar.bottomExtraView.moreMenu.setVisibility(View.VISIBLE);
         showDownBtn();
     }
 
@@ -178,10 +179,9 @@ public class MyView {
      * Created by jinphy, on 2018/4/2, at 8:59
      */
     public void hideMoreLayout() {
-        hideExtraBottomLayout();
+        bottomBar.bottomExtraView.moreMenu.setVisibility(View.GONE);
         bottomBar.btnDown.setVisibility(View.GONE);
         bottomBar.btnMore.setVisibility(View.VISIBLE);
-
     }
 
     /**
@@ -190,8 +190,9 @@ public class MyView {
      */
     public void hideExtraBottomLayout() {
         // 关闭底部额外的布局
-        bottomBar.moreMenu.rootView.setVisibility(View.GONE);
-
+        for (int i = 0; i < bottomBar.bottomExtraView.rootView.getChildCount(); i++) {
+            bottomBar.bottomExtraView.rootView.getChildAt(i).setVisibility(View.GONE);
+        }
         // 更新按键的显示
         if (bottomBar.textInput.getText().length() == 0) {
             showMoreBtn();

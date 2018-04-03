@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.system_msg;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -8,12 +9,16 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.custom_view.menu.MyMenu;
 import com.example.jinphy.simplechat.models.event_bus.EBInteger;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
+import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.modules.system_msg.new_friend.NewFriendsActivity;
 import com.example.jinphy.simplechat.modules.system_msg.new_member.NewMemberActivity;
 import com.example.jinphy.simplechat.modules.system_msg.notice.NoticeActivity;
+import com.example.jinphy.simplechat.utils.ScreenUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -36,6 +41,9 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
     private TextView titleNewFriend;
     private TextView titleNewMember;
     private TextView titleNotice;
+    private int newFriendCount;
+    private int newMemberCount;
+    private int noticeCount;
 
     public SystemMsgFragment() {
         // Required empty public constructor
@@ -68,8 +76,8 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
     @Override
     protected void findViewsById(View view) {
         itemNewFriend = view.findViewById(R.id.item_new_friend);
-        itemNotice = view.findViewById(R.id.item_notice);
         itemNewMember = view.findViewById(R.id.item_new_member);
+        itemNotice = view.findViewById(R.id.item_notice);
 
         newFriendView = view.findViewById(R.id.new_friend_view);
         newMemberView = view.findViewById(R.id.new_member_view);
@@ -82,22 +90,23 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
 
     @Override
     protected void setupViews() {
-        int newFriendCount = presenter.countFriends();
-        int newMemberCount = presenter.countMembers();
-        int noticeCount = presenter.countNotices();
-        if (newFriendCount > 0) {
-            titleNewFriend.setText("新朋友（" + newFriendCount + "）");
-        }
-        if (newMemberCount > 0) {
-            titleNewMember.setText("新成员（" + newMemberCount + "）");
-        }
-        if (noticeCount > 0) {
-            titleNotice.setText("公告（" + noticeCount + ")");
-        }
-
+        newFriendCount = presenter.countFriends();
+        newMemberCount = presenter.countMembers();
+        noticeCount = presenter.countNotices();
+        setTitle(titleNewFriend, "新朋友", newFriendCount);
+        setTitle(titleNewMember, "新成员", newMemberCount);
+        setTitle(titleNotice, "公告", noticeCount);
         newFriendView.setVisibility(presenter.countNewFriends() > 0 ? View.VISIBLE : View.GONE);
         newMemberView.setVisibility(presenter.countNewMembers() > 0 ? View.VISIBLE : View.GONE);
         noticeView.setVisibility(presenter.countNewNotices() > 0 ? View.VISIBLE : View.GONE);
+    }
+
+    private void setTitle(TextView titleView, String title, int count) {
+        if (count == 0) {
+            titleView.setText(title);
+        } else {
+            titleView.setText(String.format("%s%s%d%s", title, "(", count, ")"));
+        }
     }
 
     @Override
@@ -105,13 +114,16 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
         itemNewFriend.setOnClickListener(v->{
             NewFriendsActivity.start(activity());
         });
-
-        itemNotice.setOnClickListener(v -> {
-            NoticeActivity.start(activity());
-        });
         itemNewMember.setOnClickListener(v -> {
             NewMemberActivity.start(activity());
         });
+        itemNotice.setOnClickListener(v -> {
+            NoticeActivity.start(activity());
+        });
+
+        itemNewFriend.setOnLongClickListener(this::showMenu);
+        itemNewMember.setOnLongClickListener(this::showMenu);
+        itemNotice.setOnLongClickListener(this::showMenu);
     }
 
 
@@ -121,7 +133,7 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.menu_chat_fragment,menu);
+//        inflater.inflate(R.menu.menu_main_fragment,menu);
     }
 
     // 菜单点击事件
@@ -138,6 +150,44 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
         return super.onOptionsItemSelected(item);
     }
 
+    private boolean showMenu(View view) {
+        MyMenu.create(activity())
+                .width(200)
+                .item("清空", (menu, item) -> {
+                    switch (view.getId()) {
+                        case R.id.item_new_friend:
+                            if (newFriendCount == 0) {
+                                break;
+                            }
+                            presenter.deleteMsg(Message.TYPE_SYSTEM_ADD_FRIEND);
+                            titleNewFriend.setText("新朋友");
+                            break;
+                        case R.id.item_new_member:
+                            if (newMemberCount == 0) {
+                                break;
+                            }
+                            presenter.deleteMsg(Message.TYPE_SYSTEM_APPLY_JOIN_GROUP);
+                            titleNewMember.setText("新成员");
+                            break;
+                        case R.id.item_notice:
+                            if (noticeCount == 0) {
+                                break;
+                            }
+                            presenter.deleteMsg(Message.TYPE_SYSTEM_NOTICE);
+                            titleNotice.setText("公告");
+                            break;
+                        default:
+                            break;
+                    }
+                    App.showToast("信息已清空!", false);
+                    EventBus.getDefault().post(new EBUpdateView());
+                })
+                .display();
+
+        return true;
+    }
+
+
     @Override
     public boolean onBackPressed() {
         finishActivity();
@@ -149,12 +199,21 @@ public class SystemMsgFragment extends BaseFragment<SystemMsgPresenter> implemen
         switch (msg.data) {
             case 1:
                 newFriendView.setVisibility(View.GONE);
+                if (msg.ok) {
+                    setTitle(titleNewFriend, "新朋友", --newFriendCount);
+                }
                 break;
             case 2:
                 newMemberView.setVisibility(View.GONE);
+                if (msg.ok) {
+                    setTitle(titleNewMember, "新成员", --newMemberCount);
+                }
                 break;
             case 3:
                 noticeView.setVisibility(View.GONE);
+                if (msg.ok) {
+                    setTitle(titleNotice, "公告", --noticeCount);
+                }
                 break;
             default:
                 break;

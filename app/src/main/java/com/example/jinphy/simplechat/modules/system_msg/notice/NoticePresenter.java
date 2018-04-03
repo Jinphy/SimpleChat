@@ -63,4 +63,10 @@ public class NoticePresenter implements NoticeContract.Presenter{
             LogUtils.e("4");
         }
     }
+
+    @Override
+    public void deleteMsg(Message message) {
+        User user = userRepository.currentUser();
+        messageRepository.delete(message);
+    }
 }

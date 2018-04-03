@@ -1,32 +1,51 @@
 package com.example.jinphy.simplechat.models.menu;
 
+import com.example.jinphy.simplechat.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by jinphy on 2017/8/15.
  */
 
-public class Routine {
+public final class Routine {
 
-    private int iconId;
-    private int tagId;
+    public final int icon;
+    public final int tag;
 
-    public Routine(int iconId, int tagId) {
-        this.iconId = iconId;
-        this.tagId = tagId;
+    private Routine(int icon, int tag) {
+        this.icon = icon;
+        this.tag = tag;
     }
 
-    public int getIconId() {
-        return iconId;
-    }
-
-    public void setIconId(int iconId) {
-        this.iconId = iconId;
-    }
-
-    public int getTagId() {
-        return tagId;
-    }
-
-    public void setTagId(int tagId) {
-        this.tagId = tagId;
+    public static List<Routine> create() {
+        List<Routine> data = new ArrayList<>(9);
+        int[] icons = {
+                R.drawable.ic_system_24dp,
+                R.drawable.ic_group_chat_24dp,
+                //                    R.drawable.ic_credit_card_24dp,
+                //                    R.drawable.ic_certificates_24dp,
+                //                    R.drawable.ic_scenic_spot_24dp,
+                //                    R.drawable.ic_bus_route_24dp,
+                //                    R.drawable.ic_food_menu_24dp,
+                //                    R.drawable.ic_express_24dp,
+                //                    R.drawable.ic_weather_24dp
+        };
+        int[] tags = new int[]{
+                R.string.system_msg,
+                R.string.routine_group_chat,
+                //                    R.string.routine_credit_card_address,
+                //                    R.string.routine_certificates,
+                //                    R.string.routine_scenic_spot,
+                //                    R.string.routine_bus_route,
+                //                    R.string.routine_food_menu,
+                //                    R.string.routine_express,
+                //                    R.string.routine_weather
+        };
+        for (int i = 0; i < icons.length; i++) {
+            data.add(new Routine(icons[i], tags[i]));
+        }
+        return data;
     }
 }

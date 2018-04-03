@@ -33,4 +33,6 @@ public interface MessageRecordDataSource {
     void update(Message msg, boolean resetNewMsgCount);
 
     void update(MessageRecord record);
+
+    void update(String owner, String with);
 }

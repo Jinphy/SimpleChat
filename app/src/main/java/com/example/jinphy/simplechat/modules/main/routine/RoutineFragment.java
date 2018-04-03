@@ -1,7 +1,6 @@
 package com.example.jinphy.simplechat.modules.main.routine;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -18,6 +17,7 @@ import com.example.jinphy.simplechat.models.menu.Routine;
 import com.example.jinphy.simplechat.modules.active_zoom.ActiveZoneActivity;
 import com.example.jinphy.simplechat.modules.group.group_list.GroupListActivity;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
+import com.example.jinphy.simplechat.modules.system_msg.SystemMsgActivity;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
 /**
@@ -98,11 +98,10 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     @Override
     protected void setupViews() {
         // TODO: 2017/8/11 设置图片，设置文字，设置点击监听,设置宽高
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
-        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         adapter = MyAdapter.<Routine>newInstance()
                 .onInflate(viewType -> R.layout.main_tab_routine_item)
-                .data(presenter.loadRoutines())
+                .data(Routine.create())
                 .onCreateView(holder -> {
                     // icon
                     holder.imageViews(R.id.icon_view);
@@ -110,32 +109,20 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
                     holder.textViews(R.id.tag_view);
                 })
                 .onBindView((holder, item, position) -> {
-                    holder.imageView[0].setImageResource(item.getIconId());
-                    holder.textView[0].setText(item.getTagId());
+                    holder.imageView[0].setImageResource(item.icon);
+                    holder.textView[0].setText(item.tag);
                     holder.setClickedViews(holder.item);
                     holder.setLongClickedViews(holder.item);
                 })
                 .onClick((v, item, holder, type, position) -> {
-                    switch (item.getTagId()) {
-                        case R.string.routine_active_zoom:
-                            showActiveZoneActivity();
+                    switch (item.icon) {
+                        case R.drawable.ic_system_24dp:
+                            SystemMsgActivity.start(activity());
                             break;
-                        case R.string.routine_group_chat:
-                            showGroupListActivity();
+                        case R.drawable.ic_group_chat_24dp:
+                            GroupListActivity.start(activity(), false);
                             break;
-                        case R.string.routine_credit_card_address:
-                            break;
-                        case R.string.routine_certificates:
-                            break;
-                        case R.string.routine_scenic_spot:
-                            break;
-                        case R.string.routine_bus_route:
-                            break;
-                        case R.string.routine_food_menu:
-                            break;
-                        case R.string.routine_express:
-                            break;
-                        case R.string.routine_weather:
+                        default:
                             break;
                     }
                 })

@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.modules.group.create_group;
 import android.content.Context;
 
 import com.apkfuns.logutils.LogUtils;
+import com.example.jinphy.simplechat.models.friend.CheckedFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.group.Group;
@@ -97,9 +98,10 @@ public class CreateGroupPresenter implements CreateGroupContract.Presenter {
 
 
     @Override
-    public List<Friend> loadFriends() {
+    public List<CheckedFriend> loadFriends() {
         User user = userRepository.currentUser();
-        return friendRepository.loadLocal(user.getAccount());
+        List<Friend> friends = friendRepository.loadLocal(user.getAccount());
+        return CheckedFriend.create(friends);
     }
 
     @Override

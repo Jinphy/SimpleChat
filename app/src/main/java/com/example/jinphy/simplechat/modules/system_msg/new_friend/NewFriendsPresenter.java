@@ -8,8 +8,6 @@ import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
-import com.example.jinphy.simplechat.modules.system_msg.new_friend.NewFriendRecyclerViewAdapter
-        .NewFriend;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -69,5 +67,11 @@ public class NewFriendsPresenter implements NewFriendsContract.Presenter {
             record.setNewMsgCount(record.getNewMsgCount() - messages.size());
             recordRepository.saveOrUpdate(record);
         }
+    }
+
+    @Override
+    public void deleteMsg(Message message) {
+        User user = userRepository.currentUser();
+        messageRepository.delete(message);
     }
 }

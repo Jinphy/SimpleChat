@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.modules.chat;
+package com.example.jinphy.simplechat.modules.chat.models;
 
 import android.animation.AnimatorSet;
 import android.os.Build;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ColorUtils;
 import com.example.jinphy.simplechat.utils.Keyboard;

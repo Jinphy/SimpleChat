@@ -44,6 +44,10 @@ public class NewMemberActivity extends BaseActivity {
     }
 
     public void updateTitle(int count) {
-        actionBar.setTitle("新群聊（" + count + "）");
+        if (count == 0) {
+            actionBar.setTitle("新成员");
+        } else {
+            actionBar.setTitle("新成员(" + count + ")");
+        }
     }
 }

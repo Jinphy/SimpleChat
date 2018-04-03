@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.modules.chat;
+package com.example.jinphy.simplechat.modules.chat.models;
 
 import android.view.View;
 import android.widget.EditText;
@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.custom_view.AudioRecordButton;
+import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 
 /**
  * DESC: 聊天界面底部功能的bottomBar
@@ -59,14 +60,18 @@ public class BottomBar {
      */
     public final ImageView btnDown;
 
-    public final BottomMoreMenu moreMenu;
+    /**
+     * DESC: “更多”功能布局
+     * Created by jinphy, on 2018/4/2, at 20:52
+     */
+    public final BottomExtraView bottomExtraView;
 
 
-    public static BottomBar init(View bottomBar) {
-        return new BottomBar(bottomBar);
+    public static BottomBar init(ChatActivity activity, View bottomBar) {
+        return new BottomBar(activity, bottomBar);
     }
 
-    private BottomBar(View bottomBar) {
+    private BottomBar(ChatActivity activity, View bottomBar) {
         this.rootView = bottomBar;
         this.btnVoice = bottomBar.findViewById(R.id.voice_View);
         this.btnKeyboard = bottomBar.findViewById(R.id.keyboard_view);
@@ -75,6 +80,6 @@ public class BottomBar {
         this.btnMore = bottomBar.findViewById(R.id.more_view);
         this.btnDown = bottomBar.findViewById(R.id.down_view);
         this.btnSend = bottomBar.findViewById(R.id.send_view);
-        this.moreMenu = BottomMoreMenu.init(bottomBar.findViewById(R.id.more_layout));
+        this.bottomExtraView = BottomExtraView.init(activity, bottomBar.findViewById(R.id.bottom_extra_view));
     }
 }

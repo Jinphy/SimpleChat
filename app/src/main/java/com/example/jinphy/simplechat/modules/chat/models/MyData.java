@@ -1,10 +1,13 @@
-package com.example.jinphy.simplechat.modules.chat;
+package com.example.jinphy.simplechat.modules.chat.models;
 
-import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.member.Member;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.modules.chat.ChatAdapter;
+import com.example.jinphy.simplechat.modules.chat.ChatPresenter;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 
 import java.util.Map;
@@ -28,6 +31,8 @@ public class MyData {
     public String owner;
 
     public ChatAdapter adapter;
+
+    public MyAdapter<BottomExtraView.MenuItem> bottomMenuAdpater;
 
     public final boolean isChatWithFriend;
 
@@ -61,5 +66,18 @@ public class MyData {
         }
         adapter = new ChatAdapter(presenter.getUserAvatar(), with);
 
+        bottomMenuAdpater = MyAdapter.<BottomExtraView.MenuItem>newInstance()
+                .onInflate(viewType -> R.layout.chat_bottom_menu_item)
+                .data(BottomExtraView.MenuItem.create())
+                .onCreateView(holder -> {
+                    holder.imageViews(R.id.icon_view);
+                    holder.textViews(R.id.tag_view);
+                })
+                .onBindView((holder, item, position) -> {
+                    holder.imageView[0].setImageResource(item.icon);
+                    holder.textView[0].setText(item.tag);
+                    holder.setClickedViews(holder.imageView[0]);
+                })
+                .make();
     }
 }

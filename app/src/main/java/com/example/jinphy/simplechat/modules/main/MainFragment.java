@@ -416,13 +416,16 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                     animateFab(offset, -ScreenUtils.getToolbarHeight(getContext()),
                             R.drawable.ic_smile_24dp, View.VISIBLE);
                 } else {
-                    animateFab(offset);
+//                    animateFab(offset);
+                    // 日常功能中由于活动空间的功能暂时去掉，所以fab 暂时不显示
+                    animateFab(0);
                 }
                 break;
             case 2: //当前可见的第一个pager为第三个fragment
                 if (offset < 0.5f) {
-                    animateFab(1 - offset * 2,  -ScreenUtils.getToolbarHeight(getContext()),
-                            R.drawable.ic_smile_24dp, View.VISIBLE);
+//                    animateFab(1 - offset * 2,  -ScreenUtils.getToolbarHeight(getContext()),
+//                            R.drawable.ic_smile_24dp, View.VISIBLE);
+                    animateFab(0);
                 } else {
                     animateFab(offset * 2 - 1,  -ScreenUtils.getToolbarHeight(getContext()),
                             R.drawable.ic_edit_24dp, View.VISIBLE);

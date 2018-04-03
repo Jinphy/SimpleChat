@@ -15,7 +15,7 @@ import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.models.event_bus.EBSendMsg;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.user.UserRepository;
-import com.example.jinphy.simplechat.modules.chat.FileListener;
+import com.example.jinphy.simplechat.modules.chat.models.FileListener;
 import com.example.jinphy.simplechat.modules.login.LoginActivity;
 import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;

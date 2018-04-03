@@ -31,5 +31,7 @@ public interface SystemMsgContract {
         int countNewNotices();
 
         void updateSystemMsgRecord();
+
+        void deleteMsg(String type);
     }
 }

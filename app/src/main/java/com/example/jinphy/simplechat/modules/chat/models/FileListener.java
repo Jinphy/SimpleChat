@@ -1,4 +1,4 @@
-package com.example.jinphy.simplechat.modules.chat;
+package com.example.jinphy.simplechat.modules.chat.models;
 
 /**
  * DESC:

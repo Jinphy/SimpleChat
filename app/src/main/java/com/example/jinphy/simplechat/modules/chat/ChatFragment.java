@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,16 +11,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
-import com.example.jinphy.simplechat.base.BaseAdapter;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_libs.AudioPlayer;
 import com.example.jinphy.simplechat.custom_libs.AudioRecorder;
-import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.custom_view.dialog.file_selector.FileSelector;
 import com.example.jinphy.simplechat.custom_view.dialog.friend_selector.FriendSelector;
 import com.example.jinphy.simplechat.custom_view.menu.MyMenu;
@@ -32,6 +27,8 @@ import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.friend.CheckedFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.modules.chat.models.MyData;
+import com.example.jinphy.simplechat.modules.chat.models.MyView;
 import com.example.jinphy.simplechat.modules.group.group_detail.ModifyGroupActivity;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
 import com.example.jinphy.simplechat.modules.show_file.ShowFileActivity;
@@ -127,10 +124,10 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         if (myData.isChatWithFriend) {
             activity().setTitle(myData.withFriend.getShowName());
         } else {
-            activity().setTitle(myData.withGroup.getName());
+            activity().setTitle(myData.withGroup.getName()+"("+presenter.getMemberCount(myData.with)+")");
         }
-        myView.recyclerView.setLayoutManager(myView.layoutManager);
         myView.recyclerView.setAdapter(myData.adapter);
+        myView.bottomBar.bottomExtraView.moreMenu.setAdapter(myData.bottomMenuAdpater);
 
         Observable.just(myData.with)
                 .subscribeOn(Schedulers.io())
@@ -141,6 +138,11 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                     if (!myData.isChatWithFriend) {
                         myData.adapter.setGroup(myData.withGroup);
                         myData.adapter.setMembers(presenter.loadMembers(myData.with));
+                    }
+                    for (Message message : messages) {
+                        if (StringUtils.equal(Message.STATUS_SENDING, message.getStatus())) {
+                            myData.msgMap.put(message.getId(), message);
+                        }
                     }
 
                     int position = myData.adapter.getItemCount() - 1;
@@ -239,23 +241,6 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             }
         });
 
-        myView.bottomBar.moreMenu.photoItem.setOnClickListener(v -> {
-            PhotoPicker.builder()
-                    .setPhotoCount(9)
-                    .setShowCamera(true)
-                    .setShowGif(true)
-                    .setPreviewEnabled(true)
-                    .start(activity(), PhotoPicker.REQUEST_CODE);
-        });
-
-        myView.bottomBar.moreMenu.fileItem.setOnClickListener(v -> {{
-            FileSelector.from(activity())
-                    .onSelect(this::onSelectFilesResult)
-                    .make();
-        }
-
-        });
-
         myView.recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
             @Override
             public boolean onFling(int velocityX, int velocityY) {
@@ -267,6 +252,28 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                     }
                 }
                 return false;
+            }
+        });
+
+        myData.bottomMenuAdpater.onClick((v, item, holder, type, position) -> {
+            switch (item.icon) {
+                case R.drawable.ic_photo_24dp:
+                    // 图片
+                    PhotoPicker.builder()
+                            .setPhotoCount(9)
+                            .setShowCamera(true)
+                            .setShowGif(true)
+                            .setPreviewEnabled(true)
+                            .start(activity(), PhotoPicker.REQUEST_CODE);
+
+                    break;
+                case R.drawable.ic_folder_2_24dp:
+                    // 文件
+                    FileSelector.from(activity())
+                            .onSelect(this::onSelectFilesResult)
+                            .make();
+
+                    break;
             }
         });
 
@@ -442,7 +449,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_chat_fragment, menu);
         if (!myData.isChatWithFriend) {
-            menu.getItem(0).setIcon(R.drawable.ic_person_48dp);
+            menu.getItem(0).setIcon(R.drawable.ic_group_chat_white_24dp);
         }
     }
 

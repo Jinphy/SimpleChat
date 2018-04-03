@@ -53,7 +53,7 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
 
 
 
-    ChatAdapter(String ownerAvatar, String withAccount) {
+    public ChatAdapter(String ownerAvatar, String withAccount) {
         super();
         this.withAccount = withAccount;
         this.ownerAvatar = StringUtils.base64ToBitmap(ownerAvatar);

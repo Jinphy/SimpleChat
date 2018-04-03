@@ -9,6 +9,8 @@ import com.example.jinphy.simplechat.models.message_record.MessageRecordReposito
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
 
+import java.security.acl.Owner;
+
 /**
  * DESC:
  * Created by jinphy on 2018/3/1.
@@ -92,13 +94,13 @@ public class SystemMsgPresenter implements SystemMsgContract.Presenter {
     @Override
     public void updateSystemMsgRecord() {
         User user = userRepository.currentUser();
-        Friend friend = friendRepository.get(user.getAccount(), Friend.system);
-        MessageRecord systemMsgRecord = recordRepository.get(user.getAccount(), friend);
-        if (systemMsgRecord == null) {
-            return;
-        }
-        long newSystemMsgCount = messageRepository.countNew(Friend.system, user.getAccount());
-        systemMsgRecord.setNewMsgCount((int) newSystemMsgCount);
-        recordRepository.update(systemMsgRecord);
+        recordRepository.update(user.getAccount(), Friend.system);
+    }
+
+    @Override
+    public void deleteMsg(String type) {
+        User user = userRepository.currentUser();
+        messageRepository.delete(user.getAccount(), Friend.system, type);
+        recordRepository.update(user.getAccount(), Friend.system);
     }
 }

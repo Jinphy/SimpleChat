@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.jinphy.simplechat.base.BasePresenter;
 import com.example.jinphy.simplechat.base.BaseView;
+import com.example.jinphy.simplechat.models.friend.CheckedFriend;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.group.Group;
 
@@ -36,7 +37,7 @@ public interface CreateGroupContract {
 
         void createGroup(Context context, Map<String, Object> params);
 
-        List<Friend> loadFriends();
+        List<CheckedFriend> loadFriends();
 
         void saveMembers(Group group, List<String> members);
 

@@ -27,9 +27,6 @@ public interface RoutineContract {
     }
 
     interface Presenter extends BasePresenter {
-
-        List<Routine> loadRoutines();
-
     }
 }
 

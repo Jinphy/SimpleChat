@@ -16,6 +16,8 @@ import com.example.jinphy.simplechat.modules.system_msg.SystemMsgFragment;
 
 public class NewFriendsActivity extends BaseActivity {
 
+    private ActionBar actionBar;
+
     public static void start(Activity activity) {
         Intent intent = new Intent(activity, NewFriendsActivity.class);
         activity.startActivity(intent);
@@ -29,7 +31,7 @@ public class NewFriendsActivity extends BaseActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setTitle("新朋友");
@@ -42,4 +44,12 @@ public class NewFriendsActivity extends BaseActivity {
     public NewFriendsPresenter getPresenter(Fragment fragment) {
         return new NewFriendsPresenter((NewFriendsContract.View) fragment);
     }
+    public void updateTitle(int count) {
+        if (count == 0) {
+            actionBar.setTitle("新朋友");
+        } else {
+            actionBar.setTitle("新朋友(" + count + ")");
+        }
+    }
+
 }

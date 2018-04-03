@@ -47,6 +47,10 @@ public class NoticeActivity extends BaseActivity {
     }
 
     public void updateTitle(int msgCount) {
-        actionBar.setTitle("公告（" + msgCount + "）");
+        if (msgCount == 0) {
+            actionBar.setTitle("公告");
+        } else {
+            actionBar.setTitle("公告(" + msgCount + ")");
+        }
     }
 }

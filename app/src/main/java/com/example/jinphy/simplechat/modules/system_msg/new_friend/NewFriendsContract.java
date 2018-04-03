@@ -22,9 +22,11 @@ public interface NewFriendsContract {
 
     interface Presenter extends BasePresenter{
 
-        List<NewFriendRecyclerViewAdapter.NewFriend> loadNewFriends();
+        List<NewFriend> loadNewFriends();
 
 
-        public void updateMsg(List<Message> messages);
+        void updateMsg(List<Message> messages);
+
+        void deleteMsg(Message message);
     }
 }

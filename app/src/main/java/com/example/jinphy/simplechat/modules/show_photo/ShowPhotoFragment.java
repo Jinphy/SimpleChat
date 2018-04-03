@@ -123,6 +123,8 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
             bitmap = StringUtils.base64ToBitmap(message.extra(Message.KEY_THUMBNAIL));
             imageView.setImage(ImageSource.bitmap(bitmap));
         }
+        progressBar.setVisibility(View.GONE);
+        progressBar.setProgress(0);
 
         imageView.setMaxScale(5.0f);
         btnDownload.setText("下载原图（" + FileUtils.formatSize(totalLength) + "）");
@@ -192,6 +194,7 @@ public class ShowPhotoFragment extends BaseFragment<ShowPhotoPresenter> implemen
 
     @Override
     public void whenUpdateProgress(int percent) {
+        progressBar.setVisibility(View.VISIBLE);
         progressBar.setProgress(percent);
         btnDownload.setText(String.format("已下载：%d %s", percent,"%"));
     }

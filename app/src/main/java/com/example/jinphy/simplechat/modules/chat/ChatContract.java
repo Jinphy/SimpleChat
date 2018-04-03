@@ -42,6 +42,8 @@ public interface ChatContract {
 
         String getOwner();
 
+        int getMemberCount(String groupNo);
+
         void sendTextMsg(Message message);
 
         void sendFileMsg(Message message);
