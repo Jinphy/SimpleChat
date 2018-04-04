@@ -164,7 +164,7 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
         }
         if (position == 0) {
             holder.timeView.setVisibility(View.VISIBLE);
-            holder.timeView.setText(StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
+            holder.timeView.setText(StringUtils.formatTime(message.getCreateTime()));
         } else {
             Message preMsg = data.get(position - 1);
             Long preTime = Long.valueOf(preMsg.getCreateTime());
@@ -173,7 +173,7 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
                 // 时间间隔超过5分钟，则显示时间
                 holder.timeView.setVisibility(View.VISIBLE);
                 holder.timeView.setText(
-                        StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
+                        StringUtils.formatTime(message.getCreateTime()));
             } else {
                 holder.timeView.setVisibility(View.GONE);
             }

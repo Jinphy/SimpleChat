@@ -16,14 +16,6 @@ public interface RoutineContract {
 
     interface View extends BaseView<Presenter> {
 
-        void initFab(Activity activity);
-
-        void fabAction(android.view.View view);
-
-        void showActiveZoneActivity();
-
-        void showGroupListActivity();
-
     }
 
     interface Presenter extends BasePresenter {

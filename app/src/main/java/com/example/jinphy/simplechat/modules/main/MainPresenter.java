@@ -125,11 +125,6 @@ public class MainPresenter implements MainContract.Presenter {
         }
     }
 
-    @Override
-    public void checkAccount(Context context) {
-        userRepository.checkAccount(context);
-    }
-
     //------------------------------------------------------------------------
     @Override
     public void loadDataAfterLogin() {

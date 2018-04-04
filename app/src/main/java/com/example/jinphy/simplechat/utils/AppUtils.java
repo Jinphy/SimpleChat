@@ -1,8 +1,24 @@
 package com.example.jinphy.simplechat.utils;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 
+import com.apkfuns.logutils.LogUtils;
+import com.example.jinphy.simplechat.R;
+import com.example.jinphy.simplechat.application.App;
+import com.example.jinphy.simplechat.base.BaseActivity;
 import com.example.jinphy.simplechat.base.BaseApplication;
+import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.friend.FriendRepository;
+import com.example.jinphy.simplechat.models.group.GroupRepository;
+import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.models.user.UserRepository;
 
 /**
  * DESC:
@@ -22,9 +38,9 @@ public class AppUtils {
             return "";
         }
         try {
-            return BaseApplication.app()
+            return App.app()
                     .getPackageManager()
-                    .getPackageInfo(BaseApplication.app().getPackageName(), 0)
+                    .getPackageInfo(App.app().getPackageName(), 0)
                     .versionName;
         } catch (Exception e) {
             e.printStackTrace();

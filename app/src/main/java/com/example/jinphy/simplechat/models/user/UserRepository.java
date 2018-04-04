@@ -260,7 +260,7 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
     }
 
     @Override
-    public void checkAccount(Context context) {
+    public void checkAccount(Context context,Runnable whenOk) {
         User user = currentUser();
         Api.<Map<String, String>>common(context)
                 .path(Api.Path.checkAccount)
@@ -272,6 +272,9 @@ public class UserRepository  extends BaseRepository implements UserDataSource {
                 .onResponseYes(response -> {
                     user.setAccessToken(response.getData().get(User_.accessToken.name));
                     userBox.put(user);
+                    if (whenOk != null) {
+                        whenOk.run();
+                    }
                 })
                 .request();
     }

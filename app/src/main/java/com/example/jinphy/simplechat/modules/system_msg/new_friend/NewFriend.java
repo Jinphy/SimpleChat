@@ -29,7 +29,7 @@ public class NewFriend{
     }
 
     public String getTime() {
-        return StringUtils.formatDate(Long.valueOf(message.getCreateTime()));
+        return StringUtils.formatTime(message.getCreateTime());
     }
 
     public String getMsg() {

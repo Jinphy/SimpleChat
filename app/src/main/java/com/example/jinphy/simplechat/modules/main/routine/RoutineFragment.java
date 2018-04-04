@@ -27,8 +27,6 @@ import com.example.jinphy.simplechat.utils.ScreenUtils;
  */
 public class RoutineFragment extends BaseFragment<RoutinePresenter> implements RoutineContract.View {
 
-    FloatingActionButton fab;
-
     private RecyclerView recyclerView;
 
     private int density;
@@ -53,28 +51,12 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     }
 
 
-    @Override
-    public void initFab(Activity activity) {
-        fab = activity.findViewById(R.id.fab);
-        fab.setImageResource(R.drawable.ic_smile_24dp);
-        fab.setVisibility(View.VISIBLE);
-        fab.setScaleX(1);
-        fab.setScaleY(1);
-        fab.setTranslationY(-ScreenUtils.getToolbarHeight(getContext()));
-        fab.setOnClickListener(this::fabAction);
-    }
-
-
 
     @Override
     protected int getResourceId() {
         return R.layout.fragment_routine;
     }
 
-    @Override
-    public void fabAction(View view) {
-
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (root == null) {
@@ -97,7 +79,6 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
 
     @Override
     protected void setupViews() {
-        // TODO: 2017/8/11 设置图片，设置文字，设置点击监听,设置宽高
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         adapter = MyAdapter.<Routine>newInstance()
                 .onInflate(viewType -> R.layout.main_tab_routine_item)
@@ -139,17 +120,6 @@ public class RoutineFragment extends BaseFragment<RoutinePresenter> implements R
     protected RoutinePresenter getPresenter() {
         MainFragment parentFragment = (MainFragment) getParentFragment();
         return parentFragment.getRoutinePresenter(this);
-    }
-
-
-    @Override
-    public void showActiveZoneActivity() {
-        ActiveZoneActivity.start(activity());
-    }
-
-    @Override
-    public void showGroupListActivity() {
-        GroupListActivity.start(activity(),false);
     }
 
 }

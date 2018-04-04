@@ -1,6 +1,7 @@
 package com.example.jinphy.simplechat.modules.chat;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,13 +31,12 @@ public class ChatActivity extends BaseActivity {
     private ChatFragment fragment;
 
 
-    public static void start(Activity activity, String withAccount) {
-        Intent intent = new Intent(activity, ChatActivity.class);
+    public static void start(Context context, String withAccount) {
+        Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(ChatFragment.SAVE_KEY_WITH_ACCOUNT, withAccount);
-        activity.startActivity(intent);
-
+        context.startActivity(intent);
         // 启动前先检测推送服务是否开启，没有开启时会再次启动推送服务，保证消息及时接收
-        PushService.start(activity, PushService.FLAG_INIT);
+        PushService.start(context, PushService.FLAG_INIT);
     }
 
     @Override

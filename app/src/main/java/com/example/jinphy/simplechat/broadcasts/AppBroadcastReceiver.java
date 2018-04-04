@@ -7,16 +7,21 @@ import android.text.TextUtils;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseActivity;
+import com.example.jinphy.simplechat.custom_libs.MyNotification;
 import com.example.jinphy.simplechat.models.event_bus.EBFileTask;
 import com.example.jinphy.simplechat.models.event_bus.EBMessage;
+import com.example.jinphy.simplechat.models.event_bus.EBNotificationEvent;
 import com.example.jinphy.simplechat.models.event_bus.EBSendMsg;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.user.UserRepository;
+import com.example.jinphy.simplechat.modules.chat.ChatActivity;
 import com.example.jinphy.simplechat.modules.chat.models.FileListener;
 import com.example.jinphy.simplechat.modules.login.LoginActivity;
+import com.example.jinphy.simplechat.modules.main.MainActivity;
 import com.example.jinphy.simplechat.modules.signup.SignUpActivity;
 import com.example.jinphy.simplechat.modules.welcome.WelcomeActivity;
 import com.example.jinphy.simplechat.utils.ImageUtil;
@@ -40,29 +45,37 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
     public static final String TAG_SEND_MSG = "TAG_SEND_MSG";
     public static final String TAG_DOWNLOAD_VOICE = "TAG_DOWNLOAD_VOICE";
     public static final String TAG_DOWNLOAD_FILE = "TAG_DOWNLOAD_FILE";
+    public static final String TAG_NOTIFICATION = "TAG_NOTIFICATION";
+    public static final String TAG_NOTIFICATION_CLICK = "TAG_NOTIFICATION_CLICK";
+    public static final String TAG_NOTIFICATION_CANCEL = "TAG_NOTIFICATION_CANCEL";
+
 
 
     private static FileListener uploadFileListener;
 
     private static FileListener downloadFileListener;
 
+    private MyNotification notification;
+
 
     public static void send(Context context, String tag) {
         if (context == null) {
             return;
         }
-        Intent intent = new Intent(ACTION);
-        intent.putExtra(TAG, tag);
-        context.sendBroadcast(intent);
+        context.sendBroadcast(getIntent(tag, ""));
     }
     public static void send(Context context, String tag, String msg) {
         if (context == null) {
             return;
         }
+        context.sendBroadcast(getIntent(tag, msg));
+    }
+
+    public static Intent getIntent(String tag, String msg) {
         Intent intent = new Intent(ACTION);
         intent.putExtra(TAG, tag);
         intent.putExtra(MSG, msg);
-        context.sendBroadcast(intent);
+        return intent;
     }
 
     public static void registerUploadFileListener(FileListener listener) {
@@ -80,6 +93,7 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
     public static void unregisterDownloadFileListener() {
         downloadFileListener = null;
     }
+
 
 
     @Override
@@ -148,9 +162,38 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
                 EventBus.getDefault().post(ebMsg);
                 break;
             }
+            case TAG_NOTIFICATION:{
+                String[] split = msg.split(":");
+                String with = split[0];
+                String content = split[1];
+                getNotification().notify(with, content);
+                break;
+            }
+            case TAG_NOTIFICATION_CLICK:{
+                String[] split = msg.split(":");
+                String with = split[0];
+                int withCount = Integer.valueOf(split[1]);
+                MainActivity.start(App.app());
+                if (withCount == 1) {
+                    EventBus.getDefault().postSticky(EBNotificationEvent.startChatActivity(with));
+                }
+                getNotification().reset();
+                break;
+            }
+            case TAG_NOTIFICATION_CANCEL:{
+                getNotification().reset();
+                break;
+            }
             default:
                 break;
         }
+    }
+
+    private MyNotification getNotification() {
+        if (notification == null) {
+            notification = MyNotification.getInstance();
+        }
+        return notification;
     }
 
     private void onFileEvent(String msg, FileListener listener) {

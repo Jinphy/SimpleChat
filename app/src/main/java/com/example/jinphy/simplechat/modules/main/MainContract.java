@@ -24,8 +24,6 @@ public interface MainContract {
 
     interface View extends BaseView<Presenter>{
 
-        void selectFragment(android.view.View view);
-
         List<Fragment> generateFragments();
 
         MsgPresenter getMsgPresenter(Fragment view);
@@ -36,25 +34,7 @@ public interface MainContract {
 
         SelfPresenter getSelfPresenter(Fragment view);
 
-        void selectTab(int position,boolean setItem);
-
-        void showNormalState(int position);
-
-        void showSelectedState(int position);
-
-        void animateBar(android.view.View view, float fromValue,float toValue,boolean showBar);
-
-        void hideBar(android.view.View view);
-
-        void showBar(android.view.View view);
-
-        void setStatusBarColor(float factor);
-
-        void initFab(int position);
-
-        int currentItemPosition();
-
-        void showMenu();
+        int getCheckedTab();
 
         void showUserInfo();
 
@@ -68,8 +48,6 @@ public interface MainContract {
         void findUser(String account, BaseRepository.OnDataOk<Response<User>> callback);
 
         void findGroups(String text, Runnable whenDataOk);
-
-        void checkAccount(Context context);
 
         void loadDataAfterLogin();
 

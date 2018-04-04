@@ -19,10 +19,6 @@ public interface MsgContract {
 
     interface View extends BaseView<Presenter> {
 
-        void  initFab(Activity activity);
-
-        void fabAction(android.view.View view);
-
         RecyclerView getRecyclerView();
 
         void showChatWindow(MessageRecord item);

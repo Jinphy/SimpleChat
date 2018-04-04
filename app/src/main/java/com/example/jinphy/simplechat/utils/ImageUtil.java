@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -19,9 +21,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
@@ -460,6 +467,62 @@ public class ImageUtil {
         }
         return resultBitmap;
     }
+
+    /**
+     * DESC: 复制bitmap
+     * Created by jinphy, on 2018/4/3, at 18:08
+     */
+    public static Bitmap copytBitmap(Bitmap source) {
+        if (source == null) {
+            return null;
+        }
+        Bitmap out = Bitmap.createBitmap(
+                source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(out);
+
+        Rect rect = new Rect(0, 0, source.getWidth(), source.getHeight());
+        canvas.drawBitmap(source, rect, rect, null);
+        return out;
+    }
+
+    /**
+     * DESC: 高斯模糊bitmap
+     *
+     * @param radius 模糊半径，取值：0~25
+     * Created by jinphy, on 2018/4/3, at 16:51
+     */
+    public static Bitmap blurBitmap(Bitmap source, int radius){
+        if (source == null) {
+            return null;
+        }
+        Bitmap inputBmp = source;
+        //(1)
+        RenderScript renderScript =  RenderScript.create(App.app());
+
+        // Allocate memory for Renderscript to work with
+        //(2)
+        final Allocation input = Allocation.createFromBitmap(renderScript,inputBmp);
+        final Allocation output = Allocation.createTyped(renderScript,input.getType());
+        //(3)
+        // Load up an instance of the specific script that we want to use.
+        ScriptIntrinsicBlur scriptIntrinsicBlur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+        //(4)
+        scriptIntrinsicBlur.setInput(input);
+        //(5)
+        // Set the blur radius
+        scriptIntrinsicBlur.setRadius(radius);
+        //(6)
+        // Start the ScriptIntrinisicBlur
+        scriptIntrinsicBlur.forEach(output);
+        //(7)
+        // Copy the output to the blurred bitmap
+        output.copyTo(inputBmp);
+        //(8)
+        renderScript.destroy();
+
+        return inputBmp;
+    }
+
 
     /**
      * DESC: 形状枚举

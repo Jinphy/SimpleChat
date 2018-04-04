@@ -105,8 +105,7 @@ public class NoticeFragment extends BaseFragment<NoticePresenter> implements Not
 
                     holder.textView[0].setText(TextUtils.isEmpty(item.getExtra()) ? "无标题" : item
                             .getExtra());
-                    holder.textView[1].setText(StringUtils.formatDate(Long.valueOf(item
-                            .getCreateTime())));
+                    holder.textView[1].setText(StringUtils.formatTime(item.getCreateTime()));
                     holder.textView[2].setText(item.getContent());
 
                     holder.view[0].setVisibility(item.isNew() ? View.VISIBLE : View.GONE);

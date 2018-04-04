@@ -132,7 +132,7 @@ public class MessageRecordRepository implements MessageRecordDataSource {
     public void update(Message msg, boolean resetNewMsgCount) {
                 MessageRecord record;
         String with = msg.getWith();
-        Friend friend = null;
+        Friend friend;
         Group group = null;
         if ((friend = FriendRepository.getInstance().get(msg.getOwner(), with)) != null) {
             record = get(msg.getOwner(), friend);

@@ -14,15 +14,16 @@ public class DBApplication extends BaseApplication {
     private static BoxStore boxStore;
 
 
+
     @Override
     public void onCreate() {
         super.onCreate();
         boxStore = MyObjectBox.builder().androidContext(this).build();
     }
 
-
     public static BoxStore boxStore(){
         return boxStore;
     }
 
 }
+

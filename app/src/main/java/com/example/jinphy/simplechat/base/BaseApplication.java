@@ -9,18 +9,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.apkfuns.logutils.LogUtils;
-import com.example.jinphy.simplechat.custom_libs.RuntimePermission;
 import com.example.jinphy.simplechat.listener_adapters.ActivityLiftcycle;
 import com.example.jinphy.simplechat.secret.Secret;
 import com.example.jinphy.simplechat.services.common_service.aidl.BinderFactory;
-import com.example.jinphy.simplechat.services.common_service.aidl.service.BinderPool;
-import com.example.jinphy.simplechat.services.push.PushService;
 import com.example.jinphy.simplechat.utils.AppUtils;
 import com.example.jinphy.simplechat.utils.EncryptUtils;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.mob.MobSDK;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
 
@@ -40,6 +35,10 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
     private static Toast toast;
     private static boolean DEBUG;
     private static WeakReference<Activity> currentActivity=null;
+
+    public int count = 0;
+
+    private static boolean isForeground;
 
 
     public static BaseApplication app(){
@@ -75,7 +74,6 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
                 .configAllowLog(AppUtils.debug())
                 .configTagPrefix("Jinphy");
 
-        PushService.start(this, PushService.FLAG_INIT);
         BinderFactory.init(this);
 //        EventBus.getDefault().register(this);
 
@@ -160,12 +158,25 @@ public class BaseApplication extends Application implements ActivityLiftcycle {
         toast = Toast.makeText(INSTANCE, "", Toast.LENGTH_SHORT);
     }
 
+
     @Override
     public void onActivityResumed(Activity activity) {
         if (activity instanceof BaseActivity) {
             currentActivity = new WeakReference<>(activity);
         }
+        isForeground = true;
     }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+        isForeground = false;
+    }
+
+    public static boolean atForeground() {
+        return isForeground;
+    }
+
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);

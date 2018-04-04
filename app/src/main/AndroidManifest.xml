@@ -47,7 +47,8 @@
             android:theme="@style/LoginActivityTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
         </activity>
-        <activity android:name=".modules.main.MainActivity">
+        <activity android:name=".modules.main.MainActivity"
+            android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".modules.chat.ChatActivity"
