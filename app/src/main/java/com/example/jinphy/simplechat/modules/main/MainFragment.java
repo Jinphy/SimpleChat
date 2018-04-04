@@ -67,6 +67,7 @@ import io.reactivex.disposables.Disposable;
 public class MainFragment extends BaseFragment<MainPresenter> implements MainContract.View {
 
     public static final String FROM_LOGIN = "FROM_LOGIN";
+    public static final String WITH_ACCOUNT = "WITH_ACCOUNT";
 
     private static final String TAG = "MainFragment";
     public static final int MSG_FRAGMENT = 0;
@@ -94,6 +95,12 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     private int screenWidth;
     private boolean fromLogin;
 
+    /**
+     * DESC: 当MainActivity是通过Notification启动时，传递的好友账号
+     * Created by jinphy, on 2018/4/4, at 12:35
+     */
+    private String withAccount;
+
     public MainFragment() {
         // Required empty public constructor
     }
@@ -106,7 +113,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
      *
      * @return A new app of fragment MainFragment.
      */
-    public static MainFragment newInstance(boolean fromLogin) {
+    public static MainFragment newInstance(boolean fromLogin,String withAccount) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -114,6 +121,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         }
         MainFragment fragment = new MainFragment();
         fragment.fromLogin = fromLogin;
+        fragment.withAccount = withAccount;
         return fragment;
     }
 
@@ -168,6 +176,11 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
     @Override
     protected void setupViews() {
         viewPager.setAdapter(getAdapter());
+
+        if (withAccount != null) {
+            ChatActivity.start(activity(), withAccount);
+            withAccount = null;
+        }
     }
 
     @Override

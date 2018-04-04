@@ -23,15 +23,26 @@ public class MainActivity extends BaseActivity {
 
     private boolean hasCheckAccount;
 
-    public static void start(Context context) {
+    public static void start(Activity activity) {
+        if (activity == null) {
+            return;
+        }
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra(MainFragment.FROM_LOGIN, false);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
+        activity.startActivity(intent);
+        activity.overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
+    }
+
+    public static void startForNotification(Context context, String withAccount) {
         if (context == null) {
             return;
         }
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(MainFragment.FROM_LOGIN, false);
+        intent.putExtra(MainFragment.WITH_ACCOUNT, withAccount);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
         context.startActivity(intent);
-//        context.overridePendingTransition(R.anim.in_main_activity,R.anim.out_welcome_activity);
     }
 
 
@@ -59,7 +70,10 @@ public class MainActivity extends BaseActivity {
         actionBar.setTitle(R.string.app_name);
         MainFragment fragment = null;
         try {
-            fragment = MainFragment.newInstance(getIntent().getBooleanExtra(MainFragment.FROM_LOGIN,false));
+            fragment = MainFragment.newInstance(
+                    getIntent().getBooleanExtra(MainFragment.FROM_LOGIN,false),
+                    getIntent().getStringExtra(MainFragment.WITH_ACCOUNT)
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }

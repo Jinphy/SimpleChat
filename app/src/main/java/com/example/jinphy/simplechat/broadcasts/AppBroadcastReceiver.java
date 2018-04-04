@@ -173,9 +173,11 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
                 String[] split = msg.split(":");
                 String with = split[0];
                 int withCount = Integer.valueOf(split[1]);
-                MainActivity.start(App.app());
                 if (withCount == 1) {
+                    MainActivity.startForNotification(App.app(),with);
                     EventBus.getDefault().postSticky(EBNotificationEvent.startChatActivity(with));
+                } else {
+                    MainActivity.startForNotification(App.app(), null);
                 }
                 getNotification().reset();
                 break;
