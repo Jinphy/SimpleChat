@@ -23,6 +23,7 @@ import com.example.jinphy.simplechat.models.friend.CheckedFriend;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -211,24 +212,29 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
     @Override
     public FriendSelectorInterface<CheckedFriend>  title(CharSequence title) {
         this.title = title;
+        this.titleView.setText(title);
         return this;
     }
 
     @Override
     public FriendSelectorInterface<CheckedFriend>  cancelColor(int color) {
         this.cancelColor = color;
+        btnCancel.setImageDrawable(
+                ImageUtil.getDrawable(getContext(),R.drawable.ic_arrow_left_24dp, cancelColor));
         return this;
     }
 
     @Override
     public FriendSelectorInterface<CheckedFriend>  titleColor(int color) {
         this.titleColor = color;
+        this.titleView.setTextColor(titleColor);
         return this;
     }
 
     @Override
     public FriendSelectorInterface<CheckedFriend>  confirmColor(int color) {
         this.confirmColor = color;
+        this.btnConfirm.setTextColor(confirmColor);
         return this;
     }
 
@@ -238,7 +244,6 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
      */
     @Override
     public FriendSelectorInterface<CheckedFriend> exclude(List<String> exclude) {
-        LogUtils.e(exclude);
         if (exclude == null || exclude.size() == 0) {
             return this;
         }
@@ -248,6 +253,11 @@ public class FriendSelector extends AlertDialog implements FriendSelectorInterfa
             emptyView.setVisibility(View.VISIBLE);
         }
         return this;
+    }
+
+    @Override
+    public FriendSelectorInterface<CheckedFriend> exclude(String... exclude) {
+        return exclude(Arrays.asList(exclude));
     }
 
     @Override

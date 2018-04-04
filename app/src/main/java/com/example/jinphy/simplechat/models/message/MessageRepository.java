@@ -150,6 +150,35 @@ public class MessageRepository extends BaseRepository implements MessageDataSour
     }
 
     @Override
+    public void delete(String owner, String with, String contentType) {
+        messageBox.remove(messageBox.query()
+                .equal(Message_.owner, owner)
+                .equal(Message_.with, with)
+                .equal(Message_.contentType, contentType)
+                .build().find()
+        );
+    }
+
+    @Override
+    public Message getLast(String owner, String with) {
+        List<Message> messages = messageBox.query()
+                .equal(Message_.owner, owner)
+                .equal(Message_.with, with)
+                .build()
+                .find();
+        if (messages.size() == 0) {
+            return null;
+        }
+        Message result = messages.get(0);
+        for (Message message : messages) {
+            if (result.compareTo(message) > 0) {
+                result = message;
+            }
+        }
+        return result;
+    }
+
+    @Override
     public Message get(long id) {
         Message message = messageBox.get(id);
         message.setExtra(message.getExtra());

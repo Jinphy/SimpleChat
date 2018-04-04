@@ -1,10 +1,15 @@
 package com.example.jinphy.simplechat.modules.system_msg;
 
 import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message.MessageRepository;
+import com.example.jinphy.simplechat.models.message_record.MessageRecord;
+import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
+
+import java.security.acl.Owner;
 
 /**
  * DESC:
@@ -16,11 +21,15 @@ public class SystemMsgPresenter implements SystemMsgContract.Presenter {
     private final SystemMsgContract.View view;
     private MessageRepository messageRepository;
     private UserRepository userRepository;
+    private MessageRecordRepository recordRepository;
+    private FriendRepository friendRepository;
 
     public SystemMsgPresenter(SystemMsgContract.View view) {
         this.view = view;
         messageRepository = MessageRepository.getInstance();
         userRepository = UserRepository.getInstance();
+        recordRepository = MessageRecordRepository.getInstance();
+        friendRepository = FriendRepository.getInstance();
     }
 
     @Override
@@ -80,5 +89,18 @@ public class SystemMsgPresenter implements SystemMsgContract.Presenter {
                 Friend.system,
                 user.getAccount(),
                 Message.TYPE_SYSTEM_NOTICE);
+    }
+
+    @Override
+    public void updateSystemMsgRecord() {
+        User user = userRepository.currentUser();
+        recordRepository.update(user.getAccount(), Friend.system);
+    }
+
+    @Override
+    public void deleteMsg(String type) {
+        User user = userRepository.currentUser();
+        messageRepository.delete(user.getAccount(), Friend.system, type);
+        recordRepository.update(user.getAccount(), Friend.system);
     }
 }

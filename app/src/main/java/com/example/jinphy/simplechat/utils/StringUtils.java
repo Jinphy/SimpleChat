@@ -2,16 +2,19 @@ package com.example.jinphy.simplechat.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.icu.util.Calendar;
 import android.support.annotation.IntRange;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.example.jinphy.simplechat.constants.LongConst;
 import com.example.jinphy.simplechat.custom_libs.SChain;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,37 +82,42 @@ public class StringUtils {
         return build.toString();
     }
 
+
     /**
-     * DESC: 格式化日期
-     *
-     *
-     *
-     * @param time 毫秒
-     * Created by jinphy, on 2018/1/7, at 15:12
+     * DESC: 格式化时间
+     * Created by jinphy, on 2018/4/3, at 17:54
      */
-    public static String formatDate(long time) {
-        return SimpleDateFormat.getDateInstance().format(new Date(time));
+    public static String formatTime(String milliSeconds) {
+        if (!StringUtils.isNumber(milliSeconds)) {
+            return "";
+        }
+        return formatTime(Long.valueOf(milliSeconds));
     }
 
     /**
      * DESC:格式化时间
-     * @param time 毫秒
+     * @param milliSeconds 毫秒
      * Created by jinphy, on 2018/1/7, at 15:25
      */
-    public static String formatTime(long time) {
-        return SimpleDateFormat.getTimeInstance().format(new Date(time));
-    }
+    public static String formatTime(long milliSeconds) {
+        long now = System.currentTimeMillis();
+        long deltaTime = now - milliSeconds;
 
-    /**
-     * DESC: 格式化日期和时间
-     *
-     * @param time 毫秒
-     * Created by jinphy, on 2018/1/7, at 15:26
-     */
-    public static String formatDateTime(long time) {
-        return SimpleDateFormat.getDateTimeInstance().format(new Date(time));
+        if (deltaTime < LongConst.MINUTE_1) {
+            return "刚刚";
+        }
+        if (deltaTime < LongConst.MINUTE_30) {
+            return (deltaTime / 1000 / 60) + "分钟前";
+        }
+        Date date = new Date(milliSeconds);
+        SimpleDateFormat format;
+        if (deltaTime < LongConst.DATE_1) {
+            format = new SimpleDateFormat("HH:mm:ss");
+        } else {
+            format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+        return format.format(date);
     }
-
 
     /**
      * DESC: 将字节数组转换成16进制字符串

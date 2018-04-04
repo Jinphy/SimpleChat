@@ -10,6 +10,7 @@ public class IntConst {
     public static final int DURATION_1500 = 1500;
     public static final int DURATION_500 = 500;
     public static final int DURATION_250 = 250;
+    public static final int DURATION_300 = 300;
     public static final int TOOLBAR_HEIGHT = 56;
     public static final int HEAD_VIEW_HEIGHT = 300;
 

@@ -70,6 +70,14 @@ public interface MessageDataSource {
      */
     void delete(String owner, String with);
 
+    void delete(String owner, String with, String contentType);
+
+    /**
+     * DESC: 获取最新的消息
+     * Created by jinphy, on 2018/4/3, at 9:13
+     */
+    Message getLast(String owner, String with);
+
     Message get(long id);
 
     /**

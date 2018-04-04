@@ -21,6 +21,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:name=".application.App"
@@ -46,7 +47,8 @@
             android:theme="@style/LoginActivityTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
         </activity>
-        <activity android:name=".modules.main.MainActivity">
+        <activity android:name=".modules.main.MainActivity"
+            android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".modules.chat.ChatActivity"

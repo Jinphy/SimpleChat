@@ -138,7 +138,7 @@ public class FileTask implements Parcelable{
         task.setFilePath(filePath);
         task.setTotalFileLength(file.length());
         long now = System.currentTimeMillis();
-        String fileName = DeviceUtils.devceIdMD5() + "_" + now;
+        String fileName = DeviceUtils.deviceIdMD5() + "_" + now;
         if (filePath.contains(".")) {
             fileName += filePath.substring(filePath.lastIndexOf("."));
         }

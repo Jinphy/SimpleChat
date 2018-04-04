@@ -90,28 +90,22 @@ public class PushManager {
      * DESC: 处理PushClient发送过来的消息
      * Created by jinphy, on 2018/3/16, at 14:56
      */
-    public synchronized void handleMessage(List<Map<String, String>> messagesList) {
-        LogUtils.e(messagesList);
+    public synchronized void handleMessage(Map<String, String> messageMap) {
+        LogUtils.e(messageMap);
         // 解析消息
-        Message[] messages = Message.parse(messagesList);
+        Message message = Message.parse(messageMap);
 
         // 保存消息
-        messages = filterMessages(messages);
+        message = filterMessages(message);
 
         // 更新消息记录
-        updateMessageRecord(messages);
+        updateMessageRecord(message);
 
-        EventBus.getDefault().post(new EBService());
+        EventBus.getDefault().post(new EBService(message));
     }
 
 
-    private Message[] filterMessages(Message... messages) {
-        List<Message> list = new LinkedList<>();
-        for (Message message : messages) {
-            if (message.needSave()) {
-                message.setId(0);
-                list.add(message);
-            }
+    private Message filterMessages(Message message) {
             switch (message.getContentType()) {
                 case Message.TYPE_SYSTEM_ADD_FRIEND:
                 case Message.TYPE_SYSTEM_ADD_FRIEND_AGREE:
@@ -166,47 +160,26 @@ public class PushManager {
                 default:
                     break;
             }
-        }
-        if (list.size() > 0) {
-            messages = new Message[list.size()];
-            messages = list.toArray(messages);
-            messageRepository.saveReceive(messages);
-            return messages;
+        if (message.needSave()) {
+            message.setId(0);
+            messageRepository.saveReceive(message);
+            return message;
         }
         return null;
     }
-
 
 
     /**
      * DESC: 更新消息记录
      * Created by jinphy, on 2018/1/18, at 12:21
      */
-    private void updateMessageRecord(Message[] messages) {
-        if (messages == null || messages.length == 0) {
+    private void updateMessageRecord(Message message) {
+        if (message == null) {
             return;
         }
         // 记录是否有需要退出当前账号的消息
-        Message logoutMessage = null;
-        for (Message message : messages) {
-            if (Message.TYPE_SYSTEM_ACCOUNT_INVALIDATE.equals(message.getContentType())) {
-                logoutMessage = message;
-            }
-            if (!message.needSave()) {
-                continue;
-            }
-            messageRecordRepository.update(message, false);
-
-        }
-        if (logoutMessage != null) {
-            // 账号非法，需要强制登出
-            AppBroadcastReceiver.send(
-                    pushService.get(),
-                    AppBroadcastReceiver.LOGOUT,
-                    logoutMessage.getContent());
-        }
+        messageRecordRepository.update(message, false);
     }
-
 
     /**
      * DESC: 获取好友

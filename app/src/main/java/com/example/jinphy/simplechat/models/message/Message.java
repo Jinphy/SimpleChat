@@ -496,7 +496,31 @@ public class Message implements Comparable<Message>{
         getExtra();
     }
 
+    /**
+     * DESC: 复制一条新的消息来转发
+     * Created by jinphy, on 2018/4/2, at 15:47
+     */
+    public Message copyToSend() {
+        Message message = new Message();
+        message.setContent(this.content);
+        message.setContentType(this.contentType);
+        message.setCreateTime(System.currentTimeMillis() + "");
+        message.setSourceType(Message.SEND);
+        message.setOwner(this.owner);
+        message.setWith(this.with);
+        message.setExtra(this.getExtra());
+        if (StringUtils.equal(this.contentType, Message.TYPE_CHAT_IMAGE)) {
+            if (ObjectHelper.isEmpty(this.extra(Message.KEY_THUMBNAIL))) {
+                message.extra(KEY_THUMBNAIL,
+                        StringUtils.bitmapToBase64(
+                                ImageUtil.getBitmap(message.extra(Message.KEY_FILE_PATH),
+                                        30,30)));
+            }
+        }
+        message.setExtra(null);
 
+        return message;
+    }
 
     //------------------------------------------------------------
 
@@ -531,6 +555,8 @@ public class Message implements Comparable<Message>{
         message.setExtra(msg.get(Message_.extra.name));
         return message;
     }
+
+
 
 
     /**
@@ -641,7 +667,6 @@ public class Message implements Comparable<Message>{
         msg.extra(KEY_DURATION, duration);
         return msg;
     }
-
 
 
     public static void sort(List<Message> messages) {

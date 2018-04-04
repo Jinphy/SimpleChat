@@ -112,8 +112,19 @@ public class ChatPresenter implements ChatContract.Presenter {
 
 
     @Override
+    public int getMemberCount(String groupNo) {
+        User user = userRepository.currentUser();
+        return (int) memberRepository.count(groupNo, user.getAccount());
+    }
+
+    @Override
     public Message getMessage(long msgId) {
         return messageRepository.get(msgId);
+    }
+
+    @Override
+    public void removeMsg(Message message) {
+        messageRepository.delete(message);
     }
 
     @Override

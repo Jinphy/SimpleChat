@@ -28,6 +28,8 @@ public interface FriendSelectorInterface<T> {
 
     FriendSelectorInterface<T> exclude(List<String> exclude);
 
+    FriendSelectorInterface<T> exclude(String... exclude);
+
     FriendSelectorInterface<T> onSelect(SChain.Consumer<List<CheckedFriend>> onSelect);
 
     FriendSelector display();

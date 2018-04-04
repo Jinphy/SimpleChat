@@ -23,6 +23,8 @@ public interface NoticeContract {
         List<Message> loadNoticeMsg();
 
         void updateMsg(List<Message> messages);
+
+        void deleteMsg(Message message);
     }
 
 }

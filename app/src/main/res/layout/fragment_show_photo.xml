@@ -19,10 +19,13 @@
     <com.daimajia.numberprogressbar.NumberProgressBar
         android:id="@+id/progress_bar"
 
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/dimen_300dp"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/dimen_150dp"
 
-        app:progress_unreached_color="#00000000"
+        app:progress_unreached_color="#7faaaaaa"
         app:progress_reached_color="#ffffffff"
 
         app:progress_unreached_bar_height="0.75dp"
@@ -35,6 +38,7 @@
 
         app:progress_max="100"
         app:progress_current="0"
+        tools:progress_current="50"
         />
 
     <TextView

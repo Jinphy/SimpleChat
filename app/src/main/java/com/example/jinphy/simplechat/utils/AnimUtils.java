@@ -694,8 +694,10 @@ public class AnimUtils {
          * @see Builder#build()
          *
          * */
-        public void animate() {
-            build().start();
+        public AnimatorSet animate() {
+            AnimatorSet animatorSet = build();
+            animatorSet.start();
+            return animatorSet;
         }
 
         /**

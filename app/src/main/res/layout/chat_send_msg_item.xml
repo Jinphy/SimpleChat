@@ -47,6 +47,7 @@
             app:cardElevation="@dimen/dimen_1dp"
             app:cardCornerRadius="@dimen/dimen_5dp"
             app:cardBackgroundColor="@color/white"
+            android:layout_marginTop="@dimen/dimen_5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <LinearLayout
@@ -97,14 +98,14 @@
                         android:layout_gravity="center_vertical"
                         android:textSize="@dimen/size_15sp"
                         android:textColor="#afffffff"
-                        android:padding="@dimen/dimen_5dp"
+                        android:layout_marginLeft="@dimen/dimen_10dp"
                         android:text="10''"/>
 
                     <ImageView
                         android:id="@+id/icon_view"
                         android:padding="@dimen/dimen_7dp"
-                        android:layout_width="@dimen/dimen_48dp"
-                        android:layout_height="@dimen/dimen_48dp"
+                        android:layout_width="@dimen/dimen_43dp"
+                        android:layout_height="@dimen/dimen_43dp"
                         android:rotation="180"
                         android:tint="#afffffff"
                         android:src="@drawable/ic_voice_on_24dp"/>
@@ -145,15 +146,15 @@
                     android:id="@+id/file_view"
                     android:visibility="gone"
                     tools:visibility="visible"
-                    android:layout_width="248dp"
-                    android:layout_height="80dp">
+                    android:layout_width="200dp"
+                    android:layout_height="70dp">
 
                     <HorizontalScrollView
                         android:id="@+id/file_name_scroll_view"
                         android:scrollbars="none"
                         android:overScrollMode="never"
                         android:layout_alignParentRight="true"
-                        android:layout_width="160dp"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content">
                         <TextView
                             android:id="@+id/file_name_text"
@@ -181,10 +182,10 @@
 
                     <ImageView
                         android:layout_gravity="center_vertical"
-                        android:padding="@dimen/dimen_5dp"
                         android:src="@drawable/ic_folder_1_24dp"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"/>
+                        android:padding="@dimen/dimen_7dp"
+                        android:layout_width="@dimen/dimen_70dp"
+                        android:layout_height="@dimen/dimen_70dp"/>
 
 
                 </RelativeLayout>

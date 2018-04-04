@@ -138,7 +138,7 @@ public class ModifyUserFragment extends BaseFragment<ModifyUserPresenter> implem
         statusItem.content(User.STATUS_LOGIN.equals(user.getStatus()) ? "在线" : "离线");
         signatureItem.content(user.getSignature() == null ? "" : user.getSignature());
         passwordItem.content(user.getPassword() == null ? "" : EncryptUtils.aesDecrypt(user.getPassword()));
-        dateItem.content(StringUtils.formatDateTime(user.getDate()));
+        dateItem.content(StringUtils.formatTime(user.getDate()));
         sexItem.content(user.getSex() == null ? "" : user.getSex());
         addressItem.content(user.getAddress() == null ? "" : user.getAddress());
     }

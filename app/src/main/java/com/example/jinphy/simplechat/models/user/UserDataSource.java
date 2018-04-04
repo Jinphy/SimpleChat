@@ -69,7 +69,6 @@ public interface UserDataSource {
     void loadAvatars(Context context, BaseRepository.Task<List<Map<String, String>>> task);
 
 
-    void checkAccount(Context context);
-
+    void checkAccount(Context context,Runnable whenOk);
 
 }

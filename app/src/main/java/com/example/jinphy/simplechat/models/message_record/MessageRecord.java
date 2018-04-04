@@ -230,7 +230,7 @@ public class MessageRecord implements Comparable<MessageRecord>{
 
     public String getTime() {
         if (lastMsg.getTarget() != null) {
-            return StringUtils.formatDate(Long.valueOf(lastMsg.getTarget().getCreateTime()));
+            return StringUtils.formatTime(lastMsg.getTarget().getCreateTime());
         }
         return "";
     }

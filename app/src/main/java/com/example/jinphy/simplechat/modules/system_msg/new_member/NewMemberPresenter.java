@@ -16,7 +16,6 @@ import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.models.message_record.MessageRecordRepository;
 import com.example.jinphy.simplechat.models.user.User;
 import com.example.jinphy.simplechat.models.user.UserRepository;
-import com.example.jinphy.simplechat.modules.system_msg.new_member.NewMemberAdapter.NewMember;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import java.util.LinkedList;
@@ -101,6 +100,12 @@ public class NewMemberPresenter implements NewMemberContract.Presenter {
     @Override
     public void updateMsg(Message message) {
         messageRepository.update(message);
+    }
+
+    @Override
+    public void deleteMsg(Message message) {
+        User user = userRepository.currentUser();
+        messageRepository.delete(message);
     }
 
     @Override

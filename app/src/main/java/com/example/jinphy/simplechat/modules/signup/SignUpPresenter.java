@@ -131,17 +131,6 @@ public class SignUpPresenter implements SignUpContract.Presenter {
                         user.setRememberPassword(true);
                         userRepository.saveUser(user);
                         friendRepository.addSystemFriendLocal(user.getAccount());
-
-                        ThreadPoolUtils.threadPool.execute(()->{
-                            PushService.start(context,PushService.FLAG_CLOSE);
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            PushService.start(context, PushService.FLAG_INIT);
-
-                        });
                     })
                     // 提交设置并执行登录操作
                     .submit(task -> userRepository.login(context, task));

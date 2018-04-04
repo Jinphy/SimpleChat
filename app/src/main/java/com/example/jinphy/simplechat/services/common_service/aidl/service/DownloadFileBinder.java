@@ -2,7 +2,6 @@ package com.example.jinphy.simplechat.services.common_service.aidl.service;
 
 import android.content.Context;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.models.file_task.FileTask;
 import com.example.jinphy.simplechat.models.file_task.FileTaskRepository;
 import com.example.jinphy.simplechat.models.message.Message;
@@ -12,7 +11,6 @@ import com.example.jinphy.simplechat.services.common_service.aidl.models.FileDow
 import static com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver.TAG_DOWNLOAD_FILE;
 import static com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver.TAG_DOWNLOAD_PHOTO;
 import static com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver.TAG_DOWNLOAD_VOICE;
-import static com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver.TAG_UPLOAD_FILE;
 import static com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver.send;
 
 /**
@@ -29,12 +27,12 @@ public class DownloadFileBinder extends IDownloadFileBinder.Stub {
     private MessageRepository messageRepository;
 
     private static class InstanceHolder{
-        static final DownloadFileBinder DEFUALT = new DownloadFileBinder();
+        static final DownloadFileBinder DEFAULT = new DownloadFileBinder();
     }
 
     public static DownloadFileBinder getInstance(Context context) {
-        InstanceHolder.DEFUALT.context = context;
-        return InstanceHolder.DEFUALT;
+        InstanceHolder.DEFAULT.context = context;
+        return InstanceHolder.DEFAULT;
     }
 
 

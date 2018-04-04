@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.constants.IntConst;
+import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
+import com.example.jinphy.simplechat.models.blog.Blog;
 import com.example.jinphy.simplechat.utils.AnimUtils;
 import com.example.jinphy.simplechat.utils.ScreenUtils;
 import com.example.jinphy.simplechat.utils.ViewUtils;
@@ -40,7 +42,7 @@ public class ActiveZoneFragment extends BaseFragment<ActiveZonePresenter>
     private View statusAndToolbar;
     private View toolbar;
     private View btnBack;
-    private ActiveZoneRecyclerViewAdapter adapter;
+    private MyAdapter<Blog> adapter;
 
 
     public ActiveZoneFragment() {
@@ -94,9 +96,30 @@ public class ActiveZoneFragment extends BaseFragment<ActiveZonePresenter>
     protected void setupViews() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new ActiveZoneRecyclerViewAdapter();
-        recyclerView.setAdapter(adapter);
-        adapter.update(presenter.loadBlogs());
+
+        adapter = MyAdapter.<Blog>newInstance()
+                .onGetItemViewType(item -> 0)
+                .data(presenter.loadBlogs())
+                .onInflate(viewType -> R.layout.blog_item)
+                .onCreateView(holder -> {
+                    holder.imageViews(R.id.account_view);
+                    holder.textViews(
+                            R.id.name_text,
+                            R.id.account_view,
+                            R.id.time_text
+                    );
+                    holder.views(
+                            R.id.picture_or_video_layout,
+                            R.id.btn_comment
+                    );
+                })
+                .onBindView((holder, item, position) -> {
+                    // TODO: 2018/4/2
+                })
+                .onClick((v, item, holder, type, position) -> {
+                    // TODO: 2018/4/2
+                })
+                .into(recyclerView);
     }
 
     @Override

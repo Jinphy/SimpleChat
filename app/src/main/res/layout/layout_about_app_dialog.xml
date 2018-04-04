@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/dimen_10dp"
+    app:cardElevation="@dimen/dimen_20dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_margin="@dimen/dimen_10dp"
+        android:background="@color/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:text="关于简聊"
+            android:textSize="@dimen/size_18sp"
+            android:textColor="@color/colorAccent"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ScrollView
+            android:overScrollMode="never"
+            android:scrollbars="none"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:minHeight="@dimen/dimen_300dp"
+            android:layout_height="0dp">
+
+            <TextView
+                android:id="@+id/content_view"
+                android:text="简介：\n\t\t“简聊”是“简聊科技有限公司”旗下的\n\t一款即时通讯聊天软件。以其丰富的\n\t功能在产品上线不久就赢得了广大用\n\t户的青睐。\n\t\t通过简聊，您可以随时和家人、朋友\n\t进行聊天（包括普通文本信息聊天、发\n\t送图片、语音、文件等）。\n\n免责声明：\n\t1、简聊为用户提供永久免费的服务。\n\t2、用户在使用简聊过程中必须遵守\n\t\t\t\t国家相关法律法规规，对于违法犯\n\t\t\t\t罪行为，一律由用户自己承担。\n\t3、使用简聊则默认以上相关声明。"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/btn_confirm"
+            android:layout_gravity="center_horizontal"
+            android:text="确定"
+            android:textColor="@color/green_primary"
+            android:elevation="@dimen/dimen_1dp"
+            android:background="@drawable/ic_white_rectangle_background"
+            android:layout_marginBottom="@dimen/dimen_10dp"
+            android:gravity="center"
+            android:layout_width="150dp"
+            android:layout_height="50dp"/>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

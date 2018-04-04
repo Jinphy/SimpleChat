@@ -4,16 +4,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
+import android.text.TextUtils;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
 import com.example.jinphy.simplechat.models.event_bus.EBService;
-import com.example.jinphy.simplechat.models.user.User;
+import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.utils.GsonUtils;
-import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
-import com.example.jinphy.simplechat.utils.ThreadPoolUtils;
 import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
@@ -21,7 +18,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,8 +33,6 @@ public class PushService extends Service {
     private PushClient pushClient;
     private PushManager pushManager;
     private Type messageType;
-
-    private int i = 0;
 
     @Override
     public void onCreate() {
@@ -74,7 +68,6 @@ public class PushService extends Service {
                 pushManager = null;
             }
             stopSelf();
-            LogUtils.e("service stop!");
             return START_STICKY_COMPATIBILITY;
         }
         init();
@@ -99,7 +92,7 @@ public class PushService extends Service {
         }
         pushManager = PushManager.getInstance(this);
         pushClient = PushClient.start(this);
-        messageType = new TypeToken<List<Map<String, String>>>() {}.getType();
+        messageType = new TypeToken<Map<String, String>>() {}.getType();
     }
     /**
      * DESC: 处理从服务器中推送过来的消息
@@ -109,8 +102,8 @@ public class PushService extends Service {
      */
     public void handleMsg(String messageStr) {
         threadPool.execute(()->{
-            List<Map<String, String>> messages = GsonUtils.toBean(messageStr, messageType);
-            pushManager.handleMessage(messages);
+            Map<String, String> message = GsonUtils.toBean(messageStr, messageType);
+            pushManager.handleMessage(message);
         });
     }
 
@@ -126,5 +119,14 @@ public class PushService extends Service {
     public void eventBus(EBService msg) {
         // 通知更新界面
         AppBroadcastReceiver.send(this, AppBroadcastReceiver.MESSAGE);
+
+        Message message = msg.data;
+        if (message != null) {
+            String join = TextUtils.join(":", new String[]{
+                    message.getWith(),
+                    message.getContent()
+            });
+            AppBroadcastReceiver.send(this, AppBroadcastReceiver.TAG_NOTIFICATION, join);
+        }
     }
 }

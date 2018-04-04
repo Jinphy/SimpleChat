@@ -18,10 +18,6 @@ public interface FriendsContract {
 
     interface View extends BaseView<Presenter> {
 
-        void initFab(Activity activity);
-
-        void fabAction(android.view.View view);
-
         RecyclerView getRecyclerView();
 
         void updateView();

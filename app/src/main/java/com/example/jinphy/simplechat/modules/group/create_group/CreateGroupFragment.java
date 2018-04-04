@@ -18,14 +18,14 @@ import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_libs.SChain;
+import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.models.api.common.Api;
 import com.example.jinphy.simplechat.models.event_bus.EBBitmap;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
-import com.example.jinphy.simplechat.models.friend.Friend;
+import com.example.jinphy.simplechat.models.friend.CheckedFriend;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
-import com.example.jinphy.simplechat.modules.group.GroupMemberAdapter;
 import com.example.jinphy.simplechat.modules.pick_photo.PickPhotoActivity;
 import com.example.jinphy.simplechat.utils.GsonUtils;
 import com.example.jinphy.simplechat.utils.ImageUtil;
@@ -35,6 +35,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,10 +54,10 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
 
     private Bitmap avatarBitmap;
     private LinearLayoutManager linearLayoutManager;
-    private GroupMemberAdapter adapter;
     private List<String> members;
 
     public static final String TAG = "CreateGroupFragment";
+    private MyAdapter<CheckedFriend> adapter;
 
     public CreateGroupFragment() {
         // Required empty public constructor
@@ -86,7 +87,7 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
 
     @Override
     protected void initData() {
-
+        members = new LinkedList<>();
     }
 
     @Override
@@ -103,14 +104,39 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
     protected void setupViews() {
         maxCountItem.contentHint("请输入1~" + Group.DEFAULT_MAX_COUNT + "的整数！");
 
-
         linearLayoutManager = new LinearLayoutManager(
                 getContext(),LinearLayoutManager.HORIZONTAL,false);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        adapter = new GroupMemberAdapter();
-        recyclerView.setAdapter(adapter);
-        adapter.update(presenter.loadFriends());
+        adapter = MyAdapter.<CheckedFriend>newInstance()
+                .onGetItemViewType(item -> 0)
+                .onInflate(viewType -> R.layout.layout_group_member_item)
+                .data(presenter.loadFriends())
+                .onCreateView(holder -> {
+                    // avatar
+                    holder.circleImageViews(R.id.avatar_view);
+                    // name
+                    holder.textViews(R.id.name_view);
+                    // checkView、clickView
+                    holder.views(R.id.check_view, R.id.click_view);
+                })
+                .onBindView((holder, item, position) -> {
+                    Bitmap bitmap = ImageUtil.loadAvatar(item.getAccount(), 100, 100);
+                    if (bitmap != null) {
+                        holder.circleImageView[0].setImageBitmap(bitmap);
+                    } else {
+                        holder.circleImageView[0].setImageResource(R.drawable.ic_person_48dp);
+                    }
+                    holder.textView[0].setText(item.getName());
+                    holder.view[0].setVisibility(item.isChecked() ? View.VISIBLE : View.GONE);
+                    holder.setClickedViews(holder.view[1]);
+                })
+                .onClick((v, item, holder, type, position) -> {
+                    item.setChecked(!item.isChecked());
+                    holder.view[0].setVisibility(item.isChecked() ? View.VISIBLE : View.GONE);
+                })
+                .into(recyclerView);
+
     }
 
     @Override
@@ -148,8 +174,12 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
             if (StringUtils.equal("否", autoAddItem.content().toString())) {
                 autoAdd = false;
             }
-
-            members = adapter.getCheckedAccount();
+            members.clear();
+            adapter.forEach(item -> {
+                if (item.isChecked()) {
+                    members.add(item.getAccount());
+                }
+            });
             String currentAccount = presenter.getCurrentAccount();
             members.add(currentAccount);
 
@@ -163,9 +193,6 @@ public class CreateGroupFragment extends BaseFragment<CreateGroupPresenter> impl
                     .add(Api.Key.creator, currentAccount)
                     .build();
             presenter.createGroup(activity(), params);
-        });
-        adapter.onClick((view, item, type, position) -> {
-            adapter.updateCheckStatus((Friend) item, view);
         });
     }
 

@@ -53,7 +53,7 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
 
 
 
-    ChatAdapter(String ownerAvatar, String withAccount) {
+    public ChatAdapter(String ownerAvatar, String withAccount) {
         super();
         this.withAccount = withAccount;
         this.ownerAvatar = StringUtils.base64ToBitmap(ownerAvatar);
@@ -164,7 +164,7 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
         }
         if (position == 0) {
             holder.timeView.setVisibility(View.VISIBLE);
-            holder.timeView.setText(StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
+            holder.timeView.setText(StringUtils.formatTime(message.getCreateTime()));
         } else {
             Message preMsg = data.get(position - 1);
             Long preTime = Long.valueOf(preMsg.getCreateTime());
@@ -173,7 +173,7 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
                 // 时间间隔超过5分钟，则显示时间
                 holder.timeView.setVisibility(View.VISIBLE);
                 holder.timeView.setText(
-                        StringUtils.formatDate(Long.valueOf(message.getCreateTime())));
+                        StringUtils.formatTime(message.getCreateTime()));
             } else {
                 holder.timeView.setVisibility(View.GONE);
             }
@@ -321,8 +321,6 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
         View fileMsg_root;
         TextView fileMsg_fileName;
         TextView fileMsg_fileSize;
-
-
 
 
         public ViewHolder(View itemView,int type) {
@@ -483,6 +481,13 @@ public class ChatAdapter extends BaseAdapter<Message, ChatAdapter.ViewHolder> {
                 break;
             }
         }
+    }
+
+    public void remove(Message message) {
+        if (message != null) {
+            data.remove(message);
+        }
+        notifyDataSetChanged();
     }
 }
 

@@ -28,9 +28,9 @@ public interface MyAdapterInterface<T> {
 
     MyAdapterInterface<T> data(List<T> data);
 
-
     MyAdapter<T> into(RecyclerView recyclerView);
 
+    MyAdapter<T> make();
 
 
 

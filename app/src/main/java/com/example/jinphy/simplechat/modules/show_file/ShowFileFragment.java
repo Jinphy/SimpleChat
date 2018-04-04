@@ -3,6 +3,7 @@ package com.example.jinphy.simplechat.modules.show_file;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,10 +14,15 @@ import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.base.BaseFragment;
+import com.example.jinphy.simplechat.custom_view.menu.MyMenu;
 import com.example.jinphy.simplechat.models.event_bus.EBFileTask;
+import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.utils.DeviceUtils;
 import com.example.jinphy.simplechat.utils.FileUtils;
+import com.example.jinphy.simplechat.utils.ScreenUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.w3c.dom.Text;
@@ -38,6 +44,7 @@ public class ShowFileFragment extends BaseFragment<ShowFilePresenter> implements
     private TextView filePathView;
     private TextView btnDownload;
     private NumberProgressBar progressBar;
+    private View btnFile;
 
     public ShowFileFragment() {
         // Required empty public constructor
@@ -82,6 +89,7 @@ public class ShowFileFragment extends BaseFragment<ShowFilePresenter> implements
         filePathView = view.findViewById(R.id.file_path_view);
         btnDownload = view.findViewById(R.id.btn_download);
         progressBar = view.findViewById(R.id.progress_bar);
+        btnFile = view.findViewById(R.id.btn_file);
     }
 
     @Override
@@ -116,6 +124,41 @@ public class ShowFileFragment extends BaseFragment<ShowFilePresenter> implements
         btnDownload.setOnClickListener(v -> {
             btnDownload.setEnabled(false);
             presenter.downloadFile(message);
+        });
+        btnFile.setOnClickListener(v -> {
+            boolean hasFile = FileUtils.exist(message.extra(Message.KEY_FILE_PATH));
+            switch (message.extra(Message.KEY_FILE_STATUS)) {
+                case Message.FILE_STATUS_DOWNLOADING:
+                    App.showToast("文件正在下载！", false);
+                    break;
+                case Message.FILE_STATUS_NO_DOWNLOAD:
+                    App.showToast("文件还未下载！", false);
+                    break;
+                default:
+                    if (!hasFile) {
+                        App.showToast("文件不存在！", false);
+                    } else {
+                        MyMenu.create(activity())
+                                .width(ScreenUtils.px2dp(activity(), ScreenUtils.getScreenWidth
+                                        (activity())))
+                                .item("删除", (menu, item) -> {
+                                    FileUtils.deleteFile(message.extra(Message.KEY_FILE_PATH));
+                                    EventBus.getDefault().post(EBMessage.updateMsg(message, msgPosition));
+                                    App.showToast("文件已删除！", false);
+                                    finishActivity();
+                                })
+                                .item("分享文件", (menu, item) -> {
+                                    FileUtils.shareFile(activity(), message.extra(Message.KEY_FILE_PATH));
+                                })
+                                .item("复制文件路径", (menu, item) -> {
+                                    DeviceUtils.copyText(message.extra(Message.KEY_FILE_PATH));
+                                })
+                                .gravity(Gravity.BOTTOM)
+                                .display();
+                    }
+                    break;
+            }
+
         });
     }
 
@@ -159,7 +202,7 @@ public class ShowFileFragment extends BaseFragment<ShowFilePresenter> implements
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main_fragment, menu);
+//        inflater.inflate(R.menu.menu_main_fragment, menu);
     }
 
     // 菜单点击事件

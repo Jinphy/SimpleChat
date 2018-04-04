@@ -14,6 +14,11 @@ import com.example.jinphy.simplechat.utils.Preconditions;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by jinphy on 2017/8/10.
@@ -53,7 +58,7 @@ public class SelfPresenter implements SelfContract.Presenter {
                     userRepository.updateUser(response.getData());
                     view.whenLogout();
                     // 关闭推送服务
-                    PushService.start(context,PushService.FLAG_CLOSE);
+                    PushService.start(context, PushService.FLAG_CLOSE);
                 })
                 .doOnDataNo(noData -> {
                     if (Response.NO_ACCESS_TOKEN.equals(noData.getCode())) {

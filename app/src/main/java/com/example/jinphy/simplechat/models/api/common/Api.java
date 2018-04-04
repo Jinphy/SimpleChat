@@ -199,7 +199,7 @@ public abstract class Api {
      * <p>
      * 例如：
      * Api.<List<GSUser>>common(context)
-     * .dataType(Api.Data.MODEL_LIST,GSUser.class)
+     * .dataType(Api.MyData.MODEL_LIST,GSUser.class)
      * .path(Api.Path.login)
      * .onResponseYes(response -> {
      * List<GSUser> data = response.getBitmapFromActivity();
@@ -220,7 +220,7 @@ public abstract class Api {
         /**
          * DESC: 当data 类型为具体的某个model类型，例如：GSUser类时，使用该枚举
          * <p>
-         * 函数调用：dataType(Api.Data.MODEL, GSUser.class);
+         * 函数调用：dataType(Api.MyData.MODEL, GSUser.class);
          *
          * @see ApiInterface#dataType(Data, Class[])
          * @see BaseApi#dataType(Data, Class[])
@@ -231,7 +231,7 @@ public abstract class Api {
         /**
          * DESC: 当data类型为Map<String,String>时，使用该枚举
          * <p>
-         * 函数调用：dataType(Api.Data.MAP)
+         * 函数调用：dataType(Api.MyData.MAP)
          *
          * @see ApiInterface#dataType(Data, Class[])
          * @see BaseApi#dataType(Data, Class[])
@@ -242,7 +242,7 @@ public abstract class Api {
         /**
          * DESC: 当data类型为某个model数组类型，例如：GSUser[]时，使用该枚举
          * <p>
-         * 函数调用：dataType(Api.Data.MODEL_ARRAY, GSUser[].class)
+         * 函数调用：dataType(Api.MyData.MODEL_ARRAY, GSUser[].class)
          *
          * @see ApiInterface#dataType(Data, Class[])
          * @see BaseApi#dataType(Data, Class[])
@@ -253,7 +253,7 @@ public abstract class Api {
         /**
          * DESC: 当data类型为Map<String,String>[] 时，使用该枚举
          * <p>
-         * 函数调用：dataType(Api.Data.MAP_ARRAY)
+         * 函数调用：dataType(Api.MyData.MAP_ARRAY)
          *
          * @see ApiInterface#dataType(Data, Class[])
          * @see BaseApi#dataType(Data, Class[])
@@ -264,7 +264,7 @@ public abstract class Api {
         /**
          * DESC: 当data类型为某个model的list列表，例如List<GSUser>时，使用该枚举
          * <p>
-         * 函数调用：dataType(Api.Data.MODEL_LIST, GSUser.class)
+         * 函数调用：dataType(Api.MyData.MODEL_LIST, GSUser.class)
          *
          * @see ApiInterface#dataType(Data, Class[])
          * @see BaseApi#dataType(Data, Class[])
@@ -275,7 +275,7 @@ public abstract class Api {
         /**
          * DESC: 当data类型为List<Map<String,String>>时，使用该枚举
          * <p>
-         * 函数调用：dataType(Api.Data.MAP_LIST)
+         * 函数调用：dataType(Api.MyData.MAP_LIST)
          *
          * @see ApiInterface#dataType(Data, Class[])
          * @see BaseApi#dataType(Data, Class[])

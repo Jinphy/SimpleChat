@@ -19,50 +19,11 @@ public interface ChatContract {
 
     interface View extends BaseView<Presenter> {
 
-        void showBar(android.view.View view);
-
-        void hideBar(android.view.View view);
-
-        void animateBar(android.view.View view, float fromValue, float toValue, boolean showBar);
-
-        void fabAction(android.view.View view);
-
-        void showSendBtn();
-
-        void showMoreBtn();
-
-        void showVoiceBtn();
-
-        void showKeyboardBtn();
-
-        void showTextInput();
-
-        void showVoiceInput();
-
-        void showEmotionLayout();
-
-        void hideEmotionLayout();
-
-        void showMoreLayout();
-
-        void hideMoreLayout();
-
-
-        void setStatusBarColor(float factor);
-
-        void hideExtraBottomLayout();
-
-        void moveHorizontal(float factor);
-
-        void animateHorizontal(float fromFactor, float toFactor, boolean exit);
-
         void updateView();
 
         void whenSendStart(Message message);
 
         void whenSendFinal(EBSendMsg msg);
-
-        boolean isFriend();
 
         void cacheMsg(Message message);
 
@@ -81,6 +42,8 @@ public interface ChatContract {
 
         String getOwner();
 
+        int getMemberCount(String groupNo);
+
         void sendTextMsg(Message message);
 
         void sendFileMsg(Message message);
@@ -98,6 +61,8 @@ public interface ChatContract {
         void downloadVoice(Message message);
 
         Message getMessage(long msgId);
+
+        void removeMsg(Message message);
     }
 }
 

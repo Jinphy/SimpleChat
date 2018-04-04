@@ -6,7 +6,7 @@ import com.example.jinphy.simplechat.broadcasts.AppBroadcastReceiver;
 import com.example.jinphy.simplechat.models.file_task.FileTaskRepository;
 import com.example.jinphy.simplechat.models.message.Message;
 import com.example.jinphy.simplechat.models.message.MessageRepository;
-import com.example.jinphy.simplechat.modules.chat.FileListener;
+import com.example.jinphy.simplechat.modules.chat.models.FileListener;
 import com.example.jinphy.simplechat.services.common_service.aidl.BinderFactory;
 import com.example.jinphy.simplechat.services.common_service.aidl.service.DownloadFileBinder;
 import com.example.jinphy.simplechat.services.common_service.aidl.service.IDownloadFileBinder;

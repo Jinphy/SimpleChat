@@ -163,7 +163,7 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
         }
         signatureItem.contentHint(friend.getSignature());
         if (!TextUtils.isEmpty(friend.getDate())) {
-            dateItem.contentHint(StringUtils.formatDate(Long.valueOf(friend.getDate())));
+            dateItem.contentHint(StringUtils.formatDegree(friend.getDate()));
         }
         sexItem.contentHint(friend.getSex());
         addressItem.contentHint(friend.getAddress());
@@ -253,7 +253,7 @@ public class ModifyFriendInfoFragment extends BaseFragment<ModifyFriendInfoPrese
             }
             friend.setStatus(Friend.status_ok);
             statusItem.contentHint("正常");
-            dateItem.contentHint(StringUtils.formatDate(Long.valueOf(friend.getDate())));
+            dateItem.contentHint(StringUtils.formatTime(friend.getDate()));
             btnDelete.setVisibility(View.VISIBLE);
             btnBlackList.setVisibility(View.VISIBLE);
             btnSendMsg.setVisibility(View.VISIBLE);

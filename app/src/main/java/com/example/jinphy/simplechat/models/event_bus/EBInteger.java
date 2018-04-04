@@ -7,7 +7,11 @@ package com.example.jinphy.simplechat.models.event_bus;
 
 public class EBInteger extends EBBase<Integer> {
     public EBInteger(int x) {
-        super(true, x);
+        super(false, x);
+    }
+
+    public EBInteger(boolean ok, int x) {
+        super(ok, x);
     }
 
     public synchronized void add() {

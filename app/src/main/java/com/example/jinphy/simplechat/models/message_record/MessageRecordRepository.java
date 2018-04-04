@@ -1,11 +1,13 @@
 package com.example.jinphy.simplechat.models.message_record;
 
+import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.application.App;
 import com.example.jinphy.simplechat.models.friend.Friend;
 import com.example.jinphy.simplechat.models.friend.FriendRepository;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.models.group.GroupRepository;
 import com.example.jinphy.simplechat.models.message.Message;
+import com.example.jinphy.simplechat.models.message.MessageRepository;
 import com.example.jinphy.simplechat.utils.ObjectHelper;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
@@ -130,7 +132,7 @@ public class MessageRecordRepository implements MessageRecordDataSource {
     public void update(Message msg, boolean resetNewMsgCount) {
                 MessageRecord record;
         String with = msg.getWith();
-        Friend friend = null;
+        Friend friend;
         Group group = null;
         if ((friend = FriendRepository.getInstance().get(msg.getOwner(), with)) != null) {
             record = get(msg.getOwner(), friend);
@@ -164,5 +166,28 @@ public class MessageRecordRepository implements MessageRecordDataSource {
         if (record != null) {
             messageRecordBox.put(record);
         }
+    }
+
+    @Override
+    public void update(String owner, String with) {
+        if (owner == null || with == null) {
+            return;
+        }
+        MessageRecord record;
+        if (with.contains("G")) {
+            record = get(owner, GroupRepository.getInstance().get(with, owner));
+        } else {
+            record = get(owner, FriendRepository.getInstance().get(owner, with));
+        }
+        if (record == null) {
+            return;
+        }
+        Message lastMsg = MessageRepository.getInstance().getLast(owner, with);
+        if (lastMsg != null) {
+            record.setLastMsg(lastMsg);
+        }
+        record.setNewMsgCount((int) MessageRepository.getInstance().countNew(with,owner));
+
+        messageRecordBox.put(record);
     }
 }

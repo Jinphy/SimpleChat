@@ -1,9 +1,7 @@
 package com.example.jinphy.simplechat.modules.main.friends;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,25 +10,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.apkfuns.logutils.LogUtils;
 import com.example.jinphy.simplechat.R;
 import com.example.jinphy.simplechat.base.BaseFragment;
 import com.example.jinphy.simplechat.custom_libs.my_adapter.MyAdapter;
-import com.example.jinphy.simplechat.models.event_bus.EBFriend;
-import com.example.jinphy.simplechat.models.event_bus.EBUpdateFriend;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.friend.Friend;
-import com.example.jinphy.simplechat.models.message_record.MessageRecord;
 import com.example.jinphy.simplechat.modules.main.MainFragment;
 import com.example.jinphy.simplechat.modules.modify_friend_info.ModifyFriendInfoActivity;
-import com.example.jinphy.simplechat.modules.system_msg.SystemMsgActivity;
 import com.example.jinphy.simplechat.utils.ImageUtil;
 import com.example.jinphy.simplechat.utils.StringUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,11 +33,8 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     RecyclerView recyclerView;
     View emptyView;
 
-    FloatingActionButton fab;
     private LinearLayoutManager linearLayoutManager;
     private MyAdapter<Friend> adapter;
-
-    private View root = null;
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -64,43 +52,6 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
     }
 
     @Override
-    public void initFab(Activity activity) {
-        this.fab = activity.findViewById(R.id.fab);
-        this.fab.setTranslationY(0);
-        this.fab.setVisibility(View.GONE);
-        this.fab.setImageResource(R.drawable.ic_arrow_up_24dp);
-        this.fab.setOnClickListener(this::fabAction);
-    }
-
-    @Override
-    public void fabAction(View view) {
-        ((MainFragment) getParentFragment()).showBar(recyclerView);
-        recyclerView.smoothScrollToPosition(0);
-    }
-
-
-
-    private RecyclerView.OnScrollListener getOnScrollListener() {
-        return new RecyclerView.OnScrollListener() {
-            int total = 0;
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                //dy>0时，向上滑动，反之向下
-                total+=dy;
-                if (total > 300) {
-                    total=0;
-                    ((MainFragment) getParentFragment()).hideBar(recyclerView);
-                }
-                if (total < -300) {
-                    total=0;
-                    ((MainFragment) getParentFragment()).showBar(recyclerView);
-                }
-            }
-        };
-    }
-
-    @Override
     protected int getResourceId() {
         return R.layout.fragment_friends;
     }
@@ -115,14 +66,6 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
         emptyView = view.findViewById(R.id.empty_view);
     }
 
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (root == null) {
-            root = super.onCreateView(inflater, container, savedInstanceState);
-        }
-        return root;
-    }
 
     @Override
     protected void setupViews() {
@@ -151,8 +94,7 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
                     holder.textView[2].setText(item.getAddress());
                     // 设置时间
                     if (!TextUtils.isEmpty(item.getDate())) {
-                        holder.textView[3].setText(StringUtils.formatDate(Long.valueOf(item
-                                .getDate())));
+                        holder.textView[3].setText(StringUtils.formatTime(item.getDate()));
                     }
 
                     // 设置需要监听点击事件的view
@@ -180,7 +122,6 @@ public class FriendsFragment extends BaseFragment<FriendsPresenter> implements F
 
     @Override
     protected void registerEvent() {
-        recyclerView.addOnScrollListener(getOnScrollListener());
     }
 
 

@@ -20,6 +20,8 @@ public class AudioRecorder {
 
     private String filePath;
 
+    private static boolean isRecording;
+
     private static class InstanceHolder {
         static final AudioRecorder DEFAULT = new AudioRecorder();
     }
@@ -45,7 +47,6 @@ public class AudioRecorder {
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         recorder.setOutputFile(initFilePath());
-
         try {
             recorder.prepare();
         } catch (IOException e) {
@@ -79,6 +80,7 @@ public class AudioRecorder {
      * Created by jinphy, on 2018/3/26, at 14:57
      */
     public synchronized void start() {
+        isRecording = true;
         reset();
         recorder.start();
     }
@@ -88,6 +90,7 @@ public class AudioRecorder {
      * Created by jinphy, on 2018/3/26, at 14:58
      */
     public synchronized void stop() {
+        isRecording = false;
         try {
             recorder.stop();
         } catch (Exception e) {
@@ -100,6 +103,7 @@ public class AudioRecorder {
      * Created by jinphy, on 2018/3/26, at 14:58
      */
     public synchronized void cancel() {
+        isRecording = false;
         File file = new File(filePath);
         file.delete();
         this.stop();
@@ -123,4 +127,8 @@ public class AudioRecorder {
         return filePath;
     }
 
+
+    public static boolean isRecording() {
+        return isRecording;
+    }
 }
