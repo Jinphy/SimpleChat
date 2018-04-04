@@ -62,12 +62,14 @@ public class AudioRecordButton extends android.support.v7.widget.AppCompatTextVi
     private float upY;
     private long startTime;
     private long endTime;
+    private long downTime;
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downY = event.getY();
+                downTime = System.currentTimeMillis();
                 initDialog();
                 DeviceUtils.stopRing();
                 AudioPlayer.getInstance().stop();
@@ -88,7 +90,7 @@ public class AudioRecordButton extends android.support.v7.widget.AppCompatTextVi
                     cancelRecord();
                     return true;
                 }
-                if (endTime - startTime < 1000) {
+                if (endTime - downTime < 1000) {
                     // 时间小于 1 秒，取消录音
                     App.showToast("录音时间过短！", false);
                     cancelRecord();
@@ -143,6 +145,10 @@ public class AudioRecordButton extends android.support.v7.widget.AppCompatTextVi
     private void startRecord() {
         long period = 50;
         synchronized (recorder) {
+            if (dialogHolder == null) {
+                // 在录音未开始之前，由于按住时间过短而取消了
+                return;
+            }
             TextView timeView = dialogHolder.view.findViewById(R.id.time_view);
             // 从一开始数1200 次， 首次延时50 毫秒， 以后每个50 毫秒数一次。1200次刚好一分钟，录音时长限制为一分钟
             Observable.intervalRange(1, 1200, period, period, TimeUnit.MILLISECONDS)
@@ -195,6 +201,7 @@ public class AudioRecordButton extends android.support.v7.widget.AppCompatTextVi
         synchronized (recorder) {
             recorder.cancel();
             dialogHolder.dialog.dismiss();
+            dialogHolder = null;
             if (disposable != null) {
                 disposable.dispose();
                 disposable = null;

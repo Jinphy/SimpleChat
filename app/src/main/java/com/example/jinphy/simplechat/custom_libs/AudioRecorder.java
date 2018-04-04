@@ -103,9 +103,14 @@ public class AudioRecorder {
      * Created by jinphy, on 2018/3/26, at 14:58
      */
     public synchronized void cancel() {
+        if (!isRecording) {
+            return;
+        }
         isRecording = false;
         File file = new File(filePath);
-        file.delete();
+        if (file.exists()) {
+            file.delete();
+        }
         this.stop();
     }
 

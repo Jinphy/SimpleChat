@@ -187,6 +187,7 @@ public class ShowFileFragment extends BaseFragment<ShowFilePresenter> implements
                 App.showToast("文件下载成功！", false);
                 progressBar.setVisibility(View.GONE);
                 btnDownload.setVisibility(View.GONE);
+                message.extra(Message.KEY_FILE_STATUS,Message.FILE_STATUS_DOWNLOADED);
                 break;
             default:
                 break;
