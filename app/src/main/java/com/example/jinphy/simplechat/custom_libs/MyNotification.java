@@ -85,7 +85,7 @@ public class MyNotification {
                     .setContentTitle(title)
                     .setContentText(content)
                     .setWhen(System.currentTimeMillis())
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(R.drawable.ic_launcher)
                     .setGroup("简聊")
                     .setNumber(msgCount)
                     .setContentIntent(createClickIntent(with, withCount))
