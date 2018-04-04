@@ -54,9 +54,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
 /**
@@ -222,6 +220,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                                 dialog.dismiss();
                             })
                             .show();
+                    break;
                 }
                 case 1:{
                     /**
@@ -255,6 +254,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                                 dialog.dismiss();
                             })
                             .show();
+                    break;
                 }
                 case 2:{
                     /**
@@ -262,6 +262,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                      * Created by jinphy, on 2018/3/31, at 14:18
                      */
                     CreateGroupActivity.start(activity());
+                    break;
                 }
                 case 3:{
                     /**
@@ -271,6 +272,7 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
                     QRCode.scan(activity(),content -> {
                         EventBus.getDefault().post(new EBQRCodeContent(content));
                     });
+                    break;
                 }
                 default:
                     break;
