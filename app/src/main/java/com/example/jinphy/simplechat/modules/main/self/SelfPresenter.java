@@ -61,6 +61,10 @@ public class SelfPresenter implements SelfContract.Presenter {
                     PushService.start(context, PushService.FLAG_CLOSE);
                 })
                 .doOnDataNo(noData -> {
+                    if (noData == null) {
+                        App.showToast("网络异常，请检查网络设置！",false);
+                        return;
+                    }
                     if (Response.NO_ACCESS_TOKEN.equals(noData.getCode())) {
                         UserRepository.getInstance().logoutLocal();
                     } else {

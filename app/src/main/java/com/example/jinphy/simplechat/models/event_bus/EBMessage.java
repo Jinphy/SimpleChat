@@ -13,6 +13,7 @@ public class EBMessage extends EBBase<Message> {
     public static final int what_downloadVoice = 2;
     public static final int what_downloadVoiceResult = 3;
     public static final int what_reloadMsg = 4;
+    public static final int what_update_group = 5;
 
 
 
@@ -44,6 +45,11 @@ public class EBMessage extends EBBase<Message> {
         EBMessage result = new EBMessage(null, what_downloadVoiceResult);
         result.voiceStatus = voiceStatus;
         result.msgId = msgId;
+        return result;
+    }
+
+    public static EBMessage updateGroup() {
+        EBMessage result = new EBMessage(null, what_update_group);
         return result;
     }
 

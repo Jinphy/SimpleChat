@@ -127,7 +127,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             activity().setTitle(myData.withGroup.getName()+"("+presenter.getMemberCount(myData.with)+")");
         }
         myView.recyclerView.setAdapter(myData.adapter);
-        myView.bottomBar.bottomExtraView.moreMenu.setAdapter(myData.bottomMenuAdpater);
+        myView.bottomBar.bottomExtraView.moreMenu.setAdapter(myData.bottomMenuAdapter);
 
         Observable.just(myData.with)
                 .subscribeOn(Schedulers.io())
@@ -202,6 +202,9 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         myView.bottomBar.btnMore.setOnClickListener(v -> myView.showMoreLayout());
 
         myView.bottomBar.btnSend.setOnClickListener(v -> {
+            if (!checkIfCanSend()) {
+                return;
+            }
             EditText inputText = myView.bottomBar.textInput;
             String content = inputText.getText().toString();
             inputText.setText("");
@@ -213,6 +216,9 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
         myView.bottomBar.btnDown.setOnClickListener(v -> myView.hideExtraBottomLayout());
 
         myView.bottomBar.voiceInput.onRecordFinished((filePath, duration) -> {
+            if (!checkIfCanSend()) {
+                return;
+            }
             // 发送语音消息
             Message message = Message.makeVoiceMsg(
                     myData.owner,
@@ -255,10 +261,13 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
             }
         });
 
-        myData.bottomMenuAdpater.onClick((v, item, holder, type, position) -> {
+        myData.bottomMenuAdapter.onClick((v, item, holder, type, position) -> {
+            if (!checkIfCanSend()) {
+                return;
+            }
             switch (item.icon) {
                 case R.drawable.ic_photo_24dp:
-                    // 图片
+                    // 发送图片
                     PhotoPicker.builder()
                             .setPhotoCount(9)
                             .setShowCamera(true)
@@ -268,7 +277,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
 
                     break;
                 case R.drawable.ic_folder_2_24dp:
-                    // 文件
+                    // 发送文件
                     FileSelector.from(activity())
                             .onSelect(this::onSelectFilesResult)
                             .make();
@@ -328,6 +337,9 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                         DeviceUtils.copyText(item.getContent());
                     })
                     .item("重新发送", (menu, menuItem) -> {
+                        if (!checkIfCanSend()) {
+                            return;
+                        }
                         myData.adapter.remove(item);
                         item.setStatus(Message.STATUS_SENDING);
                         item.setCreateTime(System.currentTimeMillis() + "");
@@ -406,28 +418,39 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
      * Created by jinphy, on 2018/4/1, at 21:24
      */
     private void sendTextMsg(Message msg) {
-        if (myData.isChatWithFriend) {
-            switch (myData.withFriend.getStatus()) {
-                case Friend.status_black_listed:
-                    App.showToast("您已被对方拉入黑名单，不能发送消息！", false);
-                    return;
-                case Friend.status_deleted:
-                    App.showToast("对方不是好友，不能发送消息！", false);
-                    return;
-            }
-        } else {
-            if (!myData.withGroup.isMyGroup()) {
-                App.showToast("您非本群成员，不能发送信息！", false);
-                return;
-            }
-            if (!myData.memberOfMe.isAllowChat()) {
-                App.showToast("您已被群主禁言，不能发送信息！", false);
-                return;
-            }
-        }
         presenter.sendTextMsg(msg);
     }
 
+    /**
+     * DESC: 判断是否能够发送消息
+     * Created by jinphy, on 2018/5/8, at 9:35
+     */
+    private boolean checkIfCanSend() {
+        if (myData.isChatWithFriend) {
+            //与好友聊天
+            switch (myData.withFriend.getStatus()) {
+                case Friend.status_black_listed:
+                    App.showToast("您已被对方拉入黑名单，不能发送消息！", false);
+                    return false;
+                case Friend.status_deleted:
+                    App.showToast("对方不是好友，不能发送消息！", false);
+                    return false;
+            }
+            return true;
+        } else {
+            // 群聊
+            if (!myData.withGroup.isMyGroup()) {
+                App.showToast("您非本群成员，不能发送信息！", false);
+                return false;
+            }
+
+            if (!myData.memberOfMe.isAllowChat()) {
+                App.showToast("您已被群主禁言，不可以发送消息！", false);
+                return false;
+            }
+            return true;
+        }
+    }
 
     //----------------------------------------------
 
@@ -596,6 +619,12 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
                 int scrollY1 = myView.recyclerView.getScrollY();
                 myData.adapter.update(newMsg);
                 myView.recyclerView.scrollBy(0, scrollY1);
+                break;
+            case EBMessage.what_update_group:
+                myData.withGroup = presenter.getGroup(myData.with);
+                myData.adapter.setGroup(myData.withGroup);
+                myData.adapter.setMembers(presenter.loadMembers(myData.with));
+                updateRecyclerView();
             default:
                 break;
         }
@@ -611,7 +640,7 @@ public class ChatFragment extends BaseFragment<ChatPresenter> implements ChatCon
     }
 
     /**
-     * DESC: 跟新recyclerView界面
+     * DESC: 更新recyclerView界面
      * Created by jinphy, on 2018/4/2, at 8:30
      */
     private void updateRecyclerView() {

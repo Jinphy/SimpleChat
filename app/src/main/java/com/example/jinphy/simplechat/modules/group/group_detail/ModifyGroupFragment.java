@@ -22,6 +22,7 @@ import com.example.jinphy.simplechat.custom_libs.SChain;
 import com.example.jinphy.simplechat.custom_libs.SChain.Consumer;
 import com.example.jinphy.simplechat.custom_view.MenuItemView;
 import com.example.jinphy.simplechat.models.event_bus.EBBitmap;
+import com.example.jinphy.simplechat.models.event_bus.EBMessage;
 import com.example.jinphy.simplechat.models.event_bus.EBUpdateView;
 import com.example.jinphy.simplechat.models.group.Group;
 import com.example.jinphy.simplechat.modules.chat.ChatActivity;
@@ -556,6 +557,7 @@ public class ModifyGroupFragment extends BaseFragment<ModifyGroupPresenter> impl
         group.setShowMemberName(showMemberName);
         presenter.updateGroup(group);
         EventBus.getDefault().post(new EBUpdateView());
+        EventBus.getDefault().post(EBMessage.updateGroup());
     }
 
     @Override

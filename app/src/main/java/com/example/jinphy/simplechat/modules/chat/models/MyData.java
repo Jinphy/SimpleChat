@@ -32,7 +32,7 @@ public class MyData {
 
     public ChatAdapter adapter;
 
-    public MyAdapter<BottomExtraView.MenuItem> bottomMenuAdpater;
+    public MyAdapter<BottomExtraView.MenuItem> bottomMenuAdapter;
 
     public final boolean isChatWithFriend;
 
@@ -66,7 +66,7 @@ public class MyData {
         }
         adapter = new ChatAdapter(presenter.getUserAvatar(), with);
 
-        bottomMenuAdpater = MyAdapter.<BottomExtraView.MenuItem>newInstance()
+        bottomMenuAdapter = MyAdapter.<BottomExtraView.MenuItem>newInstance()
                 .onInflate(viewType -> R.layout.chat_bottom_menu_item)
                 .data(BottomExtraView.MenuItem.create())
                 .onCreateView(holder -> {
